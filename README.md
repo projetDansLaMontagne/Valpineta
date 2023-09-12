@@ -4,6 +4,7 @@ Projet tutoré de troisième année de BUT Informatique dont le est de créer un
 ## Ce projet est divisé en deux sous-dossiers :
 
 Documentation : regroupant toute la documentation utile à se projet 
+
 src : ce dossier regroupe tout le code de l'application 
 
 ## Nous avons ensuite plusieurs fichiers :
