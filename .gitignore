@@ -1,0 +1,10 @@
+# Folders
+.idea
+node_modules
+build
+
+
+# Files
+.gitignore
+package-lock.json
+*.DS_Store
