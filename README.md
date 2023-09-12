@@ -1,5 +1,5 @@
 # Valpineta
-Projet tutoré de troisième année de BUT Informatique dont le est de créer une application pouvant être utilisé sans connexion pour pouvoir visualiser des informations géographique. 
+Projet tutoré de troisième année de BUT Informatique dont le sujet est de créer une application pouvant être utilisé sans connexion pour pouvoir visualiser des informations géographique. 
 
 ## Ce projet est divisé en deux sous-dossiers :
 
