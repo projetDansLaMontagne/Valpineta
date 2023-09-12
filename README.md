@@ -13,11 +13,22 @@ Le [refuge de Pineta](https://www.valpineta.eu/fr/el-refugio/) et ses randonneur
 
 ## Ce projet est divisé en deux sous-dossiers :
 
-Documentation : regroupant toute la documentation utile à se projet 
+- Documentation :
+  - regroupe toute la documentation utile à se projet 
 
-src : ce dossier regroupe tout le code de l'application 
+- src :
+  - regroupe tout le code de l'application
+  
+- public :
+  - regroupe les fichiers statiques et les fichers accessibles par tous de l'application
+
+- tests :
+  - regroupe les tests unitaires et les tests d'intégration de l'application
 
 ## Nous avons ensuite plusieurs fichiers :
 
-README.md : ce fichier contient l’organisation des dossiers et sous dossiers du dépôt 
-.gitignore : ce fichier les fichiers ou dossiers qui ne seront pas à pousser sur github 
+- README.md :
+  - ce fichier contient l’organisation des dossiers et sous dossiers du dépôt 
+
+- .gitignore :
+  - ce fichier les fichiers ou dossiers qui ne seront pas à pousser sur github 

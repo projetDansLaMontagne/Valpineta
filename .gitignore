@@ -6,5 +6,8 @@ build
 
 # Files
 .gitignore
-package-lock.json
 *.DS_Store
+.commitignore
+
+commit_message.txt
+package-lock.json
