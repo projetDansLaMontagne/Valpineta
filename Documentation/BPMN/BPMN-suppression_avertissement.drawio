@@ -1,41 +1,16 @@
 <mxfile host="65bd71144e">
     <diagram id="Pdd0l_VAVQ6jBrc3Ih5y" name="Page-1">
-        <mxGraphModel dx="1233" dy="541" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1632" dy="866" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="48" value="Traitements arrière-plans" style="swimlane;startSize=20;horizontal=0;html=1;whiteSpace=wrap;" vertex="1" parent="1">
-                    <mxGeometry y="480" width="2450" height="330" as="geometry"/>
+                <mxCell id="48" value="Traitements arrière-plans" style="swimlane;startSize=20;horizontal=0;html=1;whiteSpace=wrap;" parent="1" vertex="1">
+                    <mxGeometry y="480" width="2450" height="190" as="geometry"/>
                 </mxCell>
-                <mxCell id="85" style="edgeStyle=none;html=1;" edge="1" parent="48" source="73" target="84">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="95" value="Synchro montante" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;bpmnShapeType=call;isLoopSub=1;" vertex="1" parent="48">
+                    <mxGeometry x="865" y="60" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="73" value="Sauvegarder les données en local" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=service;" vertex="1" parent="48">
-                    <mxGeometry x="870" y="84.22" width="105" height="71.25" as="geometry"/>
-                </mxCell>
-                <mxCell id="87" style="edgeStyle=none;html=1;" edge="1" parent="48" source="84" target="86">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="84" value="Tenter d'envoyer les données" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=service;" vertex="1" parent="48">
-                    <mxGeometry x="1017.5" y="86.09" width="90" height="69.38" as="geometry"/>
-                </mxCell>
-                <mxCell id="92" value="Echec" style="edgeStyle=none;html=1;" edge="1" parent="48" source="86" target="89">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="86" value="" style="points=[[0.25,0.25,0],[0.5,0,0],[0.75,0.25,0],[1,0.5,0],[0.75,0.75,0],[0.5,1,0],[0.25,0.75,0],[0,0.5,0]];shape=mxgraph.bpmn.gateway2;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=rhombusPerimeter;outlineConnect=0;outline=none;symbol=none;gwType=exclusive;" vertex="1" parent="48">
-                    <mxGeometry x="1157.5" y="94.84" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="94" style="edgeStyle=none;html=1;" edge="1" parent="48" source="89" target="84">
-                    <mxGeometry relative="1" as="geometry">
-                        <Array as="points">
-                            <mxPoint x="1062.5" y="220.78"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="89" value="Durée &lt;br&gt;selectionnée" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=standard;symbol=timer;" vertex="1" parent="48">
-                    <mxGeometry x="1157.5" y="195.78" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="50" value="Utilisateur" style="swimlane;startSize=20;horizontal=0;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+                <mxCell id="50" value="Utilisateur" style="swimlane;startSize=20;horizontal=0;html=1;whiteSpace=wrap;" parent="1" vertex="1">
                     <mxGeometry width="1560" height="480" as="geometry"/>
                 </mxCell>
                 <mxCell id="2" value="Signalement à &lt;br&gt;moins de 30m" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=standard;symbol=general;" parent="50" vertex="1">
@@ -44,7 +19,7 @@
                 <mxCell id="3" value="" style="points=[[0.25,0.25,0],[0.5,0,0],[0.75,0.25,0],[1,0.5,0],[0.75,0.75,0],[0.5,1,0],[0.25,0.75,0],[0,0.5,0]];shape=mxgraph.bpmn.gateway2;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=rhombusPerimeter;outlineConnect=0;outline=catching;symbol=multiple;" parent="50" vertex="1">
                     <mxGeometry x="360" y="120" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="81" style="edgeStyle=none;html=1;" edge="1" parent="50" source="5" target="24">
+                <mxCell id="81" style="edgeStyle=none;html=1;" parent="50" source="5" target="24" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="5" value="Signalement dépassé &lt;br&gt;de 30m" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=throwing;symbol=general;" parent="50" vertex="1">
@@ -101,7 +76,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="46" value="ferme le popup" style="edgeStyle=none;html=1;" edge="1" parent="50" source="36" target="24">
+                <mxCell id="46" value="ferme le popup" style="edgeStyle=none;html=1;" parent="50" source="36" target="24" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="36" value="" style="points=[[0.25,0.25,0],[0.5,0,0],[0.75,0.25,0],[1,0.5,0],[0.75,0.75,0],[0.5,1,0],[0.25,0.75,0],[0,0.5,0]];shape=mxgraph.bpmn.gateway2;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=rhombusPerimeter;outlineConnect=0;outline=none;symbol=none;gwType=exclusive;" parent="50" vertex="1">
@@ -113,23 +88,22 @@
                 <mxCell id="39" value="Prendre preuve visuelle" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=user;" parent="50" vertex="1">
                     <mxGeometry x="732.5" y="340" width="95" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="41" value="Signale avertissement absent" style="edgeStyle=none;html=1;" edge="1" parent="50" source="36" target="39">
+                <mxCell id="41" value="Signale avertissement absent" style="edgeStyle=none;html=1;" parent="50" source="36" target="39" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="47" style="edgeStyle=none;html=1;" edge="1" parent="50" source="44" target="24">
+                <mxCell id="47" style="edgeStyle=none;html=1;" parent="50" source="44" target="24" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="44" value="Valide le contre-signalement" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=user;" vertex="1" parent="50">
+                <mxCell id="44" value="Valide le contre-signalement" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=user;" parent="50" vertex="1">
                     <mxGeometry x="877.5" y="340" width="95" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="45" style="edgeStyle=none;html=1;" edge="1" parent="50" source="39" target="44">
+                <mxCell id="45" style="edgeStyle=none;html=1;" parent="50" source="39" target="44" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="80" style="edgeStyle=none;html=1;" edge="1" parent="1" source="44" target="73">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="90" value="Reussite" style="edgeStyle=none;html=1;" edge="1" parent="1" source="86" target="16">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="80" style="edgeStyle=none;html=1;" parent="1" source="44" target="95" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="922.9051149673633" y="564.22" as="targetPoint"/>
+                    </mxGeometry>
                 </mxCell>
             </root>
         </mxGraphModel>
