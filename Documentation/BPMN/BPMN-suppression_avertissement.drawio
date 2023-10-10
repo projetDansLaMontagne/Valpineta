@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="Pdd0l_VAVQ6jBrc3Ih5y" name="Page-1">
-        <mxGraphModel dx="1255" dy="666" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="816" dy="433" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -32,6 +32,13 @@
                 </mxCell>
                 <mxCell id="9" style="edgeStyle=none;html=1;" parent="1" source="2" target="8" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="99" style="edgeStyle=none;html=1;" edge="1" parent="1" source="11" target="24">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="738" y="235"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="11" value="Utilisateur interragit" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=throwing;symbol=message;" parent="1" vertex="1">
                     <mxGeometry x="500" y="210" width="50" height="50" as="geometry"/>
@@ -67,40 +74,25 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="46" value="ferme le popup" style="edgeStyle=none;html=1;" parent="1" source="36" target="24" edge="1">
+                <mxCell id="101" value="Valider" style="edgeStyle=none;html=1;" edge="1" parent="1" source="36" target="16">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="36" value="" style="points=[[0.25,0.25,0],[0.5,0,0],[0.75,0.25,0],[1,0.5,0],[0.75,0.75,0],[0.5,1,0],[0.25,0.75,0],[0,0.5,0]];shape=mxgraph.bpmn.gateway2;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=rhombusPerimeter;outlineConnect=0;outline=none;symbol=none;gwType=exclusive;" parent="1" vertex="1">
-                    <mxGeometry x="715" y="210" width="50" height="50" as="geometry"/>
+                    <mxGeometry x="800" y="210" width="50" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="37" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="11" target="36" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="39" value="Prendre preuve visuelle" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=user;" parent="1" vertex="1">
-                    <mxGeometry x="692.5" y="320" width="95" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="41" value="Signale avertissement absent" style="edgeStyle=none;html=1;" parent="1" source="36" target="39" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="47" style="edgeStyle=none;html=1;" parent="1" source="44" target="24" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="44" value="Valide le contre-signalement" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=user;" parent="1" vertex="1">
-                    <mxGeometry x="837.5" y="320" width="95" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="45" style="edgeStyle=none;html=1;" parent="1" source="39" target="44" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="80" style="edgeStyle=none;html=1;" parent="1" source="44" target="95" edge="1">
+                <mxCell id="41" value="Rejeter" style="edgeStyle=none;html=1;" parent="1" source="36" target="95" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="882.9051149673633" y="544.22" as="targetPoint"/>
+                        <mxPoint x="740" y="320" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="98" style="edgeStyle=none;html=1;" edge="1" parent="1" source="95" target="16">
+                <mxCell id="98" style="edgeStyle=none;html=1;" parent="1" source="95" target="16" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="95" value="Synchro montante" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;bpmnShapeType=call;isLoopSub=1;" parent="1" vertex="1">
-                    <mxGeometry x="1085" y="320" width="120" height="80" as="geometry"/>
+                    <mxGeometry x="1085" y="200" width="120" height="80" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
