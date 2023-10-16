@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="I5UC-tbMTaxYKo_7IEy1" name="Page-1">
-        <mxGraphModel dx="1596" dy="433" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1883" dy="619" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -37,17 +37,17 @@
                 </mxCell>
                 <mxCell id="46" style="edgeStyle=none;html=1;" parent="1" source="116" target="118" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="-70" y="480" as="sourcePoint"/>
+                        <mxPoint x="-70" y="500" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="48" style="edgeStyle=none;html=1;" parent="1" source="45" target="47" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="45" value="Fabriquer avis" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;bpmnShapeType=call;isLoopSub=1;" parent="1" vertex="1">
-                    <mxGeometry x="320" y="520" width="120" height="80" as="geometry"/>
+                    <mxGeometry x="320" y="540" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="47" value="" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=end;symbol=terminate;" parent="1" vertex="1">
-                    <mxGeometry x="485" y="455" width="50" height="50" as="geometry"/>
+                    <mxGeometry x="485" y="475" width="50" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="92" style="edgeStyle=none;html=1;" parent="1" source="55" target="79" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -143,29 +143,29 @@
                 <mxCell id="114" style="edgeStyle=none;html=1;" parent="1" source="113" target="95" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="113" value="Sortie d'itinéraire" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=catching;symbol=conditional;" parent="1" vertex="1">
+                <mxCell id="113" value="Sortie d'itinéraire&lt;br&gt;de 30m &lt;br&gt;(modifiable)&amp;nbsp;" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=catching;symbol=conditional;" parent="1" vertex="1">
                     <mxGeometry x="-135" y="355" width="50" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="116" value="Rando terminée" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=catching;symbol=conditional;" parent="1" vertex="1">
-                    <mxGeometry x="-135" y="455" width="50" height="50" as="geometry"/>
+                    <mxGeometry x="-135" y="475" width="50" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="118" value="Cliquer sur terminer la rando" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=user;" parent="1" vertex="1">
-                    <mxGeometry x="-30" y="440" width="80" height="80" as="geometry"/>
+                    <mxGeometry x="-30" y="460" width="80" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="121" style="edgeStyle=none;html=1;" parent="1" source="119" target="123" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="119" value="Proposer de laisser un avis" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;taskMarker=abstract;" parent="1" vertex="1">
-                    <mxGeometry x="90" y="442.5" width="90" height="75" as="geometry"/>
+                    <mxGeometry x="90" y="462.5" width="90" height="75" as="geometry"/>
                 </mxCell>
                 <mxCell id="120" style="edgeStyle=none;html=1;" parent="1" source="118" target="119" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="50" y="482.5" as="sourcePoint"/>
+                        <mxPoint x="50" y="502.5" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="122" value="NON" style="edgeStyle=none;html=1;" parent="1" source="123" target="47" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="182.3966849026574" y="682.3692744571345" as="targetPoint"/>
+                        <mxPoint x="182.3966849026574" y="702.3692744571345" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="125" value="OUI" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="123" target="45" edge="1">
@@ -174,7 +174,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="123" value="" style="points=[[0.25,0.25,0],[0.5,0,0],[0.75,0.25,0],[1,0.5,0],[0.75,0.75,0],[0.5,1,0],[0.25,0.75,0],[0,0.5,0]];shape=mxgraph.bpmn.gateway2;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=rhombusPerimeter;outlineConnect=0;outline=none;symbol=none;gwType=exclusive;" parent="1" vertex="1">
-                    <mxGeometry x="220" y="455" width="50" height="50" as="geometry"/>
+                    <mxGeometry x="220" y="475" width="50" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="135" style="edgeStyle=none;html=1;" parent="1" source="129" target="134" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -211,19 +211,19 @@
                 <mxCell id="139" value="Un avertissement &lt;br&gt;a été signalé" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=standard;symbol=message;" parent="1" vertex="1">
                     <mxGeometry x="-820" y="635" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="157" style="edgeStyle=none;html=1;" edge="1" parent="1" source="155" target="156">
+                <mxCell id="157" style="edgeStyle=none;html=1;" parent="1" source="155" target="156" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="155" value="Modérer avertissement" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;bpmnShapeType=call;isLoopSub=1;" parent="1" vertex="1">
                     <mxGeometry x="-710" y="620" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="156" value="" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=end;symbol=terminate;" vertex="1" parent="1">
+                <mxCell id="156" value="" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=end;symbol=terminate;" parent="1" vertex="1">
                     <mxGeometry x="-550" y="635" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="159" style="edgeStyle=none;html=1;" edge="1" parent="1" source="158" target="3">
+                <mxCell id="159" style="edgeStyle=none;html=1;" parent="1" source="158" target="3" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="158" value="Envie de faire&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;une randonnée" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=catching;symbol=conditional;" vertex="1" parent="1">
+                <mxCell id="158" value="Envie de faire&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;une randonnée" style="points=[[0.145,0.145,0],[0.5,0,0],[0.855,0.145,0],[1,0.5,0],[0.855,0.855,0],[0.5,1,0],[0.145,0.855,0],[0,0.5,0]];shape=mxgraph.bpmn.event;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;align=center;perimeter=ellipsePerimeter;outlineConnect=0;aspect=fixed;outline=catching;symbol=conditional;" parent="1" vertex="1">
                     <mxGeometry x="-820" y="145" width="50" height="50" as="geometry"/>
                 </mxCell>
             </root>
