@@ -13,10 +13,11 @@ import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navig
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { useColorScheme } from "react-native"
-import * as Screens from "app/screens"
+import * as screens from "../screens"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
+import { Footer } from "app/components/Footer"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -32,8 +33,10 @@ import { colors } from "app/theme"
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Welcome: undefined
-  // 🔥 Your screens go here
+
+  Accueil : undefined
+  Carte : undefined
+  Parametres : undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -54,11 +57,12 @@ const Stack = createNativeStackNavigator<AppStackParamList>()
 const AppStack = observer(function AppStack() {
   return (
     <Stack.Navigator
-      screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
+      screenOptions={{headerShown: false ,navigationBarColor: colors.fond, contentStyle: { backgroundColor: colors.fond }}}
     >
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
-      {/** 🔥 Your screens go here */}
-      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+          <Stack.Screen name="Accueil" component={screens.AccueilScreen} />
+          <Stack.Screen name="Carte" component={screens.CarteScreen} />
+          <Stack.Screen name="Parametres" component={screens.ParametresScreen} />
+          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREEN */}
     </Stack.Navigator>
   )
 })
@@ -78,6 +82,9 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <AppStack />
+      <Footer
+      navigation={navigationRef}
+      />
     </NavigationContainer>
   )
 })
