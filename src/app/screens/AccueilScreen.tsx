@@ -1,27 +1,23 @@
-import React from 'react'
-import {
-    Text,
-    Screen
-} from '../components'
-import { 
-    StyleSheet
- } from 'react-native'
 
+import React, { FC } from "react"
+import { observer } from "mobx-react-lite"
+import { ViewStyle } from "react-native"
+import { AppStackScreenProps } from "app/navigators"
+import { Screen, Text } from "app/components"
+import {spacing } from "app/theme"
 
-export function AccueilScreen() {
-    return (
-        <Screen 
-        style={styles.container}
-        >
-            <Text>Accueil</Text>
-        </Screen>
-    )
+interface AccueilScreenProps extends AppStackScreenProps<"Accueil"> {}
+
+export const AccueilScreen: FC<AccueilScreenProps> = observer(function AccueilScreen() {
+  return (
+    <Screen style={$root} preset="scroll">
+      <Text text="Accueil" size="xxl" />
+    </Screen>
+  )
+})
+
+const $root: ViewStyle = {
+  flex: 1,
+  padding : spacing.md,
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
-})
