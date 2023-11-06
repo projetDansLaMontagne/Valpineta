@@ -74,6 +74,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
+
   return (
     <NavigationContainer
       ref={navigationRef}
