@@ -1,26 +1,23 @@
-import React from 'react'
-import {
-    Text,
-    Screen
-} from '../components'
-import { 
-    StyleSheet
-} from 'react-native'
+import React, { FC } from "react"
+import { observer } from "mobx-react-lite"
+import { ViewStyle } from "react-native"
+import { AppStackScreenProps } from "app/navigators"
+import { Screen, Text } from "app/components"
+import { spacing } from "app/theme"
 
-export function CarteScreen() {
-    return (
-        <Screen 
-        style={styles.container}
-        >
-            <Text>Carte</Text>
-        </Screen>
-    )
-}
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
+interface CarteScreenProps extends AppStackScreenProps<"Carte"> {}
+
+export const CarteScreen: FC<CarteScreenProps> = observer(function CarteScreen() {
+
+  return (
+    <Screen style={$root} preset="scroll">
+      <Text text="Carte" size="xxl" />
+    </Screen>
+  )
 })
+
+const $root: ViewStyle = {
+  flex: 1,
+  padding : spacing.md,
+}

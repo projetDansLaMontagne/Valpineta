@@ -3,6 +3,7 @@ const fr = {
     ok: "OK !",
     cancel: "Annuler",
     back: "Retour",
+    accueil: "Accueil"
   },
   welcomeScreen: {
     postscript:
@@ -35,6 +36,11 @@ const fr = {
     difficulteParcours: "2",
     difficulteOrientation: "1",
   },
+  footer: {
+    accueil: "Accueil",
+    carte: "Carte",
+    parametres: "Parametres",
+  }
 }
 
 export default fr

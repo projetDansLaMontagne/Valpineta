@@ -1,28 +1,21 @@
-import React from 'react'
-import {
-    Text,
-    Screen,
-    Card
-} from '../components'
-import { 
-    StyleSheet
-} from 'react-native'
+import React, { FC } from "react"
+import { observer } from "mobx-react-lite"
+import { ViewStyle } from "react-native"
+import { AppStackScreenProps } from "app/navigators"
+import { Screen, Text } from "app/components"
+import { spacing } from "app/theme"
 
-export function ParametresScreen() {
-    return (
-        <Screen 
-        style={styles.container}
-        >
-            <Text>Paramètres</Text>
-            <Card></Card>
-        </Screen>
-    )
-}
+interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
+export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
+  return (
+    <Screen style={$root} preset="scroll">
+      <Text text="Parametres" size="xxl" />
+    </Screen>
+  )
 })
+
+const $root: ViewStyle = {
+  flex: 1,
+  padding : spacing.md,
+}

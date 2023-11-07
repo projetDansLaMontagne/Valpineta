@@ -1,44 +1,27 @@
-import React,{useEffect, useState} from 'react'
-import {
-    Text,
-    Screen,
-    Card,
-} from '../components'
-import { 
-    StyleSheet,
-    ScrollView,
-    View
- } from 'react-native'
-import DonnesApi from 'app/components/DonnesApi'
 
+import React, { FC } from "react"
+import { observer } from "mobx-react-lite"
+import { ViewStyle, ScrollView } from "react-native"
+import { AppStackScreenProps } from "app/navigators"
+import { Screen, Text } from "app/components"
+import {spacing } from "app/theme"
+import DonnesApi from "app/components/DonnesApi" 
 
+interface AccueilScreenProps extends AppStackScreenProps<"Accueil"> {}
 
-
-  
-
-export function AccueilScreen() {
-
-
-
-    return (
-        <Screen 
-        style={styles.container}
-        >
-            <ScrollView>
-
-            <Text>Accueil</Text>
+export const AccueilScreen: FC<AccueilScreenProps> = observer(function AccueilScreen() {
+  return (
+    <Screen style={$root} preset="scroll">
+        <Text text="Accueil" size="xxl" />
+        <ScrollView>
             <DonnesApi/>
-            </ScrollView>
-        </Screen>
-    )
+        </ScrollView>
+    </Screen>
+  )
+})
+
+const $root: ViewStyle = {
+  flex: 1,
+  padding : spacing.md,
 }
 
-const styles = StyleSheet.create({
-    container: {
-        // flex: 1,
-        // alignItems: 'center',
-        // justifyContent: 'center',
-        width: '90%',
-        alignSelf: 'center'
-    }
-})
