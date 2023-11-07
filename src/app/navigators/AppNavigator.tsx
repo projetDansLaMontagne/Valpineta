@@ -60,7 +60,7 @@ const AppStack = observer(function AppStack() {
       screenOptions={{headerShown: false ,navigationBarColor: colors.fond, contentStyle: { backgroundColor: colors.fond }}}
     >
           <Stack.Screen name="Accueil" component={screens.AccueilScreen} />
-          <Stack.Screen name="Carte" component={screens.CarteScreen} />
+          <Stack.Screen name="Carte" component={screens.WelcomeScreen} />
           <Stack.Screen name="Parametres" component={screens.ParametresScreen} />
           {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREEN */}
     </Stack.Navigator>

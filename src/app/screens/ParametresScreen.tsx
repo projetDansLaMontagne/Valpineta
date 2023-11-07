@@ -1,7 +1,8 @@
 import React from 'react'
 import {
     Text,
-    Screen
+    Screen,
+    Card
 } from '../components'
 import { 
     StyleSheet
@@ -13,6 +14,7 @@ export function ParametresScreen() {
         style={styles.container}
         >
             <Text>Paramètres</Text>
+            <Card></Card>
         </Screen>
     )
 }

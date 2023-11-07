@@ -12,7 +12,7 @@ import {
   View,
   ViewStyle,
 } from "react-native"
-import { colors } from "../theme"
+import { colors, spacing } from "../theme"
 import { ExtendedEdge, useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
 
 interface BaseScreenProps {
@@ -220,6 +220,7 @@ export function Screen(props: ScreenProps) {
 }
 
 const $containerStyle: ViewStyle = {
+  marginTop: isIos ? spacing.xxl : 0,
   flex: 1,
   height: "100%",
   width: "100%",

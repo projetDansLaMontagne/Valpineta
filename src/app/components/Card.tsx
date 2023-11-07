@@ -1,4 +1,5 @@
 import React, { ComponentType, Fragment, ReactElement } from "react"
+import { Image, ImageStyle} from "react-native"
 import {
   StyleProp,
   TextStyle,
@@ -13,6 +14,25 @@ import { Text, TextProps } from "./Text"
 type Presets = keyof typeof $containerPresets
 
 interface CardProps extends TouchableOpacityProps {
+
+  nomExcursions?: TextProps["text"]
+
+  zone?: TextProps["text"]
+
+  parcours?: TextProps["text"]
+
+  temps?: TextProps["text"]
+
+  distance?: TextProps["text"]
+
+  denivelePositif?: TextProps["text"]
+
+  difficulteParcours?: TextProps["text"]
+
+  difficulteOrientation?: TextProps["text"]
+
+  
+
   /**
    * One of the different types of text presets.
    */
@@ -123,6 +143,14 @@ interface CardProps extends TouchableOpacityProps {
  */
 export function Card(props: CardProps) {
   const {
+    nomExcursions,
+    zone,
+    parcours,
+    temps,
+    distance,
+    denivelePositif,
+    difficulteParcours,
+    difficulteOrientation,
     content,
     contentTx,
     contentTxOptions,
@@ -147,6 +175,17 @@ export function Card(props: CardProps) {
     FooterTextProps,
     ...WrapperProps
   } = props
+  
+  const favoriIcone = require("../../assets/icons/favori.png")
+  const zoneIcone = require("../../assets/icons/zone.png")
+  const parcoursIcone = require("../../assets/icons/parcours.png")
+  const tempsIcone = require("../../assets/icons/temps.png")
+  const distanceIcone = require("../../assets/icons/distance.png")
+  const denivelePositifIcone = require("../../assets/icons/denivelePositif.png")
+  const difficulteParcoursIcone = require("../../assets/icons/difficulteParcours.png")
+  const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png")
+
+  const imageRandonnee = require("../../assets/images/randonnee.png")
 
   const preset: Presets = $containerPresets[props.preset] ? props.preset : "default"
   const isPressable = !!WrapperProps.onPress
@@ -157,20 +196,17 @@ export function Card(props: CardProps) {
   const Wrapper: ComponentType<TouchableOpacityProps> = isPressable ? TouchableOpacity : View
   const HeaderContentWrapper = verticalAlignment === "force-footer-bottom" ? View : Fragment
 
-  const $containerStyle = [$containerPresets[preset], $containerStyleOverride]
+  const $containerStyle = [{marginBottom:10, marginTop:10},$containerPresets[preset], $containerStyleOverride]
   const $headingStyle = [
+    { maxWidth: "50%", marginEnd: spacing.xl, fontSize: 16},
     $headingPresets[preset],
     (isFooterPresent || isContentPresent) && { marginBottom: spacing.xxxs },
     $headingStyleOverride,
     HeadingTextProps?.style,
   ]
-  const $contentStyle = [
-    $contentPresets[preset],
-    isHeadingPresent && { marginTop: spacing.xxxs },
-    isFooterPresent && { marginBottom: spacing.xxxs },
-    $contentStyleOverride,
-    ContentTextProps?.style,
-  ]
+
+
+
   const $footerStyle = [
     $footerPresets[preset],
     (isHeadingPresent || isContentPresent) && { marginTop: spacing.xxxs },
@@ -178,6 +214,7 @@ export function Card(props: CardProps) {
     FooterTextProps?.style,
   ]
   const $alignmentWrapperStyle = [
+    
     $alignmentWrapper,
     { justifyContent: $alignmentWrapperFlexOptions[verticalAlignment] },
     LeftComponent && { marginStart: spacing.md },
@@ -195,48 +232,188 @@ export function Card(props: CardProps) {
 
       <View style={$alignmentWrapperStyle}>
         <HeaderContentWrapper>
-          {HeadingComponent ||
-            (isHeadingPresent && (
-              <Text
-                weight="bold"
-                text={heading}
-                tx={headingTx}
-                txOptions={headingTxOptions}
-                {...HeadingTextProps}
-                style={$headingStyle}
-              />
-            ))}
+          
+          <View style={$enteteStyle}>
+            <Image style={$imageRandoStyle} source={imageRandonnee} resizeMode="contain" />
+            <Text
+              weight="bold"
+              //tx={"carteComposant.titre"}
+              text={nomExcursions}
+              style={$headingStyle}
+            />
+            <Image style={$iconeStyle} source={favoriIcone} resizeMode="contain" />
+          </View>
 
-          {ContentComponent ||
-            (isContentPresent && (
-              <Text
-                weight="normal"
-                text={content}
-                tx={contentTx}
-                txOptions={contentTxOptions}
-                {...ContentTextProps}
-                style={$contentStyle}
-              />
-            ))}
+          <View style={$tableauInfos}>
+            <View style={$ligneSup}>
+              <View style={$groupeTexteIconeStyleLigneSup}>
+                <Image style={$iconeStyle} source={zoneIcone} resizeMode="contain" />
+                <Text
+                  //tx={"carteComposant.zone"}
+                  text={zone}
+                  style={$contentStyle}
+                />
+              </View>
+              <View style={$groupeTexteIconeStyleLigneSup}> 
+                <Image style={$iconeStyle} source={parcoursIcone} resizeMode="contain" />
+                <Text
+                  //tx={"carteComposant.parcours"}
+                  text={parcours}
+                  style={$contentStyle}
+                />
+              </View>
+              <View style={$groupeTexteIconeStyleLigneSup}>
+                <Image style={$iconeStyle} source={tempsIcone} resizeMode="contain" />
+                <Text
+                  //tx={"carteComposant.temps"}
+                  text={temps}
+                  style={$contentStyle}
+                />
+              </View>
+            </View>
+            <View style= {$ligneInf}>
+              <View style={$groupeTexteIconeStyleLigneInf}>
+                <Image style={$iconeStyle} source={distanceIcone} resizeMode="contain" />
+                <Text
+                  //tx={"carteComposant.distance"}
+                  text={distance + " km"}
+                  style={$contentStyle}
+                />
+              </View>
+              <View style={$groupeTexteIconeStyleLigneInf}>
+                <Image style={$iconeStyle} source={denivelePositifIcone} resizeMode="contain" />
+                <Text
+                  //tx={"carteComposant.denivelePositif"}
+                  text={denivelePositif + " m"}
+                  style={$contentStyle}
+                />
+              </View>
+              <View style={$groupeTexteIconeStyleLigneInf}>
+                <Image style={$iconeStyle} source={difficulteParcoursIcone} resizeMode="contain" />
+                <Text
+                  //tx={"carteComposant.difficulteParcours"}
+                  text={difficulteParcours}
+                  style={$contentStyle}
+                />
+              </View>
+              <View style={$groupeTexteIconeStyleLigneInf}>
+                <Image style={$iconeStyle} source={difficulteOrientationIcone} resizeMode="contain" />
+                <Text
+                  //tx={"carteComposant.difficulteOrientation"}
+                  text={difficulteOrientation}
+                  style={$contentStyle}
+                />
+              </View>
+            </View>  
+          </View>
+
+            
         </HeaderContentWrapper>
 
-        {FooterComponent ||
-          (isFooterPresent && (
-            <Text
-              weight="normal"
-              size="xs"
-              text={footer}
-              tx={footerTx}
-              txOptions={footerTxOptions}
-              {...FooterTextProps}
-              style={$footerStyle}
-            />
-          ))}
       </View>
 
       {RightComponent}
     </Wrapper>
   )
+}
+
+const $contentStyle: TextStyle = {
+  fontSize: 14, 
+  maxWidth: "100%", 
+  textAlign:"center"
+}
+
+const $tableauInfos: ViewStyle = {
+  flexDirection: "column",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingStart: spacing.xs,
+  paddingEnd: spacing.xs,
+  paddingBottom: spacing.xxs
+}
+
+
+const $ligneSup: ViewStyle = {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingBottom: spacing.xxs,
+  minWidth: "100%",
+  maxWidth: "100%",
+  marginBottom: spacing.xxs
+}
+
+const $ligneInf: ViewStyle = {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingStart: spacing.xs,
+  paddingEnd: spacing.xs,
+  paddingBottom: spacing.xxs,
+  minWidth: "100%",
+  
+}
+
+const $groupeTexteIconeStyleLigneSup: ViewStyle = {
+  minWidth: "30%", 
+  maxWidth: "30%",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingStart: spacing.xs,
+  paddingEnd: spacing.xs,
+  marginBottom: spacing.xxs,
+  
+}
+
+const $groupeTexteIconeStyleLigneInf: ViewStyle = {
+  minWidth: "20%", 
+  maxWidth: "24%",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+
+  //marginVertical: spacing.xs,
+  //paddingEnd: spacing.xs
+  
+}
+
+
+const $enteteStyle: ViewStyle = {
+  //wrappe les deux textes
+  flexDirection: "row", 
+  alignItems: "center", 
+  justifyContent: "space-between",
+  paddingStart: spacing.xs,
+  paddingEnd: spacing.xs,
+  marginBottom: spacing.xxs,
+}
+//Faire la même chose mais sous forme de grille
+const $imageRandoStyle: ImageStyle = {
+  width:65,
+  height:65,
+  //width: "25%", 
+  borderRadius:spacing.xs
+}
+
+const $listeInfosStyle: ViewStyle = {
+  //une grille de deux lignes et 3 colonnes
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingStart: spacing.xs,
+  paddingEnd: spacing.xs,
+  paddingBottom: spacing.xxs
+}
+
+const $iconeStyle: ImageStyle = {
+  width: spacing.lg,
+  height: spacing.lg,
+  marginEnd: spacing.xxs
 }
 
 const $containerBase: ViewStyle = {
@@ -251,6 +428,7 @@ const $containerBase: ViewStyle = {
   minHeight: 96,
   flexDirection: "row",
 }
+
 
 const $alignmentWrapper: ViewStyle = {
   flex: 1,
