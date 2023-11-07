@@ -41,7 +41,8 @@ export const Footer = observer(function Footer(props: FooterProps) {
                 <Text
                     style={ estAccueil ? {color: colors.text} : {color : colors.bouton}}
                     size="xs"
-                >Accueil</Text>
+                    tx="footer.accueil"
+                />
 
             </TouchableOpacity>
             <TouchableOpacity
@@ -55,7 +56,8 @@ export const Footer = observer(function Footer(props: FooterProps) {
                 <Text
                     style={ estCarte ? {color: colors.text} : {color : colors.bouton}}
                     size="xs"
-                >Carte</Text>
+                    tx="footer.carte"
+                    />
             </TouchableOpacity>
             <TouchableOpacity
                 onPress={() => navigation.navigate("Parametres")}
@@ -68,7 +70,8 @@ export const Footer = observer(function Footer(props: FooterProps) {
                 <Text
                     style={ estParametres ? {color: colors.text} : {color : colors.bouton}}
                     size="xs"
-                >Paramètres</Text>
+                    tx="footer.parametres"
+                    />
             </TouchableOpacity>
     </View>
   )
