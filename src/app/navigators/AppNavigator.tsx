@@ -19,6 +19,8 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { Footer } from "app/components"
 
+
+
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
  * as well as what properties (if any) they might take when navigating to them.
@@ -28,7 +30,7 @@ import { Footer } from "app/components"
  * rather than passing state through navigation params.
  *
  * For more information, see this documentation:
- *   https://reactnavigation.org/docs/params/
+ *   https://reactnavigation.org/docs/params/j
  *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
@@ -37,6 +39,7 @@ export type AppStackParamList = {
   Accueil : undefined
   Carte : undefined
   Parametres : undefined
+  DetailsExcursion: undefined
 }
 
 /**
@@ -61,6 +64,7 @@ const AppStack = observer(function AppStack() {
           <Stack.Screen name="Accueil" component={Screens.AccueilScreen} />
           <Stack.Screen name="Carte" component={Screens.CarteScreen} />
           <Stack.Screen name="Parametres" component={Screens.ParametresScreen} />
+          <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
           {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREEN */}
     </Stack.Navigator>
   )

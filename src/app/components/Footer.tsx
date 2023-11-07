@@ -29,7 +29,7 @@ export const Footer = observer(function Footer(props: FooterProps) {
   const estParametres = currentRoute === "Parametres"
 
   return (
-    <View style={[$container, estIos ? {paddingBottom: spacing.lg} : {paddingBottom: 0}]}>
+    <View style={[$container, estIos ? {marginBottom: spacing.sm} : {marginBottom: spacing.xxl}]}>
       <TouchableOpacity
                 onPress={() => navigation.navigate("Accueil")}
                 style={$iconEtTexte}
