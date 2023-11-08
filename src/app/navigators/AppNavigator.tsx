@@ -151,11 +151,9 @@ function StackNavigator() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName={"Welcome"}
     >
-      <Stack.Screen name="Footer" component={Screens.WelcomeScreen} />
-      <Stack.Screen name="Accueil" component={Screens.AccueilScreen} />
       <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
+      <Stack.Screen name="Accueil" component={Screens.AccueilScreen} />
     </Stack.Navigator>
   )
 }
