@@ -5,6 +5,7 @@ const palette = {
   vert : "#007C27",
   vertAttenue : "#009944",
   gris : "#D9D9D9",
+  grisClair : "#F9F9F9",
   blanc : "#FFFFFF",
   rouge : "#FF0000",
   jaune : "#FFEE00",

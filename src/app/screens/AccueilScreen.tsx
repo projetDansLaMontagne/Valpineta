@@ -12,9 +12,8 @@ interface AccueilScreenProps extends AppStackScreenProps<"Accueil"> {}
 export const AccueilScreen: FC<AccueilScreenProps> = observer(function AccueilScreen() {
   return (
     <Screen style={$root} preset="scroll">
-        <Text text="Accueil" size="xxl" />
         <ScrollView>
-            <DonnesApi/>
+              <DonnesApi/>
         </ScrollView>
     </Screen>
   )
