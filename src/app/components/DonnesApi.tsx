@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Card } from '../components'
-import { colors } from 'app/theme';
+import { colors, spacing } from 'app/theme';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Spacing } from 'app/theme';
 
 
 const DonnesExcursions = () => {
   const [excursionsData, setExcursionsData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const filtreIcone = require("../../assets/icons/filtre.png")
+
+  const handleFilterPress = () => {
+    // Faites ce que vous souhaitez lorsqu'on appuie sur l'icône de filtre
+    console.log('Filtrer les excursions');
+    // Autres actions à effectuer
+  };
 
   useEffect(() => {
     const loadExcursions = async () => {
@@ -58,31 +68,42 @@ const DonnesExcursions = () => {
   );
 
   return (
+    
     <View>
-      <TextInput
-        placeholder='Rechercher une excursion' 
-        style={styles.searchBox} 
-        autoCorrect={false} 
-        value={searchQuery}
-        onChangeText={text => setSearchQuery(text)}
-        placeholderTextColor={colors.palette.gris}
-      />
+        <View style={styles.searchBox}>
+        <TextInput
+          placeholder='Rechercher une excursion' 
+          autoCorrect={false} 
+          value={searchQuery}
+          onChangeText={text => setSearchQuery(text)}
+          placeholderTextColor={colors.palette.grisFonce}
+        />
+        <TouchableOpacity onPress={handleFilterPress} style={styles.zoneIcone}>
+          <Image style={styles.iconeFiltre} source={filtreIcone} resizeMode="contain" />
+        </TouchableOpacity>
+        </View>
 
+      <ScrollView>
       {filteredExcursions.length > 0 ? (
         <FlatList
           data={filteredExcursions}
           renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(item, index) => index.toString()
+          }
+          scrollEnabled={false}
         />
       ) : (
         <Text>Aucune excursion ne correspond à votre recherche.</Text>
       )}
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   searchBox: {
+    display:"flex",
+    flexDirection:"row",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderColor: "#ccc",
@@ -99,6 +120,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
-}});
+    
+},
+
+iconeFiltre:{
+  width: spacing.lg,
+  height: spacing.lg,
+},
+
+zoneIcone:{
+  marginLeft: "auto",
+}
+});
 
 export default DonnesExcursions;

@@ -1,6 +1,10 @@
-import React, { ComponentType, Fragment, ReactElement } from "react"
-import { Image, ImageStyle} from "react-native"
+import React, { ComponentType, Fragment, ReactElement, useState } from "react"
+import { Image, ImageStyle, StyleSheet} from "react-native"
 import styled from 'styled-components/native';
+import { Ionicons } from '@expo/vector-icons'; // Assurez-vous d'avoir importé les icônes correctement
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+
 
 import {
   StyleProp,
@@ -55,182 +59,206 @@ export function Card(props: CardProps) {
 
   const imageRandonnee = require("../../assets/images/randonnee.png")
 
+  const [coeurTouche, setcoeurTouche] = useState(false);
+
+
+  const excursionFavorite = () => {    
+    if (coeurTouche) {
+      setcoeurTouche(false);
+    } else {
+      setcoeurTouche(true);
+    }
+  }
+
+  const detailExcursion = () => {
+    console.log('Détail de l\'excursion');
+  }
+
+  const styles = StyleSheet.create({
+    carteGlobale: {
+      padding: 5,
+      margin: 10,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowOpacity: 0.27,
+      shadowRadius: 4.65,
+      elevation: 6,
+      borderRadius: 10,
+      backgroundColor: colors.palette.blanc,
+    },
+    heading: {
+      maxWidth: "50%",
+      marginEnd: spacing.xl,
+      fontSize: 16,
+    },
+    content: {
+      fontSize: 14,
+      maxWidth: "100%",
+      textAlign: "center",
+    },
+    tableauInfos: {
+      flexDirection: "column",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingStart: spacing.xs,
+      paddingEnd: spacing.xs,
+      paddingBottom: spacing.xxs,
+    },
+    ligne: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      minWidth: "100%",
+    },
+    ligneSup: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingBottom: spacing.xxs,
+      minWidth: "100%",
+      maxWidth: "100%",
+      marginBottom: spacing.xxs
+    },
+    ligneInf: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingStart: spacing.xs,
+      paddingEnd: spacing.xs,
+      paddingBottom: spacing.xxs,
+      minWidth: "100%",
+    },
+    groupeTexteIconeLigneSup: {
+      minWidth: "30%",
+      maxWidth: "30%",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingStart: spacing.xs,
+      paddingEnd: spacing.xs,
+      marginBottom: spacing.xxs,
+    },
+    groupeTexteIconeLigneInf: {
+      minWidth: "20%",
+      maxWidth: "24%",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    entete: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingStart: spacing.xs,
+      paddingEnd: spacing.xs,
+      marginBottom: spacing.xxs,
+    },
+    imageRando: {
+      width: 80,
+      height: 50,
+      borderRadius: spacing.xs,
+    },
+    icone: {
+      width: spacing.lg,
+      height: spacing.lg,
+      marginEnd: spacing.xxs,
+      color: coeurTouche ? 'red' : 'black',
+    },
+    zoneFavori: {
+      marginEnd: spacing.xxs,
+    },
+  });
+
+
   return (
-      <View style={$carteGlobaleStyle}>
-          <View style={$enteteStyle}>
-            <Image style={$imageRandoStyle} source={imageRandonnee} resizeMode="contain" />
+    <TouchableOpacity onPress={detailExcursion}>
+      <View style={styles.carteGlobale}>
+          <View style={styles.entete}>
+            <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
             <Text
               weight="bold"
               //tx={"carteComposant.titre"}
               text={nomExcursions}
-              style={$headingStyle}
+              style={styles.heading}
             />
-            <Image style={$iconeStyle} source={favoriIcone} resizeMode="contain" />
+            <TouchableOpacity onPress={excursionFavorite}>
+          <Icon
+            name="heart-o"
+            size={spacing.lg}
+            style={styles.icone}
+          />
+        </TouchableOpacity>
           </View>
 
-          <View style={$tableauInfos}>
-            <View style={$ligneSup}>
-              <View style={$groupeTexteIconeStyleLigneSup}>
-                <Image style={$iconeStyle} source={zoneIcone} resizeMode="contain" />
+          <View style={styles.tableauInfos}>
+            <View style={styles.ligneSup}>
+              <View style={styles.groupeTexteIconeLigneSup}>
+                <Image style={styles.icone} source={zoneIcone} resizeMode="contain" />
                 <Text
                   //tx={"carteComposant.zone"}
                   text={zone}
-                  style={$contentStyle}
+                  style={styles.content}
                 />
               </View>
-              <View style={$groupeTexteIconeStyleLigneSup}> 
-                <Image style={$iconeStyle} source={parcoursIcone} resizeMode="contain" />
+              <View style={styles.groupeTexteIconeLigneSup}> 
+                <Image style={styles.icone} source={parcoursIcone} resizeMode="contain" />
                 <Text
                   //tx={"carteComposant.parcours"}
                   text={parcours}
-                  style={$contentStyle}
+                  style={styles.content}
                 />
               </View>
-              <View style={$groupeTexteIconeStyleLigneSup}>
-                <Image style={$iconeStyle} source={tempsIcone} resizeMode="contain" />
+              <View style={styles.groupeTexteIconeLigneSup}>
+                <Image style={styles.icone} source={tempsIcone} resizeMode="contain" />
                 <Text
                   //tx={"carteComposant.temps"}
                   text={temps}
-                  style={$contentStyle}
+                  style={styles.content}
                 />
               </View>
             </View>
-            <View style= {$ligneInf}>
-              <View style={$groupeTexteIconeStyleLigneInf}>
-                <Image style={$iconeStyle} source={distanceIcone} resizeMode="contain" />
+            <View style= {styles.ligneInf}>
+              <View style={styles.groupeTexteIconeLigneInf}>
+                <Image style={styles.icone} source={distanceIcone} resizeMode="contain" />
                 <Text
                   //tx={"carteComposant.distance"}
                   text={distance + " km"}
-                  style={$contentStyle}
+                  style={styles.content}
                 />
               </View>
-              <View style={$groupeTexteIconeStyleLigneInf}>
-                <Image style={$iconeStyle} source={denivelePositifIcone} resizeMode="contain" />
+              <View style={styles.groupeTexteIconeLigneInf}>
+                <Image style={styles.icone} source={denivelePositifIcone} resizeMode="contain" />
                 <Text
                   //tx={"carteComposant.denivelePositif"}
                   text={denivelePositif + " m"}
-                  style={$contentStyle}
+                  style={styles.content}
                 />
               </View>
-              <View style={$groupeTexteIconeStyleLigneInf}>
-                <Image style={$iconeStyle} source={difficulteParcoursIcone} resizeMode="contain" />
+              <View style={styles.groupeTexteIconeLigneInf}>
+                <Image style={styles.icone} source={difficulteParcoursIcone} resizeMode="contain" />
                 <Text
                   //tx={"carteComposant.difficulteParcours"}
                   text={difficulteParcours}
-                  style={$contentStyle}
+                  style={styles.content}
                 />
               </View>
-              <View style={$groupeTexteIconeStyleLigneInf}>
-                <Image style={$iconeStyle} source={difficulteOrientationIcone} resizeMode="contain" />
+              <View style={styles.groupeTexteIconeLigneInf}>
+                <Image style={styles.icone} source={difficulteOrientationIcone} resizeMode="contain" />
                 <Text
                   //tx={"carteComposant.difficulteOrientation"}
                   text={difficulteOrientation}
-                  style={$contentStyle}
+                  style={styles.content}
                 />
               </View>
             </View>  
           </View>
       </View>
+      </TouchableOpacity>
   )
-}
-
-const $carteGlobaleStyle: ViewStyle = {
-  padding: 5,
-  margin: 10,
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 3,
-  },
-  shadowOpacity: 0.27,
-  shadowRadius: 4.65,
-  elevation: 6,
-  borderRadius: 10,
-  backgroundColor: colors.palette.blanc,
-}
-
-const $headingStyle: TextStyle = { 
-  maxWidth: "50%", 
-  marginEnd: spacing.xl, 
-  fontSize: 16
-}
-
-const $contentStyle: TextStyle = {
-  fontSize: 14, 
-  maxWidth: "100%", 
-  textAlign:"center"
-}
-
-const $tableauInfos: ViewStyle = {
-  flexDirection: "column",
-  flexWrap: "wrap",
-  justifyContent: "space-between",
-  alignItems: "center",
-  paddingStart: spacing.xs,
-  paddingEnd: spacing.xs,
-  paddingBottom: spacing.xxs
-}
-
-const $ligneSup: ViewStyle = {
-  flexDirection: "row",
-  flexWrap: "wrap",
-  justifyContent: "space-between",
-  alignItems: "center",
-  paddingBottom: spacing.xxs,
-  minWidth: "100%",
-  maxWidth: "100%",
-  marginBottom: spacing.xxs
-}
-
-const $ligneInf: ViewStyle = {
-  flexDirection: "row",
-  flexWrap: "wrap",
-  justifyContent: "space-between",
-  alignItems: "center",
-  paddingStart: spacing.xs,
-  paddingEnd: spacing.xs,
-  paddingBottom: spacing.xxs,
-  minWidth: "100%",
-}
-
-const $groupeTexteIconeStyleLigneSup: ViewStyle = {
-  minWidth: "30%", 
-  maxWidth: "30%",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  paddingStart: spacing.xs,
-  paddingEnd: spacing.xs,
-  marginBottom: spacing.xxs,
-}
-
-const $groupeTexteIconeStyleLigneInf: ViewStyle = {
-  minWidth: "20%", 
-  maxWidth: "24%",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-}
-
-const $enteteStyle: ViewStyle = {
-  //wrappe les deux textes
-  flexDirection: "row", 
-  alignItems: "center", 
-  justifyContent: "space-between",
-  paddingStart: spacing.xs,
-  paddingEnd: spacing.xs,
-  marginBottom: spacing.xxs,
-}
-
-const $imageRandoStyle: ImageStyle = {
-  width:80,
-  height:50,
-  //width "25%", 
-  borderRadius:spacing.xs
-}
-
-const $iconeStyle: ImageStyle = {
-  width: spacing.lg,
-  height: spacing.lg,
-  marginEnd: spacing.xxs
 }

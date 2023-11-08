@@ -198,7 +198,7 @@ export function Screen(props: ScreenProps) {
     statusBarStyle = "dark",
   } = props
 
-  const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges)
+  const $containerInsets = useSafeAreaInsetsStyle()
 
   return (
     <SafeAreaView  style={[$containerStyle, { backgroundColor }, $containerInsets]}>
@@ -221,7 +221,6 @@ export function Screen(props: ScreenProps) {
 }
 
 const $containerStyle: ViewStyle = {
-  marginTop: isIos ? spacing.xxl : 0,
   flex: 1,
   height: "100%",
   width: "100%",

@@ -16,16 +16,15 @@ export const AccueilScreen: FC<AccueilScreenProps> = observer(function AccueilSc
   const { navigation } = props
 
   return (
-    <Screen style={$root} preset="scroll">
-        <ScrollView>
-              <DonnesApi/>
-        </ScrollView>
+    <Screen style={$root} >
+      <DonnesApi/>
     </Screen>
   )
 })
 
 const $root: ViewStyle = {
   flex: 1,
-  padding : spacing.md,
+  padding : spacing.sm,
+
 }
 
