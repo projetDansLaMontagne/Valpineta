@@ -9,6 +9,7 @@ const en = {
       "psst  — This probably isn't what your app looks like. (Unless your designer handed you these screens, and in that case, ship it!)",
     readyForLaunch: "Your app, almost ready for launch!",
     exciting: "(ohh, this is exciting!)",
+    button: "Let's go!",
   },
   errorScreen: {
     title: "Something went wrong!",
@@ -23,6 +24,25 @@ const en = {
       button: "Let's try this again",
     },
   },
+  testScreen: {
+    title: "Test Screen",
+    locate: {
+      locate_btn: "Locate me !",
+      stop_locate_btn: "Stop locating",
+      fetching: "Fetching location...",
+      follow: "Follow me",
+      stopFollowing: "Stop following",
+      located: {
+        title: "You are here !",
+        latitude: "Latitude : ",
+        longitude: "Longitude : ",
+      },
+      notLocated: {
+          title: "impossible to locate you",
+          message: "Please check your location settings",
+      },
+    }
+  }
 }
 
 export default en

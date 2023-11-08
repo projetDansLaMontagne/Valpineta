@@ -2,11 +2,13 @@ import { observer } from "mobx-react-lite"
 import React, { FC } from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import {
+  Button,
   Text,
 } from "../components"
 import { isRTL } from "../i18n"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
+import {AppStackScreenProps} from "../navigators";
 
 const welcomeLogo = require("../../assets/images/logo.png")
 const welcomeFace = require("../../assets/images/welcome-face.png")
@@ -14,9 +16,16 @@ const welcomeFace = require("../../assets/images/welcome-face.png")
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
 
 export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(
+    _props
 ) {
 
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+
+  const { navigation } = _props
+
+  const onPress = () => {
+    navigation.navigate("EcranTest");
+  }
 
   return (
     <View style={$container}>
@@ -34,7 +43,14 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
 
       <View style={[$bottomContainer, $bottomContainerInsets]}>
         <Text tx="welcomeScreen.postscript" size="md" />
+        {/* Add a button that takes to the 'EcranTestScreen */}
+        <Button
+          title="Go to EcranTest"
+          tx={"welcomeScreen.button"}
+          onPress={onPress}
+        />
       </View>
+
     </View>
   )
 })
