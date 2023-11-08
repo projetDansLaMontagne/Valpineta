@@ -7,18 +7,24 @@
 import {
   DarkTheme,
   DefaultTheme,
-  NavigationContainer,
+  NavigationContainer, 
 } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { useColorScheme } from "react-native"
-import * as Screens from "../screens"
+import * as Screens from "app/screens"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
-import { Footer } from "app/components"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { translate } from "i18n-js"
+import { Image, ImageStyle } from "react-native"
 
+
+const explorerLogo = require("./../../assets/icons/explorer.png")
+const carteLogo = require("./../../assets/icons/carte.png")
+const parametresLogo = require("./../../assets/icons/parametres.png")
 
 
 /**
@@ -30,16 +36,18 @@ import { Footer } from "app/components"
  * rather than passing state through navigation params.
  *
  * For more information, see this documentation:
- *   https://reactnavigation.org/docs/params/j
+ *   https://reactnavigation.org/docs/params/
  *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-
+  Welcome: undefined
+  // 🔥 Your screens go here
   Accueil : undefined
-  Carte : undefined
+  Map : undefined
+  DetailsExcursion : undefined
   Parametres : undefined
-  DetailsExcursion: undefined
+	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**
@@ -53,22 +61,7 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
   T
 >
 
-// Documentation: https://reactnavigation.org/docs/stack-navigator/
-const Stack = createNativeStackNavigator<AppStackParamList>()
-
-const AppStack = observer(function AppStack() {
-  return (
-    <Stack.Navigator
-      screenOptions={{headerShown: false ,navigationBarColor: colors.fond, contentStyle: { backgroundColor: colors.fond }}}
-    >
-          <Stack.Screen name="Accueil" component={Screens.AccueilScreen} />
-          <Stack.Screen name="Carte" component={Screens.CarteScreen} />
-          <Stack.Screen name="Parametres" component={Screens.ParametresScreen} />
-          <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
-          {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREEN */}
-    </Stack.Navigator>
-  )
-})
+const Tab = createBottomTabNavigator();
 
 export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
@@ -78,17 +71,64 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
-
   return (
     <NavigationContainer
       ref={navigationRef}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
       {...props}
     >
-      <AppStack />
-      <Footer
-      navigation={navigationRef}
-      />
+      <Tab.Navigator
+        screenOptions={{ headerShown: false}}
+        initialRouteName={"Welcome"}
+        screenOptions={() => ({
+          headerShown: false,
+          tabBarStyle: {
+            padding: 5,
+            backgroundColor: colors.fond,
+            borderTopColor: colors.bordure,
+        },
+      })}
+        
+        >
+        
+        <Tab.Screen component={Screens.AccueilScreen} options={{
+            tabBarIcon:() => (
+              <Image
+                source={explorerLogo}
+                style={$icon}
+              />
+            ),
+            tabBarActiveTintColor: colors.bouton,
+            tabBarInactiveTintColor: colors.text,
+            tabBarLabelStyle: {color: colors.bouton},
+          }} name="Accueil" />
+
+        <Tab.Screen component={Screens.CarteScreen} options={{
+            tabBarIcon:(props) => (
+              <Image
+                source={carteLogo}
+                style={$icon}
+              />
+            ),
+            tabBarLabelStyle: {color: colors.bouton},
+          }} name="Carte" />
+
+        <Tab.Screen component={Screens.ParametresScreen} options={{
+            tabBarIcon:(props) => (
+              <Image
+                source={parametresLogo}
+                style={$icon}
+              />
+            ),
+            tabBarLabelStyle: {color: colors.bouton},
+          }} name="Parametres" />
+      </Tab.Navigator>
     </NavigationContainer>
   )
 })
+
+const $icon: ImageStyle = {
+  width: 30,
+  height: 30,
+  tintColor: colors.bouton,
+}

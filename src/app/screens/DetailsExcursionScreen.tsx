@@ -14,7 +14,9 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen() {
     return (
-      <Screen >
+      <View 
+      style={style.container}
+      >
         <Text text="Ici il y aura la carte" size="xxl" />
         <SwipeUpDown
           itemMini={() => (
@@ -35,8 +37,17 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           onShowFull={() => console.log("full")}
           animation="easeInEaseOut"
         />
-      </Screen>
+      </View>
     );
   }
 );
+
+const style = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.bordure,
+    alignItems: "center",
+    justifyContent: "flex-start",
+  }
+});
 
