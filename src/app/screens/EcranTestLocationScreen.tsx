@@ -1,6 +1,6 @@
 import React, {FC, useEffect, useRef, useState} from "react"
 import { observer } from "mobx-react-lite"
-import {SafeAreaView, View, StyleSheet, Pressable, GestureResponderEvent} from "react-native"
+import { SafeAreaView, View, StyleSheet, Pressable, GestureResponderEvent, Platform } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import {Button, Screen, Text} from "app/components"
 import {spacing, colors} from "../theme";
@@ -8,7 +8,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 
 // location
 import * as Location from 'expo-location';
-import MapView from 'react-native-maps';
+import MapView, { LocalTile } from "react-native-maps"
 
 // variables
 interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
@@ -133,7 +133,6 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     if (!location) {
       setNbFetch(0)
     }
-
     followUserLocation && animateToLocation(location);
   }, [location]);
 
@@ -144,57 +143,57 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
   }, []);
 
+  const Wrapper = Platform.OS === 'ios' ? SafeAreaView : View;
+
   return (
     <Screen style={styles.fullScreen}>
-      <SafeAreaView style={styles.container} >
+      <Wrapper style={styles.container} >
         <Text
           tx="testScreen.title"
           preset="heading"
           style={{color: colors.text}}
         />
-
-
         <View style={styles.mapContainer}>
           {
             location ? (
-              <>
-                <MapView
-                  ref={mapRef}
+              <MapView
+                ref={mapRef}
 
-                  style={styles.map}
-                  initialRegion={{
+                style={styles.map}
+                initialRegion={{
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
+                  latitudeDelta: 0.0922,
+                  longitudeDelta: 0.0421,
+                }}
+                initialCamera={{
+                  center: {
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
+                  },
+                  pitch: 0,
+                  heading: location.coords.heading ?? 0,
+                  altitude: 2000,
+                  zoom: 15,
+                }}
+                zoomControlEnabled={true}
+                onMapLoaded={() => {
+                  animateToLocation(location)
+                }}
+                showsBuildings={true}
+                showsUserLocation={true}
+              >
+                <Pressable
+                  onPress={() => {
+                    setFollowUserLocation(!followUserLocation);
                   }}
-                  initialCamera={{
-                    center: {
-                      latitude: location.coords.latitude,
-                      longitude: location.coords.longitude,
-                    },
-                    pitch: 0,
-                    heading: 0,
-                    altitude: 2000,
-                    zoom: 15,
-                  }}
-                  zoomControlEnabled={true}
-                  onMapLoaded={animateToLocation}
-                  showsBuildings={true}
-                  showsUserLocation={true}
+                  style={styles.locateButtonContainer}
                 >
-                  <Pressable
-                    onPress={() => {
-                      setFollowUserLocation(!followUserLocation);
-                    }}
-                    style={styles.locateButtonContainer}
-                  >
-                    <View style={styles.locateButtonContainer}>
-                      <FontAwesome5 name="location-arrow" size={24} style={styles.locateButtonContainer} />
-                    </View>
-                  </Pressable>
-                </MapView>
-              </>
+                  {/*<View style={styles.locateButtonContainer}>*/}
+                  {/*  <FontAwesome5 name="location-arrow" size={24} style={styles.locateButtonContainer} />*/}
+                  {/*</View>*/}
+                </Pressable>
+              </MapView>
             ) : (
               <>
                 {
@@ -216,7 +215,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
             )
           }
         </View>
-      </SafeAreaView>
+      </Wrapper>
     </Screen>
   )
 });
