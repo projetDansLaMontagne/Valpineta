@@ -1,8 +1,8 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image } from "react-native";
+import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, Button, TextStyle } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Button, Text, } from "app/components";
+import { Text, } from "app/components";
 import { spacing, colors } from "app/theme";
 import { Dimensions } from "react-native";
 import SwipeUpDown from "react-native-swipe-up-down";
@@ -52,6 +52,9 @@ function itemMini() {
 }
 
 function itemFull() {
+
+  const [isInfos, setIsInfos] = useState(true);
+
   return (
     <View style={$containerGrand} >
       <View style={$containerTitre}>
@@ -66,11 +69,19 @@ function itemFull() {
         </TouchableOpacity>
 
       </View>
-      <View style={$containerBouton}>
-        <Button text="Infos"/>
-        <Button text="Avis" />
+      <View>    
+        <View style={$containerBouton}>
+          <TouchableOpacity onPress={()=> setIsInfos(true)} >
+            <Text text="Infos" size="lg" style={[$boutonInfosAvis, isInfos? { color: colors.bouton }: {color: colors.text }]} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={()=> setIsInfos(false)}>
+            <Text text="Avis" size="lg" style={[$boutonInfosAvis, isInfos? { color: colors.text }: {color: colors.bouton }]} />
+          </TouchableOpacity>
+        </View>
+        <View style={[$souligneInfosAvis, isInfos? {left: spacing.xl }: {left: width/2.5 + spacing.xxl } ]}>
+        </View>
       </View>
-      <View style={$containerBouton}>
+      <View style={$containerInformations}>
         <Text text="Description" size="xs" />
         <Text text="Description" size="xs" />
         <Text text="Description" size="xs" />
@@ -79,11 +90,11 @@ function itemFull() {
       <View style={$containerDescriptionSignalement}>
         <View>
           <Text text="Description" size="xl" />
-          <Text text="loremp ipsum" size="xs" />
+          <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xs" />
         </View>
         <View>
           <Text text="Signalement" size="xl" />
-          <Text text="loremp ipsum" size="xs" />
+          <Text text="signalement" size="xs" />
         </View>
       </View>
       <View style={$containerDenivele}>
@@ -159,15 +170,34 @@ const $containerBouton: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   width: width,
-  padding: spacing.lg,
 }
 
+const $boutonInfosAvis : TextStyle = {
+  borderBottomWidth: 1,
+  borderBottomColor: colors.bouton,
+}
 
+const $souligneInfosAvis : ViewStyle = {
+  backgroundColor: colors.bouton,
+  height: 2,
+  width: width/2.5,
+  position: "relative",
+}
+
+const $containerInformations: ViewStyle = {
+  flexDirection: "row",
+  width: width,
+  padding: spacing.lg,
+}
 
 const $containerDescriptionSignalement: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   width: width,
+}
+
+const $textDescription : TextStyle = {
+  width: width/2,
 }
 
 const $containerDenivele: ViewStyle = {
