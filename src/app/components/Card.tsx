@@ -1,8 +1,8 @@
-import React, { ComponentType, Fragment, ReactElement, useState } from "react"
-import { Image, ImageStyle, StyleSheet} from "react-native"
-import styled from 'styled-components/native';
-import { Ionicons } from '@expo/vector-icons'; // Assurez-vous d'avoir importé les icônes correctement
+import React, { ComponentType, Fragment, ReactElement, useState, useEffect } from "react"
+import { Image, ImageStyle, StyleSheet,} from "react-native"
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 
@@ -34,6 +34,8 @@ interface CardProps extends TouchableOpacityProps {
   difficulteParcours?: TextProps["text"]
 
   difficulteOrientation?: TextProps["text"]
+
+  post_id?: TextProps["text"]
 }
 
 export function Card(props: CardProps) {
@@ -46,6 +48,7 @@ export function Card(props: CardProps) {
     denivelePositif,
     difficulteParcours,
     difficulteOrientation,
+    post_id,
   } = props
   
   const favoriIcone = require("../../assets/icons/favori.png")
@@ -59,16 +62,63 @@ export function Card(props: CardProps) {
 
   const imageRandonnee = require("../../assets/images/randonnee.png")
 
-  const [coeurTouche, setcoeurTouche] = useState(false);
+  let uneExcursion = {
+    post_id: post_id,
+    nomExcursions: nomExcursions,
+    zone: zone,
+    parcours: parcours,
+    temps: temps,
+    distance: distance,
+    denivelePositif: denivelePositif,
+    difficulteParcours: difficulteParcours,
+    difficulteOrientation: difficulteOrientation,
+  };
+  
+  const [isFavori, setIsFavori] = useState(false);
 
+  useEffect(() => {
+    verifierStatutFavori();
+  }, []);
 
-  const excursionFavorite = () => {    
-    if (coeurTouche) {
-      setcoeurTouche(false);
-    } else {
-      setcoeurTouche(true);
+  const verifierStatutFavori = async () => {
+    try {
+      const excursionsFavorites = await AsyncStorage.getItem('excursionsFavorites');
+      if (excursionsFavorites) {
+        const parsedExcursions = JSON.parse(excursionsFavorites);
+        const found = parsedExcursions.some(e => e.post_id === uneExcursion.post_id);
+        setIsFavori(found);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification du statut de l'excursion en favori :", error);
     }
-  }
+  };
+
+  const gererFavori = async () => {
+    try {
+      let excursionsFavorites = await AsyncStorage.getItem('excursionsFavorites');
+      const parsedExcursions = excursionsFavorites ? JSON.parse(excursionsFavorites) : [];
+
+      const found = parsedExcursions.some(e => e.post_id === uneExcursion.post_id);
+
+      if (found) {
+        const nouvellesExcursions = parsedExcursions.filter(e => e.post_id !== uneExcursion.post_id);
+        await AsyncStorage.setItem('excursionsFavorites', JSON.stringify(nouvellesExcursions));
+        console.log('Excursion supprimée des favoris');
+        setIsFavori(false);
+      } else {
+        parsedExcursions.push(uneExcursion);
+        await AsyncStorage.setItem('excursionsFavorites', JSON.stringify(parsedExcursions));
+        console.log('Excursion ajoutée aux favoris');
+        setIsFavori(true);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la gestion des excursions en favori :', error);
+    }
+  };
+
+
+  
+  
 
   const detailExcursion = () => {
     console.log('Détail de l\'excursion');
@@ -168,7 +218,7 @@ export function Card(props: CardProps) {
       width: spacing.lg,
       height: spacing.lg,
       marginEnd: spacing.xxs,
-      color: coeurTouche ? 'red' : 'black',
+      color: isFavori ? 'red' : 'black',
     },
     zoneFavori: {
       marginEnd: spacing.xxs,
@@ -187,7 +237,7 @@ export function Card(props: CardProps) {
               text={nomExcursions}
               style={styles.heading}
             />
-            <TouchableOpacity onPress={excursionFavorite}>
+            <TouchableOpacity onPress={gererFavori}>
           <Icon
             name="heart-o"
             size={spacing.lg}

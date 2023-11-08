@@ -23,6 +23,7 @@ import { Image, ImageStyle } from "react-native"
 
 const explorerLogo = require("./../../assets/icons/explorer.png")
 const carteLogo = require("./../../assets/icons/carte.png")
+const favoriLogo = require("./../../assets/icons/favori.png")
 const parametresLogo = require("./../../assets/icons/parametres.png")
 
 
@@ -40,11 +41,12 @@ const parametresLogo = require("./../../assets/icons/parametres.png")
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Welcome: undefined
   // 🔥 Your screens go here
   Accueil: undefined
   Map: undefined
+  Favoris: undefined
   Parametres: undefined
+  
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -113,6 +115,16 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           ),
           tabBarLabelStyle: { color: colors.bouton },
         }} name="Carte" />
+
+        <Tab.Screen component={Screens.FavorisScreen} options={{
+          tabBarIcon: (props) => (
+            <Image
+              source={favoriLogo}
+              style={$icon}
+            />
+          ),
+          tabBarLabelStyle: { color: colors.bouton },
+        }} name="Favoris" />
 
         <Tab.Screen component={Screens.ParametresScreen} options={{
           tabBarIcon: (props) => (

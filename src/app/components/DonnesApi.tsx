@@ -31,7 +31,8 @@ const DonnesExcursions = () => {
           distance: excursion.distance_excursion,
           denivelePositif: excursion.denivele,
           difficulteParcours: excursion.difficulte_technique,
-          difficulteOrientation:  excursion.difficulte_orientation          
+          difficulteOrientation:  excursion.difficulte_orientation,    
+          post_id: excursion.post_id,      
         }));
 
         setExcursionsData(excursions);
@@ -63,6 +64,7 @@ const DonnesExcursions = () => {
         denivelePositif={item.denivelePositif}
         difficulteParcours={item.difficulteParcours}
         difficulteOrientation={item.difficulteOrientation}
+        post_id={item.post_id}
         />    
     </View>
   );
