@@ -7,9 +7,14 @@ import { Screen, Text } from "app/components"
 import {spacing } from "app/theme"
 import DonnesApi from "app/components/DonnesApi" 
 
-interface AccueilScreenProps extends AppStackScreenProps<"Accueil"> {}
+interface AccueilScreenProps extends AppStackScreenProps<"Accueil"> {
+  navigation: any
+}
 
-export const AccueilScreen: FC<AccueilScreenProps> = observer(function AccueilScreen() {
+export const AccueilScreen: FC<AccueilScreenProps> = observer(function AccueilScreen(props : AccueilScreenProps) {
+
+  const { navigation } = props
+
   return (
     <Screen style={$root} preset="scroll">
         <ScrollView>
