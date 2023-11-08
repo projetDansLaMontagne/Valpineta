@@ -6,7 +6,9 @@ import { Screen, Text } from "app/components"
 // import { useNavigation } from "@react-navigation/native"
 // import { useStores } from "app/models"
 
-interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {}
+interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {
+  filtresSetter: React.Dispatch<any>; // On veut recevoir un setter de useState
+}
 
 export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresScreen() {
   // Pull in one of our MST stores

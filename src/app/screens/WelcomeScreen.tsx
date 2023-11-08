@@ -2,6 +2,7 @@ import React, { FC, useState, useEffect } from "react"
 import { Image, ImageStyle, TextStyle, View, ScrollView, ViewStyle, TouchableOpacity, Switch } from "react-native"
 import Slider from "react-native-a11y-slider";
 import { observer } from "mobx-react-lite"
+import { useNavigation } from "@react-navigation/native"
 
 // import { AppStackScreenProps } from "../../navigators"
 import { Text, Button, Screen } from "../components"
@@ -10,6 +11,7 @@ import { colors, spacing } from "../theme"
 /*
 -- Todo --
 Regler probleme du focus sur le slider qui empeche le slide vertical (onSlidingComplete non pris en compte)
+Regler probleme de logo check qui disparait si expo n est plus lance
 */
 
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {
@@ -82,7 +84,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
   // useEffect(() => {
   //   setIsFiltresAppliques(false);
   // }, [critereTri, intervalleDistance, intervalleDenivele, intervalleDistance, intervalleDuree, types, zone, difficultePhysique, difficulteOrientation])
-
+  const navigation = useNavigation();
   return (
     <ScrollView
       style={$container}
