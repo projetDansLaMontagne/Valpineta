@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { observer } from "mobx-react-lite";
-import { View, StyleSheet } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
+import { View, StyleSheet, Button } from "react-native";
+import { AppStackScreenProps, navigate } from "app/navigators";
 import { Screen, Text } from "app/components";
 import { spacing, colors } from "app/theme";
 import { Dimensions } from "react-native";
@@ -9,15 +9,21 @@ import SwipeUpDown from "react-native-swipe-up-down";
 
 const { width, height } = Dimensions.get("window");
 
-interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
+interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
+  navigation: any;
+}
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
-  function DetailsExcursionScreen() {
+  function DetailsExcursionScreen( props : DetailsExcursionScreenProps ) {
+
+    const { navigation } = props;
+
     return (
       <View 
       style={style.container}
       >
         <Text text="Ici il y aura la carte" size="xxl" />
+        <Button title="retour" onPress={() => navigation.goBack()} />
         <SwipeUpDown
           itemMini={() => (
             <View>

@@ -5,7 +5,6 @@ import { ViewStyle } from "react-native"
 import { AppStackScreenProps, navigate } from "app/navigators"
 import { Screen, Text, Button } from "app/components"
 import {spacing } from "app/theme" 
-import { AccueilNavigator } from "app/navigators"
 
 interface AccueilScreenProps extends AppStackScreenProps<"Accueil"> {
   navigation: any
