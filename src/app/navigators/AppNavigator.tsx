@@ -20,6 +20,7 @@ import { colors } from "app/theme"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { translate } from "i18n-js"
 import { Image, ImageStyle } from "react-native"
+import { func } from "prop-types"
 
 
 const explorerLogo = require("./../../assets/icons/explorer.png")
@@ -61,22 +62,71 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
   T
 >
 
-const Tab = createBottomTabNavigator();
+/* -------------------------------------------------------------------------- */
+/*                                APP NAVIGATOR                               */
+/* -------------------------------------------------------------------------- */
+
 
 export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
+extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()
-
+  const Stack = createNativeStackNavigator()
+  
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
   return (
     <NavigationContainer
-      ref={navigationRef}
-      theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-      {...props}
+    ref={navigationRef}
+    theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+    {...props}
+  >
+      <Stack.Navigator 
+        screenOptions={() => ({
+          headerShown: false,
+        })}
+      >
+        <Stack.Screen name="Home" component={AccueilNavigator} />
+      </Stack.Navigator>
+  </NavigationContainer>
+  )
+})
+
+const $icon: ImageStyle = {
+  width: 30,
+  height: 30,
+  tintColor: colors.bouton,
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              ACCUEIL NAVIGATOR                             */
+/* -------------------------------------------------------------------------- */
+
+const AccueilStack = createNativeStackNavigator();
+
+export function AccueilNavigator() {
+  return (
+    <AccueilStack.Navigator
+      screenOptions={() => ({
+        headerShown: false,
+      })}
     >
+      <AccueilStack.Screen name="Footer" component={Footer} />
+      <AccueilStack.Screen name="Accueil" component={Screens.AccueilScreen} />
+      <AccueilStack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
+    </AccueilStack.Navigator>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                   FOOTER                                   */
+/* -------------------------------------------------------------------------- */
+
+function Footer() {
+  const Tab = createBottomTabNavigator();
+
+  return (
       <Tab.Navigator
         screenOptions={{ headerShown: false}}
         initialRouteName={"Welcome"}
@@ -123,12 +173,5 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
             tabBarLabelStyle: {color: colors.bouton},
           }} name="Parametres" />
       </Tab.Navigator>
-    </NavigationContainer>
   )
-})
-
-const $icon: ImageStyle = {
-  width: 30,
-  height: 30,
-  tintColor: colors.bouton,
 }

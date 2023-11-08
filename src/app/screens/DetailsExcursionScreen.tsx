@@ -26,7 +26,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
               text="je suis le petit" size="sm" />
             </View>
           )}
-          itemFull={(close) => (
+          itemFull={() => (
             <View >
               <Text text="Ici il y aura les détails" size="xxl" />
               <Text text="Vous pouvez swiper vers le bas pour fermer." />
