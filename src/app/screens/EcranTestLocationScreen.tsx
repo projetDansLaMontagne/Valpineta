@@ -1,6 +1,14 @@
 import React, {FC, useEffect, useRef, useState} from "react"
 import { observer } from "mobx-react-lite"
-import { SafeAreaView, View, StyleSheet, Pressable, GestureResponderEvent, Platform } from "react-native"
+import {
+  SafeAreaView,
+  View,
+  StyleSheet,
+  Pressable,
+  GestureResponderEvent,
+  Platform,
+  TouchableOpacity, Image,
+} from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import {Button, Screen, Text} from "app/components"
 import {spacing, colors} from "../theme";
@@ -8,7 +16,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 
 // location
 import * as Location from 'expo-location';
-import MapView, { LocalTile } from "react-native-maps"
+import MapView from "react-native-maps"
 
 // variables
 interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
@@ -36,6 +44,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
   const mapRef = useRef<MapView>(null);
+  const locateButtonRef = useRef(null);
 
   // Method(s)
   const animateToLocation: T_animateToLocation = (passedLocation) => {
@@ -73,9 +82,9 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   }
 
 
-
   const getLocationAsync = async () => {
     console.log(`[EcranTestScreen] getLocationAsync()`);
+    console.log(`[EcranTestScreen] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`);
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
@@ -98,11 +107,12 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
    * withing a certain radius. If the user moves the map outside of this radius, the map
    * stops following the user location.
    *
-   * @param gesture {GestureResponderEvent} The gesture event
+   * @param _ {GestureResponderEvent} The gesture event
    */
-  const handleMapMoves = (gesture: GestureResponderEvent) => {
-
+  const handleMapMoves = (_: GestureResponderEvent) => {
     setFollowUserLocation(false);
+
+    return false
   }
 
   const onPress = async () => {
@@ -120,6 +130,27 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     setIsFetching(false);
   }
 
+  const toggleFollowUserLocation = () => {
+    setFollowUserLocation(!followUserLocation);
+  }
+
+  const locateButtonOnPressIn = () => {
+    // change the background color of the button
+    locateButtonRef.current.setNativeProps({
+      style: {
+        backgroundColor: colors.palette.transparentButtonActive,
+      }
+    });
+  }
+
+  const locateButtonOnPressOut = () => {
+    // change the background color of the button
+    locateButtonRef.current.setNativeProps({
+      style: {
+        backgroundColor: colors.palette.transparentButton,
+      }
+    });
+  }
 
   // Effect(s)
   useEffect(() => {
@@ -133,6 +164,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     if (!location) {
       setNbFetch(0)
     }
+
     followUserLocation && animateToLocation(location);
   }, [location]);
 
@@ -158,8 +190,8 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
             location ? (
               <MapView
                 ref={mapRef}
-
                 style={styles.map}
+
                 initialRegion={{
                   latitude: location.coords.latitude,
                   longitude: location.coords.longitude,
@@ -176,23 +208,51 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   altitude: 2000,
                   zoom: 15,
                 }}
-                zoomControlEnabled={true}
+
                 onMapLoaded={() => {
                   animateToLocation(location)
                 }}
+                onMoveShouldSetResponder={handleMapMoves}
+
+                // if the default google map location button is clicked
+                // we want to stop following the user location
+                // onUserLocationChange={(event) => {
+                //   console.log("onUserLocationChange");
+                //   console.log(event.nativeEvent);
+                // }}
+
+
                 showsBuildings={true}
+                showsCompass={true}
+                showsMyLocationButton={true} // only for Android
+                shouldRasterizeIOS={true} // only for iOS
+                showsScale={true} // only for iOS
                 showsUserLocation={true}
+
+                zoomControlEnabled={true}
               >
-                <Pressable
-                  onPress={() => {
-                    setFollowUserLocation(!followUserLocation);
-                  }}
-                  style={styles.locateButtonContainer}
-                >
-                  {/*<View style={styles.locateButtonContainer}>*/}
-                  {/*  <FontAwesome5 name="location-arrow" size={24} style={styles.locateButtonContainer} />*/}
-                  {/*</View>*/}
-                </Pressable>
+                {
+                  Platform.OS === 'ios' && (
+                    <TouchableOpacity
+                      ref={locateButtonRef}
+                      style={{
+                        ...styles.locateButtonContainer,
+                      }}
+
+                      onPressIn={locateButtonOnPressIn}
+                      onPressOut={locateButtonOnPressOut}
+                      onPress={toggleFollowUserLocation}
+                    >
+                      <FontAwesome5
+                        name="location-arrow"
+                        size={20}
+                        color={
+                          followUserLocation ? colors.palette.locateIconActive : colors.palette.locateIconInactive
+                        }
+                      />
+                    </TouchableOpacity>
+                  )
+                }
               </MapView>
             ) : (
               <>
@@ -220,6 +280,9 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   )
 });
 
+const values = {
+  locateBtnContainerSize: 50,
+}
 
 const styles = StyleSheet.create({
   button: {
@@ -249,19 +312,31 @@ const styles = StyleSheet.create({
     display: 'flex',
     height: 40,
     justifyContent: 'center',
-    position: 'relative',
     width: 40,
     zIndex: 1000,
   },
   locateButtonContainer: {
-    alignSelf: 'flex-end',
-    backgroundColor: colors.palette.angry500,
+    alignItems: 'center',
+    backgroundColor: colors.palette.transparentButton,
+    borderRadius: 50,
+    display: 'flex',
+    height: values.locateBtnContainerSize,
+    justifyContent: 'center',
+    width: values.locateBtnContainerSize,
   },
   map: {
-    ...StyleSheet.absoluteFillObject
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'flex-end',
+    display: 'flex',
+    height: '100%',
+    justifyContent: 'flex-end',
+    paddingBottom: '10%',
+    paddingRight: '10%',
+    width: '100%',
   },
   mapContainer: {
-    height: '100%',
+    minHeight: '90%',
     width: '100%',
+    position: 'relative',
   },
 });
