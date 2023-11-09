@@ -4,7 +4,6 @@ import { View, ViewStyle, Text } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { colors } from "../theme";
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle";
-import data from "./../../assets/JSON/exemple.json"
 import {
   LineChart,
   BarChart,
@@ -19,48 +18,51 @@ interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> { }
 
 export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen() {
 
-  const coordonnees = data.features[0].geometry.coordinates[0];
-  const listeALtitude = coordonnees.map((item) => item[2]);
+  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
 
-  const altitudeMax = Math.max(...listeALtitude);
-  const altitudeMin = Math.min(...listeALtitude);
+  const coordonnees = data.features[0].geometry.coordinates[0];
+  const listeALtitude = coordonnees
+  .map((item, index) => (index % 50 === 0 ? item[2] : null))
+  .filter((altitude) => altitude !== 0);
 
   const line = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
     datasets: [
       {
-        data: [20, 45, 28, 80, 99, 43],
-        strokeWidth: 2, // optional
+        data: listeALtitude,
       },
     ],
   };
 
   return (
-    <View>
-      <Text>
-        Bezier Line Chart
-      </Text>
+    <View style={$container}>
       <LineChart
         data={line}
         width={Dimensions.get('window').width} // from react-native
-        height={220}
-        yAxisLabel={'$'}
+        height={200}
+        withInnerLines={false}
+        withOuterLines={false}
+        yAxisSuffix="m"
+        withShadow={false}
         chartConfig={{
-          backgroundColor: '#e26a00',
-          backgroundGradientFrom: '#fb8c00',
-          backgroundGradientTo: '#ffa726',
+          backgroundColor: "#ffffff",
           decimalPlaces: 2, // optional, defaults to 2dp
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           style: {
             borderRadius: 16
+          },
+          propsForDots: {
+            r: "4",
+            strokeWidth: "2",
+            stroke: "#ffffff"
           }
         }}
         bezier
-        style={{
-          marginVertical: 8,
-          borderRadius: 16
-        }}
       />
+      {/* <Text>
+        {listeALtitude}
+      </Text> */}
+
     </View>
   );
 });
