@@ -54,6 +54,7 @@
     "expo-splash-screen": "~0.18.1",
     "expo-status-bar": "~1.4.4",
     "gpx-parse": "^0.10.4",
+    "gpxparser": "^3.0.8",
     "i18n-js": "3.9.2",
     "mobx": "6.6.0",
     "mobx-react-lite": "3.4.0",
