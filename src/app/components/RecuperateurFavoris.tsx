@@ -1,5 +1,5 @@
 import React, { useEffect, useState, } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card } from './Card';
 
@@ -25,28 +25,44 @@ const EcranFavoris = ({ navigation }) => {
     return unsubscribe;
   }, [navigation]);
 
-
-  console.log('Excursions dans le state :', excursionsFavorites); // Vérifier les données stockées dans le state
-
   return (
     <View>
-      <Text>Excursions Favorites :</Text>
-      {excursionsFavorites.map((excursion) => (
-        <View key={excursion.post_id}>
+      <Text style={styles.titre}>Excursions Favorites :</Text>
+
+      
+      {excursionsFavorites.length > 0 ? (
+        excursionsFavorites.map(excursion => (
           <Card
+            key={excursion.post_id}
             nomExcursions={excursion.nomExcursions}
-            parcours={excursion.typeParcours}
+            parcours={excursion.parcours}
             zone={excursion.zone}
+            temps={excursion.temps}
             distance={excursion.distance}
             denivelePositif={excursion.denivelePositif}
             difficulteParcours={excursion.difficulteParcours}
             difficulteOrientation={excursion.difficulteOrientation}
+            post_id={excursion.post_id}
           />
-          {/* Afficher d'autres détails de l'excursion si nécessaire */}
-        </View>
-      ))}
+        ))
+      ) : (
+        <Text style={styles.pasDeFavorites}>Aucune excursion en favori</Text>
+      )}
     </View>
   );
 };
 
+const styles = StyleSheet.create({
+  titre: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  pasDeFavorites: {
+    textAlign: 'center',
+    marginVertical: 10,
+    fontSize: 16,
+  },
+});
 export default EcranFavoris;
