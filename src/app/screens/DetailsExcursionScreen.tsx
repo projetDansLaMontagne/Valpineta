@@ -6,6 +6,7 @@ import { Text, CarteAvis } from "app/components";
 import { spacing, colors } from "app/theme";
 import { Dimensions } from "react-native";
 import SwipeUpDown from "react-native-swipe-up-down";
+import { Platform } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,6 +16,8 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
+
+    const isIOS = Platform.OS === "ios";
 
     const { navigation } = props;
 
@@ -39,6 +42,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           disableSwipeIcon={false}
           animation="easeInEaseOut"
           extraMarginTop={0}
+          swipeHeight={100}
         />
       </SafeAreaView>
     );
