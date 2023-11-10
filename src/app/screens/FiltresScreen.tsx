@@ -273,7 +273,6 @@ const $container: ViewStyle = {
 const $critereTri: ViewStyle = {
   flexDirection: "row",
   width: "100%",
-  flexWrap: "wrap",
   alignItems: "center",
   justifyContent: "space-between",
 }
@@ -352,9 +351,6 @@ const $boutonValidation: ViewStyle = {
   borderWidth: 2,
   padding: 0,
   backgroundColor: "#007C27",
-
-  // position: "relative",
-  // bottom: 0
 }
 const $switch: ViewStyle = {
   backgroundColor: "transparent",
