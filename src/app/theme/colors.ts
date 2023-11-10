@@ -42,7 +42,11 @@ const palette = {
 
   transparentButton: "rgba(255, 255, 255, 0.7)",
   transparentButtonOnPress: "rgba(255, 255, 255, 0.6)",
-} as const
+} as const;
+
+const valpinetaPalette = {
+  green: "#007C27"
+} as const;
 
 export const colors = {
   /**
@@ -51,6 +55,8 @@ export const colors = {
    * semantic names as much as possible.
    */
   palette,
+
+  valpinetaPalette,
   /**
    * A helper for making something see-thru.
    */

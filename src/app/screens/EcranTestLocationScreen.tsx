@@ -1,6 +1,7 @@
 import React, {FC, useEffect, useRef, useState} from "react"
 import { observer } from "mobx-react-lite"
 import {
+  Animated,
   SafeAreaView,
   View,
   StyleSheet,
@@ -17,6 +18,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 // location
 import * as Location from 'expo-location';
 import MapView, { LocalTile, PROVIDER_GOOGLE } from "react-native-maps"
+import MapButton from "../components/MapButton";
 
 // variables
 interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
@@ -39,11 +41,21 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   const [nbFetch, setNbFetch] = useState(0);
   const [followUserLocation, setFollowUserLocation] = useState(false);
 
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+
   const intervalRef = useRef(null);
 
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
   const mapRef = useRef<MapView>(null);
-  const locateButtonRef = useRef(null);
+
+  // buttons
+  const followLocationButtonRef = useRef(null);
+  const toggleBtnMenuRef = useRef(null);
+  const addPOVBtnRef = useRef(null);
+  const addWarningBtnRef = useRef(null);
+
+  // Animation(s)
+  const buttonOpacity = useRef(new Animated.Value(0)).current;
 
   // Method(s)
   const animateToLocation: T_animateToLocation = (passedLocation) => {
@@ -137,7 +149,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
   const locateButtonOnPressIn = () => {
     // change the background color of the button
-    locateButtonRef.current.setNativeProps({
+    followLocationButtonRef.current.setNativeProps({
       style: {
         backgroundColor: colors.palette.transparentButtonOnPress,
       }
@@ -146,11 +158,15 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
   const locateButtonOnPressOut = () => {
     // change the background color of the button
-    locateButtonRef.current.setNativeProps({
+    followLocationButtonRef.current.setNativeProps({
       style: {
         backgroundColor: colors.palette.transparentButton,
       }
     });
+  }
+
+  const toggleMenu = () => {
+    setMenuIsOpen(!menuIsOpen);
   }
 
   // Effect(s)
@@ -176,6 +192,19 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
       console.log("isFetching is true");
     }
   }, [isFetching])
+
+  useEffect(() => {
+    if (menuIsOpen) {
+      // animate the 'addPOVBtnRef' and 'addWarningBtnRef' buttons
+      Animated.sequence([
+        Animated.timing(buttonOpacity, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [menuIsOpen]);
 
   useEffect(() => {
 
@@ -228,30 +257,23 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   maxZoomLevel={14}
                   minZoomLevel={12}
 
-                  // initialCamera={{
-                  //   center: {
-                  //     // latitude: location.coords.latitude,
-                  //     // longitude: location.coords.longitude,
-                  //     latitude: LATITUDE,
-                  //     longitude: LONGITUDE,
-                  //   },
-                  //   pitch: 0,
-                  //   heading: location.coords.heading ?? 0,
-                  //   altitude: Platform.OS === 'ios' ? 2000 : 0,
-                  //   zoom: Platform.OS === 'ios' ? 15 : 10,
-                  // }}
+                  initialCamera={{
+                    center: {
+                      // latitude: location.coords.latitude,
+                      // longitude: location.coords.longitude,
+                      latitude: LATITUDE,
+                      longitude: LONGITUDE,
+                    },
+                    pitch: 0,
+                    heading: location.coords.heading ?? 0,
+                    altitude: 2000,
+                    zoom: 15
+                  }}
 
                   // onMapLoaded={() => {
                   //   animateToLocation(location)
                   // }}
                   onMoveShouldSetResponder={handleMapMoves}
-
-                  // if the default google map location button is clicked
-                  // we want to stop following the user location
-                  // onUserLocationChange={(event) => {
-                  //   console.log("onUserLocationChange");
-                  //   console.log(event.nativeEvent);
-                  // }}
 
                   mapType={Platform.OS == "android" ? "none" : "standard"}
 
@@ -261,35 +283,76 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   shouldRasterizeIOS={true} // only for iOS
                   showsScale={true} // only for iOS
                   showsUserLocation={true}
-
-                  zoomControlEnabled={true}
                 >
                   <LocalTile
                     pathTemplate={'/Users/tom_planche/Desktop/BUT/BUT3/SAE_Valpineta/Valpineta/src/Chupaca/{z}/{x}/{y}.png'}
                     tileSize={256}
-                    // zIndex={-1}
+                    zIndex={-1}
                   />
                 </MapView>
-                {/*<View style={styles.mapOverlay}>*/}
-                {/*  <TouchableOpacity*/}
-                {/*      ref={locateButtonRef}*/}
-                {/*      style={{*/}
-                {/*        ...styles.locateButtonContainer,*/}
-                {/*      }}*/}
+                <View style={styles.mapOverlay}>
+                  {
+                    menuIsOpen && (
+                      <>
+                        <MapButton
+                          ref={addPOVBtnRef}
+                          style={{
+                            ...styles.actionsButtonContainer,
+                          }}
 
-                {/*      onPressIn={locateButtonOnPressIn}*/}
-                {/*      onPressOut={locateButtonOnPressOut}*/}
-                {/*      onPress={toggleFollowUserLocation}*/}
-                {/*    >*/}
-                {/*      <FontAwesome5*/}
-                {/*        name="location-arrow"*/}
-                {/*        size={20}*/}
-                {/*        color={*/}
-                {/*          followUserLocation ? colors.palette.locationBlue : colors.palette.locationBlueDisabled*/}
-                {/*        }*/}
-                {/*      />*/}
-                {/*  </TouchableOpacity>*/}
-                {/*</View>*/}
+                          // onPressIn={locateButtonOnPressIn}
+                          // onPressOut={locateButtonOnPressOut}
+                          // onPress={toggleFollowUserLocation}
+
+                          icon={'eye'}
+                          iconSize={spacing.lg}
+                          iconColor={colors.palette.neutral200}
+                        />
+                        <MapButton
+                          ref={addWarningBtnRef}
+                          style={{
+                            ...styles.actionsButtonContainer,
+                          }}
+
+                          // onPressIn={locateButtonOnPressIn}
+                          // onPressOut={locateButtonOnPressOut}
+                          // onPress={toggleFollowUserLocation}
+
+                          icon='exclamation-circle'
+                          iconSize={spacing.lg}
+                          iconColor={colors.palette.neutral200}
+                        />
+                      </>
+                    )
+                  }
+                  <MapButton
+                    ref={toggleBtnMenuRef}
+                    style={{
+                      ...styles.actionsButtonContainer,
+                    }}
+
+                    onPress={toggleMenu}
+
+                    icon={menuIsOpen ? 'times' : 'map-marker-alt'}
+                    iconSize={spacing.lg}
+                    iconColor={colors.palette.neutral200}
+                  />
+                </View>
+                <View style={styles.mapOverlayLeft}>
+
+                  <MapButton
+                    ref={followLocationButtonRef}
+                    style={{
+                      ...styles.locateButtonContainer,
+                    }}
+
+                    onPress={toggleFollowUserLocation}
+
+                    icon='location-arrow'
+                    iconSize={spacing.lg}
+                    iconColor={followUserLocation ? colors.palette.locationBlue : colors.palette.locationBlueDisabled}
+                  />
+                </View>
               </>
             ) : (
               <>
@@ -327,6 +390,45 @@ const $container: ViewStyle = {
   display: 'flex',
 }
 
+const mapOverlayStyle: ViewStyle = {
+  position: 'absolute',
+  bottom: 0,
+  right: 0,
+
+  height: "40%",
+  width: "20%",
+
+  borderStyle: "dashed",
+  borderWidth: 1,
+  borderColor: "red",
+
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: spacing.sm,
+
+  paddingBottom: spacing.xl,
+
+  zIndex: 1000,
+}
+
+const buttonContainer: ViewStyle = {
+  height: values.locateBtnContainerSize,
+  width: values.locateBtnContainerSize,
+
+  backgroundColor: colors.valpinetaPalette.green,
+  borderRadius: values.locateBtnContainerSize / 2,
+
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  // position: 'absolute',
+  // bottom: spacing.xl,
+  // right: spacing.sm,
+}
+
 const styles = StyleSheet.create({
   button: {
     borderRadius: 10,
@@ -334,7 +436,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    width: "100%",
+    width: "75%",
   },
   container: {
     height: '100%',
@@ -350,19 +452,12 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   locateButtonContainer: {
-    height: values.locateBtnContainerSize,
-    width: values.locateBtnContainerSize,
-
+    ...buttonContainer,
     backgroundColor: colors.palette.transparentButton,
-    borderRadius: values.locateBtnContainerSize / 2,
-
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    position: 'absolute',
-    bottom: spacing.lg,
-    right: spacing.sm,
+  },
+  actionsButtonContainer: {
+    ...buttonContainer,
+    backgroundColor: colors.valpinetaPalette.green,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -372,26 +467,16 @@ const styles = StyleSheet.create({
     flex: 1,
 
     display: 'flex',
-
+    alignItems: 'center',
     width: '100%',
     position: 'relative',
+
   },
   mapOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-
-    height: "40%",
-    width: "20%",
-
-    borderStyle: "dashed",
-    borderWidth: 1,
-    borderColor: "red",
-
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    zIndex: 1000,
-  }
+    ...mapOverlayStyle
+  },
+  mapOverlayLeft: {
+    ...mapOverlayStyle,
+    left: 0,
+  },
 });
