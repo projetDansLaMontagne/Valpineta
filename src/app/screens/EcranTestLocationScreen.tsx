@@ -7,7 +7,7 @@ import {
   Pressable,
   GestureResponderEvent,
   Platform,
-  TouchableOpacity, Image,
+  TouchableOpacity, Image, ViewStyle,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import {Button, Screen, Text} from "app/components"
@@ -16,7 +16,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 
 // location
 import * as Location from 'expo-location';
-import MapView from "react-native-maps"
+import MapView, { LocalTile, PROVIDER_GOOGLE } from "react-native-maps"
 
 // variables
 interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
@@ -25,6 +25,168 @@ interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
 type T_animateToLocation = (
   passedLocation?: Location.LocationObject
 ) => void;
+
+const mapStyle = [
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#242f3e"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#746855"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#242f3e"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.locality",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#263c3f"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#6b9a76"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#38414e"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#212a37"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9ca5b3"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#746855"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#1f2835"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#f3d19c"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#2f3948"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#17263c"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#515c6d"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#17263c"
+      }
+    ]
+  }
+]
 
 // Component(s)
 export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function EcranTestScreen(
@@ -116,6 +278,9 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   }
 
   const onPress = async () => {
+    setIsFetching(true);
+    console.log("[EcranTestScreen] onPress()");
+
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       setGavePermission(false);
@@ -123,11 +288,10 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
 
     setGavePermission(true);
-    setIsFetching(true);
+
 
     await getLocationAsync();
 
-    setIsFetching(false);
   }
 
   const toggleFollowUserLocation = () => {
@@ -163,10 +327,18 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   useEffect(() => {
     if (!location) {
       setNbFetch(0)
+      return;
     }
 
+    setIsFetching(false);
     followUserLocation && animateToLocation(location);
   }, [location]);
+
+  useEffect(() => {
+    if (isFetching) {
+      console.log("isFetching is true");
+    }
+  }, [isFetching])
 
   useEffect(() => {
 
@@ -175,65 +347,62 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
   }, []);
 
-  const Wrapper = Platform.OS === 'ios' ? SafeAreaView : View;
+  // const Wrapper = Platform.OS === 'ios' ? SafeAreaView : View;
 
   return (
-    <Screen style={styles.fullScreen}>
-      <Wrapper style={styles.container} >
+    <Screen style={$container}>
+      <SafeAreaView style={styles.container} >
         <Text
           tx="testScreen.title"
           preset="heading"
-          style={{color: colors.text}}
         />
         <View style={styles.mapContainer}>
           {
             location ? (
-              <MapView
-                ref={mapRef}
-                style={styles.map}
+              <>
+                <MapView
+                  ref={mapRef}
+                  style={styles.map}
 
-                initialRegion={{
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
-                }}
-                initialCamera={{
-                  center: {
+                  initialRegion={{
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,
-                  },
-                  pitch: 0,
-                  heading: location.coords.heading ?? 0,
-                  altitude: 2000,
-                  zoom: 15,
-                }}
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                  }}
+                  initialCamera={{
+                    center: {
+                      latitude: location.coords.latitude,
+                      longitude: location.coords.longitude,
+                    },
+                    pitch: 0,
+                    heading: location.coords.heading ?? 0,
+                    altitude: 2000,
+                    zoom: 15,
+                  }}
 
-                onMapLoaded={() => {
-                  animateToLocation(location)
-                }}
-                onMoveShouldSetResponder={handleMapMoves}
+                  onMapLoaded={() => {
+                    animateToLocation(location)
+                  }}
+                  onMoveShouldSetResponder={handleMapMoves}
 
-                // if the default google map location button is clicked
-                // we want to stop following the user location
-                // onUserLocationChange={(event) => {
-                //   console.log("onUserLocationChange");
-                //   console.log(event.nativeEvent);
-                // }}
+                  // if the default google map location button is clicked
+                  // we want to stop following the user location
+                  // onUserLocationChange={(event) => {
+                  //   console.log("onUserLocationChange");
+                  //   console.log(event.nativeEvent);
+                  // }}
 
 
-                showsBuildings={true}
-                showsCompass={true}
-                showsMyLocationButton={true} // only for Android
-                shouldRasterizeIOS={true} // only for iOS
-                showsScale={true} // only for iOS
-                showsUserLocation={true}
-
-                zoomControlEnabled={true}
-              >
-                {
-                  Platform.OS === 'ios' && (
-                    <TouchableOpacity
+                  showsBuildings={true}
+                  showsCompass={true}
+                  showsMyLocationButton={true} // only for Android
+                  shouldRasterizeIOS={true} // only for iOS
+                  showsScale={true} // only for iOS
+                  showsUserLocation={true}
+                />
+                <View style={styles.mapOverlay}>
+                  <TouchableOpacity
                       ref={locateButtonRef}
                       style={{
                         ...styles.locateButtonContainer,
@@ -250,15 +419,16 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                           followUserLocation ? colors.palette.locateIconActive : colors.palette.locateIconInactive
                         }
                       />
-                    </TouchableOpacity>
-                  )
-                }
-              </MapView>
+                  </TouchableOpacity>
+                </View>
+              </>
             ) : (
               <>
                 {
                   isFetching ? (
-                    <Text tx={"testScreen.locate.fetching"} style={{color: "white"}} />
+                    <>
+                      <Text tx={"testScreen.locate.fetching"} style={{color: "white"}} />
+                    </>
                   ) : (
                     <>
                       <Text tx={"testScreen.locate.notLocated.title"} style={{color: "white"}} />
@@ -275,7 +445,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
             )
           }
         </View>
-      </Wrapper>
+      </SafeAreaView>
     </Screen>
   )
 });
@@ -284,10 +454,13 @@ const values = {
   locateBtnContainerSize: 50,
 }
 
+const $container: ViewStyle = {
+  display: 'flex',
+}
+
 const styles = StyleSheet.create({
   button: {
     borderRadius: 10,
-    color: colors.text,
     height: 50,
     justifyContent: "center",
     marginVertical: spacing.sm,
@@ -295,18 +468,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   container: {
-    alignItems: "center",
-    color: colors.palette.neutral900,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    paddingTop: "5%",
+    height: '100%',
 
-  },
-  fullScreen: {
-    flex: 1,
-    height: '70%',
-    width: '100%',
+    alignItems: "center",
+    color: colors.text,
   },
   locateButton: {
     display: 'flex',
@@ -316,27 +481,48 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   locateButtonContainer: {
-    alignItems: 'center',
-    backgroundColor: colors.palette.transparentButton,
-    borderRadius: 50,
-    display: 'flex',
     height: values.locateBtnContainerSize,
-    justifyContent: 'center',
     width: values.locateBtnContainerSize,
+
+    backgroundColor: colors.palette.transparentButton,
+    borderRadius: values.locateBtnContainerSize / 2,
+
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    position: 'absolute',
+    bottom: spacing.lg,
+    right: spacing.sm,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-    alignItems: 'flex-end',
-    display: 'flex',
-    height: '100%',
-    justifyContent: 'flex-end',
-    paddingBottom: '10%',
-    paddingRight: '10%',
     width: '100%',
   },
   mapContainer: {
-    minHeight: '90%',
+    flex: 1,
+
+    display: 'flex',
+
     width: '100%',
     position: 'relative',
   },
+  mapOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+
+    height: "40%",
+    width: "20%",
+
+    borderStyle: "dashed",
+    borderWidth: 1,
+    borderColor: "red",
+
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    zIndex: 1000,
+  }
 });
