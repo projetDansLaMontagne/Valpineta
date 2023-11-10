@@ -3,14 +3,8 @@ import React, { FC, useEffect, useState } from "react";
 import { View, ViewStyle, Text } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { colors } from "../theme";
-import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle";
 import {
   LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
 } from 'react-native-chart-kit'
 import { Dimensions } from "react-native";
 
@@ -71,5 +65,5 @@ const $container: ViewStyle = {
   flex: 1,
   justifyContent: "center",
   alignItems: "center",
-  backgroundColor: colors.background,
+  backgroundColor: colors.fond,
 };

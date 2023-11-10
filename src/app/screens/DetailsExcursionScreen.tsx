@@ -1,12 +1,14 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions } from "react-native";
+import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { Text, CarteAvis } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
+import { LineChart } from 'react-native-chart-kit'
 
 const { width, height } = Dimensions.get("window");
+
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   navigation: any;
@@ -14,22 +16,17 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-
     const { navigation } = props;
 
-    return (
-      < SafeAreaView
-        style={$container}
-      >
+    return(
+      <SafeAreaView style={$container}>
         <TouchableOpacity
           style={$boutonRetour}
           onPress={() => navigation.navigate("Accueil")}
         >
           <Image
             source={require("../../assets/icons/back.png")}
-          >
-
-          </Image>
+          />
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
@@ -43,6 +40,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     );
   }
 );
+
 
 function itemMini() {
   return (
@@ -139,16 +137,63 @@ function infos() {
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-            <Image
-              source={require("../../assets/images/denivele.jpeg")}
-              style={$imageDenivele}
-            >
-            </Image>
+            {
+              graphiqueDenivele()
+            }
           </View>
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>
   )
+}
+
+function graphiqueDenivele() {
+
+  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
+
+  const coordonnees = data.features[0].geometry.coordinates[0];
+  const listeALtitude = coordonnees
+    .map((item, index) => (index % 50 === 0 ? item[2] : null))
+    .filter((altitude) => altitude !== 0);
+  const line = {
+    labels: ["0", "200", "400", "600", "800", "1000"],
+    datasets: [
+      {
+        data: listeALtitude,
+      },
+    ],
+  };
+
+  return (
+    <View style={$container}>
+      <LineChart
+        data={line}
+        width={width - spacing.lg * 2}
+        height={200}
+        withInnerLines={false}
+        withOuterLines={false}
+        yAxisSuffix="m"
+        withShadow={false}
+        chartConfig={{
+          backgroundColor: colors.fond,
+          backgroundGradientFrom: colors.fond,
+          backgroundGradientTo: colors.fond,
+          color: () => colors.boutonAttenue,
+          labelColor: () => colors.bouton,
+          style: {
+            borderRadius: 16
+          },
+          propsForDots: {
+            r: "4",
+            strokeWidth: "2",
+            stroke: colors.bouton
+          }
+        }}
+        bezier
+      />
+    </View>
+  );
+
 }
 
 function avis() {
@@ -280,12 +325,6 @@ const $textDescription: TextStyle = {
 
 const $containerDenivele: ViewStyle = {
   padding: spacing.lg,
-}
-
-const $imageDenivele: ViewStyle = {
-  height: 100,
-  width: width - spacing.xxl,
-  marginTop: spacing.xs,
 }
 
 const $containerAvis: ViewStyle = {

@@ -23,10 +23,6 @@ export const colors = {
    */
   text: palette.marron,
   /**
-   * Texte attenué.
-   */
-  textAttenue: palette.vertAttenue,
-  /**
    * The default color of the screen background.
    */
   fond: palette.blanc,
@@ -42,6 +38,10 @@ export const colors = {
    * Couleur pour les boutons.
    */
   bouton: palette.vert,
+  /**
+   * Couleur pour les boutons attenue.
+   */
+  boutonAttenue: palette.vertAttenue,
   /**
    * Messages d'erreurs.
    */
