@@ -40,10 +40,10 @@ const parametresLogo = require("./../../assets/icons/parametres.png")
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Welcome: undefined
   // 🔥 Your screens go here
   Excursions: undefined
   Map: undefined
+  DetailsExcursion: undefined
   Parametres: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
@@ -81,7 +81,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     >
 
       <Tab.Navigator
-        initialRouteName={"Welcome"}
+        screenOptions={{ headerShown: false }}
+        initialRouteName={"Footer"}
         screenOptions={() => ({
           headerShown: false,
           tabBarStyle: {
@@ -91,8 +92,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           },
         })}
       >
-        <Tab.Screen component={StackNavigator} name="Footer" options={{ tabBarButton: () => null, }} />
-        <Tab.Screen component={Screens.ExcursionsScreen} options={{
+        <Tab.Screen component={StackNavigator} name="Stack" options={{tabBarButton: () => null,}} />
+        <Tab.Screen component={Screens.AccueilScreen} options={{
           tabBarIcon: () => (
             <Image
               source={explorerLogo}
@@ -146,6 +147,7 @@ function StackNavigator() {
         headerShown: false,
       }}
     >
+      <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
       <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
     </Stack.Navigator>
   )
