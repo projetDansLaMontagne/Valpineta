@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { View, ViewStyle, ScrollView, Text, FlatList, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { AppStackScreenProps } from "app/navigators"
-import { Screen, Card } from "app/components"
+import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
 
 
@@ -58,7 +58,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   const renderItem = ({ item }) => (
     <View>
-      <Card
+      <CarteExcursion
         nomExcursions={item.nom_excursions}
         parcours={item.typeParcours}
         zone={item.zone}
