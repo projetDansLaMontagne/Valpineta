@@ -75,10 +75,10 @@ function itemFull() {
       <View>
         <View style={$containerBouton}>
           <TouchableOpacity onPress={() => setIsInfos(true)} >
-            <Text text="Infos" size="lg" style={[$boutonInfosAvis, isInfos ? { color: colors.bouton } : { color: colors.text }]} />
+            <Text text="Infos" size="lg" style={[ isInfos ? { color: colors.bouton } : { color: colors.text }]} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setIsInfos(false)}>
-            <Text text="Avis" size="lg" style={[$boutonInfosAvis, isInfos ? { color: colors.text } : { color: colors.bouton }]} />
+            <Text text="Avis" size="lg" style={[ isInfos ? { color: colors.text } : { color: colors.bouton }]} />
           </TouchableOpacity>
         </View>
           <View style={[$souligneInfosAvis, isInfos ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
@@ -125,11 +125,11 @@ function infos() {
       </View>
       <View style={$containerDescriptionSignalement}>
         <View>
-          <Text text="Description" size="xl" />
+          <Text text="Description" size="lg" />
           <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
         </View>
         <View>
-          <Text text="Signalement" size="xl" />
+          <Text text="Signalement" size="lg" />
           <Text text="signalement" size="xs" />
         </View>
       </View>
@@ -147,7 +147,7 @@ function infos() {
 
 function avis() {
   return (
-    <ScrollView>
+    <ScrollView style={$containerAvis}>
       <TouchableWithoutFeedback>
         <View>
           <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
@@ -224,11 +224,6 @@ const $containerBouton: ViewStyle = {
   width: width,
 }
 
-const $boutonInfosAvis: TextStyle = {
-  borderBottomWidth: 1,
-  borderBottomColor: colors.bouton,
-}
-
 const $souligneInfosAvis: ViewStyle = {
   backgroundColor: colors.bouton,
   height: 2,
@@ -239,8 +234,7 @@ const $souligneInfosAvis: ViewStyle = {
 const $containerInformations: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
-  width: width,
-  padding: spacing.lg,
+  padding: spacing.xl,
 }
 
 const $containerUneInformation: ViewStyle = {
@@ -258,10 +252,13 @@ const $iconInformation: ImageStyle = {
 const $containerDescriptionSignalement: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
+  paddingLeft: spacing.xl,
+  paddingRight: spacing.xl,
 }
 
 const $textDescription: TextStyle = {
   width: width / 2,
+  paddingRight: spacing.xl,
 }
 
 const $containerDenivele: ViewStyle = {
@@ -272,4 +269,8 @@ const $imageDenivele: ViewStyle = {
   height: 100,
   width: width - spacing.xxl,
   marginTop: spacing.xs,
+}
+
+const $containerAvis: ViewStyle = {
+  marginBottom: 100,
 }
