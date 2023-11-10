@@ -168,6 +168,8 @@ export function CarteExcursion(props: CarteExcursionProps) {
       width: spacing.lg,
       height: spacing.lg,
       marginEnd: spacing.xxs,
+    },
+    coeur: {
       color: coeurTouche ? 'red' : 'black',
     },
     zoneFavori: {
@@ -191,7 +193,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <Icon
               name="heart-o"
               size={spacing.lg}
-              style={styles.icone}
+              style={styles.coeur}
             />
           </TouchableOpacity>
         </View>
