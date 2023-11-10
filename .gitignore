@@ -51,6 +51,7 @@ local.properties
 src/node_modules/
 src/npm-debug.log
 src/yarn-error.log
+src/yarn.lock
 
 # BUCK
 src/buck-out/

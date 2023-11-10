@@ -41,7 +41,7 @@ const parametresLogo = require("./../../assets/icons/parametres.png")
  */
 export type AppStackParamList = {
   // 🔥 Your screens go here
-  Accueil: undefined
+  Excursions: undefined
   Map: undefined
   DetailsExcursion: undefined
   Parametres: undefined
@@ -103,8 +103,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           tabBarActiveTintColor: colors.bouton,
           tabBarInactiveTintColor: colors.text,
           tabBarLabelStyle: { color: colors.bouton },
-        }} name="Accueil" />
-
+        }} name="Excursions" />
         <Tab.Screen component={Screens.CarteScreen} options={{
           tabBarIcon: (props) => (
             <Image
@@ -114,7 +113,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           ),
           tabBarLabelStyle: { color: colors.bouton },
         }} name="Carte" />
-
         <Tab.Screen component={Screens.ParametresScreen} options={{
           tabBarIcon: (props) => (
             <Image
@@ -150,7 +148,7 @@ function StackNavigator() {
       }}
     >
       <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
-      <Stack.Screen name="Accueil" component={Screens.AccueilScreen} />
+      <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
     </Stack.Navigator>
   )
 }
