@@ -8,12 +8,15 @@ import { colors, spacing } from 'app/theme';
 
 
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
-  navigation: any
+  navigation: any;
+  filtres: any;
 }
 
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(props: ExcursionsScreenProps) {
   const [excursions, setExcursions] = useState(undefined);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const { navigation } = props;
 
   // Fonctions 
   const loadExcursions = async () => {
@@ -36,11 +39,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     catch (error) {
       console.error('Erreur lors du chargement du fichier JSON :', error);
     }
-  };
-  const handleFilterPress = () => {
-    // Faites ce que vous souhaitez lorsqu'on appuie sur l'icône de filtre
-    console.log('Filtrer les excursions');
-    // Autres actions à effectuer
   };
   // const excursionsFiltrees = () => {
   //   return excursionsData.filter(excursion =>
@@ -81,8 +79,15 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           onChangeText={text => setSearchQuery(text)}
           placeholderTextColor={colors.palette.grisFonce}
         />
-        <TouchableOpacity onPress={handleFilterPress} style={styles.zoneIcone}>
-          <Image style={styles.iconeFiltre} source={filtreIcone} resizeMode="contain" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Stack", { screen: 'Filtres' })}
+          style={styles.zoneIcone}
+        >
+          <Image
+            style={styles.iconeFiltre}
+            source={filtreIcone}
+            resizeMode="contain"
+          />
         </TouchableOpacity>
       </View>
 

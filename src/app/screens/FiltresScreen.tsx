@@ -107,7 +107,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       difficulteOrientation: difficulteOrientation,
     };
 
-    navigation.navigate("Welcome", { filtres: filtres });
+    navigation.navigate("Excursions", { filtres: filtres });
   }
 
   return <ScrollView
@@ -124,7 +124,11 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     <View>
       {
         criteresTri.map((critere, i) =>
-          <TouchableOpacity onPress={() => setCritereTri(i)} style={$critereTri}>
+          <TouchableOpacity
+            onPress={() => setCritereTri(i)}
+            style={$critereTri}
+            key={i}
+          >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Image source={critere.logo} style={$logoCritere} />
               <Text style={$criteresTri} >{critere.texte}</Text>
@@ -181,7 +185,11 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     <View>
       {
         types.map((type, i) =>
-          <TouchableOpacity onPress={() => clicType(i)} style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            onPress={() => clicType(i)}
+            style={{ flexDirection: "row", alignItems: "center" }}
+            key={i}
+          >
             <Switch
               trackColor={{ false: 'onsenfout', true: '#cccccc' }}
               thumbColor={type.estCoche ? 'green' : '#ffffff'}
@@ -215,9 +223,9 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       {
         difficultePhysique.map((difficulte, i) =>
           <TouchableOpacity
-            key={difficulte.niveau}
             onPress={() => clicDifficultePhysique(i)}
             style={difficulte.selectionnee ? $difficulteSelectionnee : $difficulte}
+            key={difficulte.niveau}
           >
             {
               [...Array(difficulte.niveau)].map(() =>
@@ -234,9 +242,9 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       {
         difficulteOrientation.map((difficulte, i) =>
           <TouchableOpacity
-            key={difficulte.niveau}
             onPress={() => clicDifficulteOrientation(i)}
             style={difficulte.selectionnee ? $difficulteSelectionnee : $difficulte}
+            key={difficulte.niveau}
           >
             {
               [...Array(difficulte.niveau)].map(() =>
