@@ -1,0 +1,100 @@
+<mxfile host="Electron" modified="2023-10-18T06:48:01.224Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.2 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="vRWKjZvIzUAsPi_kxnZl" version="22.0.2" type="device">
+  <diagram name="Page-1" id="G52OUv80cTCtacmYWDGP">
+    <mxGraphModel dx="821" dy="1787" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="nMeOASZX_UeLLUZow387-2" value="&lt;font face=&quot;Verdana&quot; style=&quot;font-size: 20px;&quot;&gt;&lt;b&gt;Enregistrement des signalements.&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;gradientColor=none;gradientDirection=north;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="-1120" width="640" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-9" value="Requête les excursions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=none;" edge="1" parent="1" source="nMeOASZX_UeLLUZow387-6" target="nMeOASZX_UeLLUZow387-8">
+          <mxGeometry x="0.2181" y="10" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="-980" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="nMeOASZX_UeLLUZow387-6" target="nMeOASZX_UeLLUZow387-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="170" y="-800" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-17" value="Sauvegarde des excursions traitées / Requêtes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" vertex="1" connectable="0" parent="nMeOASZX_UeLLUZow387-15">
+          <mxGeometry x="-0.0977" y="2" relative="1" as="geometry">
+            <mxPoint x="27" y="-18" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-6" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;API&lt;br&gt;&lt;/font&gt;" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.citrix.tower_server;" vertex="1" parent="1">
+          <mxGeometry x="120" y="-920" width="61.18" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=none;" edge="1" parent="1" source="nMeOASZX_UeLLUZow387-8" target="nMeOASZX_UeLLUZow387-6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="-950" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-13" value="Répond aux requêtes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" vertex="1" connectable="0" parent="nMeOASZX_UeLLUZow387-12">
+          <mxGeometry x="-0.2299" relative="1" as="geometry">
+            <mxPoint x="-18" y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-8" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;WP&lt;br&gt;Pods&lt;br&gt;&lt;/font&gt;" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.citrix.tower_server;" vertex="1" parent="1">
+          <mxGeometry x="449.99999999999994" y="-1000" width="61.18" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-11" value="Traite les excursions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;elbow=vertical;labelBackgroundColor=none;labelBorderColor=none;" edge="1" parent="1" source="nMeOASZX_UeLLUZow387-6" target="nMeOASZX_UeLLUZow387-6">
+          <mxGeometry y="59" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="nMeOASZX_UeLLUZow387-14" target="nMeOASZX_UeLLUZow387-6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="130" y="-780" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-18" value="Répond aux requêtes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" vertex="1" connectable="0" parent="nMeOASZX_UeLLUZow387-16">
+          <mxGeometry x="-0.3697" y="1" relative="1" as="geometry">
+            <mxPoint x="-18" y="9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" edge="1" parent="1" source="nMeOASZX_UeLLUZow387-14" target="nMeOASZX_UeLLUZow387-20">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="540" y="-800" />
+              <mxPoint x="540" y="-737" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-14" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;BD&lt;br&gt;&lt;/font&gt;" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.citrix.tower_server;" vertex="1" parent="1">
+          <mxGeometry x="449.99999999999994" y="-840" width="61.18" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-20" value="Signalement" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=14;labelBackgroundColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="560" y="-840" width="116.5" height="206" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-21" value="id: NUMBER" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="nMeOASZX_UeLLUZow387-20">
+          <mxGeometry y="26" width="116.5" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-22" value="nom: VARCHAR" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="nMeOASZX_UeLLUZow387-20">
+          <mxGeometry y="56" width="116.5" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-24" value="type: VARCHAR" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="nMeOASZX_UeLLUZow387-20">
+          <mxGeometry y="86" width="116.5" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-25" value="description: TEXT" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="nMeOASZX_UeLLUZow387-20">
+          <mxGeometry y="116" width="116.5" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-26" value="image: BLOB" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="nMeOASZX_UeLLUZow387-20">
+          <mxGeometry y="146" width="116.5" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nMeOASZX_UeLLUZow387-23" value="Excursions: JSON" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="nMeOASZX_UeLLUZow387-20">
+          <mxGeometry y="176" width="116.5" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
