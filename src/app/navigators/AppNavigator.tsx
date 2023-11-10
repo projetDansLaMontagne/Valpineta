@@ -93,36 +93,52 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           },
         })}
       >
-        <Tab.Screen component={StackNavigator} name="Stack" options={{ tabBarButton: () => null, }} />
-        <Tab.Screen component={Screens.ExcursionsScreen} options={{
-          tabBarIcon: () => (
-            <Image
-              source={explorerLogo}
-              style={$icon}
-            />
-          ),
-          tabBarActiveTintColor: colors.bouton,
-          tabBarInactiveTintColor: colors.text,
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Excursions" />
-        <Tab.Screen component={Screens.CarteScreen} options={{
-          tabBarIcon: (props) => (
-            <Image
-              source={carteLogo}
-              style={$icon}
-            />
-          ),
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Carte" />
-        <Tab.Screen component={Screens.ParametresScreen} options={{
-          tabBarIcon: (props) => (
-            <Image
-              source={parametresLogo}
-              style={$icon}
-            />
-          ),
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Parametres" />
+        <Tab.Screen
+          name="Stack"
+          component={StackNavigator}
+          options={{ tabBarButton: () => null, }}
+        />
+        <Tab.Screen
+          name="Excursions"
+          component={Screens.ExcursionsScreen}
+          options={{
+            tabBarIcon: () => (
+              <Image
+                source={explorerLogo}
+                style={$icon}
+              />
+            ),
+            tabBarActiveTintColor: colors.bouton,
+            tabBarInactiveTintColor: colors.text,
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
+        <Tab.Screen
+          name="Carte"
+          component={Screens.CarteScreen}
+          options={{
+            tabBarIcon: (props) => (
+              <Image
+                source={carteLogo}
+                style={$icon}
+              />
+            ),
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
+        <Tab.Screen
+          name="Parametres"
+          component={Screens.ParametresScreen}
+          options={{
+            tabBarIcon: (props) => (
+              <Image
+                source={parametresLogo}
+                style={$icon}
+              />
+            ),
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   )
