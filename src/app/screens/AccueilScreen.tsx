@@ -3,9 +3,10 @@ import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
 import { ViewStyle, ScrollView } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import { Screen, Text } from "app/components"
+import {Screen, Text } from "app/components"
 import {spacing } from "app/theme"
 import DonnesApi from "app/components/DonnesApi" 
+
 
 interface AccueilScreenProps extends AppStackScreenProps<"Accueil"> {
   navigation: any
