@@ -1,15 +1,14 @@
-const fr = {
+const es = {
   common: {
     ok: "OK !",
     cancel: "Annuler",
     back: "Retour",
-    accueil: "Accueil"
   },
   welcomeScreen: {
     postscript:
       "psst  — Ce n'est probablement pas à quoi ressemble votre application. (À moins que votre designer ne vous ait donné ces écrans, dans ce cas, mettez la en prod !)",
     readyForLaunch: "Votre application, presque prête pour le lancement !",
-    exciting: "(ohh, c'est excitant !)",
+    exciting: "(ESPAGNOLLLL !)",
   },
   errorScreen: {
     title: "Quelque chose s'est mal passé !",
@@ -27,21 +26,10 @@ const fr = {
   },
 
   carteComposant: {
-    titre: "Le col de la marmotte",
-    zone: "Pineta",
-    parcours: "Allez/Retour",
-    temps: "7h30",
-    distance: "13,5 km",
-    denivelePositif: "1350 m",
-    difficulteParcours: "2",
-    difficulteOrientation: "1",
+    titre: "Título de la tarjeta",
+    localisation: "Ubicación",
+    parcours: "Ida y vuelta",
   },
-  footer: {
-    accueil: "Accueil",
-    carte: "Carte",
-    parametres: "Parametres",
-  }
 }
 
-export default fr
-export type Translations = typeof fr
+export default es
