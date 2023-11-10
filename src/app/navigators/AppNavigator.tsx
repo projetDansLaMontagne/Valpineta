@@ -42,7 +42,7 @@ const parametresLogo = require("./../../assets/icons/parametres.png")
 export type AppStackParamList = {
   Welcome: undefined
   // 🔥 Your screens go here
-  Accueil: undefined
+  Excursions: undefined
   Map: undefined
   Parametres: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
@@ -91,8 +91,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           },
         })}
       >
-        <Tab.Screen component={StackNavigator} name="Footer" options={{tabBarButton: () => null,}} />
-        <Tab.Screen component={Screens.AccueilScreen} options={{
+        <Tab.Screen component={StackNavigator} name="Footer" options={{ tabBarButton: () => null, }} />
+        <Tab.Screen component={Screens.ExcursionsScreen} options={{
           tabBarIcon: () => (
             <Image
               source={explorerLogo}
@@ -102,8 +102,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           tabBarActiveTintColor: colors.bouton,
           tabBarInactiveTintColor: colors.text,
           tabBarLabelStyle: { color: colors.bouton },
-        }} name="Accueil" />
-
+        }} name="Excursions" />
         <Tab.Screen component={Screens.CarteScreen} options={{
           tabBarIcon: (props) => (
             <Image
@@ -113,7 +112,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           ),
           tabBarLabelStyle: { color: colors.bouton },
         }} name="Carte" />
-
         <Tab.Screen component={Screens.ParametresScreen} options={{
           tabBarIcon: (props) => (
             <Image
@@ -148,7 +146,7 @@ function StackNavigator() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="Accueil" component={Screens.AccueilScreen} />
+      <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
     </Stack.Navigator>
   )
 }
