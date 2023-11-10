@@ -19,7 +19,7 @@ export const AccueilScreen: FC<AccueilScreenProps> = observer(function AccueilSc
       <Text text="Accueil" size="xxl" />
       <Button 
       text="Voir détails"
-      onPress={() => navigation.navigate('DetailsExcursion')}
+      onPress={() => navigation.navigate('Stack',{screen: 'DetailsExcursion'})}
       />
     </Screen>
   )

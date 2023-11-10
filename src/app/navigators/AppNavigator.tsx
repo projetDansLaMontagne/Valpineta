@@ -85,7 +85,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 
       <Tab.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName={"Welcome"}
+        initialRouteName={"Footer"}
         screenOptions={() => ({
           headerShown: false,
           tabBarStyle: {
@@ -95,7 +95,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           },
         })}
       >
-        <Tab.Screen component={StackNavigator} name="Footer" options={{tabBarButton: () => null,}} />
+        <Tab.Screen component={StackNavigator} name="Stack" options={{tabBarButton: () => null,}} />
         <Tab.Screen component={Screens.AccueilScreen} options={{
           tabBarIcon: () => (
             <Image
