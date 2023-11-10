@@ -1,10 +1,9 @@
-import { Translations } from "./en"
-
-const fr: Translations = {
+const fr = {
   common: {
     ok: "OK !",
     cancel: "Annuler",
     back: "Retour",
+    accueil: "Accueil"
   },
   welcomeScreen: {
     postscript:
@@ -26,6 +25,12 @@ const fr: Translations = {
       button: "Essayons à nouveau",
     },
   },
+  footer: {
+    accueil: "Accueil",
+    carte: "Carte",
+    parametres: "Parametres",
+  }
 }
 
 export default fr
+export type Translations = typeof fr
