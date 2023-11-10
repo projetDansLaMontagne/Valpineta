@@ -5,14 +5,12 @@ import { AppStackScreenProps } from "app/navigators"
 import { Screen, Text } from "app/components"
 import { spacing } from "app/theme"
 
+interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 
-interface CarteScreenProps extends AppStackScreenProps<"Carte"> {}
-
-export const CarteScreen: FC<CarteScreenProps> = observer(function CarteScreen() {
-
+export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
   return (
     <Screen style={$root} preset="scroll">
-      <Text text="Carte" size="xxl" />
+      <Text text="Parametres" size="xxl" />
     </Screen>
   )
 })
