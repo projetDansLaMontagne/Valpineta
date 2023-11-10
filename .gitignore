@@ -1,0 +1,9 @@
+# Folders
+.idea
+src/.expo
+
+src/node_modules
+src/package-lock.json
+
+src/ios
+src/test/test-gpx

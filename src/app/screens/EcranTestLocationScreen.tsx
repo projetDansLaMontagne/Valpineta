@@ -7,7 +7,7 @@ import {
   Pressable,
   GestureResponderEvent,
   Platform,
-  TouchableOpacity, Image, ViewStyle,
+  TouchableOpacity, Image, ViewStyle, Dimensions,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import {Button, Screen, Text} from "app/components"
@@ -21,172 +21,9 @@ import MapView, { LocalTile, PROVIDER_GOOGLE } from "react-native-maps"
 // variables
 interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
 
-
 type T_animateToLocation = (
   passedLocation?: Location.LocationObject
 ) => void;
-
-const mapStyle = [
-  {
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#242f3e"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#746855"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#242f3e"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.locality",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#d59563"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#d59563"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#263c3f"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#6b9a76"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#38414e"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      {
-        "color": "#212a37"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#9ca5b3"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#746855"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      {
-        "color": "#1f2835"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#f3d19c"
-      }
-    ]
-  },
-  {
-    "featureType": "transit",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#2f3948"
-      }
-    ]
-  },
-  {
-    "featureType": "transit.station",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#d59563"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#17263c"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#515c6d"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#17263c"
-      }
-    ]
-  }
-]
 
 // Component(s)
 export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function EcranTestScreen(
@@ -200,7 +37,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   const [location, setLocation] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
   const [nbFetch, setNbFetch] = useState(0);
-  const [followUserLocation, setFollowUserLocation] = useState(true);
+  const [followUserLocation, setFollowUserLocation] = useState(false);
 
   const intervalRef = useRef(null);
 
@@ -302,7 +139,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     // change the background color of the button
     locateButtonRef.current.setNativeProps({
       style: {
-        backgroundColor: colors.palette.transparentButtonActive,
+        backgroundColor: colors.palette.transparentButtonOnPress,
       }
     });
   }
@@ -331,7 +168,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
 
     setIsFetching(false);
-    followUserLocation && animateToLocation(location);
+    // followUserLocation && animateToLocation(location);
   }, [location]);
 
   useEffect(() => {
@@ -349,6 +186,21 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
   // const Wrapper = Platform.OS === 'ios' ? SafeAreaView : View;
 
+  const { width, height } = Dimensions.get('window');
+
+  const ASPECT_RATIO = width / height;
+  const LATITUDE = -12.054985242912784;
+  const LONGITUDE = -75.24545159952076;
+  const LATITUDE_DELTA = 0.0922;
+  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+  const region = {
+    latitude: LATITUDE,
+    longitude: LONGITUDE,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  }
+
   return (
     <Screen style={$container}>
       <SafeAreaView style={styles.container} >
@@ -364,26 +216,34 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   ref={mapRef}
                   style={styles.map}
 
-                  initialRegion={{
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                  }}
-                  initialCamera={{
-                    center: {
-                      latitude: location.coords.latitude,
-                      longitude: location.coords.longitude,
-                    },
-                    pitch: 0,
-                    heading: location.coords.heading ?? 0,
-                    altitude: 2000,
-                    zoom: 15,
-                  }}
+                  // initialRegion={{
+                  //   latitude: location.coords.latitude,
+                  //   longitude: location.coords.longitude,
+                  //   latitudeDelta: 0.0922,
+                  //   longitudeDelta: 0.0421,
+                  // }}
 
-                  onMapLoaded={() => {
-                    animateToLocation(location)
-                  }}
+                  initialRegion={region}
+
+                  maxZoomLevel={14}
+                  minZoomLevel={12}
+
+                  // initialCamera={{
+                  //   center: {
+                  //     // latitude: location.coords.latitude,
+                  //     // longitude: location.coords.longitude,
+                  //     latitude: LATITUDE,
+                  //     longitude: LONGITUDE,
+                  //   },
+                  //   pitch: 0,
+                  //   heading: location.coords.heading ?? 0,
+                  //   altitude: Platform.OS === 'ios' ? 2000 : 0,
+                  //   zoom: Platform.OS === 'ios' ? 15 : 10,
+                  // }}
+
+                  // onMapLoaded={() => {
+                  //   animateToLocation(location)
+                  // }}
                   onMoveShouldSetResponder={handleMapMoves}
 
                   // if the default google map location button is clicked
@@ -393,6 +253,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   //   console.log(event.nativeEvent);
                   // }}
 
+                  mapType={Platform.OS == "android" ? "none" : "standard"}
 
                   showsBuildings={true}
                   showsCompass={true}
@@ -400,27 +261,35 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   shouldRasterizeIOS={true} // only for iOS
                   showsScale={true} // only for iOS
                   showsUserLocation={true}
-                />
-                <View style={styles.mapOverlay}>
-                  <TouchableOpacity
-                      ref={locateButtonRef}
-                      style={{
-                        ...styles.locateButtonContainer,
-                      }}
 
-                      onPressIn={locateButtonOnPressIn}
-                      onPressOut={locateButtonOnPressOut}
-                      onPress={toggleFollowUserLocation}
-                    >
-                      <FontAwesome5
-                        name="location-arrow"
-                        size={20}
-                        color={
-                          followUserLocation ? colors.palette.locateIconActive : colors.palette.locateIconInactive
-                        }
-                      />
-                  </TouchableOpacity>
-                </View>
+                  zoomControlEnabled={true}
+                >
+                  <LocalTile
+                    pathTemplate={'/Users/tom_planche/Desktop/BUT/BUT3/SAE_Valpineta/Valpineta/src/Chupaca/{z}/{x}/{y}.png'}
+                    tileSize={256}
+                    // zIndex={-1}
+                  />
+                </MapView>
+                {/*<View style={styles.mapOverlay}>*/}
+                {/*  <TouchableOpacity*/}
+                {/*      ref={locateButtonRef}*/}
+                {/*      style={{*/}
+                {/*        ...styles.locateButtonContainer,*/}
+                {/*      }}*/}
+
+                {/*      onPressIn={locateButtonOnPressIn}*/}
+                {/*      onPressOut={locateButtonOnPressOut}*/}
+                {/*      onPress={toggleFollowUserLocation}*/}
+                {/*    >*/}
+                {/*      <FontAwesome5*/}
+                {/*        name="location-arrow"*/}
+                {/*        size={20}*/}
+                {/*        color={*/}
+                {/*          followUserLocation ? colors.palette.locationBlue : colors.palette.locationBlueDisabled*/}
+                {/*        }*/}
+                {/*      />*/}
+                {/*  </TouchableOpacity>*/}
+                {/*</View>*/}
               </>
             ) : (
               <>
