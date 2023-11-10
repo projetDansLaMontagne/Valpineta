@@ -23,7 +23,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       >
         <TouchableOpacity
           style={$boutonRetour}
-          onPress={() => navigation.navigate("Accueil")}
+          onPress={() => navigation.navigate("Excursions")}
         >
           <Image
             source={require("../../assets/icons/back.png")}
