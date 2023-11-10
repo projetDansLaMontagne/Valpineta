@@ -21,9 +21,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       < SafeAreaView
         style={$container}
       >
-        <Text size="xxl">
-          {height}
-        </Text>
         <TouchableOpacity
           style={$boutonRetour}
           onPress={() => navigation.navigate("Accueil")}
@@ -208,7 +205,7 @@ const $containerGrand: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.xs,
-  paddingBottom: 250,
+  paddingBottom: 275,
 }
 
 const $iconsSwipeUp: ImageStyle = {
