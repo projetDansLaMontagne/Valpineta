@@ -1,18 +1,18 @@
 import { observer } from "mobx-react-lite"
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 
 import { Text, Button } from "../components"
 import { isRTL } from "../i18n"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
-import { useNavigation } from "@react-navigation/native"
 
 const welcomeLogo = require("../../assets/images/logo.png")
 const welcomeFace = require("../../assets/images/welcome-face.png")
 
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {
   navigation: undefined
+  filtres?: {}
 }
 
 export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(
