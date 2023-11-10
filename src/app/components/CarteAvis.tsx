@@ -40,8 +40,7 @@ export const CarteAvis = observer(function CarteAvis(props: CarteAvisProps) {
             style={$icon}
             key={index}
             source={require("../../assets/icons/etoile_pleine.png")}
-          >
-          </Image>
+          />
         ))
       }
       {
@@ -50,8 +49,7 @@ export const CarteAvis = observer(function CarteAvis(props: CarteAvisProps) {
             style={$icon}
             key={index}
             source={require("../../assets/icons/etoile_vide.png")}
-          >
-          </Image>
+          />
         ))
       }
     </View>
@@ -66,13 +64,16 @@ const $container: ViewStyle = {
   borderColor: colors.bordure,
   borderWidth: 1,
   borderRadius: spacing.xs,
-  margin: spacing.lg,
+  marginTop: spacing.xs,
+  marginBottom: spacing.xs,
+  marginLeft: spacing.lg,
+  marginRight: spacing.lg,
   padding: spacing.lg,
 }
 
 const $text: TextStyle = {
   fontFamily: typography.primary.normal,
-  color: colors.texte,
+  color: colors.text,
   fontSize: 14,
 }
 

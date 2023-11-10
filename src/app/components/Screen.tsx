@@ -11,7 +11,6 @@ import {
   StyleProp,
   View,
   ViewStyle,
-  SafeAreaView,
 } from "react-native"
 import { colors, spacing } from "../theme"
 import { ExtendedEdge, useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
@@ -201,7 +200,7 @@ export function Screen(props: ScreenProps) {
   const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges)
 
   return (
-    <SafeAreaView  style={[$containerStyle, { backgroundColor }, $containerInsets]}>
+    <View  style={[$containerStyle, { backgroundColor }, $containerInsets]}>
       <StatusBar style={statusBarStyle} {...StatusBarProps} />
 
       <KeyboardAvoidingView
@@ -216,7 +215,7 @@ export function Screen(props: ScreenProps) {
           <ScreenWithScrolling {...props} />
         )}
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   )
 }
 

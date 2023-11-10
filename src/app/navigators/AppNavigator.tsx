@@ -18,9 +18,7 @@ import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { translate } from "i18n-js"
 import { Image, ImageStyle } from "react-native"
-import { func } from "prop-types"
 
 
 const explorerLogo = require("./../../assets/icons/explorer.png")
@@ -42,7 +40,6 @@ const parametresLogo = require("./../../assets/icons/parametres.png")
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Welcome: undefined
   // 🔥 Your screens go here
   Accueil: undefined
   Map: undefined
