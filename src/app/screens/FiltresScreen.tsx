@@ -178,7 +178,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     />
 
     <Text style={$h2}>Type de parcours</Text>
-    <View style={$cadre}>
+    <View>
       {
         types.map((type, i) =>
           <TouchableOpacity onPress={() => clicType(i)} style={{ flexDirection: "row", alignItems: "center" }}>
@@ -278,7 +278,6 @@ const $critereTri: ViewStyle = {
   justifyContent: "space-between",
 }
 const $containerZones: ViewStyle = {
-  ...$cadre,
   display: "flex",
   flexDirection: "row",
   flexWrap: "wrap",
