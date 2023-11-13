@@ -15,6 +15,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const [excursions, setExcursions] = useState(undefined);
   const [searchQuery, setSearchQuery] = useState('');
 
+
   // Fonctions 
   const loadExcursions = async () => {
     try {
@@ -67,6 +68,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         denivelePositif={item.denivelePositif}
         difficulteParcours={item.difficulteParcours}
         difficulteOrientation={item.difficulteOrientation}
+        navigation={props.navigation}
       />
     </View>
   );
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
     color: colors.palette.noir,
     backgroundColor: colors.palette.grisClair,
     margin: 10,
-    shadowColor: "#000",
+    shadowColor: colors.palette.noir,
     shadowOffset: {
       width: 0,
       height: 1,
