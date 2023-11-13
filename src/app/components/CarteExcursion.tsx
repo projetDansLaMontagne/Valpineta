@@ -74,7 +74,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   }
 
   const detailExcursion = () => {
-    navigation.navigate('Stack', { screen: 'DetailsExcursion', params: { nomExcursion: nomExcursions } });
+    navigation.navigate('Stack', { screen: 'DetailsExcursion', params: { nomExcursion: nomExcursions, temps: temps, distance: distance, difficulteParcours: difficulteParcours, difficulteOrientation: difficulteOrientation } });
   }
 
   const styles = StyleSheet.create({

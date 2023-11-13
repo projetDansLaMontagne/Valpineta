@@ -21,11 +21,14 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       route: {
         params: {
             nomExcursion,
+            temps,
+            distance,
+            difficulteParcours,
+            difficulteOrientation,
         }
       }
     } = props;
 
-console.log(nomExcursion);
 
     return (
       < SafeAreaView
@@ -43,7 +46,7 @@ console.log(nomExcursion);
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(nomExcursion)}
+          itemFull={itemFull(nomExcursion,temps,distance,difficulteParcours,difficulteOrientation)}
           disableSwipeIcon={true}
           animation="easeInEaseOut"
           extraMarginTop={125}
@@ -64,7 +67,7 @@ function itemMini() {
   )
 }
 
-function itemFull(nomExcursion) {
+function itemFull(nomExcursion,temps,distance,difficulteParcours,difficulteOrientation) {
 
   const [isInfos, setIsInfos] = useState(true);
 
@@ -96,13 +99,14 @@ function itemFull(nomExcursion) {
         </View>
         <View style={[$souligneInfosAvis, isInfos ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
         </View>
-        {isInfos ? infos() : avis()}
+        {isInfos ? infos(temps, distance, difficulteParcours, difficulteOrientation) : avis()}
       </View>
     </View>
   )
 }
 
-function infos() {
+function infos(temps, distance, difficulteParcours, difficulteOrientation) {
+
   return (
     <ScrollView>
       <TouchableWithoutFeedback>
@@ -113,28 +117,28 @@ function infos() {
                 source={require("../../assets/icons/temps.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={temps} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={distance+' km'} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/difficulteParcours.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={difficulteParcours} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
               >
               </Image>
-              <Text text="1" size="xs" />
+              <Text text={difficulteOrientation} size="xs" />
             </View>
           </View>
           <View style={$containerDescriptionSignalement}>
@@ -260,20 +264,19 @@ const $souligneInfosAvis: ViewStyle = {
 
 const $containerInformations: ViewStyle = {
   flexDirection: "row",
-  justifyContent: "space-around",
+  justifyContent: "space-between",
   padding: spacing.xl,
 }
 
 const $containerUneInformation: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",
-  justifyContent: "space-around",
-  width: spacing.xxl,
 }
 
 const $iconInformation: ImageStyle = {
   width: spacing.lg,
   height: spacing.lg,
+  marginRight: spacing.xs,
 }
 
 const $containerDescriptionSignalement: ViewStyle = {
