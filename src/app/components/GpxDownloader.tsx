@@ -8,7 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 
 
 export default function GpxDownloader() {
-
+  
   const copyFile = async () => {
     const filename = "test.json";
 
