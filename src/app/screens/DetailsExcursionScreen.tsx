@@ -10,12 +10,22 @@ const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   navigation: any;
+  route: any;
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
 
-    const { navigation } = props;
+    const { 
+      navigation,
+      route: {
+        params: {
+            nomExcursion,
+        }
+      }
+    } = props;
+
+console.log(nomExcursion);
 
     return (
       < SafeAreaView
@@ -33,7 +43,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull()}
+          itemFull={itemFull(nomExcursion)}
           disableSwipeIcon={true}
           animation="easeInEaseOut"
           extraMarginTop={125}
@@ -54,7 +64,7 @@ function itemMini() {
   )
 }
 
-function itemFull() {
+function itemFull(nomExcursion) {
 
   const [isInfos, setIsInfos] = useState(true);
 
@@ -66,7 +76,7 @@ function itemFull() {
         style={$iconsSwipeUp}
       />
       <View style={$containerTitre}>
-        <Text text="Col de la marmotte" size="xl" style={$titre} />
+        <Text text={nomExcursion} size="xl" style={$titre} />
         <TouchableOpacity>
           <Image
             source={require("../../assets/icons/download.png")}
