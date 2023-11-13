@@ -2,10 +2,11 @@ import React, { FC, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Text, CarteAvis } from "app/components";
+import { Text, CarteAvis, GraphiqueDenivele } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { LineChart } from 'react-native-chart-kit'
+import { useFocusEffect } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -54,7 +55,7 @@ function itemMini() {
 
 function itemFull() {
 
-  const [isInfos, setIsInfos] = useState(true);
+  const [isInfos, setIsInfos] = useState(false);
 
   return (
 
@@ -75,10 +76,10 @@ function itemFull() {
       </View>
       <View>
         <View style={$containerBouton}>
-          <TouchableOpacity onPress={() => setIsInfos(true)} style={$boutonInfoAvis} >
+          <TouchableOpacity onPress={() => {setIsInfos(true)}} style={$boutonInfoAvis} >
             <Text text="Infos" size="lg" style={[isInfos ? { color: colors.bouton } : { color: colors.text }]} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsInfos(false)} style={$boutonInfoAvis}>
+          <TouchableOpacity onPress={() => {setIsInfos(false)}} style={$boutonInfoAvis}>
             <Text text="Avis" size="lg" style={[isInfos ? { color: colors.text } : { color: colors.bouton }]} />
           </TouchableOpacity>
         </View>
@@ -137,9 +138,7 @@ function infos() {
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-            {
-              graphiqueDenivele()
-            }
+            <GraphiqueDenivele/>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -147,54 +146,6 @@ function infos() {
   )
 }
 
-function graphiqueDenivele() {
-
-  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
-
-  const coordonnees = data.features[0].geometry.coordinates[0];
-  const listeALtitude = coordonnees
-    .map((item, index) => (index % 50 === 0 ? item[2] : null))
-    .filter((altitude) => altitude !== 0);
-  const line = {
-    labels: ["0", "200", "400", "600", "800", "1000"],
-    datasets: [
-      {
-        data: listeALtitude,
-      },
-    ],
-  };
-
-  return (
-    <View style={$container}>
-      <LineChart
-        data={line}
-        width={width - spacing.lg * 2}
-        height={200}
-        withInnerLines={false}
-        withOuterLines={false}
-        yAxisSuffix="m"
-        withShadow={false}
-        chartConfig={{
-          backgroundColor: colors.fond,
-          backgroundGradientFrom: colors.fond,
-          backgroundGradientTo: colors.fond,
-          color: () => colors.boutonAttenue,
-          labelColor: () => colors.bouton,
-          style: {
-            borderRadius: 16
-          },
-          propsForDots: {
-            r: "4",
-            strokeWidth: "2",
-            stroke: colors.bouton
-          }
-        }}
-        bezier
-      />
-    </View>
-  );
-
-}
 
 function avis() {
   return (
