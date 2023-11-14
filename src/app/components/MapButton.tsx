@@ -17,7 +17,7 @@ import {
 import {FontAwesome5} from "@expo/vector-icons";
 import { Text, TextProps } from "./Text"
 import {colors, spacing} from "../theme";
-import {ComponentType, RefObject} from "react";
+import {ComponentType, forwardRef, RefObject} from "react";
 import {ButtonAccessoryProps} from "./Button";
 // END IMPORTS ==========================================================================================   END IMPORTS
 
@@ -38,12 +38,6 @@ export interface MapButtonProps extends PressableProps {
   iconColor?: string;
 
   /**
-   * An optional ref to access the TouchableOpacity element
-   * @type {React.RefObject<TouchableOpacity>}
-   */
-  ref?: RefObject<TouchableOpacity>
-
-  /**
    * An optional style override useful for padding & margin.
    */
   style?: StyleProp<ViewStyle>
@@ -57,7 +51,7 @@ export interface MapButtonProps extends PressableProps {
  * @return
  * @constructor
  **/
-const MapButton = (props: MapButtonProps) => {
+const MapButton = forwardRef((props: MapButtonProps, ref) => {
   // Props
   const {
     onPressIn,
@@ -68,7 +62,6 @@ const MapButton = (props: MapButtonProps) => {
     iconSize,
     iconColor,
 
-    ref,
     style,
     ...rest
   } = props
@@ -84,7 +77,7 @@ const MapButton = (props: MapButtonProps) => {
   return (
     <Animated.View>
       <TouchableOpacity
-        ref={ref}
+        ref={ref as RefObject<any>}
         style={style}
 
         onPressIn={onPressIn}
@@ -99,7 +92,7 @@ const MapButton = (props: MapButtonProps) => {
       </TouchableOpacity>
     </Animated.View>
   )
-}
+});
 
 
 // END COMPONENT =======================================================================================  END COMPONENT

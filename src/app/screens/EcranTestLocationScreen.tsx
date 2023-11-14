@@ -213,13 +213,11 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
   }, []);
 
-  // const Wrapper = Platform.OS === 'ios' ? SafeAreaView : View;
-
   const { width, height } = Dimensions.get('window');
 
   const ASPECT_RATIO = width / height;
-  const LATITUDE = -12.054985242912784;
-  const LONGITUDE = -75.24545159952076;
+  const LATITUDE = 42.6338;
+  const LONGITUDE = 0.218477;
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
@@ -229,6 +227,8 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   }
+
+  const tilesPath = '/Users/tom_planche/Desktop/BUT/BUT3/SAE_Valpineta/Valpineta/src/assets/Tiles/{z}/{x}/{y}.png';
 
   return (
     <Screen style={$container}>
@@ -243,7 +243,12 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
               <>
                 <MapView
                   ref={mapRef}
-                  style={styles.map}
+                  style={{
+                    height,
+                    width,
+
+                    ...styles.map
+                  }}
 
                   // initialRegion={{
                   //   latitude: location.coords.latitude,
@@ -254,9 +259,6 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
                   initialRegion={region}
 
-                  maxZoomLevel={14}
-                  minZoomLevel={12}
-
                   initialCamera={{
                     center: {
                       // latitude: location.coords.latitude,
@@ -265,9 +267,9 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                       longitude: LONGITUDE,
                     },
                     pitch: 0,
-                    heading: location.coords.heading ?? 0,
-                    altitude: 2000,
-                    zoom: 15
+                    heading: 0,
+                    altitude: 6000,
+                    zoom: 5
                   }}
 
                   // onMapLoaded={() => {
@@ -283,61 +285,64 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   shouldRasterizeIOS={true} // only for iOS
                   showsScale={true} // only for iOS
                   showsUserLocation={true}
+
+                  zoomControlEnabled={true}
+                  zoomEnabled={true}
                 >
                   <LocalTile
-                    pathTemplate={'/Users/tom_planche/Desktop/BUT/BUT3/SAE_Valpineta/Valpineta/src/Chupaca/{z}/{x}/{y}.png'}
+                    pathTemplate={tilesPath}
                     tileSize={256}
-                    zIndex={-1}
+                    zIndex={1}
                   />
                 </MapView>
-                <View style={styles.mapOverlay}>
-                  {
-                    menuIsOpen && (
-                      <>
-                        <MapButton
-                          ref={addPOVBtnRef}
-                          style={{
-                            ...styles.actionsButtonContainer,
-                          }}
+                {/*<View style={styles.mapOverlay}>*/}
+                {/*  {*/}
+                {/*    menuIsOpen && (*/}
+                {/*      <>*/}
+                {/*        <MapButton*/}
+                {/*          ref={addPOVBtnRef}*/}
+                {/*          style={{*/}
+                {/*            ...styles.actionsButtonContainer,*/}
+                {/*          }}*/}
 
-                          // onPressIn={locateButtonOnPressIn}
-                          // onPressOut={locateButtonOnPressOut}
-                          // onPress={toggleFollowUserLocation}
+                {/*          // onPressIn={locateButtonOnPressIn}*/}
+                {/*          // onPressOut={locateButtonOnPressOut}*/}
+                {/*          // onPress={toggleFollowUserLocation}*/}
 
-                          icon={'eye'}
-                          iconSize={spacing.lg}
-                          iconColor={colors.palette.neutral200}
-                        />
-                        <MapButton
-                          ref={addWarningBtnRef}
-                          style={{
-                            ...styles.actionsButtonContainer,
-                          }}
+                {/*          icon={'eye'}*/}
+                {/*          iconSize={spacing.lg}*/}
+                {/*          iconColor={colors.palette.neutral200}*/}
+                {/*        />*/}
+                {/*        <MapButton*/}
+                {/*          ref={addWarningBtnRef}*/}
+                {/*          style={{*/}
+                {/*            ...styles.actionsButtonContainer,*/}
+                {/*          }}*/}
 
-                          // onPressIn={locateButtonOnPressIn}
-                          // onPressOut={locateButtonOnPressOut}
-                          // onPress={toggleFollowUserLocation}
+                {/*          // onPressIn={locateButtonOnPressIn}*/}
+                {/*          // onPressOut={locateButtonOnPressOut}*/}
+                {/*          // onPress={toggleFollowUserLocation}*/}
 
-                          icon='exclamation-circle'
-                          iconSize={spacing.lg}
-                          iconColor={colors.palette.neutral200}
-                        />
-                      </>
-                    )
-                  }
-                  <MapButton
-                    ref={toggleBtnMenuRef}
-                    style={{
-                      ...styles.actionsButtonContainer,
-                    }}
+                {/*          icon='exclamation-circle'*/}
+                {/*          iconSize={spacing.lg}*/}
+                {/*          iconColor={colors.palette.neutral200}*/}
+                {/*        />*/}
+                {/*      </>*/}
+                {/*    )*/}
+                {/*  }*/}
+                {/*  <MapButton*/}
+                {/*    ref={toggleBtnMenuRef}*/}
+                {/*    style={{*/}
+                {/*      ...styles.actionsButtonContainer,*/}
+                {/*    }}*/}
 
-                    onPress={toggleMenu}
+                {/*    onPress={toggleMenu}*/}
 
-                    icon={menuIsOpen ? 'times' : 'map-marker-alt'}
-                    iconSize={spacing.lg}
-                    iconColor={colors.palette.neutral200}
-                  />
-                </View>
+                {/*    icon={menuIsOpen ? 'times' : 'map-marker-alt'}*/}
+                {/*    iconSize={spacing.lg}*/}
+                {/*    iconColor={colors.palette.neutral200}*/}
+                {/*  />*/}
+                {/*</View>*/}
                 <View style={styles.mapOverlayLeft}>
 
                   <MapButton
