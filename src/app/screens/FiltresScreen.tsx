@@ -228,8 +228,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
             key={difficulte.niveau}
           >
             {
-              [...Array(difficulte.niveau)].map(() =>
-                <Image source={logoDiffPhy} style={$imageDifficulte} />
+              [...Array(difficulte.niveau)].map((trash, i) =>
+                <Image source={logoDiffPhy} style={$imageDifficulte} key={(i + 1) * (difficulte.niveau)} />
               )
             }
           </TouchableOpacity>
@@ -247,8 +247,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
             key={difficulte.niveau}
           >
             {
-              [...Array(difficulte.niveau)].map(() =>
-                <Image source={logoDiffOri} style={$imageDifficulte} />
+              [...Array(difficulte.niveau)].map((trash, i) =>
+                <Image source={logoDiffOri} style={$imageDifficulte} key={(i + 1) * (difficulte.niveau)} />
               )
             }
           </TouchableOpacity>
