@@ -54,21 +54,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   const filtreIcone = require("../../assets/icons/filtre.png")
 
-  const renderItem = ({ item }) => (
-    <View>
-      <CarteExcursion
-        nomExcursions={item.nom_excursions}
-        parcours={item.typeParcours}
-        zone={item.zone}
-        temps={item.duree}
-        distance={item.distance}
-        denivelePositif={item.denivelePositif}
-        difficulteParcours={item.difficulteParcours}
-        difficulteOrientation={item.difficulteOrientation}
-      />
-    </View>
-  );
-
   return <Screen style={$root} >
     <View>
       <View style={styles.searchBox}>
@@ -97,13 +82,21 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
             <Text>Aucune excursion ne correspond à votre recherche.</Text>
             :
             <ScrollView>
-              <FlatList
-                data={excursions}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()
-                }
-                scrollEnabled={false}
-              />
+              {
+                excursions.map((excursion, i) => (
+                  <CarteExcursion
+                    key={i}
+                    nomExcursions={excursion.nom_excursions}
+                    parcours={excursion.typeParcours}
+                    zone={excursion.zone}
+                    temps={excursion.duree}
+                    distance={excursion.distance}
+                    denivelePositif={excursion.denivelePositif}
+                    difficulteParcours={excursion.difficulteParcours}
+                    difficulteOrientation={excursion.difficulteOrientation}
+                  />
+                ))
+              }
             </ScrollView>
         )
 
