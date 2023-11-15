@@ -6,9 +6,11 @@ import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
 
-/**@warning ATTENTION LE PARAMETRE "filtres" en minuscule est BUGGE est est defini lorsqu on navigue vers la page grace au foot */
-/**@warning Pas de gestion des erreurs de recuperation du track */
 /**@bug Il faut cliquer 2 fois sur le le bouton des filtres pour etre redirige */
+
+/**@warning ATTENTION LE PARAMETRE "filtres" en minuscule est BUGGE est est defini lorsqu on navigue vers la page grace au foot */
+/**@warning Cliquer sur excursions dans le footer redirige vers la page en retirant les filtres */
+/**@warning Pas de gestion des erreurs de recuperation du track */
 
 /**@todo agrandir la zone de texte de recherche + la rendre fonctionnelle */
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
@@ -16,7 +18,7 @@ interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
 }
 
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(props: ExcursionsScreenProps) {
-  var filtresAppliques;
+  var filtres: Record<string, any>;
 
   const [excursions, setExcursions] = useState(undefined);
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,31 +26,74 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const { navigation } = props;
 
   // Fonctions 
-  const excursionsFiltrees = (excursions) => {
-    return [excursions[0]];
+  const excursionsFiltrees = (excursions: Array<Record<string, any>>, filtres) => {
+    excursions = excursions.filter(excursion => {
+      if (excursion.duree.h < filtres.intervalleDuree.min ||
+        (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
+        (excursion.duree.h > filtres.intervalleDuree.max)
+      ) {
+        // On supprime de l excursion
+        return false;
+      }
+      // On garde de l excursion
+      return true;
+    });
+
+    console.log(excursions);
+    return excursions;
+  }
+
+  const formatageExcursions = (excursions: Array<Record<string, any>>) => {
+    var excursionsFormatees = [];
+
+    const formatDuree = /(\d{1,2})h(\d{0,2})/;
+
+    excursions.forEach(excursion => {
+      const matchDuree: RegExpMatchArray | null = excursion.duree.match(formatDuree);
+
+      if (matchDuree == null) {
+        // Si le format est mauvais, on ne formate pas la duree et on retire l excursion
+        console.log("Format de duree de l excursion MAUVAIS, impossible de formater. Il faut que la duree soit de la forme : 1h30");
+      }
+      else {
+        // Formatage duree
+        excursion.duree = { h: +matchDuree[1], m: +matchDuree[2] };
+      }
+
+
+      excursionsFormatees.push(excursion)
+    })
+
+
+    return excursionsFormatees;
   }
 
   const loadExcursions = async (): Promise<void> => {
     try {
-      const jsonData = require('../../assets/jsons/excursions.json');
+      var excursionsBRUT = require('../../assets/jsons/excursions.json');
 
-      const excursionsJSON = jsonData.data.map(excursion => ({
+      excursionsBRUT = excursionsBRUT.data.map(excursion => ({
         nom: excursion.nom_excursions,
         duree: excursion.duree,
         typeParcours: excursion.type_parcours.name,
-        zone: excursion.vallee,
+        vallee: excursion.vallee,
         distance: excursion.distance_excursion,
         denivelePositif: excursion.denivele,
         difficulteParcours: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation
       }));
 
-      if (filtresAppliques) {
-        // Application des filtres
-        setExcursions(excursionsFiltrees(excursionsJSON))
+      // REDUCTION POUR DEBUG
+      excursionsBRUT = excursionsBRUT.slice(0, 3);
+
+      excursionsBRUT = formatageExcursions(excursionsBRUT);
+
+      if (filtres === undefined) {
+        setExcursions(excursionsBRUT);
       }
       else {
-        setExcursions(excursionsJSON);
+        // Application des filtres
+        setExcursions(excursionsFiltrees(excursionsBRUT, filtres))
       }
     }
     catch (error) {
@@ -58,9 +103,10 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
 
   useEffect(() => {
-    filtresAppliques = (props.route.params.Filtres !== undefined);
+    filtres = props.route.params.Filtres;
     loadExcursions();
-    console.log("(DEBUG) parametres de navigation : " + props.route.params);
+    // console.log("(DEBUG) parametres de navigation :");
+    // console.log(props.route.params);
   }, []);
 
 
@@ -78,7 +124,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         />
         <TouchableOpacity
           onPress={() => navigation.navigate("Stack", { screen: 'Filtres' })}
-          style={styles.zoneIcone}
+          style={styles.valleeIcone}
         >
           <Image
             style={styles.iconeFiltre}
@@ -100,8 +146,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                     key={i}
                     nomExcursions={excursion.nom}
                     parcours={excursion.typeParcours}
-                    zone={excursion.zone}
-                    temps={excursion.duree}
+                    vallee={excursion.vallee}
+                    duree={excursion.duree}
                     distance={excursion.distance}
                     denivelePositif={excursion.denivelePositif}
                     difficulteParcours={excursion.difficulteParcours}
@@ -152,7 +198,7 @@ const styles = StyleSheet.create({
     height: spacing.lg,
   },
 
-  zoneIcone: {
+  valleeIcone: {
     marginLeft: "auto",
   }
 });
