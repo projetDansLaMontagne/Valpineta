@@ -106,8 +106,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       difficultePhysique: difficultePhysique,
       difficulteOrientation: difficulteOrientation,
     };
-
-    navigation.navigate("Excursions", { filtres: filtres });
+    console.log("Redirection page excursions");
+    navigation.navigate("Excursions", { Filtres: filtres });
   }
 
   return <ScrollView
