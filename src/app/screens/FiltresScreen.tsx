@@ -99,7 +99,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     const filtres = {
       critereTri: critereTri,
       intervalleDistance: intervalleDistance,
-      intervalleDuree: intervalleDuree,
+      intervalleDuree: { min: intervalleDuree[0], max: intervalleDuree[1] },
       intervalleDenivele: intervalleDenivele,
       types: types,
       zones: zones,
