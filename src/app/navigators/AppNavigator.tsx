@@ -84,14 +84,14 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       <Tab.Navigator
         screenOptions={{ headerShown: false }}
         initialRouteName={"Footer"}
-        screenOptions={() => ({
+        screenOptions={{
           headerShown: false,
           tabBarStyle: {
             padding: 5,
             backgroundColor: colors.fond,
-            borderTopColor: colors.bordure,
-          },
-        })}
+            borderTopColor: colors.bordure,       // une bordure n a rien a faire  dans colors
+          }
+        }}
       >
         <Tab.Screen
           name="Stack"
@@ -108,8 +108,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
                 style={$icon}
               />
             ),
-            tabBarActiveTintColor: colors.bouton,
-            tabBarInactiveTintColor: colors.text,
+            // tabBarActiveTintColor: colors.bouton,
+            // tabBarInactiveTintColor: colors.text,
             tabBarLabelStyle: { color: colors.bouton },
           }}
         />
