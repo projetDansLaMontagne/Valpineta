@@ -6,25 +6,34 @@ import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
 
+/**@warning ATTENTION LE PARAMETRE "filtres" en minuscule est BUGGE est est defini lorsqu on navigue vers la page grace au foot */
+/**@warning Pas de gestion des erreurs de recuperation du track */
+/**@bug Il faut cliquer 2 fois sur le le bouton des filtres pour etre redirige */
 
+/**@todo agrandir la zone de texte de recherche + la rendre fonctionnelle */
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
-  navigation: any;
-  filtres: any;
+  Filtres: Record<string, any>
 }
 
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(props: ExcursionsScreenProps) {
+  var filtresAppliques;
+
   const [excursions, setExcursions] = useState(undefined);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { navigation } = props;
 
   // Fonctions 
-  const loadExcursions = async () => {
+  const excursionsFiltrees = (excursions) => {
+    return [excursions[0]];
+  }
+
+  const loadExcursions = async (): Promise<void> => {
     try {
       const jsonData = require('../../assets/jsons/excursions.json');
 
       const excursionsJSON = jsonData.data.map(excursion => ({
-        nom_excursions: excursion.nom_excursions,
+        nom: excursion.nom_excursions,
         duree: excursion.duree,
         typeParcours: excursion.type_parcours.name,
         zone: excursion.vallee,
@@ -34,21 +43,24 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         difficulteOrientation: excursion.difficulte_orientation
       }));
 
-      setExcursions(excursionsJSON);
+      if (filtresAppliques) {
+        // Application des filtres
+        setExcursions(excursionsFiltrees(excursionsJSON))
+      }
+      else {
+        setExcursions(excursionsJSON);
+      }
     }
     catch (error) {
       console.error('Erreur lors du chargement du fichier JSON :', error);
     }
   };
-  // const excursionsFiltrees = () => {
-  //   return excursionsData.filter(excursion =>
-  //     excursion.nom_excursions.toLowerCase().includes(searchQuery.toLowerCase())
-  //   );
-  // };
 
-  var filteredExcursions;
+
   useEffect(() => {
+    filtresAppliques = (props.route.params.Filtres !== undefined);
     loadExcursions();
+    console.log("(DEBUG) parametres de navigation : " + props.route.params);
   }, []);
 
 
@@ -86,7 +98,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                 excursions.map((excursion, i) => (
                   <CarteExcursion
                     key={i}
-                    nomExcursions={excursion.nom_excursions}
+                    nomExcursions={excursion.nom}
                     parcours={excursion.typeParcours}
                     zone={excursion.zone}
                     temps={excursion.duree}
