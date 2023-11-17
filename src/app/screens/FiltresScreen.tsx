@@ -7,11 +7,8 @@ import { Text, Button, Screen } from "app/components"
 import { AppStackScreenProps } from "app/navigators"
 import { colors, spacing } from "../theme"
 
-/*
--- Todo --
-Regler probleme du focus sur le slider qui empeche le slide vertical (onSlidingComplete non pris en compte)
-Regler probleme de logo check qui disparait si expo n est plus lance
-*/
+/**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
+/**@bug Valles ne sont pas re selectionnables */
 
 interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {
   navigation: undefined
@@ -28,47 +25,35 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   const logoDiffOri = require("./../../assets/icons/difficulte_orientation.png");
 
   // -- CONSTANTES --
-  const criteresTri = [
+  // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
+  const valeursFiltres = require("../../assets/jsons/valeurs_filtres.json");
+  const incrementDenivele = 200;
+  const tris = [
     { texte: "Distance", logo: require("./../../assets/icons/distance.png") },
     { texte: "Temps de parcours", logo: require("./../../assets/icons/time.png") },
     { texte: "Dénivelé", logo: require("./../../assets/icons/denivele.png") },
     { texte: "Difficulté physique", logo: logoDiffPhy },
     { texte: "Difficulté d'orientation", logo: logoDiffOri },
   ]
-  const distanceMax = 15;
-  const dureeMax = 8;
-  const deniveleMax = 3000;
-
 
   // -- USE STATES --
   // Tri / Filtres selectionnes
   const [critereTri, setCritereTri] = useState(0);
-  const [intervalleDistance, setIntervalleDistance] = useState([0, distanceMax]);
-  const [intervalleDuree, setIntervalleDuree] = useState([0, dureeMax]);
-  const [intervalleDenivele, setIntervalleDenivele] = useState([0, dureeMax]);
-  const [types, setTypes] = useState([
-    { texte: "Aller-Retour", estCoche: true },
-    { texte: "Boucle", estCoche: true },
-    { texte: "Ligne", estCoche: true },
-  ])
-  const [zones, setzones] = useState([
-    { nom: "Pineta", selectionnee: true },
-    { nom: "Vallée de la Roya", selectionnee: true },
-    { nom: "Vallée des Merveilles", selectionnee: true },
-    { nom: "Vallée de la Vésubie", selectionnee: true },
-    { nom: "Vallée de la Tinée", selectionnee: true },
-    { nom: "Vallée de la B", selectionnee: true },
-  ])
-  const [difficultePhysique, setDifficultePhysique] = useState([
-    { niveau: 1, selectionnee: true },
-    { niveau: 2, selectionnee: true },
-    { niveau: 3, selectionnee: true },
-  ])
-  const [difficulteOrientation, setDifficulteOrientation] = useState([
-    { niveau: 1, selectionnee: true },
-    { niveau: 2, selectionnee: true },
-    { niveau: 3, selectionnee: true },
-  ])
+  const [intervalleDistance, setIntervalleDistance] = useState([0, valeursFiltres.distanceMax]);
+  const [intervalleDuree, setIntervalleDuree] = useState([0, valeursFiltres.dureeMax]);
+  const [intervalleDenivele, setIntervalleDenivele] = useState([0, valeursFiltres.deniveleMax + incrementDenivele]);
+  const [types, setTypes] = useState(
+    valeursFiltres.nomsTypesParcours.map(nom => ({ texte: nom, estCoche: true }))
+  )
+  const [vallees, setVallees] = useState(
+    valeursFiltres.nomsVallees.map(nom => ({ nom: nom, selectionnee: true }))
+  )
+  const [difficultePhysique, setDifficultePhysique] = useState(
+    [...Array(valeursFiltres.difficultePhysiqueMax)].map((trash, i) => ({ niveau: i + 1, selectionnee: true }))
+  );
+  const [difficulteOrientation, setDifficulteOrientation] = useState(
+    [...Array(valeursFiltres.difficulteOrientationMax)].map((trash, i) => ({ niveau: i + 1, selectionnee: true }))
+  )
 
   // Autres
   const [slideVerticalBloque, setSlideVerticalBloque] = useState(false);
@@ -80,17 +65,26 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     updatedTypes[i].estCoche = !updatedTypes[i].estCoche;
     setTypes(updatedTypes);
   }
-  const clicZone = (i) => {
-    let newZones = [...zones];
-    newZones[i].selectionnee = !newZones[i].selectionnee;
-    setzones(newZones);
+  const clicVallee = (i: number) => {
+    let newVallees = [...vallees];
+    newVallees[i].selectionnee = !newVallees[i].selectionnee;
+    setVallees(newVallees);
+    console.log("MODIFICATION VALLEE", newVallees[i]);
+    console.log(vallees);
+    // setVallees(vallees.map((vallee, index) => {
+    //   if (index === i) {
+    //     // Créez un nouvel objet avec la propriété selectionnee mise à jour
+    //     return { ...vallee, selectionnee: !vallee.selectionnee };
+    //   }
+    //   return vallee;
+    // }));
   }
-  const clicDifficultePhysique = (i) => {
+  const clicDifficultePhysique = (i: number) => {
     let newDifficulte = [...difficultePhysique];
     newDifficulte[i].selectionnee = !newDifficulte[i].selectionnee;
     setDifficultePhysique(newDifficulte);
   }
-  const clicDifficulteOrientation = (i) => {
+  const clicDifficulteOrientation = (i: number) => {
     let newDifficulte = [...difficulteOrientation];
     newDifficulte[i].selectionnee = !newDifficulte[i].selectionnee;
     setDifficulteOrientation(newDifficulte);
@@ -98,15 +92,14 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   const validerFiltres = () => {
     const filtres = {
       critereTri: critereTri,
-      intervalleDistance: intervalleDistance,
+      intervalleDistance: { min: intervalleDistance[0], max: intervalleDistance[1] },
       intervalleDuree: { min: intervalleDuree[0], max: intervalleDuree[1] },
-      intervalleDenivele: intervalleDenivele,
-      types: types,
-      zones: zones,
-      difficultePhysique: difficultePhysique,
-      difficulteOrientation: difficulteOrientation,
+      intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
+      typesParcours: types.map(type => type.estCoche ? type.texte : null).filter(type => type != null),
+      vallees: vallees.map(vallee => vallee.selectionnee ? vallee.nom : null).filter(type => type != null),
+      difficultePhysique: difficultePhysique.map(difficultePhysique => difficultePhysique.selectionnee ? difficultePhysique.niveau : null).filter(type => type != null),
+      difficulteOrientation: difficulteOrientation.map(difficulteOrientation => difficulteOrientation.selectionnee ? difficulteOrientation.niveau : null).filter(type => type != null),
     };
-    console.log("Redirection page excursions");
     navigation.navigate("Excursions", { Filtres: filtres });
   }
 
@@ -123,7 +116,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     <Text style={$h1}>Trier par</Text>
     <View>
       {
-        criteresTri.map((critere, i) =>
+        tris.map((critere, i) =>
           <TouchableOpacity
             onPress={() => setCritereTri(i)}
             style={$critereTri}
@@ -131,7 +124,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Image source={critere.logo} style={$logoCritere} />
-              <Text style={$criteresTri} >{critere.texte}</Text>
+              <Text style={$filtres} >{critere.texte}</Text>
             </View>
             {i == critereTri &&
               <Image source={logoCheck} style={$logoCheck} />
@@ -142,10 +135,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     </View>
 
     <Text style={$h1}>Filtrer par</Text>
-    <Text style={$h2}>Distance</Text>
+    <Text style={$h2}>Distance (en km)</Text>
     <Slider
       min={0}
-      max={distanceMax}
+      max={valeursFiltres.distanceMax}
       increment={1}
       values={intervalleDistance}
       markerColor="#007C27"
@@ -155,10 +148,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       style={$slider}
     />
 
-    <Text style={$h2}>Durée</Text>
+    <Text style={$h2}>Durée (en h)</Text>
     <Slider
       min={0}
-      max={dureeMax}
+      max={valeursFiltres.dureeMax}
       increment={1}
       values={intervalleDuree}
       markerColor="#007C27"
@@ -168,11 +161,11 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       style={$slider}
     />
 
-    <Text style={$h2}>Dénivelé</Text>
+    <Text style={$h2}>Dénivelé (en m)</Text>
     <Slider
       min={0}
-      max={deniveleMax}
-      increment={200}
+      max={valeursFiltres.deniveleMax + incrementDenivele}
+      increment={incrementDenivele}
       values={intervalleDenivele}
       markerColor="#007C27"
       onSlidingStart={() => setSlideVerticalBloque(true)}
@@ -204,15 +197,15 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       }
     </View>
 
-    <Text style={$h2}>Zones</Text>
-    <View style={$containerZones}>
+    <Text style={$h2}>Vallees</Text>
+    <View style={$containerVallees}>
       {
-        zones.map((zone, i) =>
+        vallees.map((vallee, i) =>
           <Button
             key={i}
-            text={zone.nom}
-            style={zone.selectionnee ? $zoneSelectionnee : $zone}
-            onPress={() => clicZone(i)}
+            text={vallee.nom}
+            style={vallee.selectionnee ? $valleeSelectionnee : $vallee}
+            onPress={() => clicVallee(i)}
           />
         )
       }
@@ -284,35 +277,36 @@ const $critereTri: ViewStyle = {
   alignItems: "center",
   justifyContent: "space-between",
 }
-const $containerZones: ViewStyle = {
+const $containerVallees: ViewStyle = {
   display: "flex",
   flexDirection: "row",
   flexWrap: "wrap",
 
 }
-const $zone: ViewStyle = {
+const $vallee: ViewStyle = {
   borderColor: "#007C27",
   borderRadius: 15,
   margin: spacing.xs,
 }
-const $zoneSelectionnee: ViewStyle = {
-  ...$zone,
+const $valleeSelectionnee: ViewStyle = {
+  ...$vallee,
   backgroundColor: "#007C27",
+}
+const $containerDiff: ViewStyle = {
+  flexDirection: "row",
+  flexWrap: "wrap",
 }
 const $difficulte: ViewStyle = {
   flexDirection: "row",
   borderRadius: 20,
   borderWidth: 1,
-  margin: spacing.md,
+  margin: spacing.sm,
+  marginBottom: 0,
   padding: 8,
 }
 const $difficulteSelectionnee: ViewStyle = {
   ...$difficulte,
   backgroundColor: "#007C27",
-}
-const $containerDiff: ViewStyle = {
-  flexDirection: "row",
-  justifyContent: "space-around",
 }
 
 
@@ -348,7 +342,7 @@ const $h2: TextStyle = {
   fontSize: 20,
   marginTop: spacing.lg,
 }
-const $criteresTri: TextStyle = {
+const $filtres: TextStyle = {
   fontSize: 15,
 }
 

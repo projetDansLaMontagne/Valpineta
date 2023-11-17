@@ -12,7 +12,8 @@ import { colors, spacing } from 'app/theme';
 /**@warning Cliquer sur excursions dans le footer redirige vers la page en retirant les filtres */
 /**@warning Pas de gestion des erreurs de recuperation du track */
 
-/**@todo agrandir la zone de texte de recherche + la rendre fonctionnelle */
+/**@todo CSS : agrandir la zone de texte de recherche + la rendre fonctionnelle */
+/**@todo CSS : empecher le footer d etre au dessus de la derniere excursion */
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
   Filtres: Record<string, any>
 }
@@ -25,12 +26,82 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   const { navigation } = props;
 
-  // Fonctions 
+  // -- Fonctions --
+  /**@warning Cette fonction est utilise pour recuperer des donnes (independemment du composant), 
+   * qui vont etre copiees manuellement dans la page filtre */
+  /**
+   * Recupere les valeurs de chaque filtre (valeurs max, types de parcours, vallees)
+   * @param excursions 
+   */
+  const valeursFiltres = (excursions: Array<any>) => {
+    // Parcourt de chaque excursion pour connaitre les maximas 
+    var distanceMax = 0;
+    var dureeMax = 0;
+    var deniveleMax = 0;
+    var typesParcours = [];
+    var vallees = [];
+    var difficultePhysiqueMax = 0;
+    var difficulteOrientationMax = 0;
+
+    excursions.forEach(excursion => {
+      // Distance
+      if (excursion.distance > distanceMax) {
+        distanceMax = excursion.distance;
+      }
+      // Duree
+      const duree = excursion.duree.h + excursion.duree.m / 60;
+      if (duree > dureeMax) {
+        dureeMax = duree;
+      }
+      // Denivele
+      if (excursion.denivelePositif > deniveleMax) {
+        deniveleMax = excursion.denivelePositif;
+      }
+      // Types de parcours
+      if (!typesParcours.includes(excursion.typeParcours)) {
+        typesParcours.push(excursion.typeParcours);
+      }
+      // Vallee
+      if (!vallees.includes(excursion.vallee)) {
+        vallees.push(excursion.vallee);
+      }
+      // Difficulte physique
+      if (excursion.difficulteTechnique > difficultePhysiqueMax) {
+        difficultePhysiqueMax = excursion.difficulteTechnique;
+      }
+      // Difficulte orientation
+      if (excursion.difficulteOrientation > difficulteOrientationMax) {
+        difficulteOrientationMax = excursion.difficulteOrientation;
+      }
+    });
+
+    return {
+      distanceMax: distanceMax,
+      dureeMax: dureeMax,
+      deniveleMax: deniveleMax,
+      typesParcours: typesParcours,
+      vallees: vallees,
+      difficultePhysiqueMax: difficultePhysiqueMax,
+      difficulteOrientationMax: difficulteOrientationMax,
+    }
+  }
   const excursionsFiltrees = (excursions: Array<Record<string, any>>, filtres) => {
+    console.log(filtres)
+    console.log(excursions[0]);
+
     excursions = excursions.filter(excursion => {
-      if (excursion.duree.h < filtres.intervalleDuree.min ||
+      if (
+        excursion.distance < filtres.intervalleDistance.min ||
+        excursion.distance > filtres.intervalleDistance.max ||
         (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
-        (excursion.duree.h > filtres.intervalleDuree.max)
+        excursion.duree.h < filtres.intervalleDuree.min ||
+        excursion.duree.h > filtres.intervalleDuree.max ||
+        excursion.denivelePositif < filtres.intervalleDenivele.min ||
+        excursion.denivelePositif > filtres.intervalleDenivele.max ||
+        !filtres.typesParcours.includes(excursion.typeParcours) ||
+        !filtres.vallees.includes(excursion.vallee) ||
+        !filtres.difficulteOrientation.includes(excursion.difficulteOrientation) ||
+        !filtres.difficultePhysique.includes(excursion.difficulteTechnique)
       ) {
         // On supprime de l excursion
         return false;
@@ -38,36 +109,54 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       // On garde de l excursion
       return true;
     });
-
-    console.log(excursions);
     return excursions;
   }
-
-  const formatageExcursions = (excursions: Array<Record<string, any>>) => {
+  const excursionsFormatees = (excursions: Array<Record<string, any>>) => {
     var excursionsFormatees = [];
 
     const formatDuree = /(\d{1,2})h(\d{0,2})/;
 
     excursions.forEach(excursion => {
+      var malFormatee = false;
+
+      // Duree
       const matchDuree: RegExpMatchArray | null = excursion.duree.match(formatDuree);
 
       if (matchDuree == null) {
-        // Si le format est mauvais, on ne formate pas la duree et on retire l excursion
-        console.log("Format de duree de l excursion MAUVAIS, impossible de formater. Il faut que la duree soit de la forme : 1h30");
+        // MAUVAIS FORMAT DUREE
+        console.log("Format de duree d une excursion MAUVAIS, impossible de formater. Il faut que les durees soient de la forme : HHhMM et non : " + excursion.duree);
+        malFormatee = true;
       }
-      else {
-        // Formatage duree
+
+      if (!malFormatee) {
+        // Conversions string --> number
         excursion.duree = { h: +matchDuree[1], m: +matchDuree[2] };
+        excursion.distance = +excursion.distance;
+        excursion.denivelePositif = +excursion.denivelePositif;
+        excursion.difficulteTechnique = +excursion.difficulteTechnique;
+        excursion.difficulteOrientation = +excursion.difficulteOrientation;
+
+        // Verification de la validite des conversions
+        if (isNaN(excursion.duree.h) ||
+          isNaN(excursion.duree.m) ||
+          isNaN(excursion.distance) ||
+          isNaN(excursion.denivelePositif) ||
+          isNaN(excursion.difficulteTechnique) ||
+          isNaN(excursion.difficulteOrientation)) {
+          // L excursion est mal formatee, on la retire
+          console.log("Format d un attribut de l excursion MAUVAIS, impossible de formater.");
+          malFormatee = true;
+        }
       }
 
-
-      excursionsFormatees.push(excursion)
+      if (!malFormatee) {
+        // L excursion est bien formatee, on l ajoute
+        excursionsFormatees.push(excursion);
+      }
     })
-
 
     return excursionsFormatees;
   }
-
   const loadExcursions = async (): Promise<void> => {
     try {
       var excursionsBRUT = require('../../assets/jsons/excursions.json');
@@ -79,14 +168,14 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         vallee: excursion.vallee,
         distance: excursion.distance_excursion,
         denivelePositif: excursion.denivele,
-        difficulteParcours: excursion.difficulte_technique,
+        difficulteTechnique: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation
       }));
 
       // REDUCTION POUR DEBUG
-      excursionsBRUT = excursionsBRUT.slice(0, 3);
+      // excursionsBRUT = excursionsBRUT.slice(0, 3);
 
-      excursionsBRUT = formatageExcursions(excursionsBRUT);
+      excursionsBRUT = excursionsFormatees(excursionsBRUT);
 
       if (filtres === undefined) {
         setExcursions(excursionsBRUT);
@@ -150,7 +239,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                     duree={excursion.duree}
                     distance={excursion.distance}
                     denivelePositif={excursion.denivelePositif}
-                    difficulteParcours={excursion.difficulteParcours}
+                    difficulteParcours={excursion.difficulteTechnique}
                     difficulteOrientation={excursion.difficulteOrientation}
                   />
                 ))
