@@ -11,7 +11,6 @@ import { colors, spacing } from "../theme"
 /**@bug Valles ne sont pas re selectionnables */
 
 interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {
-  navigation: undefined
 }
 
 export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresScreen(
@@ -28,31 +27,31 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
   const valeursFiltres = require("../../assets/jsons/valeurs_filtres.json");
   const incrementDenivele = 200;
-  const tris = [
-    { texte: "Distance", logo: require("./../../assets/icons/distance.png") },
-    { texte: "Temps de parcours", logo: require("./../../assets/icons/time.png") },
-    { texte: "Dénivelé", logo: require("./../../assets/icons/denivele.png") },
-    { texte: "Difficulté physique", logo: logoDiffPhy },
-    { texte: "Difficulté d'orientation", logo: logoDiffOri },
+  const criteresTri = [
+    { nom: "Distance", logo: require("./../../assets/icons/distance.png") },
+    { nom: "Temps de parcours", logo: require("./../../assets/icons/time.png") },
+    { nom: "Dénivelé", logo: require("./../../assets/icons/denivele.png") },
+    { nom: "Difficulté physique", logo: logoDiffPhy },
+    { nom: "Difficulté d'orientation", logo: logoDiffOri },
   ]
 
   // -- USE STATES --
   // Tri / Filtres selectionnes
-  const [critereTri, setCritereTri] = useState(0);
+  const [critereTriSelectionne, setCritereTriSelectionne] = useState(0);
   const [intervalleDistance, setIntervalleDistance] = useState([0, valeursFiltres.distanceMax]);
   const [intervalleDuree, setIntervalleDuree] = useState([0, valeursFiltres.dureeMax]);
   const [intervalleDenivele, setIntervalleDenivele] = useState([0, valeursFiltres.deniveleMax + incrementDenivele]);
-  const [types, setTypes] = useState(
-    valeursFiltres.nomsTypesParcours.map(nom => ({ texte: nom, estCoche: true }))
+  const [typesParcours, setTypesParcours] = useState(
+    valeursFiltres.nomTypesParcours.map(nomType => ({ nom: nomType, selectionne: true }))
   )
   const [vallees, setVallees] = useState(
-    valeursFiltres.nomsVallees.map(nom => ({ nom: nom, selectionnee: true }))
+    valeursFiltres.nomVallees.map(nomVallee => ({ nom: nomVallee, selectionne: true }))
   )
-  const [difficultePhysique, setDifficultePhysique] = useState(
-    [...Array(valeursFiltres.difficultePhysiqueMax)].map((trash, i) => ({ niveau: i + 1, selectionnee: true }))
+  const [difficultesPhysiques, setDifficultesPhysiques] = useState(
+    [...Array(valeursFiltres.difficultePhysiqueMax)].map((trash, i) => ({ niveau: i + 1, selectionne: true }))
   );
-  const [difficulteOrientation, setDifficulteOrientation] = useState(
-    [...Array(valeursFiltres.difficulteOrientationMax)].map((trash, i) => ({ niveau: i + 1, selectionnee: true }))
+  const [difficultesOrientation, setDifficultesOrientation] = useState(
+    [...Array(valeursFiltres.difficulteOrientationMax)].map((trash, i) => ({ niveau: i + 1, selectionne: true }))
   )
 
   // Autres
@@ -61,44 +60,44 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   // -- CallBacks --
   const clicType = (i) => {
     // Modification de l'état du type
-    const updatedTypes = [...types];
-    updatedTypes[i].estCoche = !updatedTypes[i].estCoche;
-    setTypes(updatedTypes);
+    const updatedTypesParcours = [...typesParcours];
+    updatedTypesParcours[i].selectionne = !updatedTypesParcours[i].selectionne;
+    setTypesParcours(updatedTypesParcours);
   }
   const clicVallee = (i: number) => {
     let newVallees = [...vallees];
-    newVallees[i].selectionnee = !newVallees[i].selectionnee;
+    newVallees[i].selectionne = !newVallees[i].selectionne;
     setVallees(newVallees);
     console.log("MODIFICATION VALLEE", newVallees[i]);
     console.log(vallees);
     // setVallees(vallees.map((vallee, index) => {
     //   if (index === i) {
     //     // Créez un nouvel objet avec la propriété selectionnee mise à jour
-    //     return { ...vallee, selectionnee: !vallee.selectionnee };
+    //     return { ...vallee, selectionne: !vallee.selectionne };
     //   }
     //   return vallee;
     // }));
   }
   const clicDifficultePhysique = (i: number) => {
-    let newDifficulte = [...difficultePhysique];
-    newDifficulte[i].selectionnee = !newDifficulte[i].selectionnee;
-    setDifficultePhysique(newDifficulte);
+    let newDifficulte = [...difficultesPhysiques];
+    newDifficulte[i].selectionne = !newDifficulte[i].selectionne;
+    setDifficultesPhysiques(newDifficulte);
   }
   const clicDifficulteOrientation = (i: number) => {
-    let newDifficulte = [...difficulteOrientation];
-    newDifficulte[i].selectionnee = !newDifficulte[i].selectionnee;
-    setDifficulteOrientation(newDifficulte);
+    let newDifficulte = [...difficultesOrientation];
+    newDifficulte[i].selectionne = !newDifficulte[i].selectionne;
+    setDifficultesOrientation(newDifficulte);
   }
   const validerFiltres = () => {
     const filtres = {
-      critereTri: critereTri,
+      critereTri: critereTriSelectionne,
       intervalleDistance: { min: intervalleDistance[0], max: intervalleDistance[1] },
       intervalleDuree: { min: intervalleDuree[0], max: intervalleDuree[1] },
       intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
-      typesParcours: types.map(type => type.estCoche ? type.texte : null).filter(type => type != null),
-      vallees: vallees.map(vallee => vallee.selectionnee ? vallee.nom : null).filter(type => type != null),
-      difficultePhysique: difficultePhysique.map(difficultePhysique => difficultePhysique.selectionnee ? difficultePhysique.niveau : null).filter(type => type != null),
-      difficulteOrientation: difficulteOrientation.map(difficulteOrientation => difficulteOrientation.selectionnee ? difficulteOrientation.niveau : null).filter(type => type != null),
+      typesParcours: typesParcours.map(type => type.selectionne ? type.nom : null).filter(type => type != null),
+      vallees: vallees.map(vallee => vallee.selectionne ? vallee.nom : null).filter(type => type != null),
+      difficultesPhysiques: difficultesPhysiques.map(difficultePhysique => difficultePhysique.selectionne ? difficultePhysique.niveau : null).filter(type => type != null),
+      difficultesOrientation: difficultesOrientation.map(difficultesOrientation => difficultesOrientation.selectionne ? difficultesOrientation.niveau : null).filter(type => type != null),
     };
     navigation.navigate("Excursions", { Filtres: filtres });
   }
@@ -116,17 +115,17 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     <Text style={$h1}>Trier par</Text>
     <View>
       {
-        tris.map((critere, i) =>
+        criteresTri.map((critere, i) =>
           <TouchableOpacity
-            onPress={() => setCritereTri(i)}
+            onPress={() => setCritereTriSelectionne(i)}
             style={$critereTri}
             key={i}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Image source={critere.logo} style={$logoCritere} />
-              <Text style={$filtres} >{critere.texte}</Text>
+              <Text style={$filtres} >{critere.nom}</Text>
             </View>
-            {i == critereTri &&
+            {i == critereTriSelectionne &&
               <Image source={logoCheck} style={$logoCheck} />
             }
           </TouchableOpacity>
@@ -177,7 +176,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     <Text style={$h2}>Type de parcours</Text>
     <View>
       {
-        types.map((type, i) =>
+        typesParcours.map((typeParcours, i) =>
           <TouchableOpacity
             onPress={() => clicType(i)}
             style={{ flexDirection: "row", alignItems: "center" }}
@@ -185,13 +184,13 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           >
             <Switch
               trackColor={{ false: 'onsenfout', true: '#cccccc' }}
-              thumbColor={type.estCoche ? 'green' : '#ffffff'}
+              thumbColor={typeParcours.selectionne ? 'green' : '#ffffff'}
               ios_backgroundColor="#CCCCCC"
               onValueChange={() => clicType(i)}
-              value={type.estCoche}
+              value={typeParcours.selectionne}
               style={$switch}
             />
-            <Text>{type.texte}</Text>
+            <Text>{typeParcours.nom}</Text>
           </TouchableOpacity>
         )
       }
@@ -204,7 +203,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           <Button
             key={i}
             text={vallee.nom}
-            style={vallee.selectionnee ? $valleeSelectionnee : $vallee}
+            style={vallee.selectionne ? $valleeSelectionnee : $vallee}
             onPress={() => clicVallee(i)}
           />
         )
@@ -214,10 +213,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     <Text style={$h2}>Difficulté physique</Text>
     <View style={$containerDiff}>
       {
-        difficultePhysique.map((difficulte, i) =>
+        difficultesPhysiques.map((difficulte, i) =>
           <TouchableOpacity
             onPress={() => clicDifficultePhysique(i)}
-            style={difficulte.selectionnee ? $difficulteSelectionnee : $difficulte}
+            style={difficulte.selectionne ? $difficulteSelectionnee : $difficulte}
             key={difficulte.niveau}
           >
             {
@@ -233,10 +232,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     <Text style={$h2}>Difficulté d'orientation</Text>
     <View style={[$containerDiff, { marginBottom: spacing.xxxl }]}>
       {
-        difficulteOrientation.map((difficulte, i) =>
+        difficultesOrientation.map((difficulte, i) =>
           <TouchableOpacity
             onPress={() => clicDifficulteOrientation(i)}
-            style={difficulte.selectionnee ? $difficulteSelectionnee : $difficulte}
+            style={difficulte.selectionne ? $difficulteSelectionnee : $difficulte}
             key={difficulte.niveau}
           >
             {
@@ -251,22 +250,11 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   </ScrollView>
 })
 
-const $root: ViewStyle = {
-  flex: 1,
-}
-
-
-// ---- R E U T I L I S A B L E ----
-const $cadre: ViewStyle = {
-  borderRadius: 20,
-  borderWidth: 1,
-  margin: spacing.sm
-}
 
 // ---- V I E W S ----
 const $container: ViewStyle = {
   flex: 1,
-  backgroundColor: colors.background,
+  backgroundColor: colors.fond,
   padding: spacing.lg,
 
   paddingTop: 50 // A SUPPRIMER

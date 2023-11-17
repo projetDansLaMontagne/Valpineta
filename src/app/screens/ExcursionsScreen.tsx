@@ -7,13 +7,16 @@ import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
 
 /**@bug Il faut cliquer 2 fois sur le le bouton des filtres pour etre redirige */
+/**@warning La navigation vers filtres est dans le mauvais sens  */
 
 /**@warning ATTENTION LE PARAMETRE "filtres" en minuscule est BUGGE est est defini lorsqu on navigue vers la page grace au foot */
 /**@warning Cliquer sur excursions dans le footer redirige vers la page en retirant les filtres */
 /**@warning Pas de gestion des erreurs de recuperation du track */
+/**@warning Le fichier excursions.json est mal encodé. On recupere trop de données et elles sont mal organisees */
 
 /**@todo CSS : agrandir la zone de texte de recherche + la rendre fonctionnelle */
 /**@todo CSS : empecher le footer d etre au dessus de la derniere excursion */
+/**@todo Faire fonctionner search bar*/
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
   Filtres: Record<string, any>
 }
@@ -55,7 +58,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       }
       // Denivele
       if (excursion.denivelePositif > deniveleMax) {
-        deniveleMax = excursion.denivelePositif;
+        deniveleMax = excursion.denivele;
       }
       // Types de parcours
       if (!typesParcours.includes(excursion.typeParcours)) {
@@ -96,12 +99,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
         excursion.duree.h < filtres.intervalleDuree.min ||
         excursion.duree.h > filtres.intervalleDuree.max ||
-        excursion.denivelePositif < filtres.intervalleDenivele.min ||
-        excursion.denivelePositif > filtres.intervalleDenivele.max ||
+        excursion.denivele < filtres.intervalleDenivele.min ||
+        excursion.denivele > filtres.intervalleDenivele.max ||
         !filtres.typesParcours.includes(excursion.typeParcours) ||
         !filtres.vallees.includes(excursion.vallee) ||
-        !filtres.difficulteOrientation.includes(excursion.difficulteOrientation) ||
-        !filtres.difficultePhysique.includes(excursion.difficulteTechnique)
+        !filtres.difficultesPhysiques.includes(excursion.difficulteTechnique) ||
+        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
       ) {
         // On supprime de l excursion
         return false;
@@ -111,6 +114,11 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     });
     return excursions;
   }
+  /**
+   * Cette fonction doit etre executee systematiquement lors de la synchro descendante
+   * @param excursions 
+   * @returns 
+   */
   const excursionsFormatees = (excursions: Array<Record<string, any>>) => {
     var excursionsFormatees = [];
 
@@ -132,7 +140,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         // Conversions string --> number
         excursion.duree = { h: +matchDuree[1], m: +matchDuree[2] };
         excursion.distance = +excursion.distance;
-        excursion.denivelePositif = +excursion.denivelePositif;
+        excursion.denivele = +excursion.denivele;
         excursion.difficulteTechnique = +excursion.difficulteTechnique;
         excursion.difficulteOrientation = +excursion.difficulteOrientation;
 
@@ -140,7 +148,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         if (isNaN(excursion.duree.h) ||
           isNaN(excursion.duree.m) ||
           isNaN(excursion.distance) ||
-          isNaN(excursion.denivelePositif) ||
+          isNaN(excursion.denivele) ||
           isNaN(excursion.difficulteTechnique) ||
           isNaN(excursion.difficulteOrientation)) {
           // L excursion est mal formatee, on la retire
@@ -163,11 +171,11 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
       excursionsBRUT = excursionsBRUT.data.map(excursion => ({
         nom: excursion.nom_excursions,
+        denivele: excursion.denivele,
         duree: excursion.duree,
+        distance: excursion.distance_excursion,
         typeParcours: excursion.type_parcours.name,
         vallee: excursion.vallee,
-        distance: excursion.distance_excursion,
-        denivelePositif: excursion.denivele,
         difficulteTechnique: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation
       }));
@@ -233,12 +241,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                 excursions.map((excursion, i) => (
                   <CarteExcursion
                     key={i}
-                    nomExcursions={excursion.nom}
-                    parcours={excursion.typeParcours}
-                    vallee={excursion.vallee}
-                    duree={excursion.duree}
+                    nom={excursion.nom}
+                    denivele={excursion.denivele}
                     distance={excursion.distance}
-                    denivelePositif={excursion.denivelePositif}
+                    duree={excursion.duree}
+                    vallee={excursion.vallee}
+                    typeParcours={excursion.typeParcours}
                     difficulteParcours={excursion.difficulteTechnique}
                     difficulteOrientation={excursion.difficulteOrientation}
                   />

@@ -17,17 +17,17 @@ import {
 import { colors, spacing } from "../theme"
 import { Text, TextProps } from "./Text"
 
-/**@warning Tous les parametres sont declares comme optionnels et ne sont pas geres */
+/**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-  nomExcursions?: string
-  vallee?: string
-  parcours?: string
-  duree?: Record<"h" | "m", number>
-  distance?: string
-  denivelePositif?: string
-  difficulteParcours?: string
-  difficulteOrientation?: string
+  nom: string
+  vallee: string
+  typeParcours: string
+  duree: Record<"h" | "m", number>
+  distance: string
+  denivele: string
+  difficulteParcours: string
+  difficulteOrientation: string
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
@@ -158,7 +158,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
         <View style={styles.entete}>
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
           <Text
-            text={props.nomExcursions}
+            text={props.nom}
             weight="bold"
             style={styles.heading}
           />
@@ -185,7 +185,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
               <Image style={styles.icone} source={parcoursIcone} resizeMode="contain" />
               <Text
                 //tx={"carteComposant.parcours"}
-                text={props.parcours}
+                text={props.typeParcours}
                 style={styles.content}
               />
             </View>
@@ -211,7 +211,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
               <Image style={styles.icone} source={denivelePositifIcone} resizeMode="contain" />
               <Text
                 //tx={"carteComposant.denivelePositif"}
-                text={props.denivelePositif + " m"}
+                text={props.denivele + " m"}
                 style={styles.content}
               />
             </View>

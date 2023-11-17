@@ -2,12 +2,12 @@
     "distanceMax": 41,
     "dureeMax": 18,
     "deniveleMax": 3300,
-    "nomsTypesParcours": [
+    "nomTypesParcours": [
         "Ida",
         "Ida y Vuelta",
         "Circular"
     ],
-    "nomsVallees": [
+    "nomVallees": [
         "Pineta/Refugio",
         "Pineta/Pradera",
         "Salcorz",
