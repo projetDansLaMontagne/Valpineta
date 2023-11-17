@@ -1,5 +1,5 @@
 import React, { ComponentType, Fragment, ReactElement, useState } from "react"
-import { Image, ImageStyle, StyleSheet} from "react-native"
+import { Image, ImageStyle, StyleSheet } from "react-native"
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons'; // Assurez-vous d'avoir importé les icônes correctement
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -17,7 +17,7 @@ import {
 import { colors, spacing } from "../theme"
 import { Text, TextProps } from "./Text"
 
-interface CardProps extends TouchableOpacityProps {
+interface CarteExcursionProps extends TouchableOpacityProps {
 
   nomExcursions?: TextProps["text"]
 
@@ -36,7 +36,7 @@ interface CardProps extends TouchableOpacityProps {
   difficulteOrientation?: TextProps["text"]
 }
 
-export function Card(props: CardProps) {
+export function CarteExcursion(props: CarteExcursionProps) {
   const {
     nomExcursions,
     zone,
@@ -47,7 +47,7 @@ export function Card(props: CardProps) {
     difficulteParcours,
     difficulteOrientation,
   } = props
-  
+
   const favoriIcone = require("../../assets/icons/favori.png")
   const zoneIcone = require("../../assets/icons/zone.png")
   const parcoursIcone = require("../../assets/icons/parcours.png")
@@ -62,7 +62,7 @@ export function Card(props: CardProps) {
   const [coeurTouche, setcoeurTouche] = useState(false);
 
 
-  const excursionFavorite = () => {    
+  const excursionFavorite = () => {
     if (coeurTouche) {
       setcoeurTouche(false);
     } else {
@@ -179,86 +179,86 @@ export function Card(props: CardProps) {
   return (
     <TouchableOpacity onPress={detailExcursion}>
       <View style={styles.carteGlobale}>
-          <View style={styles.entete}>
-            <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
-            <Text
-              weight="bold"
-              //tx={"carteComposant.titre"}
-              text={nomExcursions}
-              style={styles.heading}
-            />
-            <TouchableOpacity onPress={excursionFavorite}>
-          <Icon
-            name="heart-o"
-            size={spacing.lg}
-            style={styles.icone}
+        <View style={styles.entete}>
+          <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
+          <Text
+            weight="bold"
+            //tx={"carteComposant.titre"}
+            text={nomExcursions}
+            style={styles.heading}
           />
-        </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={excursionFavorite}>
+            <Icon
+              name="heart-o"
+              size={spacing.lg}
+              style={styles.icone}
+            />
+          </TouchableOpacity>
+        </View>
 
-          <View style={styles.tableauInfos}>
-            <View style={styles.ligneSup}>
-              <View style={styles.groupeTexteIconeLigneSup}>
-                <Image style={styles.icone} source={zoneIcone} resizeMode="contain" />
-                <Text
-                  //tx={"carteComposant.zone"}
-                  text={zone}
-                  style={styles.content}
-                />
-              </View>
-              <View style={styles.groupeTexteIconeLigneSup}> 
-                <Image style={styles.icone} source={parcoursIcone} resizeMode="contain" />
-                <Text
-                  //tx={"carteComposant.parcours"}
-                  text={parcours}
-                  style={styles.content}
-                />
-              </View>
-              <View style={styles.groupeTexteIconeLigneSup}>
-                <Image style={styles.icone} source={tempsIcone} resizeMode="contain" />
-                <Text
-                  //tx={"carteComposant.temps"}
-                  text={temps}
-                  style={styles.content}
-                />
-              </View>
+        <View style={styles.tableauInfos}>
+          <View style={styles.ligneSup}>
+            <View style={styles.groupeTexteIconeLigneSup}>
+              <Image style={styles.icone} source={zoneIcone} resizeMode="contain" />
+              <Text
+                //tx={"carteComposant.zone"}
+                text={zone}
+                style={styles.content}
+              />
             </View>
-            <View style= {styles.ligneInf}>
-              <View style={styles.groupeTexteIconeLigneInf}>
-                <Image style={styles.icone} source={distanceIcone} resizeMode="contain" />
-                <Text
-                  //tx={"carteComposant.distance"}
-                  text={distance + " km"}
-                  style={styles.content}
-                />
-              </View>
-              <View style={styles.groupeTexteIconeLigneInf}>
-                <Image style={styles.icone} source={denivelePositifIcone} resizeMode="contain" />
-                <Text
-                  //tx={"carteComposant.denivelePositif"}
-                  text={denivelePositif + " m"}
-                  style={styles.content}
-                />
-              </View>
-              <View style={styles.groupeTexteIconeLigneInf}>
-                <Image style={styles.icone} source={difficulteParcoursIcone} resizeMode="contain" />
-                <Text
-                  //tx={"carteComposant.difficulteParcours"}
-                  text={difficulteParcours}
-                  style={styles.content}
-                />
-              </View>
-              <View style={styles.groupeTexteIconeLigneInf}>
-                <Image style={styles.icone} source={difficulteOrientationIcone} resizeMode="contain" />
-                <Text
-                  //tx={"carteComposant.difficulteOrientation"}
-                  text={difficulteOrientation}
-                  style={styles.content}
-                />
-              </View>
-            </View>  
+            <View style={styles.groupeTexteIconeLigneSup}>
+              <Image style={styles.icone} source={parcoursIcone} resizeMode="contain" />
+              <Text
+                //tx={"carteComposant.parcours"}
+                text={parcours}
+                style={styles.content}
+              />
+            </View>
+            <View style={styles.groupeTexteIconeLigneSup}>
+              <Image style={styles.icone} source={tempsIcone} resizeMode="contain" />
+              <Text
+                //tx={"carteComposant.temps"}
+                text={temps}
+                style={styles.content}
+              />
+            </View>
           </View>
+          <View style={styles.ligneInf}>
+            <View style={styles.groupeTexteIconeLigneInf}>
+              <Image style={styles.icone} source={distanceIcone} resizeMode="contain" />
+              <Text
+                //tx={"carteComposant.distance"}
+                text={distance + " km"}
+                style={styles.content}
+              />
+            </View>
+            <View style={styles.groupeTexteIconeLigneInf}>
+              <Image style={styles.icone} source={denivelePositifIcone} resizeMode="contain" />
+              <Text
+                //tx={"carteComposant.denivelePositif"}
+                text={denivelePositif + " m"}
+                style={styles.content}
+              />
+            </View>
+            <View style={styles.groupeTexteIconeLigneInf}>
+              <Image style={styles.icone} source={difficulteParcoursIcone} resizeMode="contain" />
+              <Text
+                //tx={"carteComposant.difficulteParcours"}
+                text={difficulteParcours}
+                style={styles.content}
+              />
+            </View>
+            <View style={styles.groupeTexteIconeLigneInf}>
+              <Image style={styles.icone} source={difficulteOrientationIcone} resizeMode="contain" />
+              <Text
+                //tx={"carteComposant.difficulteOrientation"}
+                text={difficulteOrientation}
+                style={styles.content}
+              />
+            </View>
+          </View>
+        </View>
       </View>
-      </TouchableOpacity>
+    </TouchableOpacity>
   )
 }
