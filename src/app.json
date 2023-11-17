@@ -52,8 +52,12 @@
         "backgroundColor": "#191015"
       }
     },
+    "packagerOpts": {
+      "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
+    },
     "plugins": [
       "expo-localization"
     ]
+    
   }
 }
