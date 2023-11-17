@@ -3,6 +3,7 @@ import { StyleProp, TextStyle, View, ViewStyle,Dimensions } from "react-native"
 import { observer } from "mobx-react-lite"
 import { colors, spacing } from "app/theme"
 import { LineChart } from 'react-native-chart-kit'
+import { useEffect, useState } from "react"
 
 export interface GraphiqueDeniveleProps {
   /**

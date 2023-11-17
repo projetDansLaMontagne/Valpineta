@@ -5,11 +5,8 @@ import { AppStackScreenProps } from "app/navigators";
 import { Text, CarteAvis, GraphiqueDenivele } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
-import { LineChart } from 'react-native-chart-kit'
-import { useFocusEffect } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
-
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   navigation: any;
@@ -18,6 +15,8 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { navigation } = props;
+    const [isLoading, setIsLoading] = useState(true);
+
 
     return(
       <SafeAreaView style={$container}>
@@ -31,7 +30,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull()}
+          itemFull={itemFull(isLoading, setIsLoading)}
+          onShowFull={() => setIsLoading(true)}
+          onShowMini={() => setIsLoading(false)}
           disableSwipeIcon={true}
           animation="easeInEaseOut"
           extraMarginTop={125}
@@ -53,9 +54,28 @@ function itemMini() {
   )
 }
 
-function itemFull() {
+function itemFull(isLoading: boolean, setIsLoading: any) {
 
-  const [isInfos, setIsInfos] = useState(false);
+  const [isInfos, setIsInfos] = useState(true);
+
+  const chrono = () => {
+    setTimeout(() => {
+      setIsLoading(false)
+    }
+      , 2000);
+  }
+
+  useEffect(() => {
+    if (isInfos) {
+      chrono();
+    }
+  }, [isInfos]);
+
+  useEffect(() => {
+    if (isLoading) {
+      chrono();
+    }
+  }, [isLoading]);
 
   return (
 
@@ -76,22 +96,28 @@ function itemFull() {
       </View>
       <View>
         <View style={$containerBouton}>
-          <TouchableOpacity onPress={() => {setIsInfos(true)}} style={$boutonInfoAvis} >
+          <TouchableOpacity onPress={() => {
+            chrono()
+            setIsInfos(true)
+            }} style={$boutonInfoAvis} >
             <Text text="Infos" size="lg" style={[isInfos ? { color: colors.bouton } : { color: colors.text }]} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {setIsInfos(false)}} style={$boutonInfoAvis}>
+          <TouchableOpacity onPress={() => {
+            setIsLoading(true)
+            setIsInfos(false)}} style={$boutonInfoAvis}>
             <Text text="Avis" size="lg" style={[isInfos ? { color: colors.text } : { color: colors.bouton }]} />
           </TouchableOpacity>
         </View>
         <View style={[$souligneInfosAvis, isInfos ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
         </View>
-        {isInfos ? infos() : avis()}
+        {isInfos ? infos(isLoading): avis()}
       </View>
     </View>
   )
 }
 
-function infos() {
+function infos(isLoading: boolean) {
+
   return (
     <ScrollView>
       <TouchableWithoutFeedback>
@@ -138,7 +164,9 @@ function infos() {
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-            <GraphiqueDenivele/>
+            {
+              isLoading ? <ActivityIndicator size="large" color={colors.bouton} /> : <GraphiqueDenivele />
+            }
           </View>
         </View>
       </TouchableWithoutFeedback>
