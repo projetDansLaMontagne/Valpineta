@@ -79,7 +79,7 @@ function itemFull(nomExcursion,temps,distance,difficulteParcours,difficulteOrien
         style={$iconsSwipeUp}
       />
       <View style={$containerTitre}>
-        <Text text="Col de la marmotte" size="xl" style={$titre} />
+        <Text text={nomExcursion} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
@@ -224,12 +224,13 @@ const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width,
-  padding: spacing.lg,
+  width: width- spacing.xxl,
+  margin: spacing.lg,
 }
 
 const $titre: ViewStyle = {
   marginTop: spacing.xs,
+  paddingRight: spacing.xl,
 }
 
 const $containerBouton: ViewStyle = {
