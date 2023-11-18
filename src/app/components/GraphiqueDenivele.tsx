@@ -23,7 +23,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(props: Grap
     const coordonnees = data.features[0].geometry.coordinates[0];
     const listeALtitude = coordonnees
       .map((item, index) => (index % 50 === 0 ? item[2] : null))
-      .filter((altitude) => altitude !== 0);
+      .filter((altitude) =>altitude !== null);
     const line = {
       labels: ["0", "200", "400", "600", "800", "1000"],
       datasets: [
@@ -37,11 +37,10 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(props: Grap
       <View>
         <LineChart
           data={line}
-          width={width - spacing.lg * 2}
+          width={width - spacing.xl * 2}
           height={200}
           withInnerLines={false}
           withOuterLines={false}
-          yAxisSuffix="m"
           withShadow={false}
           chartConfig={{
             backgroundColor: colors.fond,
