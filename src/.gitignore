@@ -84,3 +84,4 @@ web-build/
 
 # Configurations
 !env.js
+package-lock.json

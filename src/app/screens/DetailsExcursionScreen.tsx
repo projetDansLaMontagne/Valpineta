@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Text, CarteAvis, GraphiqueDenivele } from "app/components";
+import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 
@@ -22,7 +22,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       <SafeAreaView style={$container}>
         <TouchableOpacity
           style={$boutonRetour}
-          onPress={() => navigation.navigate("Accueil")}
+          onPress={() => navigation.navigate("Excursions")}
         >
           <Image
             source={require("../../assets/icons/back.png")}
@@ -42,7 +42,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     );
   }
 );
-
 
 function itemMini() {
   return (
@@ -173,7 +172,6 @@ function infos(isLoading: boolean) {
     </ScrollView>
   )
 }
-
 
 function avis() {
   return (

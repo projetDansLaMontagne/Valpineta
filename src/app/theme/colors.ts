@@ -5,6 +5,8 @@ const palette = {
   vert : "#007C27",
   vertAttenue : "#009944",
   gris : "#D9D9D9",
+  grisClair : "#F9F9F9",
+  grisFonce : "#666666",
   blanc : "#FFFFFF",
   rouge : "#FF0000",
   jaune : "#FFEE00",
@@ -22,6 +24,10 @@ export const colors = {
    * Couleur par défault du texte.
    */
   text: palette.marron,
+  /**
+   * Texte attenué.
+   */
+  textAttenue: palette.vertAttenue,
   /**
    * The default color of the screen background.
    */
