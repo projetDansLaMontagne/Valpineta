@@ -85,13 +85,7 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
       />
       <View style={$containerTitre}>
         <Text text="Col de la marmotte" size="xl" style={$titre} />
-        <TouchableOpacity>
-          <Image
-            source={require("../../assets/icons/download.png")}
-            style={$iconDownload}
-          >
-          </Image>
-        </TouchableOpacity>
+        <GpxDownloader />
       </View>
       <View>
         <View style={$containerBouton}>
