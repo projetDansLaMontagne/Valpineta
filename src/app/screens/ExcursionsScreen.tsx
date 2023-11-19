@@ -21,6 +21,7 @@ interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
   Filtres: Record<string, any>
 }
 
+
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(props: ExcursionsScreenProps) {
   var filtres: Record<string, any>;
 
@@ -89,9 +90,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     }
   }
   const excursionsFiltrees = (excursions: Array<Record<string, any>>, filtres) => {
-    console.log(filtres)
-    console.log(excursions[0]);
-
     excursions = excursions.filter(excursion => {
       if (
         excursion.distance < filtres.intervalleDistance.min ||
@@ -199,6 +197,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   };
 
 
+  // CALL BACKS
+  const navigationFiltres = () => {
+    // @todo Ajouter les filtres par defaut en parametres
+    navigation.navigate("Stack", { screen: 'Filtres' });
+  }
+
   useEffect(() => {
     filtres = props.route.params.Filtres;
     loadExcursions();
@@ -220,7 +224,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           placeholderTextColor={colors.palette.grisFonce}
         />
         <TouchableOpacity
-          onPress={() => navigation.navigate("Stack", { screen: 'Filtres' })}
+          onPress={() => navigationFiltres}
           style={styles.valleeIcone}
         >
           <Image

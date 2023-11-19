@@ -11,12 +11,28 @@ import { colors, spacing } from "../theme"
 /**@bug Valles ne sont pas re selectionnables */
 
 interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {
+  distanceMax: number,
+  dureeMax: number,
+  deniveleMax: number,
+  nomTypesParcours: string[],
+  nomVallees: string[],
+  difficultePhysiqueMax: number,
+  difficulteOrientationMax: number,
 }
 
 export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresScreen(
   props: FiltresScreenProps
 ) {
   const { navigation } = props;
+
+
+  const valeursFiltress = props.route.params;
+  console.log(valeursFiltress);
+  if (valeursFiltress === undefined) {
+    // ERREUR CETTE PAGE NECESSITE LES FILTRES APPLIQUES
+    throw new Error("Page des filtres necessite les filtres appliques en parametres");
+  }
+
 
   // Assets
   const logoCheck = require("../../assets/icons/check_3x_vert.png");
