@@ -259,7 +259,7 @@ const $containerGrand: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.xs,
-  paddingBottom: 235,
+  paddingBottom: 250,
 }
 
 //Style du container du titre et du bouton de téléchargement
