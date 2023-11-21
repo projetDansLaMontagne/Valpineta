@@ -137,7 +137,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
       width: spacing.lg,
       height: spacing.lg,
       marginEnd: spacing.xxs,
-      color: coeurTouche ? colors.palette.rouge : colors.palette.noir,
     },
     valleeFavori: {
       marginEnd: spacing.xxs,
