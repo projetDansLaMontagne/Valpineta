@@ -37,9 +37,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           onPress={() => navigation.navigate("Excursions")}
         >
           <Image
+          style={{tintColor: colors.bouton}}
             source={require("../../assets/icons/back.png")}
           >
-
           </Image>
         </TouchableOpacity>
         <SwipeUpDown
@@ -174,8 +174,10 @@ function avis() {
 
 
 const $boutonRetour: ViewStyle = {
-  backgroundColor: colors.bouton,
-  borderRadius: 5,
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
   padding: spacing.sm,
   margin: spacing.lg,
   width: 50,
