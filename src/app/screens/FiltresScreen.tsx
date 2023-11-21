@@ -144,7 +144,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       max={distanceMax}
       increment={1}
       values={intervalleDistance}
-      markerColor="#007C27"
+      markerColor={colors.palette.vert}
       onSlidingStart={() => setSlideVerticalBloque(true)}
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDistance(value)}
@@ -157,7 +157,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       max={dureeMax}
       increment={1}
       values={intervalleDuree}
-      markerColor="#007C27"
+      markerColor={colors.palette.vert}
       onSlidingStart={() => setSlideVerticalBloque(true)}
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDuree(value)}
@@ -170,7 +170,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       max={deniveleMax}
       increment={200}
       values={intervalleDenivele}
-      markerColor="#007C27"
+      markerColor={colors.palette.vert}
       onSlidingStart={() => setSlideVerticalBloque(true)}
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDenivele(value)}
@@ -183,9 +183,9 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
         types.map((type, i) =>
           <TouchableOpacity onPress={() => clicType(i)} style={{ flexDirection: "row", alignItems: "center" }}>
             <Switch
-              trackColor={{ false: 'onsenfout', true: '#cccccc' }}
-              thumbColor={type.estCoche ? 'green' : '#ffffff'}
-              ios_backgroundColor="#CCCCCC"
+              trackColor={{ false: 'onsenfout', true: colors.palette.grisFonce }}
+              thumbColor={type.estCoche ? colors.bordure : colors.palette.noir}
+              ios_backgroundColor={colors.palette.grisFonce}
               onValueChange={() => clicType(i)}
               value={type.estCoche}
               style={$switch}
@@ -265,7 +265,7 @@ const $cadre: ViewStyle = {
 // ---- V I E W S ----
 const $container: ViewStyle = {
   flex: 1,
-  backgroundColor: colors.background,
+  backgroundColor: colors.fond,
   padding: spacing.lg,
 
   paddingTop: 50 // A SUPPRIMER
@@ -283,13 +283,13 @@ const $containerZones: ViewStyle = {
 
 }
 const $zone: ViewStyle = {
-  borderColor: "#007C27",
+  borderColor: colors.palette.vert,
   borderRadius: 15,
   margin: spacing.xs,
 }
 const $zoneSelectionnee: ViewStyle = {
   ...$zone,
-  backgroundColor: "#007C27",
+  backgroundColor: colors.palette.vert,
 }
 const $difficulte: ViewStyle = {
   flexDirection: "row",
@@ -300,7 +300,7 @@ const $difficulte: ViewStyle = {
 }
 const $difficulteSelectionnee: ViewStyle = {
   ...$difficulte,
-  backgroundColor: "#007C27",
+  backgroundColor: colors.palette.vert,
 }
 const $containerDiff: ViewStyle = {
   flexDirection: "row",
@@ -350,7 +350,7 @@ const $boutonValidation: ViewStyle = {
   borderRadius: 15,
   borderWidth: 2,
   padding: 0,
-  backgroundColor: "#007C27",
+  backgroundColor: colors.palette.vert,
 }
 const $switch: ViewStyle = {
   backgroundColor: "transparent",

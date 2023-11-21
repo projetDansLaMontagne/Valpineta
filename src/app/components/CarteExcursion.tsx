@@ -1,18 +1,13 @@
 import React, { ComponentType, Fragment, ReactElement, useState } from "react"
 import { Image, ImageStyle, StyleSheet } from "react-native"
-import styled from 'styled-components/native';
-import { Ionicons } from '@expo/vector-icons'; // Assurez-vous d'avoir importé les icônes correctement
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 
 import {
-  StyleProp,
-  TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
   View,
-  ViewStyle,
 } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text, TextProps } from "./Text"
@@ -34,6 +29,7 @@ interface CarteExcursionProps extends TouchableOpacityProps {
   difficulteParcours?: TextProps["text"]
 
   difficulteOrientation?: TextProps["text"]
+
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
@@ -46,6 +42,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
     denivelePositif,
     difficulteParcours,
     difficulteOrientation,
+    navigation,
   } = props
 
   const favoriIcone = require("../../assets/icons/favori.png")
@@ -71,14 +68,14 @@ export function CarteExcursion(props: CarteExcursionProps) {
   }
 
   const detailExcursion = () => {
-    console.log('Détail de l\'excursion');
+    navigation.navigate('Stack', { screen: 'DetailsExcursion', params: { nomExcursion: nomExcursions, temps: temps, distance: distance, difficulteParcours: difficulteParcours, difficulteOrientation: difficulteOrientation } });
   }
 
   const styles = StyleSheet.create({
     carteGlobale: {
       padding: 5,
       margin: 10,
-      shadowColor: "#000",
+      shadowColor: colors.palette.noir,
       shadowOffset: {
         width: 0,
         height: 3,
@@ -168,7 +165,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
       width: spacing.lg,
       height: spacing.lg,
       marginEnd: spacing.xxs,
-      color: coeurTouche ? 'red' : 'black',
+      color: coeurTouche ? colors.palette.rouge : colors.palette.noir,
     },
     zoneFavori: {
       marginEnd: spacing.xxs,
@@ -183,7 +180,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
           <Text
             weight="bold"
-            //tx={"carteComposant.titre"}
             text={nomExcursions}
             style={styles.heading}
           />
@@ -201,7 +197,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={zoneIcone} resizeMode="contain" />
               <Text
-                //tx={"carteComposant.zone"}
                 text={zone}
                 style={styles.content}
               />
@@ -209,7 +204,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={parcoursIcone} resizeMode="contain" />
               <Text
-                //tx={"carteComposant.parcours"}
                 text={parcours}
                 style={styles.content}
               />
@@ -217,7 +211,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={tempsIcone} resizeMode="contain" />
               <Text
-                //tx={"carteComposant.temps"}
                 text={temps}
                 style={styles.content}
               />
@@ -227,7 +220,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={distanceIcone} resizeMode="contain" />
               <Text
-                //tx={"carteComposant.distance"}
                 text={distance + " km"}
                 style={styles.content}
               />
@@ -235,7 +227,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={denivelePositifIcone} resizeMode="contain" />
               <Text
-                //tx={"carteComposant.denivelePositif"}
                 text={denivelePositif + " m"}
                 style={styles.content}
               />
@@ -243,7 +234,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={difficulteParcoursIcone} resizeMode="contain" />
               <Text
-                //tx={"carteComposant.difficulteParcours"}
                 text={difficulteParcours}
                 style={styles.content}
               />
@@ -251,7 +241,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={difficulteOrientationIcone} resizeMode="contain" />
               <Text
-                //tx={"carteComposant.difficulteOrientation"}
                 text={difficulteOrientation}
                 style={styles.content}
               />
