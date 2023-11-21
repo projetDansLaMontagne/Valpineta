@@ -45,6 +45,10 @@ export const colors = {
    */
   bouton: palette.vert,
   /**
+   * Couleur pour les boutons attenue.
+   */
+  boutonAttenue: palette.vertAttenue,
+  /**
    * Messages d'erreurs.
    */
   erreur: palette.rouge,
