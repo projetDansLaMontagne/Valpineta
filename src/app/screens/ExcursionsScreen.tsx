@@ -6,17 +6,13 @@ import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
 
-/**@bug Il faut cliquer 2 fois sur le le bouton des filtres pour etre redirige */
-/**@warning La navigation vers filtres est dans le mauvais sens  */
+/**@warning La navigation vers filtres est dans le mauvais sens (l'écran slide vers la gauche au lieu de la droite) */
 
-/**@warning ATTENTION LE PARAMETRE "filtres" en minuscule est BUGGE est est defini lorsqu on navigue vers la page grace au foot */
-/**@warning Cliquer sur excursions dans le footer redirige vers la page en retirant les filtres */
+/**@warning Cliquer sur excursions dans le footer redirige vers la page en retirant les parametre "Filtres" mais donne un parametre buggé "filtres" */
 /**@warning Pas de gestion des erreurs de recuperation du track */
-/**@warning Le fichier excursions.json est mal encodé. On recupere trop de données et elles sont mal organisees */
 
 /**@todo CSS : agrandir la zone de texte de recherche + la rendre fonctionnelle */
 /**@todo CSS : empecher le footer d etre au dessus de la derniere excursion */
-/**@todo Faire fonctionner search bar*/
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
   Filtres: Record<string, any>
 }
@@ -32,6 +28,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const [searchQuery, setSearchQuery] = useState('');
 
   const { navigation } = props;
+  const filtreIcone = require("../../assets/icons/filtre.png")
 
   // -- Primitives --
   /**
@@ -239,12 +236,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       filtres = props.route.params.Filtres;
     }
     loadExcursions();
-    // console.log("(DEBUG) parametres de navigation :");
-    // console.log(props.route.params);
   }, []);
-
-
-  const filtreIcone = require("../../assets/icons/filtre.png")
 
   return <Screen style={$root} >
     <View>

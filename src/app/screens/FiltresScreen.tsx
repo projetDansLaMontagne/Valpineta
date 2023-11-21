@@ -8,8 +8,6 @@ import { AppStackScreenProps } from "app/navigators"
 import { colors, spacing } from "../theme"
 
 /**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
-/**@warning criteresTri dans le fichier valeurs_filtres non utilisé */
-
 
 interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {
 }
