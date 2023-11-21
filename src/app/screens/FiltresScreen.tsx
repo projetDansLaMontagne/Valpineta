@@ -26,7 +26,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   const logoDistance = require("../../assets/icons/distance.png");
   const logoDuree = require("../../assets/icons/time.png");
   const logoDenivele = require("../../assets/icons/denivele.png");
-  const logoDiffPhy = require("../../assets/icons/difficulte_physique.png");
+  const logoDiffTech = require("../../assets/icons/difficulte_technique.png");
   const logoDiffOri = require("./../../assets/icons/difficulte_orientation.png");
 
   // -- CONSTANTES --
@@ -46,7 +46,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     { nom: "Distance", nomCle: "distance", logo: logoDistance },
     { nom: "Durée", nomCle: "duree", logo: logoDuree },
     { nom: "Dénivelé", nomCle: "denivele", logo: logoDenivele },
-    { nom: "Difficulté physique", nomCle: "difficulteTechnique", logo: logoDiffPhy },
+    { nom: "Difficulté technique", nomCle: "difficulteTechnique", logo: logoDiffTech },
     { nom: "Difficulté d'orientation", nomCle: "difficulteOrientation", logo: logoDiffOri },
   ]
 
@@ -63,8 +63,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   const [vallees, setVallees] = useState(
     valeursFiltres.nomVallees.map(nomVallee => ({ nom: nomVallee, selectionne: true }))
   )
-  const [difficultesPhysiques, setDifficultesPhysiques] = useState(
-    [...Array(valeursFiltres.difficultePhysiqueMax)].map((trash, i) => ({ niveau: i + 1, selectionne: true }))
+  const [difficultesTechniques, setDifficultesTechniques] = useState(
+    [...Array(valeursFiltres.difficulteTechniqueMax)].map((trash, i) => ({ niveau: i + 1, selectionne: true }))
   );
   const [difficultesOrientation, setDifficultesOrientation] = useState(
     [...Array(valeursFiltres.difficulteOrientationMax)].map((trash, i) => ({ niveau: i + 1, selectionne: true }))
@@ -85,10 +85,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     newVallees[i].selectionne = !newVallees[i].selectionne;
     setVallees(newVallees);
   }
-  const clicDifficultePhysique = (i: number) => {
-    let newDifficulte = [...difficultesPhysiques];
+  const clicDifficulteTechnique = (i: number) => {
+    let newDifficulte = [...difficultesTechniques];
     newDifficulte[i].selectionne = !newDifficulte[i].selectionne;
-    setDifficultesPhysiques(newDifficulte);
+    setDifficultesTechniques(newDifficulte);
   }
   const clicDifficulteOrientation = (i: number) => {
     let newDifficulte = [...difficultesOrientation];
@@ -103,7 +103,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
       typesParcours: typesParcours.map(type => type.selectionne ? type.nom : null).filter(type => type != null),
       vallees: vallees.map(vallee => vallee.selectionne ? vallee.nom : null).filter(type => type != null),
-      difficultesPhysiques: difficultesPhysiques.map(difficultePhysique => difficultePhysique.selectionne ? difficultePhysique.niveau : null).filter(type => type != null),
+      difficultesTechniques: difficultesTechniques.map(difficulteTechnique => difficulteTechnique.selectionne ? difficulteTechnique.niveau : null).filter(type => type != null),
       difficultesOrientation: difficultesOrientation.map(difficultesOrientation => difficultesOrientation.selectionne ? difficultesOrientation.niveau : null).filter(type => type != null),
     };
     navigation.navigate("Excursions", { Filtres: filtres });
@@ -217,18 +217,18 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       }
     </View>
 
-    <Text style={$h2}>Difficulté physique</Text>
+    <Text style={$h2}>Difficulté technique</Text>
     <View style={$containerDiff}>
       {
-        difficultesPhysiques.map((difficulte, i) =>
+        difficultesTechniques.map((difficulte, i) =>
           <TouchableOpacity
-            onPress={() => clicDifficultePhysique(i)}
+            onPress={() => clicDifficulteTechnique(i)}
             style={difficulte.selectionne ? $difficulteSelectionnee : $difficulte}
             key={difficulte.niveau}
           >
             {
               [...Array(difficulte.niveau)].map((trash, i) =>
-                <Image source={logoDiffPhy} style={$imageDifficulte} key={(i + 1) * (difficulte.niveau)} />
+                <Image source={logoDiffTech} style={$imageDifficulte} key={(i + 1) * (difficulte.niveau)} />
               )
             }
           </TouchableOpacity>

@@ -46,7 +46,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     var deniveleMax = 0;
     var typesParcours = [];
     var vallees = [];
-    var difficultePhysiqueMax = 0;
+    var difficulteTechniqueMax = 0;
     var difficulteOrientationMax = 0;
 
     excursions.forEach(excursion => {
@@ -71,9 +71,9 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       if (!vallees.includes(excursion.vallee)) {
         vallees.push(excursion.vallee);
       }
-      // Difficulte physique
-      if (excursion.difficulteTechnique > difficultePhysiqueMax) {
-        difficultePhysiqueMax = excursion.difficulteTechnique;
+      // Difficulte technique
+      if (excursion.difficulteTechnique > difficulteTechniqueMax) {
+        difficulteTechniqueMax = excursion.difficulteTechnique;
       }
       // Difficulte orientation
       if (excursion.difficulteOrientation > difficulteOrientationMax) {
@@ -87,7 +87,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       deniveleMax: deniveleMax,
       typesParcours: typesParcours,
       vallees: vallees,
-      difficultePhysiqueMax: difficultePhysiqueMax,
+      difficulteTechniqueMax: difficulteTechniqueMax,
       difficulteOrientationMax: difficulteOrientationMax,
     }
   }
@@ -107,7 +107,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         excursion.denivele > filtres.intervalleDenivele.max ||
         !filtres.typesParcours.includes(excursion.typeParcours) ||
         !filtres.vallees.includes(excursion.vallee) ||
-        !filtres.difficultesPhysiques.includes(excursion.difficulteTechnique) ||
+        !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
         !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
       ) {
         // On supprime de l excursion
