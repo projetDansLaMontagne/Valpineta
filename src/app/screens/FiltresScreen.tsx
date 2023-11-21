@@ -8,47 +8,48 @@ import { AppStackScreenProps } from "app/navigators"
 import { colors, spacing } from "../theme"
 
 /**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
-/**@bug Valles ne sont pas re selectionnables */
+/**@warning criteresTri dans le fichier valeurs_filtres non utilisé */
+
 
 interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {
-  distanceMax: number,
-  dureeMax: number,
-  deniveleMax: number,
-  nomTypesParcours: string[],
-  nomVallees: string[],
-  difficultePhysiqueMax: number,
-  difficulteOrientationMax: number,
 }
 
 export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresScreen(
   props: FiltresScreenProps
 ) {
   const { navigation } = props;
-
-
-  const valeursFiltress = props.route.params;
-  if (valeursFiltress === undefined) {
-    // ERREUR CETTE PAGE NECESSITE LES FILTRES APPLIQUES
-    navigation.navigate("Excursions");
-    console.error("Page des filtres necessite les filtres appliques en parametres");
-  }
+  var valeursFiltres;
 
   // Assets
   const logoCheck = require("../../assets/icons/check_3x_vert.png");
+
+  const logoDistance = require("../../assets/icons/distance.png");
+  const logoDuree = require("../../assets/icons/time.png");
+  const logoDenivele = require("../../assets/icons/denivele.png");
   const logoDiffPhy = require("../../assets/icons/difficulte_physique.png");
   const logoDiffOri = require("./../../assets/icons/difficulte_orientation.png");
 
   // -- CONSTANTES --
-  // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
-  const valeursFiltres = require("../../assets/jsons/valeurs_filtres.json");
+  // Recuperation des valeurs de filtres
+  try {
+    // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
+    valeursFiltres = require("../../assets/jsons/valeurs_filtres.json");
+  }
+  catch (error) {
+    // Erreur critique si on n a pas les valeurs de filtres
+    navigation.navigate("Excursions");
+    console.error("Page des filtres necessite les filtres appliques en parametres");
+    return <></>;
+  }
   const incrementDenivele = 200;
   const criteresTri = [
-    { nom: "Distance", nomCle: "distance", logo: require("./../../assets/icons/distance.png") },
-    { nom: "Durée", nomCle: "duree", logo: require("./../../assets/icons/time.png") },
-    { nom: "Dénivelé", nomCle: "denivele", logo: require("./../../assets/icons/denivele.png") },
+    { nom: "Distance", nomCle: "distance", logo: logoDistance },
+    { nom: "Durée", nomCle: "duree", logo: logoDuree },
+    { nom: "Dénivelé", nomCle: "denivele", logo: logoDenivele },
     { nom: "Difficulté physique", nomCle: "difficulteTechnique", logo: logoDiffPhy },
     { nom: "Difficulté d'orientation", nomCle: "difficulteOrientation", logo: logoDiffOri },
   ]
+
 
   // -- USE STATES --
   // Tri / Filtres selectionnes
@@ -83,10 +84,6 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     let newVallees = [...vallees];
     newVallees[i].selectionne = !newVallees[i].selectionne;
     setVallees(newVallees);
-
-    // console.log(i);
-    console.log("MODIFICATION VALLEE", newVallees[i]);
-
   }
   const clicDifficultePhysique = (i: number) => {
     let newDifficulte = [...difficultesPhysiques];

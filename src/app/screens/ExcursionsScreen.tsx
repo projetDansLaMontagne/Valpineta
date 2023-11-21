@@ -227,7 +227,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   // CALL BACKS
   const navigationFiltres = () => {
     if (valeursFiltres) {
-      navigation.navigate("Stack", { screen: 'Filtres', params: valeursFiltres });
+      navigation.navigate("Stack", { screen: 'Filtres' });
     }
     else {
       console.log("Impossible de naviguer vers la page filtres sans les filtres par défaut");
