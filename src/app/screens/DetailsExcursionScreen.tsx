@@ -2,7 +2,7 @@ import React, { FC, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Text, CarteAvis } from "app/components";
+import { Text, CarteAvis, GpxDownloader } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 
@@ -67,13 +67,7 @@ function itemFull() {
       />
       <View style={$containerTitre}>
         <Text text="Col de la marmotte" size="xl" style={$titre} />
-        <TouchableOpacity>
-          <Image
-            source={require("../../assets/icons/download.png")}
-            style={$iconDownload}
-          >
-          </Image>
-        </TouchableOpacity>
+        <GpxDownloader />
       </View>
       <View>
         <View style={$containerBouton}>
@@ -222,12 +216,6 @@ const $containerTitre: ViewStyle = {
 
 const $titre: ViewStyle = {
   marginTop: spacing.xs,
-}
-
-const $iconDownload: ImageStyle = {
-  width: 40,
-  height: 40,
-  tintColor: colors.bouton,
 }
 
 const $containerBouton: ViewStyle = {
