@@ -1,18 +1,13 @@
 import React, { ComponentType, Fragment, ReactElement, useState } from "react"
 import { Image, ImageStyle, StyleSheet } from "react-native"
-import styled from 'styled-components/native';
-import { Ionicons } from '@expo/vector-icons'; // Assurez-vous d'avoir importé les icônes correctement
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 
 import {
-  StyleProp,
-  TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
   View,
-  ViewStyle,
 } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text, TextProps } from "./Text"
@@ -35,7 +30,6 @@ interface CarteExcursionProps extends TouchableOpacityProps {
 
   difficulteOrientation?: TextProps["text"]
 
-  navigation?: any
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {

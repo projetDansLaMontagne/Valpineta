@@ -9,8 +9,6 @@ import SwipeUpDown from "react-native-swipe-up-down";
 const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  navigation: any;
-  route: any;
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
