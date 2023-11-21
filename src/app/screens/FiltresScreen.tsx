@@ -145,7 +145,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       max={valeursFiltres.distanceMax}
       increment={1}
       values={intervalleDistance}
-      markerColor="#007C27"
+      markerColor={colors.palette.vert}
       onSlidingStart={() => setSlideVerticalBloque(true)}
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDistance(value)}
@@ -158,7 +158,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       max={valeursFiltres.dureeMax}
       increment={1}
       values={intervalleDuree}
-      markerColor="#007C27"
+      markerColor={colors.palette.vert}
       onSlidingStart={() => setSlideVerticalBloque(true)}
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDuree(value)}
@@ -171,7 +171,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       max={valeursFiltres.deniveleMax + incrementDenivele}
       increment={incrementDenivele}
       values={intervalleDenivele}
-      markerColor="#007C27"
+      markerColor={colors.palette.vert}
       onSlidingStart={() => setSlideVerticalBloque(true)}
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDenivele(value)}
@@ -188,9 +188,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
             key={i}
           >
             <Switch
-              trackColor={{ false: 'onsenfout', true: '#cccccc' }}
-              thumbColor={typeParcours.selectionne ? 'green' : '#ffffff'}
-              ios_backgroundColor="#CCCCCC"
+              trackColor={{ false: 'onsenfout', true: colors.palette.grisFonce }}
+              thumbColor={typeParcours.selectionne ? colors.bordure : colors.palette.noir}
+              ios_backgroundColor={colors.palette.grisFonce}
+
               onValueChange={() => clicType(i)}
               value={typeParcours.selectionne}
               style={$switch}
@@ -207,7 +208,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
         vallees.map((vallee, i) =>
           <TouchableOpacity
             onPress={() => clicVallee(i)}
-            style={[$vallee, vallee.selectionne ? { backgroundColor: '#007C27' } : { backgroundColor: '#FFFFFF' }]}
+            style={[$vallee, vallee.selectionne ? { backgroundColor: colors.palette.vert } : { backgroundColor: colors.palette.blanc }]}
             key={i}>
             <Text>{vallee.nom}</Text>
           </TouchableOpacity>
@@ -277,7 +278,7 @@ const $containerVallees: ViewStyle = {
 
 }
 const $vallee: ViewStyle = {
-  borderColor: "#007C27",
+  borderColor: colors.palette.vert,
   borderRadius: 15,
   borderWidth: 1,
   margin: spacing.xxs,
@@ -297,7 +298,7 @@ const $difficulte: ViewStyle = {
 }
 const $difficulteSelectionnee: ViewStyle = {
   ...$difficulte,
-  backgroundColor: "#007C27",
+  backgroundColor: colors.palette.vert,
 }
 
 
@@ -343,7 +344,7 @@ const $boutonValidation: ViewStyle = {
   borderRadius: 15,
   borderWidth: 2,
   padding: 0,
-  backgroundColor: "#007C27",
+  backgroundColor: colors.palette.vert,
 }
 const $switch: ViewStyle = {
   backgroundColor: "transparent",

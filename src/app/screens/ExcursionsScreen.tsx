@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     color: colors.palette.noir,
     backgroundColor: colors.palette.grisClair,
     margin: 10,
-    shadowColor: "#000",
+    shadowColor: colors.palette.noir,
     shadowOffset: {
       width: 0,
       height: 1,

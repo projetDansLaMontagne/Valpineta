@@ -1,40 +1,50 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions } from "react-native";
+import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Text, CarteAvis, GpxDownloader } from "app/components";
+import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 
 const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  navigation: any;
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
 
-    const { navigation } = props;
+    const { 
+      navigation,
+      route: {
+        params: {
+            nomExcursion,
+            temps,
+            distance,
+            difficulteParcours,
+            difficulteOrientation,
+        }
+      }
+    } = props;
+
+    const [isLoading, setIsLoading] = useState(true);
 
     return (
-      < SafeAreaView
-        style={$container}
-      >
+      <SafeAreaView style={$container}>
         <TouchableOpacity
           style={$boutonRetour}
           onPress={() => navigation.navigate("Excursions")}
         >
           <Image
+          style={{tintColor: colors.bouton}}
             source={require("../../assets/icons/back.png")}
-          >
-
-          </Image>
+          />
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull()}
-          disableSwipeIcon={true}
+          itemFull={itemFull(isLoading, setIsLoading, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation)}
+          onShowFull={() => setIsLoading(true)}
+          onShowMini={() => setIsLoading(false)}
           animation="easeInEaseOut"
           extraMarginTop={125}
           swipeHeight={100}
@@ -44,6 +54,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   }
 );
 
+/**
+ * 
+ * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas 
+ */
 function itemMini() {
   return (
     <View style={$containerPetit}>
@@ -54,39 +68,76 @@ function itemMini() {
   )
 }
 
-function itemFull() {
+/**
+ * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
+ */
+function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation) {
 
-  const [isInfos, setIsInfos] = useState(true);
+  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
 
+  //Lance le chrono pour le chargement du graphique de dénivelé
+  const chrono = () => {
+    setTimeout(() => {
+      setIsLoading(false)
+    }
+      , 1000);
+  }
+
+  //Observateur de l'état du containerInfoAffiche
+  useEffect(() => {
+    if (containerInfoAffiche) {
+      chrono();
+    }
+  }, [containerInfoAffiche]);
+
+  //Observateur de l'état du containerInfoAffiche
+  useEffect(() => {
+    if (isLoading) {
+      chrono();
+    }
+  }, [isLoading]);
+  
   return (
 
     <View style={$containerGrand}>
-      <Image
-        source={require("../../assets/icons/swipe-up.png")}
-        style={$iconsSwipeUp}
-      />
       <View style={$containerTitre}>
-        <Text text="Col de la marmotte" size="xl" style={$titre} />
+        <Text text={nomExcursion} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
         <View style={$containerBouton}>
-          <TouchableOpacity onPress={() => setIsInfos(true)} style={$boutonInfoAvis} >
-            <Text text="Infos" size="lg" style={[isInfos ? { color: colors.bouton } : { color: colors.text }]} />
+          <TouchableOpacity onPress={() => {
+            //lancement du chrono pour le loading
+            setIsLoading(true),
+            isLoading ? chrono() : null
+            setcontainerInfoAffiche(true)
+            }} style={$boutonInfoAvis} >
+            <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsInfos(false)} style={$boutonInfoAvis}>
-            <Text text="Avis" size="lg" style={[isInfos ? { color: colors.text } : { color: colors.bouton }]} />
+          <TouchableOpacity onPress={() => {
+            //Loading à false pour pouvoir relancer le chrono
+            setIsLoading(true)
+            setcontainerInfoAffiche(false)}} style={$boutonInfoAvis}>
+            <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
           </TouchableOpacity>
         </View>
-        <View style={[$souligneInfosAvis, isInfos ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
+        <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
         </View>
-        {isInfos ? infos() : avis()}
+        {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation): avis()}
       </View>
-    </View>
+    </View >
   )
 }
 
-function infos() {
+/**
+ * 
+ * @param isLoading 
+ * @returns les informations de l'excursion
+ */
+function infos(isLoading: boolean, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number) {
+
+  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
+
   return (
     <ScrollView>
       <TouchableWithoutFeedback>
@@ -97,31 +148,31 @@ function infos() {
                 source={require("../../assets/icons/temps.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={temps} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={distance+' km'} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/difficulteParcours.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={difficulteParcours} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
               >
               </Image>
-              <Text text="1" size="xs" />
+              <Text text={difficulteOrientation} size="xs" />
             </View>
           </View>
-          <View style={$containerDescriptionSignalement}>
+          <View style={$containerDescriptionSignalements}>
             <View>
               <Text text="Description" size="lg" />
               <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
@@ -133,11 +184,9 @@ function infos() {
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-            <Image
-              source={require("../../assets/images/denivele.jpeg")}
-              style={$imageDenivele}
-            >
-            </Image>
+            {
+              isLoading ? <ActivityIndicator size="large" color={colors.bouton} /> : <GraphiqueDenivele data={data} />
+            }
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -145,6 +194,9 @@ function infos() {
   )
 }
 
+/**
+ * @returns les avis de l'excursion
+ */
 function avis() {
   return (
     <ScrollView style={$containerAvis}>
@@ -160,24 +212,30 @@ function avis() {
   );
 }
 
-
+/* -------------------------------------------------------------------------- */
+/*                                   STYLES                                   */
+/* -------------------------------------------------------------------------- */
 
 const $boutonRetour: ViewStyle = {
-  backgroundColor: colors.bouton,
-  borderRadius: 5,
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
   padding: spacing.sm,
   margin: spacing.lg,
   width: 50,
   position: "absolute",
-  top: 0,
+  top: 15,
 }
 
 const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
-  backgroundColor: colors.fond,
+  backgroundColor: colors.erreur,
 }
+
+//Style de itemMini
 
 const $containerPetit: ViewStyle = {
   flex: 1,
@@ -190,6 +248,8 @@ const $containerPetit: ViewStyle = {
   padding: spacing.xxs,
 }
 
+//Style de itemFull
+
 const $containerGrand: ViewStyle = {
   flex: 1,
   alignItems: "center",
@@ -199,24 +259,25 @@ const $containerGrand: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.xs,
-  paddingBottom: 275,
+  paddingBottom: 250,
 }
 
-const $iconsSwipeUp: ImageStyle = {
-  transform: [{ rotate: "180deg" }],
-}
+//Style du container du titre et du bouton de téléchargement
 
 const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width,
-  padding: spacing.lg,
+  width: width-(width/5),
+  margin: spacing.lg,
 }
 
 const $titre: ViewStyle = {
   marginTop: spacing.xs,
+  paddingRight: spacing.xl,
 }
+
+//Style du container des boutons infos et avis
 
 const $containerBouton: ViewStyle = {
   flexDirection: "row",
@@ -236,25 +297,28 @@ const $souligneInfosAvis: ViewStyle = {
   position: "relative",
 }
 
+//Style des informations
+
 const $containerInformations: ViewStyle = {
   flexDirection: "row",
-  justifyContent: "space-around",
+  justifyContent: "space-between",
   padding: spacing.xl,
 }
 
 const $containerUneInformation: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",
-  justifyContent: "space-around",
-  width: spacing.xxl,
 }
 
 const $iconInformation: ImageStyle = {
   width: spacing.lg,
   height: spacing.lg,
+  marginRight: spacing.xs,
 }
 
-const $containerDescriptionSignalement: ViewStyle = {
+//Style de la description et des signalements
+
+const $containerDescriptionSignalements: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   paddingLeft: spacing.xl,
@@ -266,16 +330,10 @@ const $textDescription: TextStyle = {
   paddingRight: spacing.xl,
 }
 
-const $containerDenivele: ViewStyle = {
-  padding: spacing.lg,
-}
-
-const $imageDenivele: ViewStyle = {
-  height: 100,
-  width: width - spacing.xxl,
-  marginTop: spacing.xs,
-}
-
 const $containerAvis: ViewStyle = {
   height: 200,
+}
+
+const $containerDenivele: ViewStyle = {
+  padding: spacing.lg,
 }
