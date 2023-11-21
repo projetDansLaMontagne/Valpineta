@@ -23,21 +23,23 @@ interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
 
 
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(props: ExcursionsScreenProps) {
-  var filtres: Record<string, any>;
+  var filtres: typeof props.Filtres;
+
+  type excursionsType = Array<Record<string, any>>;
 
   const [excursions, setExcursions] = useState(undefined);
+  const [valeursFiltres, setValeursFiltres] = useState(undefined);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { navigation } = props;
 
-  // -- Fonctions --
-  /**@warning Cette fonction est utilise pour recuperer des donnes (independemment du composant), 
-   * qui vont etre copiees manuellement dans la page filtre */
+  // -- Primitives --
   /**
-   * Recupere les valeurs de chaque filtre (valeurs max, types de parcours, vallees)
+   * Cette fonction doit etre executee systematiquement lors de la synchro descendante
+   * Recupere les valeurs max et les intervalles de chaque filtre (valeurs max, types de parcours, vallees)
    * @param excursions 
    */
-  const valeursFiltres = (excursions: Array<any>) => {
+  const calculValeursFiltres = (excursions: excursionsType): Record<string, number | Array<number>> => {
     // Parcourt de chaque excursion pour connaitre les maximas 
     var distanceMax = 0;
     var dureeMax = 0;
@@ -89,7 +91,11 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       difficulteOrientationMax: difficulteOrientationMax,
     }
   }
-  const excursionsFiltrees = (excursions: Array<Record<string, any>>, filtres) => {
+  /**
+   * Tri et filtre des excursions avec les filtres
+   * @returns 
+   */
+  const filtrageExcursions = (excursions: excursionsType, filtres) => {
     excursions = excursions.filter(excursion => {
       if (
         excursion.distance < filtres.intervalleDistance.min ||
@@ -110,14 +116,29 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       // On garde de l excursion
       return true;
     });
+
+    // Tri en fonction du critere de tri
+    excursions = excursions.sort((a, b) => {
+      const critere = filtres.critereTri;
+
+      if (critere === "duree") {
+        // On tri par la duree (avec h et m)
+        const duree1 = a.duree.h + a.duree.m / 60;
+        const duree2 = b.duree.h + b.duree.m / 60;
+        return duree1 - duree2
+      }
+      return a[critere] - b[critere]
+    })
+
     return excursions;
   }
   /**
    * Cette fonction doit etre executee systematiquement lors de la synchro descendante
+   * Formate les fichiers de maniere a n avoir que le type necessaire (au lieu des strings)
    * @param excursions 
    * @returns 
    */
-  const excursionsFormatees = (excursions: Array<Record<string, any>>) => {
+  const formatageExcursions = (excursions: excursionsType) => {
     var excursionsFormatees = [];
 
     const formatDuree = /(\d{1,2})h(\d{0,2})/;
@@ -163,10 +184,13 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
     return excursionsFormatees;
   }
+
+
+  // -- Fonctions -- 
   const loadExcursions = async (): Promise<void> => {
     try {
+      // -- RECUPERATION DU FICHIER --
       var excursionsBRUT = require('../../assets/jsons/excursions.json');
-
       excursionsBRUT = excursionsBRUT.data.map(excursion => ({
         nom: excursion.nom_excursions,
         denivele: excursion.denivele,
@@ -178,33 +202,42 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         difficulteOrientation: excursion.difficulte_orientation
       }));
 
-      // REDUCTION POUR DEBUG
-      // excursionsBRUT = excursionsBRUT.slice(0, 3);
+      // -- FORMATAGE DES DONNEES RECUPEREES --
+      const excursionsFormatees = formatageExcursions(excursionsBRUT);
 
-      excursionsBRUT = excursionsFormatees(excursionsBRUT);
 
+      // -- APPLICATION DES FILTRES --
       if (filtres === undefined) {
-        setExcursions(excursionsBRUT);
+        // Pas de filtre
+        setExcursions(excursionsFormatees);
       }
       else {
         // Application des filtres
-        setExcursions(excursionsFiltrees(excursionsBRUT, filtres))
+        setExcursions(filtrageExcursions(excursionsFormatees, filtres))
       }
+
+      // -- CALCUL DES VALEURS DE FILTRES --
+      setValeursFiltres(calculValeursFiltres(excursionsFormatees));
     }
     catch (error) {
       console.error('Erreur lors du chargement du fichier JSON :', error);
     }
   };
 
-
   // CALL BACKS
   const navigationFiltres = () => {
-    // @todo Ajouter les filtres par defaut en parametres
-    navigation.navigate("Stack", { screen: 'Filtres' });
+    if (valeursFiltres) {
+      navigation.navigate("Stack", { screen: 'Filtres', params: valeursFiltres });
+    }
+    else {
+      console.log("Impossible de naviguer vers la page filtres sans les filtres par défaut");
+    }
   }
 
   useEffect(() => {
-    filtres = props.route.params.Filtres;
+    if (props.route.params) {
+      filtres = props.route.params.Filtres;
+    }
     loadExcursions();
     // console.log("(DEBUG) parametres de navigation :");
     // console.log(props.route.params);
@@ -224,7 +257,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           placeholderTextColor={colors.palette.grisFonce}
         />
         <TouchableOpacity
-          onPress={() => navigationFiltres}
+          onPress={() => navigationFiltres()}
           style={styles.valleeIcone}
         >
           <Image

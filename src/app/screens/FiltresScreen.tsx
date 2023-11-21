@@ -27,12 +27,11 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
 
 
   const valeursFiltress = props.route.params;
-  console.log(valeursFiltress);
   if (valeursFiltress === undefined) {
     // ERREUR CETTE PAGE NECESSITE LES FILTRES APPLIQUES
-    throw new Error("Page des filtres necessite les filtres appliques en parametres");
+    navigation.navigate("Excursions");
+    console.error("Page des filtres necessite les filtres appliques en parametres");
   }
-
 
   // Assets
   const logoCheck = require("../../assets/icons/check_3x_vert.png");
@@ -44,11 +43,11 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   const valeursFiltres = require("../../assets/jsons/valeurs_filtres.json");
   const incrementDenivele = 200;
   const criteresTri = [
-    { nom: "Distance", logo: require("./../../assets/icons/distance.png") },
-    { nom: "Temps de parcours", logo: require("./../../assets/icons/time.png") },
-    { nom: "Dénivelé", logo: require("./../../assets/icons/denivele.png") },
-    { nom: "Difficulté physique", logo: logoDiffPhy },
-    { nom: "Difficulté d'orientation", logo: logoDiffOri },
+    { nom: "Distance", nomCle: "distance", logo: require("./../../assets/icons/distance.png") },
+    { nom: "Durée", nomCle: "duree", logo: require("./../../assets/icons/time.png") },
+    { nom: "Dénivelé", nomCle: "denivele", logo: require("./../../assets/icons/denivele.png") },
+    { nom: "Difficulté physique", nomCle: "difficulteTechnique", logo: logoDiffPhy },
+    { nom: "Difficulté d'orientation", nomCle: "difficulteOrientation", logo: logoDiffOri },
   ]
 
   // -- USE STATES --
@@ -84,15 +83,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     let newVallees = [...vallees];
     newVallees[i].selectionne = !newVallees[i].selectionne;
     setVallees(newVallees);
+
+    // console.log(i);
     console.log("MODIFICATION VALLEE", newVallees[i]);
-    console.log(vallees);
-    // setVallees(vallees.map((vallee, index) => {
-    //   if (index === i) {
-    //     // Créez un nouvel objet avec la propriété selectionnee mise à jour
-    //     return { ...vallee, selectionne: !vallee.selectionne };
-    //   }
-    //   return vallee;
-    // }));
+
   }
   const clicDifficultePhysique = (i: number) => {
     let newDifficulte = [...difficultesPhysiques];
@@ -106,7 +100,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   }
   const validerFiltres = () => {
     const filtres = {
-      critereTri: critereTriSelectionne,
+      critereTri: criteresTri[critereTriSelectionne].nomCle,
       intervalleDistance: { min: intervalleDistance[0], max: intervalleDistance[1] },
       intervalleDuree: { min: intervalleDuree[0], max: intervalleDuree[1] },
       intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
@@ -216,12 +210,12 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     <View style={$containerVallees}>
       {
         vallees.map((vallee, i) =>
-          <Button
-            key={i}
-            text={vallee.nom}
-            style={vallee.selectionne ? $valleeSelectionnee : $vallee}
+          <TouchableOpacity
             onPress={() => clicVallee(i)}
-          />
+            style={[$vallee, vallee.selectionne ? { backgroundColor: '#007C27' } : { backgroundColor: '#FFFFFF' }]}
+            key={i}>
+            <Text>{vallee.nom}</Text>
+          </TouchableOpacity>
         )
       }
     </View>
@@ -290,11 +284,9 @@ const $containerVallees: ViewStyle = {
 const $vallee: ViewStyle = {
   borderColor: "#007C27",
   borderRadius: 15,
-  margin: spacing.xs,
-}
-const $valleeSelectionnee: ViewStyle = {
-  ...$vallee,
-  backgroundColor: "#007C27",
+  borderWidth: 1,
+  margin: spacing.xxs,
+  padding: spacing.md,
 }
 const $containerDiff: ViewStyle = {
   flexDirection: "row",
