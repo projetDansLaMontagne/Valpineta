@@ -63,8 +63,8 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(props: Grap
               borderRadius: 16
             },
             propsForDots: {
-              r: "4",
-              strokeWidth: "2",
+              r: "0",
+              strokeWidth: "0",
               stroke: colors.bouton
             }
           }}
