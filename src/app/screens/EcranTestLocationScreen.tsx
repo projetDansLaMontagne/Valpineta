@@ -19,6 +19,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import MapView, { LocalTile, PROVIDER_GOOGLE } from "react-native-maps"
 import MapButton from "../components/MapButton";
+import {folder_dest} from "./WelcomeScreen";
 
 // variables
 interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
@@ -216,8 +217,8 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   const { width, height } = Dimensions.get('window');
 
   const ASPECT_RATIO = width / height;
-  const LATITUDE = 42.6338;
-  const LONGITUDE = 0.218477;
+  const LATITUDE = -12.054985242912784;
+  const LONGITUDE = -75.24545159952076;
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
@@ -228,7 +229,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     longitudeDelta: LONGITUDE_DELTA,
   }
 
-  const tilesPath = '/Users/tom_planche/Desktop/BUT/BUT3/SAE_Valpineta/Valpineta/src/assets/Tiles/{z}/{x}/{y}.png';
+  const tilesPath = folder_dest + "/{z}/{x}/{y}.png";
 
   return (
     <Screen style={$container}>
