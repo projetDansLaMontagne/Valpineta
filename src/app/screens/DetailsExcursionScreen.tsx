@@ -5,6 +5,7 @@ import { AppStackScreenProps } from "app/navigators";
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
+import { is } from "date-fns/locale";
 
 const { width, height } = Dimensions.get("window");
 
@@ -43,6 +44,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   }
 );
 
+/**
+ * 
+ * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas 
+ */
 function itemMini() {
   return (
     <View style={$containerPetit}>
@@ -53,10 +58,14 @@ function itemMini() {
   )
 }
 
+/**
+ * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
+ */
 function itemFull(isLoading: boolean, setIsLoading: any) {
 
-  const [isInfos, setIsInfos] = useState(true);
+  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
 
+  //Lance le chrono pour le chargement du graphique de dénivelé
   const chrono = () => {
     setTimeout(() => {
       setIsLoading(false)
@@ -64,12 +73,14 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
       , 2000);
   }
 
+  //Observateur de l'état du containerInfoAffiche
   useEffect(() => {
-    if (isInfos) {
+    if (containerInfoAffiche) {
       chrono();
     }
-  }, [isInfos]);
+  }, [containerInfoAffiche]);
 
+  //Observateur de l'état du containerInfoAffiche
   useEffect(() => {
     if (isLoading) {
       chrono();
@@ -90,25 +101,33 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
       <View>
         <View style={$containerBouton}>
           <TouchableOpacity onPress={() => {
-            chrono()
-            setIsInfos(true)
+            //lancement du chrono pour le loading
+            setIsLoading(true),
+            isLoading ? chrono() : null
+            setcontainerInfoAffiche(true)
             }} style={$boutonInfoAvis} >
-            <Text text="Infos" size="lg" style={[isInfos ? { color: colors.bouton } : { color: colors.text }]} />
+            <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
+            //Loading à false pour pouvoir relancer le chrono
             setIsLoading(true)
-            setIsInfos(false)}} style={$boutonInfoAvis}>
-            <Text text="Avis" size="lg" style={[isInfos ? { color: colors.text } : { color: colors.bouton }]} />
+            setcontainerInfoAffiche(false)}} style={$boutonInfoAvis}>
+            <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
           </TouchableOpacity>
         </View>
-        <View style={[$souligneInfosAvis, isInfos ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
+        <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
         </View>
-        {isInfos ? infos(isLoading): avis()}
+        {containerInfoAffiche ? infos(isLoading): avis()}
       </View>
     </View>
   )
 }
 
+/**
+ * 
+ * @param isLoading 
+ * @returns les informations de l'excursion
+ */
 function infos(isLoading: boolean) {
 
   return (
@@ -145,7 +164,7 @@ function infos(isLoading: boolean) {
               <Text text="1" size="xs" />
             </View>
           </View>
-          <View style={$containerDescriptionSignalement}>
+          <View style={$containerDescriptionSignalements}>
             <View>
               <Text text="Description" size="lg" />
               <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
@@ -167,6 +186,9 @@ function infos(isLoading: boolean) {
   )
 }
 
+/**
+ * @returns les avis de l'excursion
+ */
 function avis() {
   return (
     <ScrollView style={$containerAvis}>
@@ -182,7 +204,9 @@ function avis() {
   );
 }
 
-
+/* -------------------------------------------------------------------------- */
+/*                                   STYLES                                   */
+/* -------------------------------------------------------------------------- */
 
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.bouton,
@@ -201,6 +225,8 @@ const $container: ViewStyle = {
   backgroundColor: colors.fond,
 }
 
+//Style de itemMini
+
 const $containerPetit: ViewStyle = {
   flex: 1,
   width: width,
@@ -211,6 +237,8 @@ const $containerPetit: ViewStyle = {
   borderRadius: 10,
   padding: spacing.xxs,
 }
+
+//Style de itemFull
 
 const $containerGrand: ViewStyle = {
   flex: 1,
@@ -228,6 +256,8 @@ const $iconsSwipeUp: ImageStyle = {
   transform: [{ rotate: "180deg" }],
 }
 
+//Style du container du titre et du bouton de téléchargement
+
 const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
@@ -240,11 +270,7 @@ const $titre: ViewStyle = {
   marginTop: spacing.xs,
 }
 
-const $iconDownload: ImageStyle = {
-  width: 40,
-  height: 40,
-  tintColor: colors.bouton,
-}
+//Style du container des boutons infos et avis
 
 const $containerBouton: ViewStyle = {
   flexDirection: "row",
@@ -264,6 +290,8 @@ const $souligneInfosAvis: ViewStyle = {
   position: "relative",
 }
 
+//Style des informations
+
 const $containerInformations: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
@@ -282,7 +310,9 @@ const $iconInformation: ImageStyle = {
   height: spacing.lg,
 }
 
-const $containerDescriptionSignalement: ViewStyle = {
+//Style de la description et des signalements
+
+const $containerDescriptionSignalements: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   paddingLeft: spacing.xl,
@@ -294,10 +324,10 @@ const $textDescription: TextStyle = {
   paddingRight: spacing.xl,
 }
 
-const $containerDenivele: ViewStyle = {
-  padding: spacing.lg,
-}
-
 const $containerAvis: ViewStyle = {
   height: 200,
+}
+
+const $containerDenivele: ViewStyle = {
+  padding: spacing.lg,
 }
