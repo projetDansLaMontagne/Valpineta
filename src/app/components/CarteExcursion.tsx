@@ -23,6 +23,7 @@ interface CarteExcursionProps extends TouchableOpacityProps {
   denivele: string
   difficulteParcours: string
   difficulteOrientation: string
+  navigation: any
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
@@ -38,9 +39,17 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const imageRandonnee = require("../../assets/images/randonnee.png")
 
   const [coeurTouche, setCoeurTouche] = useState(false);
-
   const detailExcursion = () => {
-    navigation.navigate('Stack', { screen: 'DetailsExcursion', params: { nomExcursion: nomExcursions, temps: temps, distance: distance, difficulteParcours: difficulteParcours, difficulteOrientation: difficulteOrientation } });
+    props.navigation.navigate('Stack', {
+      screen: 'DetailsExcursion',
+      params: {
+        nomExcursion: props.nom,
+        temps: props.duree,
+        distance: props.distance,
+        difficulteParcours: props.difficulteParcours,
+        difficulteOrientation: props.difficulteOrientation
+      }
+    });
   }
 
   const styles = StyleSheet.create({

@@ -9,20 +9,22 @@ import SwipeUpDown from "react-native-swipe-up-down";
 const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
+  temps: Record<'h' | 'm', number>,
+
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
 
-    const { 
+    const {
       navigation,
       route: {
         params: {
-            nomExcursion,
-            temps,
-            distance,
-            difficulteParcours,
-            difficulteOrientation,
+          nomExcursion,
+          temps,
+          distance,
+          difficulteParcours,
+          difficulteOrientation,
         }
       }
     } = props;
@@ -36,13 +38,13 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           onPress={() => navigation.navigate("Excursions")}
         >
           <Image
-          style={{tintColor: colors.bouton}}
+            style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(isLoading, setIsLoading, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation)}
+          itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation)}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
           animation="easeInEaseOut"
@@ -71,7 +73,7 @@ function itemMini() {
 /**
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
-function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation) {
+function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation) {
 
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
 
@@ -96,7 +98,7 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,dist
       chrono();
     }
   }, [isLoading]);
-  
+
   return (
 
     <View style={$containerGrand}>
@@ -109,21 +111,22 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,dist
           <TouchableOpacity onPress={() => {
             //lancement du chrono pour le loading
             setIsLoading(true),
-            isLoading ? chrono() : null
+              isLoading ? chrono() : null
             setcontainerInfoAffiche(true)
-            }} style={$boutonInfoAvis} >
+          }} style={$boutonInfoAvis} >
             <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             //Loading à false pour pouvoir relancer le chrono
             setIsLoading(true)
-            setcontainerInfoAffiche(false)}} style={$boutonInfoAvis}>
+            setcontainerInfoAffiche(false)
+          }} style={$boutonInfoAvis}>
             <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
           </TouchableOpacity>
         </View>
         <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
         </View>
-        {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation): avis()}
+        {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation) : avis()}
       </View>
     </View >
   )
@@ -134,7 +137,7 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,dist
  * @param isLoading 
  * @returns les informations de l'excursion
  */
-function infos(isLoading: boolean, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number) {
+function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number) {
 
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
 
@@ -148,14 +151,14 @@ function infos(isLoading: boolean, temps: number, distance: number, difficultePa
                 source={require("../../assets/icons/temps.png")}
               >
               </Image>
-              <Text text={temps} size="xs" />
+              <Text text={temps.h + "h" + temps.m} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
               >
               </Image>
-              <Text text={distance+' km'} size="xs" />
+              <Text text={distance + ' km'} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
@@ -268,7 +271,7 @@ const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width-(width/5),
+  width: width - (width / 5),
   margin: spacing.lg,
 }
 

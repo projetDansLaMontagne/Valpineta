@@ -24,7 +24,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   type excursionsType = Array<Record<string, any>>;
 
   const [excursions, setExcursions] = useState(undefined);
-  const [valeursFiltres, setValeursFiltres] = useState(undefined);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { navigation } = props;
@@ -214,22 +213,15 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       }
 
       // -- CALCUL DES VALEURS DE FILTRES --
-      setValeursFiltres(calculValeursFiltres(excursionsFormatees));
+      /**@warning : ligne inutile */
+      /**@todo faire ceci automatiquement avec le formatage lors de la synchro descendante */
+      const valeursFiltres = calculValeursFiltres(excursionsFormatees);
     }
     catch (error) {
       console.error('Erreur lors du chargement du fichier JSON :', error);
     }
   };
 
-  // CALL BACKS
-  const navigationFiltres = () => {
-    if (valeursFiltres) {
-      navigation.navigate("Stack", { screen: 'Filtres' });
-    }
-    else {
-      console.log("Impossible de naviguer vers la page filtres sans les filtres par défaut");
-    }
-  }
 
   useEffect(() => {
     if (props.route.params) {
@@ -249,7 +241,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           placeholderTextColor={colors.palette.grisFonce}
         />
         <TouchableOpacity
-          onPress={() => navigationFiltres()}
+          onPress={() => navigation.navigate("Stack", { screen: 'Filtres' })}
           style={styles.valleeIcone}
         >
           <Image
@@ -278,6 +270,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                     typeParcours={excursion.typeParcours}
                     difficulteParcours={excursion.difficulteTechnique}
                     difficulteOrientation={excursion.difficulteOrientation}
+                    navigation={navigation}
                   />
                 ))
               }
