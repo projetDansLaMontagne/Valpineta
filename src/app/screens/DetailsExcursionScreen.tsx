@@ -1,11 +1,10 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
-import { is } from "date-fns/locale";
 
 const { width, height } = Dimensions.get("window");
 
@@ -19,7 +18,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [isLoading, setIsLoading] = useState(true);
 
 
-    return(
+    return (
       <SafeAreaView style={$container}>
         <TouchableOpacity
           style={$boutonRetour}
@@ -34,7 +33,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           itemFull={itemFull(isLoading, setIsLoading)}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
-          disableSwipeIcon={true}
           animation="easeInEaseOut"
           extraMarginTop={125}
           swipeHeight={100}
@@ -70,7 +68,7 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
     setTimeout(() => {
       setIsLoading(false)
     }
-      , 2000);
+      , 1000);
   }
 
   //Observateur de l'état du containerInfoAffiche
@@ -86,14 +84,10 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
       chrono();
     }
   }, [isLoading]);
-
+  
   return (
 
     <View style={$containerGrand}>
-      <Image
-        source={require("../../assets/icons/swipe-up.png")}
-        style={$iconsSwipeUp}
-      />
       <View style={$containerTitre}>
         <Text text="Col de la marmotte" size="xl" style={$titre} />
         <GpxDownloader />
@@ -119,7 +113,7 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
         </View>
         {containerInfoAffiche ? infos(isLoading): avis()}
       </View>
-    </View>
+    </View >
   )
 }
 
@@ -129,6 +123,8 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
  * @returns les informations de l'excursion
  */
 function infos(isLoading: boolean) {
+
+  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
 
   return (
     <ScrollView>
@@ -177,7 +173,7 @@ function infos(isLoading: boolean) {
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
             {
-              isLoading ? <ActivityIndicator size="large" color={colors.bouton} /> : <GraphiqueDenivele />
+              isLoading ? <ActivityIndicator size="large" color={colors.bouton} /> : <GraphiqueDenivele data={data} />
             }
           </View>
         </View>
@@ -222,7 +218,7 @@ const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
-  backgroundColor: colors.fond,
+  backgroundColor: colors.erreur,
 }
 
 //Style de itemMini
@@ -249,11 +245,7 @@ const $containerGrand: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.xs,
-  paddingBottom: 275,
-}
-
-const $iconsSwipeUp: ImageStyle = {
-  transform: [{ rotate: "180deg" }],
+  paddingBottom: 235,
 }
 
 //Style du container du titre et du bouton de téléchargement
