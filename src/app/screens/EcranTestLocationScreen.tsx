@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
-    color: colors.palette.neutral900,
+    color: colors.palette.vert,
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   },
   locateButtonContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: colors.palette.angry500,
+    backgroundColor: colors.palette.vert,
   },
   map: {
     ...StyleSheet.absoluteFillObject

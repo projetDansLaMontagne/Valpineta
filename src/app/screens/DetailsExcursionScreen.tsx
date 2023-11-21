@@ -9,14 +9,25 @@ import SwipeUpDown from "react-native-swipe-up-down";
 const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  navigation: any;
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { navigation } = props;
-    const [isLoading, setIsLoading] = useState(true);
 
+    const { 
+      navigation,
+      route: {
+        params: {
+            nomExcursion,
+            temps,
+            distance,
+            difficulteParcours,
+            difficulteOrientation,
+        }
+      }
+    } = props;
+
+    const [isLoading, setIsLoading] = useState(true);
 
     return (
       <SafeAreaView style={$container}>
@@ -25,12 +36,13 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           onPress={() => navigation.navigate("Excursions")}
         >
           <Image
+          style={{tintColor: colors.bouton}}
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(isLoading, setIsLoading)}
+          itemFull={itemFull(isLoading, setIsLoading, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation)}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
           animation="easeInEaseOut"
@@ -59,7 +71,7 @@ function itemMini() {
 /**
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
-function itemFull(isLoading: boolean, setIsLoading: any) {
+function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation) {
 
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
 
@@ -89,7 +101,7 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
 
     <View style={$containerGrand}>
       <View style={$containerTitre}>
-        <Text text="Col de la marmotte" size="xl" style={$titre} />
+        <Text text={nomExcursion} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
@@ -111,7 +123,7 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
         </View>
         <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
         </View>
-        {containerInfoAffiche ? infos(isLoading): avis()}
+        {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation): avis()}
       </View>
     </View >
   )
@@ -122,7 +134,7 @@ function itemFull(isLoading: boolean, setIsLoading: any) {
  * @param isLoading 
  * @returns les informations de l'excursion
  */
-function infos(isLoading: boolean) {
+function infos(isLoading: boolean, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number) {
 
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
 
@@ -136,28 +148,28 @@ function infos(isLoading: boolean) {
                 source={require("../../assets/icons/temps.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={temps} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={distance+' km'} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/difficulteParcours.png")}
               >
               </Image>
-              <Text text="2" size="xs" />
+              <Text text={difficulteParcours} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
               >
               </Image>
-              <Text text="1" size="xs" />
+              <Text text={difficulteOrientation} size="xs" />
             </View>
           </View>
           <View style={$containerDescriptionSignalements}>
@@ -205,13 +217,15 @@ function avis() {
 /* -------------------------------------------------------------------------- */
 
 const $boutonRetour: ViewStyle = {
-  backgroundColor: colors.bouton,
-  borderRadius: 5,
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
   padding: spacing.sm,
   margin: spacing.lg,
   width: 50,
   position: "absolute",
-  top: 0,
+  top: 15,
 }
 
 const $container: ViewStyle = {
@@ -254,12 +268,13 @@ const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width,
-  padding: spacing.lg,
+  width: width-(width/5),
+  margin: spacing.lg,
 }
 
 const $titre: ViewStyle = {
   marginTop: spacing.xs,
+  paddingRight: spacing.xl,
 }
 
 //Style du container des boutons infos et avis
@@ -286,20 +301,19 @@ const $souligneInfosAvis: ViewStyle = {
 
 const $containerInformations: ViewStyle = {
   flexDirection: "row",
-  justifyContent: "space-around",
+  justifyContent: "space-between",
   padding: spacing.xl,
 }
 
 const $containerUneInformation: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",
-  justifyContent: "space-around",
-  width: spacing.xxl,
 }
 
 const $iconInformation: ImageStyle = {
   width: spacing.lg,
   height: spacing.lg,
+  marginRight: spacing.xs,
 }
 
 //Style de la description et des signalements
