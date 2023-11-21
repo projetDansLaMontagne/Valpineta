@@ -173,7 +173,6 @@ function avis() {
 }
 
 
-
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.bouton,
   borderRadius: 5,
@@ -181,7 +180,7 @@ const $boutonRetour: ViewStyle = {
   margin: spacing.lg,
   width: 50,
   position: "absolute",
-  top: 0,
+  top: 15,
 }
 
 const $container: ViewStyle = {
@@ -222,7 +221,7 @@ const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width- spacing.xxl,
+  width: width-(width/5),
   margin: spacing.lg,
 }
 
