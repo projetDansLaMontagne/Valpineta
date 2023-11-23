@@ -1,50 +1,65 @@
-import React, { FC, useEffect, useRef, useState } from "react";
-import { observer } from "mobx-react-lite";
-import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components";
-import { spacing, colors } from "app/theme";
-import SwipeUpDown from "react-native-swipe-up-down";
+import React, { FC, useEffect, useRef, useState } from "react"
+import { observer } from "mobx-react-lite"
+import {
+  View,
+  SafeAreaView,
+  ViewStyle,
+  TouchableOpacity,
+  Image,
+  TextStyle,
+  ImageStyle,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native"
+import { AppStackScreenProps } from "app/navigators"
+import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components"
+import { spacing, colors } from "app/theme"
+import SwipeUpDown from "react-native-swipe-up-down"
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
+  navigation: any
+  excursion: JSON
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
+    const { navigation } = props
 
-    var nomExcursion= "";
-    var temps=0;
-    var distance=0;
-    var difficulteParcours=0;
-    var difficulteOrientation=0;
-    var navigation = props.navigation;
+    const {
+      nom_excursions,
+      duree,
+      distance,
+      difficulteParcours,
+      difficulteOrientation,
+      signalements,
+    } = props.route.params.excursion
 
-    if (props.route.params !== undefined) {
-      nomExcursion = props.route.params.nomExcursion || "";
-      temps = props.route.params.temps || 0;
-      distance = props.route.params.distance || 0;
-      difficulteParcours = props.route.params.difficulteParcours || 0;
-      difficulteOrientation = props.route.params.difficulteOrientation || 0;
-    }
-
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true)
 
     return (
       <SafeAreaView style={$container}>
-        <TouchableOpacity
-          style={$boutonRetour}
-          onPress={() => navigation.navigate("Excursions")}
-        >
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
-          style={{tintColor: colors.bouton}}
+            style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(isLoading, setIsLoading, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation, navigation)}
+          itemFull={itemFull(
+            isLoading,
+            setIsLoading,
+            nom_excursions,
+            duree,
+            distance,
+            difficulteParcours,
+            difficulteOrientation,
+            navigation,
+          )}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
           animation="easeInEaseOut"
@@ -52,9 +67,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           swipeHeight={100}
         />
       </SafeAreaView>
-    );
-  }
-);
+    )
+  },
+)
 
 /**
  *
@@ -63,9 +78,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 function itemMini() {
   return (
     <View style={$containerPetit}>
-      <Image
-        source={require("../../assets/icons/swipe-up.png")}
-      />
+      <Image source={require("../../assets/icons/swipe-up.png")} />
     </View>
   )
 }
@@ -73,61 +86,97 @@ function itemMini() {
 /**
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
-function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation, navigation:any) {
-
-  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
+function itemFull(
+  isLoading: boolean,
+  setIsLoading: any,
+  nom_excursions,
+  duree,
+  distance,
+  difficulteParcours,
+  difficulteOrientation,
+  navigation: any,
+) {
+  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
 
   //Lance le chrono pour le chargement du graphique de dénivelé
   const chrono = () => {
     setTimeout(() => {
       setIsLoading(false)
-    }
-      , 1000);
+    }, 1000)
   }
 
   //Observateur de l'état du containerInfoAffiche
   useEffect(() => {
     if (containerInfoAffiche) {
-      chrono();
+      chrono()
     }
-  }, [containerInfoAffiche]);
+  }, [containerInfoAffiche])
 
   //Observateur de l'état du containerInfoAffiche
   useEffect(() => {
     if (isLoading) {
-      chrono();
+      chrono()
     }
-  }, [isLoading]);
+  }, [isLoading])
 
   return (
-
     <View style={$containerGrand}>
       <View style={$containerTitre}>
-        <Text text={nomExcursion} size="xl" style={$titre} />
+        <Text text={nom_excursions} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
         <View style={$containerBouton}>
-          <TouchableOpacity onPress={() => {
-            //lancement du chrono pour le loading
-            setIsLoading(true),
-            isLoading ? chrono() : null
-            setcontainerInfoAffiche(true)
-            }} style={$boutonInfoAvis} >
-            <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
+          <TouchableOpacity
+            onPress={() => {
+              //lancement du chrono pour le loading
+              setIsLoading(true), isLoading ? chrono() : null
+              setcontainerInfoAffiche(true)
+            }}
+            style={$boutonInfoAvis}
+          >
+            <Text
+              text="Infos"
+              size="lg"
+              style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
+            />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            //Loading à false pour pouvoir relancer le chrono
-            setIsLoading(true)
-            setcontainerInfoAffiche(false)}} style={$boutonInfoAvis}>
-            <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
+          <TouchableOpacity
+            onPress={() => {
+              //Loading à false pour pouvoir relancer le chrono
+              setIsLoading(true)
+              setcontainerInfoAffiche(false)
+            }}
+            style={$boutonInfoAvis}
+          >
+            <Text
+              text="Avis"
+              size="lg"
+              style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
+            />
           </TouchableOpacity>
         </View>
-        <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
-        </View>
-        {containerInfoAffiche ? infos(isLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, navigation): avis()}
+        <View
+          style={[
+            $souligneInfosAvis,
+            containerInfoAffiche
+              ? { left: spacing.lg }
+              : { left: width - width / 2.5 - spacing.lg / 1.5 },
+          ]}
+        ></View>
+        {containerInfoAffiche
+          ? infos(
+              isLoading,
+              nom_excursions,
+              duree,
+              distance,
+              difficulteParcours,
+              difficulteOrientation,
+              navigation,
+            )
+          : avis()}
       </View>
-    </View >
+    </View>
   )
 }
 
@@ -136,9 +185,16 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,dist
  * @param isLoading
  * @returns les informations de l'excursion
  */
-function infos(isLoading: boolean, nomExcursion: string, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number , navigation:any) {
-
-  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
+function infos(
+  isLoading: boolean,
+  nom_excursions: string,
+  duree: number,
+  distance: number,
+  difficulteParcours: number,
+  difficulteOrientation: number,
+  navigation: any,
+) {
+  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
 
   return (
     <ScrollView>
@@ -146,39 +202,47 @@ function infos(isLoading: boolean, nomExcursion: string, temps: number, distance
         <View>
           <View style={$containerInformations}>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
-                source={require("../../assets/icons/temps.png")}
-              >
-              </Image>
-              <Text text={temps} size="xs" />
+              <Image
+                style={$iconInformation}
+                source={require("../../assets/icons/duree.png")}
+              ></Image>
+              <Text text={duree} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
-              >
-              </Image>
-              <Text text={distance+' km'} size="xs" />
+              ></Image>
+              <Text text={distance + " km"} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/difficulteParcours.png")}
-              >
-              </Image>
+              ></Image>
               <Text text={difficulteParcours} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
-              >
-              </Image>
+              ></Image>
               <Text text={difficulteOrientation} size="xs" />
             </View>
           </View>
           <View style={$containerDescriptionSignalements}>
             <View>
               <Text text="Description" size="lg" />
-              <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
-              <TouchableOpacity onPress={() => { navigation.navigate("Description", {nomExcursion: nomExcursion}) }}>
+              <Text
+                style={$textDescription}
+                text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !"
+                size="xxs"
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Description", { nom_excursions: nom_excursions })
+                }}
+              >
                 <Text text="Lire la suite" size="xs" />
               </TouchableOpacity>
             </View>
@@ -189,9 +253,11 @@ function infos(isLoading: boolean, nomExcursion: string, temps: number, distance
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-            {
-              isLoading ? <ActivityIndicator size="large" color={colors.bouton} /> : <GraphiqueDenivele data={data} />
-            }
+            {isLoading ? (
+              <ActivityIndicator size="large" color={colors.bouton} />
+            ) : (
+              <GraphiqueDenivele data={data} />
+            )}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -207,14 +273,26 @@ function avis() {
     <ScrollView style={$containerAvis}>
       <TouchableWithoutFeedback>
         <View>
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>
-  );
+  )
 }
 
 /* -------------------------------------------------------------------------- */
@@ -273,7 +351,7 @@ const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width-(width/5),
+  width: width - width / 5,
   margin: spacing.lg,
 }
 

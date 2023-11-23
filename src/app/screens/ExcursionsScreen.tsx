@@ -62,17 +62,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const renderItem = ({ item }) => (
     <View>
       <CarteExcursion
-        nomExcursions={item.nom_excursions}
-        parcours={item.typeParcours}
-        zone={item.zone}
-        temps={item.duree}
-        distance={item.distance}
-        denivelePositif={item.denivelePositif}
-        difficulteParcours={item.difficulteParcours}
-        difficulteOrientation={item.difficulteOrientation}
+        excursion={item}
         navigation={props.navigation}
-        signalements={item.signalements}
-
       />
     </View>
   );
