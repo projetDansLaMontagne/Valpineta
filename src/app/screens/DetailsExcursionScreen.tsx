@@ -44,7 +44,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(isLoading, setIsLoading, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation)}
+          itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, navigation)}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
           animation="easeInEaseOut"
@@ -73,7 +73,7 @@ function itemMini() {
 /**
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
-function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,distance,difficulteParcours,difficulteOrientation) {
+function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion: string, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number, navigation: any) {
 
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
 
@@ -125,7 +125,7 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,dist
         </View>
         <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
         </View>
-        {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation): avis()}
+        {containerInfoAffiche ? infos(isLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, navigation): avis()}
       </View>
     </View >
   )
@@ -136,7 +136,7 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion,temps,dist
  * @param isLoading
  * @returns les informations de l'excursion
  */
-function infos(isLoading: boolean, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number) {
+function infos(isLoading: boolean, nomExcusrion: string, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number, navigation: any) {
 
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
 
@@ -178,6 +178,11 @@ function infos(isLoading: boolean, temps: number, distance: number, difficultePa
             <View>
               <Text text="Description" size="lg" />
               <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
+              <TouchableOpacity 
+              onPress={() => navigation.navigate("Description", {nomExcursion: nomExcusrion})}
+              >
+                <Text style={$boutonExcursion} text="En savoir plus" size="xs" />
+              </TouchableOpacity>
             </View>
             <View>
               <Text text="Signalement" size="lg" />
@@ -330,6 +335,12 @@ const $containerDescriptionSignalements: ViewStyle = {
 const $textDescription: TextStyle = {
   width: width / 2,
   paddingRight: spacing.xl,
+}
+
+const $boutonExcursion: TextStyle = {
+  color: colors.bordure,
+  paddingTop: spacing.xs,
+  textDecorationLine: "underline",
 }
 
 const $containerAvis: ViewStyle = {

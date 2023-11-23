@@ -46,7 +46,8 @@ export type AppStackParamList = {
   Map: undefined
   DetailsExcursion: undefined
   Parametres: undefined
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  Description: undefined
+	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**
@@ -148,6 +149,7 @@ function StackNavigator() {
         headerShown: false,
       }}
     >
+      <Stack.Screen name="Description" component={Screens.DescriptionScreen} />
       <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
       <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
       <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
