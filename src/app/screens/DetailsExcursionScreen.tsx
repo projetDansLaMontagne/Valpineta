@@ -2,11 +2,14 @@ import React, { FC, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Text, CarteAvis, GpxDownloader } from "app/components";
+import { Text, CarteAvis, GpxDownloader, Button } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
+import { CarteSignalement } from "app/components/CarteSignalement";
 
 const { width, height } = Dimensions.get("window");
+
+
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
 }
@@ -23,6 +26,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             distance,
             difficulteParcours,
             difficulteOrientation,
+            signalements
+
         }
       }
     } = props;
@@ -44,7 +49,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(nomExcursion,temps,distance,difficulteParcours,difficulteOrientation)}
+          itemFull={itemFull(nomExcursion,temps,distance,difficulteParcours,difficulteOrientation, signalements)}
           disableSwipeIcon={true}
           animation="easeInEaseOut"
           extraMarginTop={125}
@@ -65,39 +70,90 @@ function itemMini() {
   )
 }
 
-function itemFull(nomExcursion,temps,distance,difficulteParcours,difficulteOrientation) {
+function itemFull(nomExcursion,temps,distance,difficulteParcours,difficulteOrientation, signalements) {
 
   const [isInfos, setIsInfos] = useState(true);
 
-  return (
+  const [isAllSignalements, setisAllSignalements] = useState(false);
 
-    <View style={$containerGrand}>
-      <Image
-        source={require("../../assets/icons/swipe-up.png")}
-        style={$iconsSwipeUp}
-      />
-      <View style={$containerTitre}>
-        <Text text={nomExcursion} size="xl" style={$titre} />
-        <GpxDownloader />
+
+    return (
+      <View style={$containerGrand}>
+        <Image
+          source={require("../../assets/icons/swipe-up.png")}
+          style={$iconsSwipeUp}
+        />
+        {isAllSignalements ? listeSignalements(setisAllSignalements, signalements) : infosGenerales(nomExcursion, setIsInfos, isInfos, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements) }
+
       </View>
-      <View>
-        <View style={$containerBouton}>
-          <TouchableOpacity onPress={() => setIsInfos(true)} style={$boutonInfoAvis} >
-            <Text text="Infos" size="lg" style={[isInfos ? { color: colors.bouton } : { color: colors.text }]} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsInfos(false)} style={$boutonInfoAvis}>
-            <Text text="Avis" size="lg" style={[isInfos ? { color: colors.text } : { color: colors.bouton }]} />
-          </TouchableOpacity>
+)
+  
+}
+
+function infosGenerales(nomExcursion, setIsInfos, isInfos, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements) {
+  
+  return(
+        <View>
+          <View style={$containerTitre}>
+            <Text text={nomExcursion} size="xl" style={$titre} />
+            <GpxDownloader />
+          </View>
+          <View>
+            <View style={$containerBouton}>
+              <TouchableOpacity onPress={() => setIsInfos(true)} style={$boutonInfoAvis} >
+                <Text text="Infos" size="lg" style={[isInfos ? { color: colors.bouton } : { color: colors.text }]} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsInfos(false)} style={$boutonInfoAvis}>
+                <Text text="Avis" size="lg" style={[isInfos ? { color: colors.text } : { color: colors.bouton }]} />
+              </TouchableOpacity>
+            </View>
+            <View style={[$souligneInfosAvis, isInfos ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
+            </View>
+            {isInfos ? infos(temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements) : avis()}
+          </View>
         </View>
-        <View style={[$souligneInfosAvis, isInfos ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
-        </View>
-        {isInfos ? infos(temps, distance, difficulteParcours, difficulteOrientation) : avis()}
-      </View>
+      )
+    }
+
+function listeSignalements(setisAllSignalements, signalements) {
+
+  return(
+    <View style={$listeSignalements}>
+    <ScrollView>
+      <TouchableWithoutFeedback>
+        <View>
+
+    {signalements?.pointsInteret.length > 0 ? (
+  signalements.pointsInteret.map((pointInteret, index) => (
+    <View key={index}>
+      <CarteSignalement type="pointInteret" nomSignalement={pointInteret.nom_signalement} description={pointInteret.description} imageSignalement={pointInteret.image}/>
     </View>
+  ))
+) : (
+  <Text>Aucun point d'intérêt à afficher</Text>
+)}
+
+{signalements?.avertissements.length > 0 ? (
+  signalements.avertissements.map((avertissement, index) => (
+    <View key={index}>
+      <CarteSignalement type="avertissement" nomSignalement={avertissement.nom_signalement} description={avertissement.description}  imageSignalement={avertissement.image}/>
+    </View>
+  ))
+) : (
+  <Text>Aucun avertissement à afficher</Text>
+)}
+        </View>
+        </TouchableWithoutFeedback>
+    </ScrollView>
+    <View>
+      <Button text="Revenir aux informations" onPress={() => setisAllSignalements(false)} />
+
+    </View>
+  </View>
   )
 }
 
-function infos(temps, distance, difficulteParcours, difficulteOrientation) {
+function infos(temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements) {
 
   return (
     <ScrollView>
@@ -139,8 +195,13 @@ function infos(temps, distance, difficulteParcours, difficulteOrientation) {
               <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
             </View>
             <View>
-              <Text text="Signalement" size="lg" />
-              <Text text="signalement" size="xs" />
+              <View>
+                <Text text="Signalement" size="lg" />
+                <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                  <Text text="Voir tous" size="sm" style={$tousLesSignalements}/>
+                </TouchableOpacity>
+                {}
+              </View>
             </View>
           </View>
           <View style={$containerDenivele}>
@@ -156,6 +217,8 @@ function infos(temps, distance, difficulteParcours, difficulteOrientation) {
     </ScrollView>
   )
 }
+
+
 
 function avis() {
   return (
@@ -291,4 +354,16 @@ const $imageDenivele: ViewStyle = {
 
 const $containerAvis: ViewStyle = {
   height: 200,
+}
+
+const $tousLesSignalements: TextStyle = {
+  justifyContent: "space-between",
+  paddingLeft: spacing.xl,
+  paddingRight: spacing.xl,
+  color:colors.souligne,
+  textDecorationLine: "underline",
+}
+const $listeSignalements: ViewStyle = {
+  height:"115%", //Si je met a 100% il descend pas jusqu'en bas voir avec reio prod
+  width:"95%"
 }

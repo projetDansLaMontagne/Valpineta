@@ -22,6 +22,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       const jsonData = require('../../assets/jsons/excursions.json');
 
       const excursionsJSON = jsonData.data.map(excursion => ({
+
         nom_excursions: excursion.nom_excursions,
         duree: excursion.duree,
         typeParcours: excursion.type_parcours.name,
@@ -29,7 +30,23 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         distance: excursion.distance_excursion,
         denivelePositif: excursion.denivele,
         difficulteParcours: excursion.difficulte_technique,
-        difficulteOrientation: excursion.difficulte_orientation
+        difficulteOrientation: excursion.difficulte_orientation,
+
+        signalements: {
+          pointsInteret: excursion.signalements.point_interet.map(pointInteret => ({
+            nom_signalement: pointInteret.nom_signalement,
+            description: pointInteret.description,
+            coordonnees: pointInteret.coordonnes,
+            image: pointInteret.image
+          })),
+          avertissements: excursion.signalements.avertissement.map(avertissement => ({
+            nom_signalement: avertissement.nom_signalement,
+            description: avertissement.description,
+            coordonnees: avertissement.coordonnes,
+            image: avertissement.image
+          }))
+        }
+
       }));
 
       setExcursions(excursionsJSON);
@@ -69,11 +86,16 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         difficulteParcours={item.difficulteParcours}
         difficulteOrientation={item.difficulteOrientation}
         navigation={props.navigation}
+        signalements={item.signalements}
+
       />
     </View>
   );
 
   return <Screen style={$root} >
+    <View>
+      
+    </View>
     <View>
       <View style={styles.searchBox}>
         <TextInput
