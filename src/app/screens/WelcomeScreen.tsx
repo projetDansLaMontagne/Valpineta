@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import React, { FC } from "react"
+import React, {FC, useEffect} from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import {
   Button,
@@ -93,6 +93,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
     console.log("Downloading files...");
 
 
+
     create_folder_struct(
       fichier_json_aled_jenpeuxPlus,
       folder_dest
@@ -114,6 +115,14 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
 
       });
   }
+
+  // useEffect(() => {
+  //   fileSystem.deleteAsync(folder_dest).then(() => {
+  //     console.log("Folder deleted");
+  //   }).catch((error) => {
+  //     console.log(error);
+  //   });
+  // }, []);
 
   return (
     <View style={$container}>
