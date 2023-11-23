@@ -17,6 +17,7 @@ import { AppStackScreenProps } from "app/navigators"
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components"
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
+import { nettoyageTexte } from "./DescriptionScreen"
 
 const { width, height } = Dimensions.get("window")
 
@@ -160,6 +161,13 @@ function itemFull(
   )
 }
 
+function afficherDescriptionCourte(description: string) {
+  const texteNettoye = nettoyageTexte(description)
+  const texteCoupe = texteNettoye.slice(0, 100)
+  const texteFinal = texteCoupe + "..."
+  return texteFinal
+}
+
 /**
  *
  * @param isLoading
@@ -211,7 +219,7 @@ function infos(
               <Text text="Description" size="lg" />
               <Text
                 style={$textDescription}
-                text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !"
+                text={afficherDescriptionCourte(excursion.descriptionES)}
                 size="xxs"
               />
               <TouchableOpacity
@@ -219,7 +227,7 @@ function infos(
                   navigation.navigate("Description", {excursion : excursion })
                 }}
               >
-                <Text text="Lire la suite" size="xs" />
+                <Text style={$lienDescription} text="Lire la suite" size="xs" />
               </TouchableOpacity>
             </View>
             <View>
@@ -387,6 +395,12 @@ const $containerDescriptionSignalements: ViewStyle = {
 const $textDescription: TextStyle = {
   width: width / 2,
   paddingRight: spacing.xl,
+}
+
+const $lienDescription: TextStyle = {
+  color: colors.bouton,
+  paddingTop: spacing.xs,
+  textDecorationLine: "underline",
 }
 
 const $containerAvis: ViewStyle = {

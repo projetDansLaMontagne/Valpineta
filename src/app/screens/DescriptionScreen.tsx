@@ -16,16 +16,17 @@ interface DescriptionScreenProps extends AppStackScreenProps<"Description"> {
   route: any
 }
 
+export function nettoyageTexte(texte: string) {
+  const regex = /<[^>]+>/g
+  return texte.replace(regex, "")
+}
+
+
 export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function DescriptionScreen(
   props: DescriptionScreenProps,
 ) {
   const { navigation } = props
   const { excursion } = props.route.params
-
-  function nettoyageTexte(texte: string) {
-    const regex = /<[^>]+>/g
-    return texte.replace(regex, "")
-  }
 
   return (
     <Screen style={$container} preset="fixed">
