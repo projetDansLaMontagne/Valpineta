@@ -22,21 +22,13 @@ const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   navigation: any
-  excursion: JSON
+  route: any
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { navigation } = props
-
-    const {
-      nom_excursions,
-      duree,
-      distance,
-      difficulteParcours,
-      difficulteOrientation,
-      signalements,
-    } = props.route.params.excursion
+    const { excursion } = props.route.params
 
     const [isLoading, setIsLoading] = useState(true)
 
@@ -51,14 +43,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         <SwipeUpDown
           itemMini={itemMini()}
           itemFull={itemFull(
+            excursion,
             isLoading,
             setIsLoading,
-            nom_excursions,
-            duree,
-            distance,
-            difficulteParcours,
-            difficulteOrientation,
-            navigation,
+            navigation
           )}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
@@ -87,13 +75,9 @@ function itemMini() {
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
 function itemFull(
+  excursion: any,
   isLoading: boolean,
-  setIsLoading: any,
-  nom_excursions,
-  duree,
-  distance,
-  difficulteParcours,
-  difficulteOrientation,
+  setIsLoading: Function,
   navigation: any,
 ) {
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
@@ -122,7 +106,7 @@ function itemFull(
   return (
     <View style={$containerGrand}>
       <View style={$containerTitre}>
-        <Text text={nom_excursions} size="xl" style={$titre} />
+        <Text text={excursion.nomExcursion} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
@@ -167,12 +151,8 @@ function itemFull(
         {containerInfoAffiche
           ? infos(
               isLoading,
-              nom_excursions,
-              duree,
-              distance,
-              difficulteParcours,
-              difficulteOrientation,
-              navigation,
+              excursion,
+              navigation
             )
           : avis()}
       </View>
@@ -187,11 +167,7 @@ function itemFull(
  */
 function infos(
   isLoading: boolean,
-  nom_excursions: string,
-  duree: number,
-  distance: number,
-  difficulteParcours: number,
-  difficulteOrientation: number,
+  excursion: any,
   navigation: any,
 ) {
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
@@ -206,28 +182,28 @@ function infos(
                 style={$iconInformation}
                 source={require("../../assets/icons/duree.png")}
               ></Image>
-              <Text text={duree} size="xs" />
+              <Text text={excursion.duree} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
               ></Image>
-              <Text text={distance + " km"} size="xs" />
+              <Text text={excursion.distance + " km"} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/difficulteParcours.png")}
               ></Image>
-              <Text text={difficulteParcours} size="xs" />
+              <Text text={excursion.difficulteParcours} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
               ></Image>
-              <Text text={difficulteOrientation} size="xs" />
+              <Text text={excursion.difficulteOrientation} size="xs" />
             </View>
           </View>
           <View style={$containerDescriptionSignalements}>
@@ -240,7 +216,7 @@ function infos(
               />
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Description", { nom_excursions: nom_excursions })
+                  navigation.navigate("Description", {excursion : excursion })
                 }}
               >
                 <Text text="Lire la suite" size="xs" />

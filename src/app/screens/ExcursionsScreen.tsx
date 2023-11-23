@@ -23,7 +23,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
       const excursionsJSON = jsonData.data.map(excursion => ({
 
-        nom_excursions: excursion.nom_excursions,
+        nomExcursion: excursion.nom_excursions,
         duree: excursion.duree,
         typeParcours: excursion.type_parcours.name,
         zone: excursion.vallee,
@@ -31,6 +31,9 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         denivelePositif: excursion.denivele,
         difficulteParcours: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation,
+        signalements: excursion.signalements,
+        descriptionFR: excursion.post_content_fr,
+        descriptionES: excursion.post_content_es,
 
       }));
 

@@ -16,7 +16,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const { navigation } = props
 
   const {
-    nom_excursions,
+    nomExcursion,
     duree,
     typeParcours,
     zone,
@@ -24,7 +24,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
     denivelePositif,
     difficulteParcours,
     difficulteOrientation,
-    signalements,
   } = props.excursion
 
   const zoneIcone = require("../../assets/icons/zone.png")
@@ -160,7 +159,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
       <View style={styles.carteGlobale}>
         <View style={styles.entete}>
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
-          <Text weight="bold" text={nom_excursions} style={styles.heading} />
+          <Text weight="bold" text={nomExcursion} style={styles.heading} />
           <TouchableOpacity onPress={excursionFavorite}>
             <Icon name="heart-o" size={spacing.lg} style={styles.icone} />
           </TouchableOpacity>
