@@ -16,18 +16,21 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
 
-    const {
-      navigation,
-      route: {
-        params: {
-          nomExcursion,
-          temps,
-          distance,
-          difficulteParcours,
-          difficulteOrientation,
-        }
-      }
-    } = props;
+    var nomExcursion;
+    var temps;
+    var distance;
+    var difficulteParcours;
+    var difficulteOrientation;
+    var navigation = props.navigation;
+
+    /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
+    if (props.route.params !== undefined) {
+      nomExcursion = props.route.params.nomExcursion || "";
+      temps = props.route.params.temps || 0;
+      distance = props.route.params.distance || 0;
+      difficulteParcours = props.route.params.difficulteParcours || 0;
+      difficulteOrientation = props.route.params.difficulteOrientation || 0;
+    }
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -57,8 +60,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 );
 
 /**
- * 
- * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas 
+ *
+ * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas
  */
 function itemMini() {
   return (
@@ -133,8 +136,8 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, di
 }
 
 /**
- * 
- * @param isLoading 
+ *
+ * @param isLoading
  * @returns les informations de l'excursion
  */
 function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number) {
