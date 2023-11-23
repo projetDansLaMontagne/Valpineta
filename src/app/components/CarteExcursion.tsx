@@ -30,6 +30,8 @@ interface CarteExcursionProps extends TouchableOpacityProps {
 
   difficulteOrientation?: TextProps["text"]
 
+  signalements?: TextProps["text"]
+
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
@@ -43,6 +45,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
     difficulteParcours,
     difficulteOrientation,
     navigation,
+    signalements
   } = props
 
   const favoriIcone = require("../../assets/icons/favori.png")
@@ -68,7 +71,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   }
 
   const detailExcursion = () => {
-    navigation.navigate('Stack', { screen: 'DetailsExcursion', params: { nomExcursion: nomExcursions, temps: temps, distance: distance, difficulteParcours: difficulteParcours, difficulteOrientation: difficulteOrientation } });
+    navigation.navigate('Stack', { screen: 'DetailsExcursion', params: { nomExcursion: nomExcursions, temps: temps, distance: distance, difficulteParcours: difficulteParcours, difficulteOrientation: difficulteOrientation, signalements: signalements } });
   }
 
   const styles = StyleSheet.create({
