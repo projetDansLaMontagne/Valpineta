@@ -34,9 +34,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         signalements: excursion.signalements,
         descriptionFR: excursion.post_content_fr,
         descriptionES: excursion.post_content_es,
-
       }));
-
       setExcursions(excursionsJSON);
     }
     catch (error) {
