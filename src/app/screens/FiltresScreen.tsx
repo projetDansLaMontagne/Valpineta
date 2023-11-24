@@ -107,9 +107,11 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     navigation.navigate("Excursions", { Filtres: filtres });
   }
 
-  return <ScrollView
+  return <Screen
+    preset="scroll"
+    safeAreaEdges={["top", "bottom"]}
     style={$container}
-    scrollEnabled={!slideVerticalBloque}
+    ScrollViewProps={{ scrollEnabled: !slideVerticalBloque }}
   >
     <Button
       text="Valider filtres"
@@ -150,6 +152,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDistance(value)}
       style={$slider}
+      labelStyle={{ backgroundColor: colors.fond }}
     />
 
     <Text style={$h2}>Durée (en h)</Text>
@@ -163,6 +166,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDuree(value)}
       style={$slider}
+      labelStyle={{ backgroundColor: colors.fond }}
     />
 
     <Text style={$h2}>Dénivelé (en m)</Text>
@@ -176,6 +180,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       onSlidingComplete={() => setSlideVerticalBloque(false)}
       onChange={(value) => setIntervalleDenivele(value)}
       style={$slider}
+      labelStyle={{ backgroundColor: colors.fond }}
     />
 
     <Text style={$h2}>Type de parcours</Text>
@@ -188,9 +193,9 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
             key={i}
           >
             <Switch
-              trackColor={{ false: 'onsenfout', true: colors.palette.grisFonce }}
+              trackColor={{ false: 'onsenfout', true: colors.palette.gris }}
               thumbColor={typeParcours.selectionne ? colors.bordure : colors.palette.noir}
-              ios_backgroundColor={colors.palette.grisFonce}
+              ios_backgroundColor={colors.palette.gris}
 
               onValueChange={() => clicType(i)}
               value={typeParcours.selectionne}
@@ -202,7 +207,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       }
     </View>
 
-    <Text style={$h2}>Vallees</Text>
+    <Text style={$h2}>Vallées</Text>
     <View style={$containerVallees}>
       {
         vallees.map((vallee, i) =>
@@ -210,7 +215,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
             onPress={() => clicVallee(i)}
             style={[$vallee, vallee.selectionne ? { backgroundColor: colors.palette.vert } : { backgroundColor: colors.palette.blanc }]}
             key={i}>
-            <Text>{vallee.nom}</Text>
+            <Text style={vallee.selectionne ? { color: colors.palette.blanc } : { color: colors.palette.noir }}>{vallee.nom}</Text>
           </TouchableOpacity>
         )
       }
@@ -236,7 +241,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     </View>
 
     <Text style={$h2}>Difficulté d'orientation</Text>
-    <View style={[$containerDiff, { marginBottom: spacing.xxxl }]}>
+    <View style={$containerDiff}>
       {
         difficultesOrientation.map((difficulte, i) =>
           <TouchableOpacity
@@ -253,17 +258,15 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
         )
       }
     </View>
-  </ScrollView>
+  </Screen >
 })
 
 
 // ---- V I E W S ----
 const $container: ViewStyle = {
-  flex: 1,
   backgroundColor: colors.fond,
   padding: spacing.lg,
-
-  paddingTop: 50 // A SUPPRIMER
+  height: "100%"
 }
 const $critereTri: ViewStyle = {
   flexDirection: "row",
@@ -282,7 +285,7 @@ const $vallee: ViewStyle = {
   borderRadius: 15,
   borderWidth: 1,
   margin: spacing.xxs,
-  padding: spacing.md,
+  padding: spacing.sm,
 }
 const $containerDiff: ViewStyle = {
   flexDirection: "row",
@@ -291,6 +294,7 @@ const $containerDiff: ViewStyle = {
 const $difficulte: ViewStyle = {
   flexDirection: "row",
   borderRadius: 20,
+  borderColor: colors.palette.vert,
   borderWidth: 1,
   margin: spacing.sm,
   marginBottom: 0,
@@ -320,7 +324,7 @@ const $logoCheck: ImageStyle = {
 const $imageDifficulte: ImageStyle = {
   width: 30,
   height: 30,
-  resizeMode: "contain",
+  resizeMode: "stretch",
 }
 
 

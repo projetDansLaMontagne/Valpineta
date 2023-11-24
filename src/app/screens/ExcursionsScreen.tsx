@@ -230,55 +230,53 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     loadExcursions();
   }, []);
 
-  return <Screen style={$root} >
-    <View>
-      <View style={styles.searchBox}>
-        <TextInput
-          placeholder='Rechercher une excursion'
-          autoCorrect={false}
-          value={searchQuery}
-          onChangeText={text => setSearchQuery(text)}
-          placeholderTextColor={colors.palette.grisFonce}
+  return <Screen style={$root} safeAreaEdges={["top", "bottom"]}>
+    <View style={styles.searchBox}>
+      <TextInput
+        placeholder='Rechercher une excursion'
+        autoCorrect={false}
+        value={searchQuery}
+        onChangeText={text => setSearchQuery(text)}
+        placeholderTextColor={colors.palette.grisFonce}
+      />
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Stack", { screen: 'Filtres' })}
+        style={styles.valleeIcone}
+      >
+        <Image
+          style={styles.iconeFiltre}
+          source={filtreIcone}
+          resizeMode="contain"
         />
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Stack", { screen: 'Filtres' })}
-          style={styles.valleeIcone}
-        >
-          <Image
-            style={styles.iconeFiltre}
-            source={filtreIcone}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
-      </View>
-
-      {
-        excursions && (
-          excursions.length == 0 ?
-            <Text>Aucune excursion ne correspond à votre recherche.</Text>
-            :
-            <ScrollView>
-              {
-                excursions.map((excursion, i) => (
-                  <CarteExcursion
-                    key={i}
-                    nom={excursion.nom}
-                    denivele={excursion.denivele}
-                    distance={excursion.distance}
-                    duree={excursion.duree}
-                    vallee={excursion.vallee}
-                    typeParcours={excursion.typeParcours}
-                    difficulteParcours={excursion.difficulteTechnique}
-                    difficulteOrientation={excursion.difficulteOrientation}
-                    navigation={navigation}
-                  />
-                ))
-              }
-            </ScrollView>
-        )
-
-      }
+      </TouchableOpacity>
     </View>
+
+    {
+      excursions && (
+        excursions.length == 0 ?
+          <Text>Aucune excursion ne correspond à votre recherche.</Text>
+          :
+          <ScrollView>
+            {
+              excursions.map((excursion, i) => (
+                <CarteExcursion
+                  key={i}
+                  nom={excursion.nom}
+                  denivele={excursion.denivele}
+                  distance={excursion.distance}
+                  duree={excursion.duree}
+                  vallee={excursion.vallee}
+                  typeParcours={excursion.typeParcours}
+                  difficulteParcours={excursion.difficulteTechnique}
+                  difficulteOrientation={excursion.difficulteOrientation}
+                  navigation={navigation}
+                />
+              ))
+            }
+          </ScrollView>
+      )
+
+    }
   </Screen>
 
 
@@ -286,7 +284,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
 const $root: ViewStyle = {
   flex: 1,
-  padding: spacing.sm,
+  padding: spacing.md,
 }
 
 const styles = StyleSheet.create({
@@ -300,7 +298,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     color: colors.palette.noir,
     backgroundColor: colors.palette.grisClair,
-    margin: 10,
     shadowColor: colors.palette.noir,
     shadowOffset: {
       width: 0,
@@ -309,7 +306,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
-
   },
 
   iconeFiltre: {
