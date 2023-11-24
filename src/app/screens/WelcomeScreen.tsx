@@ -20,7 +20,7 @@ import * as fileSystem from 'expo-file-system';
 // src/app/screens/WelcomeScreen.tsx
 // src/app/utils/tiles_struct.json
 
-import fichier_json_aled_jenpeuxPlus from '../utils/tiles_struct.json';
+import fichier_json_aled_jenpeuxPlus from '../../assets/tiles_struct.json';
 
 const url = 'https://valpineta.eu/wp-json/api-wp/dl-file?file=carte/Chupaca';
 export const folder_dest = `${fileSystem.documentDirectory}cartes/Chupaca`;
@@ -40,9 +40,7 @@ const create_folder_struct = async (
         let file_folder = folder_path.replace(folder_dest, '');
         const final_url = url + file_folder + '/' + file_name;
 
-        console.log(final_url);
         console.log(`DL_DEST --- ${folder_dest}${file_folder}/${file_name}`);
-
 
         await fileSystem.makeDirectoryAsync(`${folder_dest}${file_folder}`, {
           intermediates: true,
@@ -50,27 +48,23 @@ const create_folder_struct = async (
 
 
         const dl_file = await fileSystem.downloadAsync(
-          final_url,
-          `${folder_dest}${file_folder}/${file_name}`, {
-          cache: true,
+            final_url,
+            `${folder_dest}${file_folder}/${file_name}`, {
+              cache: true,
 
-        });
+            });
 
         if (dl_file.status === 200) {
           console.log(`File downloaded: ${final_url}`);
           FINAL_IMAGE_MESCOuiLLEs = dl_file.uri;
         }
+        console.log(`${file_folder}`);
+
 
 
 
       } else {
         console.log(`Folder name: ${folder}`);
-
-        // create folder in folder_dest
-        await fileSystem.makeDirectoryAsync(`${folder_dest}/${folder}`, {
-          intermediates: true,
-        });
-
         await create_folder_struct(folder_struct[folder], `${folder_path}/${folder}`);
       }
     }
@@ -104,25 +98,23 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
       .finally(() => {
         console.log("FIIINIIIIIIIIIIIIIIII");
 
-
-        fileSystem.readDirectoryAsync(FINAL_IMAGE_MESCOuiLLEs.split("/").slice(0, -1).join("/"))
+        fileSystem.readDirectoryAsync(FINAL_IMAGE_MESCOuiLLEs.split('/').slice(0, -1).join('/'))
 
         .then((result) => {
           console.log(result);
-
-          console.log(FINAL_IMAGE_MESCOuiLLEs);
         })
 
       });
   }
 
-  // useEffect(() => {
-  //   fileSystem.deleteAsync(folder_dest).then(() => {
-  //     console.log("Folder deleted");
-  //   }).catch((error) => {
-  //     console.log(error);
-  //   });
-  // }, []);
+   useEffect(() => {
+     fileSystem.deleteAsync(folder_dest).then(() => {
+       console.log("Folder deleted");
+     }).catch((error) => {
+       console.log(error);
+     });
+
+   }, []);
 
   return (
     <View style={$container}>

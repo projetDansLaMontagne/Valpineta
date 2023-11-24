@@ -13,11 +13,10 @@ import {
 import { AppStackScreenProps } from "app/navigators"
 import {Button, Screen, Text} from "app/components"
 import {spacing, colors} from "../theme";
-import { FontAwesome5 } from '@expo/vector-icons';
 
 // location
 import * as Location from 'expo-location';
-import MapView, { LocalTile, PROVIDER_GOOGLE } from "react-native-maps"
+import MapView, {LocalTile, PROVIDER_GOOGLE, UrlTile} from "react-native-maps"
 import MapButton from "../components/MapButton";
 import {folder_dest} from "./WelcomeScreen";
 
@@ -93,7 +92,6 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
   }
 
-
   const getLocationAsync = async () => {
     console.log(`[EcranTestScreen] getLocationAsync()`);
     console.log(`[EcranTestScreen] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`);
@@ -138,8 +136,6 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
 
     setGavePermission(true);
-
-
     await getLocationAsync();
 
   }
@@ -243,6 +239,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
             location ? (
               <>
                 <MapView
+                  mapType={Platform.OS == "android" ? "none" : "standard"}
                   ref={mapRef}
                   style={{
                     height,
@@ -278,8 +275,6 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   // }}
                   onMoveShouldSetResponder={handleMapMoves}
 
-                  mapType={Platform.OS == "android" ? "none" : "standard"}
-
                   showsBuildings={true}
                   showsCompass={true}
                   showsMyLocationButton={true} // only for Android
@@ -290,10 +285,10 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                   zoomControlEnabled={true}
                   zoomEnabled={true}
                 >
-                  <LocalTile
-                    pathTemplate={tilesPath}
+
+                  <UrlTile
+                    urlTemplate={folder_dest + "/{z}/{x}/{y}.png"}
                     tileSize={256}
-                    zIndex={1}
                   />
                 </MapView>
                 {/*<View style={styles.mapOverlay}>*/}
