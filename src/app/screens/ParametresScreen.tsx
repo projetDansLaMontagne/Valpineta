@@ -11,9 +11,8 @@ interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window")
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
-
   const { parametres } = useStores()
-  
+
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
       <View style={$souligne}>
@@ -24,23 +23,25 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           <Icon name="language" size={30} color={colors.text} />
           <Text style={$texteParametre} text="Changer de langue" size="sm" />
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            parametres.setLangues("fr")
-          }}
-        >
-          <Text text="Français" size="sm" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            parametres.setLangues("es")
-          }}
-        >
-          <Text text="Espagnol" size="sm" />
-        </TouchableOpacity>
+        <View style={$containerBoutons}>
+        <View style={[$souligneBouton, parametres.langues === "fr" ? {left:0}:{left:'50%'}]}></View>
+          <TouchableOpacity
+            onPress={() => {
+              parametres.setLangues("fr")
+            }}
+          >
+            <Text style={$texteBouton} text="Français" size="sm" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              parametres.setLangues("es")
+            }}
+          >
+            <Text style={$texteBouton} text="Espagnol" size="sm" />
+          </TouchableOpacity>
+        </View>
       </View>
-      <Text>
-      </Text>
+      <Text></Text>
     </Screen>
   )
 })
@@ -72,6 +73,26 @@ const $containerIconTexte: ViewStyle = {
   justifyContent: "space-around",
 }
 
+const $containerBoutons: ViewStyle = {
+  flexDirection: "row",
+  justifyContent: "space-between",
+}
+
+
 const $texteParametre: TextStyle = {
   marginStart: spacing.xs,
+}
+
+const $souligneBouton: ViewStyle = {
+  backgroundColor: colors.bouton,
+  height: 2,
+  width: "50%",
+  bottom: 0,
+  position: "absolute",
+}
+
+const $texteBouton: TextStyle = {
+  color: colors.text,
+  paddingRight: spacing.xs,
+  paddingLeft: spacing.xs,
 }
