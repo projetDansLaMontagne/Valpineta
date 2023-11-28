@@ -46,7 +46,8 @@ export type AppStackParamList = {
   Map: undefined
   DetailsExcursion: undefined
   Parametres: undefined
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  ListeSignalements: undefined
+	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**
