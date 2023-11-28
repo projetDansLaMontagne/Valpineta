@@ -5,6 +5,8 @@ import { View, ViewStyle, ScrollView, Text, FlatList, TextInput, StyleSheet, Ima
 import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
+import { useStores } from "app/models";
+import { translate } from "i18n-js";
 
 
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
@@ -14,6 +16,8 @@ interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(props: ExcursionsScreenProps) {
   const [excursions, setExcursions] = useState(undefined);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const { parametres } = useStores()
 
 
   // Fonctions 
@@ -76,7 +80,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     <View>
       <View style={styles.searchBox}>
         <TextInput
-          placeholder='Rechercher une excursion'
+          placeholder={parametres.langues === "fr" ? "Rechercher une excursion" : "Buscar una excursión"}
           autoCorrect={false}
           value={searchQuery}
           onChangeText={text => setSearchQuery(text)}
@@ -90,7 +94,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       {
         excursions && (
           excursions.length == 0 ?
-            <Text>Aucune excursion ne correspond à votre recherche.</Text>
+            <Text>{translate("excursion.erreur")}</Text>
             :
             <ScrollView>
               <FlatList

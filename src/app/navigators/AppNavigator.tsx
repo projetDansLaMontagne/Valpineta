@@ -19,6 +19,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { Image, ImageStyle } from "react-native"
+import { useStores } from "app/models"
 
 
 const explorerLogo = require("./../../assets/icons/explorer.png")
@@ -73,6 +74,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   const colorScheme = useColorScheme()
   const Tab = createBottomTabNavigator()
 
+  const { parametres } = useStores()
+
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
   return (
@@ -105,6 +108,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           tabBarActiveTintColor: colors.bouton,
           tabBarInactiveTintColor: colors.text,
           tabBarLabelStyle: { color: colors.bouton },
+          tabBarLabel: parametres.langues === "fr" ? "Explorer" : "Explorar",
         }} name="Excursions" />
         <Tab.Screen component={Screens.CarteScreen} options={{
           tabBarIcon: (props) => (
@@ -114,6 +118,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
             />
           ),
           tabBarLabelStyle: { color: colors.bouton },
+          tabBarLabel: parametres.langues === "fr" ? "Carte" : "Mapa",
         }} name="Carte" />
         <Tab.Screen component={Screens.ParametresScreen} options={{
           tabBarIcon: (props) => (
@@ -123,6 +128,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
             />
           ),
           tabBarLabelStyle: { color: colors.bouton },
+          tabBarLabel: parametres.langues === "fr" ? "Paramètres" : "Ajustes",
         }} name="Parametres" />
       </Tab.Navigator>
     </NavigationContainer>

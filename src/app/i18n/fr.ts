@@ -36,10 +36,29 @@ const fr = {
     difficulteParcours: "2",
     difficulteOrientation: "1",
   },
-  footer: {
-    accueil: "Accueil",
-    carte: "Carte",
-    parametres: "Parametres",
+  excursion:{
+    erreur: "Aucune excursion trouvée",
+  },
+  detailsExcursion:{
+    titres:{
+      infos: "Infos",
+      avis: "Avis",
+      description: "Description",
+      signalement: "Signalement",
+      denivele: "Denivelé",
+    },
+    boutons:{
+      lireSuite: "Lire la suite",
+    }
+
+  },
+  parametres:{
+    titre: "Paramètres",
+    changerLangue: {
+      titre: "Changer la langue",
+      francais: "Français",
+      espagnol: "Espagnol",
+    }
   }
 }
 

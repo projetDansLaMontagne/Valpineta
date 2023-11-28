@@ -6,6 +6,7 @@ import { Screen, Text } from "app/components"
 import { colors, spacing } from "app/theme"
 import Icon from "react-native-vector-icons/FontAwesome"
 import { useStores } from "app/models"
+import I18n, { translate } from "i18n-js"
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window")
@@ -16,28 +17,30 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
       <View style={$souligne}>
-        <Text style={$titre} text="Paramètres de l'application" size="xl" />
+        <Text style={$titre} tx={"parametres.titre"} size="xl" />
       </View>
       <View style={$containerUnParametre}>
         <View style={$containerIconTexte}>
           <Icon name="language" size={30} color={colors.text} />
-          <Text style={$texteParametre} text="Changer de langue" size="sm" />
+          <Text style={$texteParametre} tx={"parametres.changerLangue.titre"} size="sm" />
         </View>
         <View style={$containerBoutons}>
         <View style={[$souligneBouton, parametres.langues === "fr" ? {left:0}:{left:'50%'}]}></View>
           <TouchableOpacity
             onPress={() => {
+              I18n.locale = "fr"
               parametres.setLangues("fr")
             }}
           >
-            <Text style={$texteBouton} text="Français" size="sm" />
+            <Text style={$texteBouton} tx={"parametres.changerLangue.francais"} size="sm" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
+              I18n.locale = "es"
               parametres.setLangues("es")
             }}
           >
-            <Text style={$texteBouton} text="Espagnol" size="sm" />
+            <Text style={$texteBouton} tx={"parametres.changerLangue.espagnol"} size="sm" />
           </TouchableOpacity>
         </View>
       </View>

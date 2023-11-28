@@ -30,6 +30,30 @@ const es = {
     localisation: "Ubicación",
     parcours: "Ida y vuelta",
   },
+  excursion:{
+    erreur: "Ninguna excursión encontrada",
+  },
+  detailsExcursion:{
+    titres:{
+      infos: "Infos",
+      avis: "Aviso",
+      description: "Descripción",
+      signalement: "Informes",
+      denivele: "Desnivel",
+    },
+    boutons:{
+      lireSuite: "Leer más",
+    },
+  },
+
+  parametres:{
+    titre: "Ajustes",
+    changerLangue: {
+      titre: "Cambiar el idioma",
+      francais: "Francés",
+      espagnol: "Español",
+    }
+  },
 }
 
 export default es

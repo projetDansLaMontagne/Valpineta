@@ -121,7 +121,7 @@ function itemFull(
             style={$boutonInfoAvis}
           >
             <Text
-              text="Infos"
+              tx="detailsExcursion.titres.infos"
               size="lg"
               style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
             />
@@ -135,7 +135,7 @@ function itemFull(
             style={$boutonInfoAvis}
           >
             <Text
-              text="Avis"
+              tx="detailsExcursion.titres.avis"
               size="lg"
               style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
             />
@@ -216,7 +216,7 @@ function infos(
           </View>
           <View style={$containerDescriptionSignalements}>
             <View>
-              <Text text="Description" size="lg" />
+              <Text tx="detailsExcursion.titres.description" size="lg" />
               <Text
                 style={$textDescription}
                 text={afficherDescriptionCourte(excursion.descriptionES)}
@@ -227,16 +227,16 @@ function infos(
                   navigation.navigate("Description", {excursion : excursion })
                 }}
               >
-                <Text style={$lienDescription} text="Lire la suite" size="xs" />
+                <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xs" />
               </TouchableOpacity>
             </View>
             <View>
-              <Text text="Signalement" size="lg" />
+              <Text tx="detailsExcursion.titres.signalement" size="lg" />
               <Text text="signalement" size="xs" />
             </View>
           </View>
           <View style={$containerDenivele}>
-            <Text text="Dénivelé" size="xl" />
+            <Text tx="detailsExcursion.titres.denivele" size="xl" />
             {isLoading ? (
               <ActivityIndicator size="large" color={colors.bouton} />
             ) : (
