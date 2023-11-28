@@ -5,11 +5,15 @@ import { AppStackScreenProps } from "app/navigators"
 import { Screen, Text } from "app/components"
 import { colors, spacing } from "app/theme"
 import Icon from "react-native-vector-icons/FontAwesome"
+import { useStores } from "app/models"
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window")
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
+
+  const { parametres } = useStores()
+  
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
       <View style={$souligne}>
@@ -20,13 +24,23 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           <Icon name="language" size={30} color={colors.text} />
           <Text style={$texteParametre} text="Changer de langue" size="sm" />
         </View>
-        <TouchableOpacity onPress={() => {console.log('bite')}}>
+        <TouchableOpacity
+          onPress={() => {
+            parametres.setLangues("fr")
+          }}
+        >
           <Text text="Français" size="sm" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {console.log('double bite')}}>
+        <TouchableOpacity
+          onPress={() => {
+            parametres.setLangues("es")
+          }}
+        >
           <Text text="Espagnol" size="sm" />
         </TouchableOpacity>
       </View>
+      <Text>
+      </Text>
     </Screen>
   )
 })
