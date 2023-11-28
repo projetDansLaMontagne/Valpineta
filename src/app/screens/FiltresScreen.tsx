@@ -194,7 +194,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           >
             <Switch
               trackColor={{ false: 'onsenfout', true: colors.palette.gris }}
-              thumbColor={typeParcours.selectionne ? colors.bordure : colors.palette.noir}
+              thumbColor={typeParcours.selectionne ? colors.bordure : colors.palette.blanc}
               ios_backgroundColor={colors.palette.gris}
 
               onValueChange={() => clicType(i)}
