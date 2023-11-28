@@ -12,79 +12,84 @@ export interface CarteSignalementProps {
    */
   style?: StyleProp<ViewStyle>
 
+  details?: boolean
+
   type?: TextProps["text"]
 
   nomSignalement?: TextProps["text"]
 
   description?: TextProps["text"]
 
-  imageSignalement?: TextProps["text"] 
-  
+  coordonnes?: TextProps["text"]
+
+  imageSignalement?: TextProps["text"]
+
 }
 
 /**
  * Describe your component here
  */
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
-  const { 
+  const {
     style,
+    details,
     type,
     nomSignalement,
     description,
+    coordonnes,
     imageSignalement
-   } = props
-
-  //  const imageSignalement2 = "randonnee.png";
-
-  //  const imageSignalement3 = imageSignalement.toString();
-
-  //  const pathImg = '../../assets/images/' + imageSignalement;
-
-
-
-  // const pathImg = `../../assets/images/${imageSignalement}`;
-  // const imageSource = require(pathImg);
-
-
-
-
-    // const pathImg2 = '../../assets/images/' + imageSignalement2;
-
-  //  console.log(imageSignalement)
-  //  console.log(pathImg)
-   
-  //  console.log(imageSignalement2)
-  //  console.log(pathImg2)
-
-
+  } = props
 
   return (
-    <View style={styles.carteGlobale}>
-        <View style={styles.entete}>
-          {type === 'pointInteret' ? (
-          <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
-        ) : (
-          <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
-        )}
+    <>
+      {details ? (
+        <View style={styles.carteGlobale}>
+          <View style={styles.entete}>
+            {type === 'pointInteret' ? (
+              <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
+            ) : (
+              <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
+            )}
             <Text style={styles.heading}>
-            {nomSignalement}
-          </Text>
+              {nomSignalement}
+            </Text>
+            <Text>
+              {coordonnes}
+            </Text>
 
-          {/* <Text>{imageSignalement}</Text> */}
 
+          </View>
 
+          <View style={styles.contenu}>
+            {/* {require(`../../assets/images/${imageSignalement}`)}  */}
+            <Text style={styles.texte}>
+              {description}
+            </Text>
+          </View>
         </View>
-
-      <View style={styles.contenu}>
-      {/* {require(`../../assets/images/${imageSignalement}`)}  */}
-        <Text style={styles.texte}>
-          {description}
-        </Text>
-      </View>
-    </View>
-
+      ) : (
+        <View>
+          <View style={styles.carteGlobale}>
+            <View style={styles.entete}>
+              {type === 'pointInteret' ? (
+                <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
+              ) : (
+                <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
+              )}
+              <Text style={styles.heading}>
+                {nomSignalement}
+              </Text>
+              <Text>
+                {coordonnes}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+    </>
   )
 })
+
 
 
 const styles = StyleSheet.create({
@@ -119,9 +124,10 @@ const styles = StyleSheet.create({
     color: colors.palette.vert,
   },
   heading: {
-    maxWidth: "50%",
-    marginEnd: spacing.xl,
     fontSize: 16,
+    paddingEnd: 15,
+    paddingStart: 15,
+    padding: 5
   },
   imageSignalement: {
     width: "100%",

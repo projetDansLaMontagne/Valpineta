@@ -36,7 +36,7 @@ interface CarteExcursionProps extends TouchableOpacityProps {
 
 export function CarteExcursion(props: CarteExcursionProps) {
   const {
-    nomExcursions,
+    nomExcursions = "zizi",
     zone,
     parcours,
     temps,
