@@ -250,6 +250,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
 
   useEffect(() => {
+    console.log('useEffect ExcursionsScreen')
     // Initialisation du filtre
     if (props.route.params) {
       filtres = props.route.params.Filtres;
@@ -258,7 +259,9 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
     // Chargement des excursions
     loadExcursions();
-  }, []);
+
+    // Changement apporté : Ajout de props.route.params en dependance pour que loadExcurison soit appelé a chaque changement de filtre
+  }, [props.route.params]);
 
   return <Screen style={$root} safeAreaEdges={["top", "bottom"]}>
     <View style={styles.searchBox}>
