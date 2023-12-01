@@ -31,6 +31,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }
     } = props as DetailsExcursionScreenProps;
 
+    const [isAllSignalements, setisAllSignalements] = useState(false);
 
     return (
       < SafeAreaView
@@ -38,7 +39,11 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       >
         <TouchableOpacity
           style={$boutonRetour}
-          onPress={() => navigation.navigate("Excursions")}
+          onPress={() => {
+            navigation.navigate("Excursions");
+            setisAllSignalements(false)
+          }
+          }
         >
           <Image
             style={{ tintColor: colors.bouton }}
@@ -48,7 +53,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements)}
+          itemFull={itemFull(nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setisAllSignalements)}
           disableSwipeIcon={true}
           animation="easeInEaseOut"
           extraMarginTop={125}
@@ -69,11 +74,10 @@ function itemMini() {
   )
 }
 
-function itemFull(nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements) {
+function itemFull(nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setisAllSignalements) {
 
   const [isInfos, setIsInfos] = useState(true);
 
-  const [isAllSignalements, setisAllSignalements] = useState(false);
 
 
   return (
@@ -122,25 +126,17 @@ function listeSignalements(setisAllSignalements, signalements) {
         <TouchableWithoutFeedback>
           <View>
 
-            {signalements?.avertissements.length > 0 ? (
-              signalements.avertissements.map((avertissement, index) => (
-                <View key={index}>
-                  <CarteSignalement type="avertissement" details={true} nomSignalement={avertissement.nom_signalement} description={avertissement.description} coordonnes={avertissement.coordonnees.longitude} imageSignalement={avertissement.image} />
-                </View>
-              ))
-            ) : (
-              <Text>Aucun avertissement à afficher</Text>
-            )}
 
-            {signalements?.pointsInteret.length > 0 ? (
-              signalements.pointsInteret.map((pointInteret, index) => (
-                <View key={index}>
-                  <CarteSignalement type="pointInteret" details={true} nomSignalement={pointInteret.nom_signalement} description={pointInteret.description} coordonnes={pointInteret.coordonnees.longitude} imageSignalement={pointInteret.image} />
-                </View>
-              ))
-            ) : (
-              <Text>Aucun point d'intérêt à afficher</Text>
-            )}
+            {signalements.avertissements.map((avertissement, index) => (
+              <View key={index}>
+                <CarteSignalement type="avertissement" details={true} nomSignalement={avertissement.nom_signalement} description={avertissement.description} coordonnes={avertissement.coordonnees.longitude} imageSignalement={avertissement.image} />
+              </View>
+            ))}
+            {signalements.pointsInteret.map((pointInteret, index) => (
+              <View key={index}>
+                <CarteSignalement type="pointInteret" details={true} nomSignalement={pointInteret.nom_signalement} description={pointInteret.description} coordonnes={pointInteret.coordonnees.longitude} imageSignalement={pointInteret.image} />
+              </View>
+            ))}
 
 
           </View>
@@ -197,45 +193,69 @@ function infos(temps, distance, difficulteParcours, difficulteOrientation, setis
             </View>
 
             <View>
-              <Text text="Signalements" size="lg" />
-
-              <ScrollView horizontal>
-                <TouchableWithoutFeedback>
-                  <View style={$scrollLine}>
-                    {signalements?.avertissements.length > 0 ? (
-                      signalements.avertissements.map((avertissement, index) => (
-                        <View key={index}>
-                          <CarteSignalement type="avertissement" details={false} nomSignalement={avertissement.nom_signalement} coordonnes={avertissement.coordonnees.longitude} />
+              {signalements?.avertissements.length > 0 && signalements?.pointsInteret.length > 0 ? (
+                <View>
+                  <Text text="Signalements" size="lg" />
+                </View>
+              ) : (
+                <View>
+                  {signalements?.avertissements.length == 0 && signalements?.pointsInteret.length > 0 ? (
+                    <View>
+                      <Text text="Points d'interets" size="lg" />
+                    </View>
+                  ) : (
+                    <View>
+                      {signalements?.avertissements.length > 0 && signalements?.pointsInteret.length == 0 ? (
+                        <View>
+                          <Text text="Avertissements" size="lg" />
                         </View>
-                      ))
-                    ) : (
-                      <Text>Aucun avertissement à afficher</Text>
-                    )}
-
-                    {signalements?.pointsInteret.length > 0 ? (
-                      signalements.pointsInteret.map((pointInteret, index) => (
-                        <View key={index}>
-                          <CarteSignalement type="pointInteret" details={false} nomSignalement={pointInteret.nom_signalement} coordonnes={pointInteret.coordonnees.longitude} />
+                      ) : (
+                        <View>
+                          <Text text="Aucun signalement" size="lg" />
                         </View>
-                      ))
-                    ) : (
-                      <Text>Aucun point d'intérêt à afficher</Text>
-                    )}
+                      )}
+                    </View>
+                  )}
+                </View>
+              )}
+              <View>
+                <ScrollView horizontal>
+                  <TouchableWithoutFeedback>
+                    <View style={$scrollLine}>
+                      {signalements.avertissements.map((avertissement, index) => (
+                        <View key={index}>
+                          <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                            <CarteSignalement type="avertissement" details={false} nomSignalement={avertissement.nom_signalement} coordonnes={avertissement.coordonnees.longitude} />
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                      {signalements.pointsInteret.map((pointInteret, index) => (
+                        <View key={index}>
+                          <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                            <CarteSignalement type="pointInteret" details={false} nomSignalement={pointInteret.nom_signalement} coordonnes={pointInteret.coordonnees.longitude} />
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                      {signalements.avertissements.length > 0 || signalements.pointsInteret.length > 0 ? (
+                        <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                          <View style={$carteGlobale}>
+                            <Text text="Voir détails" size="sm" style={$tousLesSignalements} />
+                          </View>
+                        </TouchableOpacity>
+                      ) : (
+                        <View></View>
+                      )}
+                    </View>
+                  </TouchableWithoutFeedback>
+                </ScrollView>
 
-                    {/* <CarteSignalement type="avertissement" details={false} nomSignalement="Marmotte agressive" coordonnes="" /> */}
-
-                    <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                      <Text text="Voir détails" size="sm" style={$tousLesSignalements} />
-                    </TouchableOpacity>
-                  </View>
-                </TouchableWithoutFeedback>
-              </ScrollView>
+              </View>
 
             </View>
           </View>
 
           <View style={$containerDenivele}>
-            <Text text="Dénivelé" size="xl" />
+            <Text text="Dénivelé" size="lg" />
             <Image
               source={require("../../assets/images/denivele.jpeg")}
               style={$imageDenivele}
@@ -391,7 +411,6 @@ const $tousLesSignalements: TextStyle = {
   paddingLeft: spacing.xl,
   paddingRight: spacing.xl,
   color: colors.souligne,
-  textDecorationLine: "underline",
 }
 const $listeSignalements: ViewStyle = {
   height: "115%", //Si je met a 100% il descend pas jusqu'en bas voir avec reio prod
@@ -403,4 +422,19 @@ const $scrollLine: ViewStyle = {
   justifyContent: "space-between",
   alignItems: "center",
   marginTop: spacing.xs,
+}
+
+const $carteGlobale: ViewStyle = {
+  padding: 13,
+  margin: 10,
+  shadowColor: colors.palette.noir,
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+  shadowOpacity: 0.27,
+  shadowRadius: 4.65,
+  elevation: 6,
+  borderRadius: 10,
+  backgroundColor: colors.palette.blanc,
 }

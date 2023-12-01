@@ -10,7 +10,6 @@ export interface CarteSignalementProps {
   /**
    * An optional style override useful for padding & margin.
    */
-  style?: StyleProp<ViewStyle>
 
   details?: boolean
 
@@ -31,7 +30,6 @@ export interface CarteSignalementProps {
  */
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
   const {
-    style,
     details,
     type,
     nomSignalement,
@@ -54,7 +52,7 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
               {nomSignalement}
             </Text>
             <Text>
-              {coordonnes}
+              {coordonnes} km
             </Text>
 
 
@@ -80,7 +78,7 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
                 {nomSignalement}
               </Text>
               <Text>
-                {coordonnes}
+                {coordonnes} km
               </Text>
             </View>
           </View>
