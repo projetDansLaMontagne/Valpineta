@@ -1,274 +1,309 @@
 import React, { FC, useState, useEffect } from "react"
-import { Image, ImageStyle, TextStyle, View, ScrollView, ViewStyle, TouchableOpacity, Switch } from "react-native"
-import Slider from "react-native-a11y-slider";
+import {
+  Image,
+  ImageStyle,
+  TextStyle,
+  View,
+  ScrollView,
+  ViewStyle,
+  TouchableOpacity,
+  Switch,
+} from "react-native"
+import Slider from "react-native-a11y-slider"
 import { observer } from "mobx-react-lite"
 
 import { Text, Button, Screen } from "app/components"
 import { AppStackScreenProps } from "app/navigators"
 import { colors, spacing } from "../theme"
 
-/*
--- Todo --
-Regler probleme du focus sur le slider qui empeche le slide vertical (onSlidingComplete non pris en compte)
-Regler probleme de logo check qui disparait si expo n est plus lance
-*/
+/**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
 
-interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {
-  navigation: undefined
-}
+interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> { }
 
 export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresScreen(
-  props: FiltresScreenProps
+  props: FiltresScreenProps,
 ) {
-  const { navigation } = props;
+  const { navigation } = props
+  var valeursFiltres
 
   // Assets
-  const logoCheck = require("../../assets/icons/check_3x_vert.png");
-  const logoDiffPhy = require("../../assets/icons/difficulte_physique.png");
-  const logoDiffOri = require("./../../assets/icons/difficulte_orientation.png");
+  const logoCheck = require("../../assets/icons/check_3x_vert.png")
+
+  const logoDistance = require("../../assets/icons/distance.png")
+  const logoDuree = require("../../assets/icons/time.png")
+  const logoDenivele = require("../../assets/icons/denivele.png")
+  const logoDiffTech = require("../../assets/icons/difficulte_technique.png")
+  const logoDiffOri = require("./../../assets/icons/difficulte_orientation.png")
 
   // -- CONSTANTES --
+  // Recuperation des valeurs de filtres
+  try {
+    // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
+    valeursFiltres = require("../../assets/jsons/valeurs_filtres.json")
+  } catch (error) {
+    // Erreur critique si on n a pas les valeurs de filtres
+    navigation.navigate("Excursions")
+    console.error("Page des filtres necessite les filtres appliques en parametres")
+    return <></>
+  }
+  const incrementDenivele = 200
   const criteresTri = [
-    { texte: "Distance", logo: require("./../../assets/icons/distance.png") },
-    { texte: "Temps de parcours", logo: require("./../../assets/icons/time.png") },
-    { texte: "Dénivelé", logo: require("./../../assets/icons/denivele.png") },
-    { texte: "Difficulté physique", logo: logoDiffPhy },
-    { texte: "Difficulté d'orientation", logo: logoDiffOri },
+    { nom: "Distance", nomCle: "distance", logo: logoDistance },
+    { nom: "Durée", nomCle: "duree", logo: logoDuree },
+    { nom: "Dénivelé", nomCle: "denivele", logo: logoDenivele },
+    { nom: "Difficulté technique", nomCle: "difficulteTechnique", logo: logoDiffTech },
+    { nom: "Difficulté d'orientation", nomCle: "difficulteOrientation", logo: logoDiffOri },
   ]
-  const distanceMax = 15;
-  const dureeMax = 8;
-  const deniveleMax = 3000;
-
 
   // -- USE STATES --
   // Tri / Filtres selectionnes
-  const [critereTri, setCritereTri] = useState(0);
-  const [intervalleDistance, setIntervalleDistance] = useState([0, distanceMax]);
-  const [intervalleDuree, setIntervalleDuree] = useState([0, dureeMax]);
-  const [intervalleDenivele, setIntervalleDenivele] = useState([0, dureeMax]);
-  const [types, setTypes] = useState([
-    { texte: "Aller-Retour", estCoche: true },
-    { texte: "Boucle", estCoche: true },
-    { texte: "Ligne", estCoche: true },
+  const [critereTriSelectionne, setCritereTriSelectionne] = useState(0)
+  const [intervalleDistance, setIntervalleDistance] = useState([0, valeursFiltres.distanceMax])
+  const [intervalleDuree, setIntervalleDuree] = useState([0, valeursFiltres.dureeMax])
+  const [intervalleDenivele, setIntervalleDenivele] = useState([
+    0,
+    valeursFiltres.deniveleMax + incrementDenivele,
   ])
-  const [zones, setzones] = useState([
-    { nom: "Pineta", selectionnee: true },
-    { nom: "Vallée de la Roya", selectionnee: true },
-    { nom: "Vallée des Merveilles", selectionnee: true },
-    { nom: "Vallée de la Vésubie", selectionnee: true },
-    { nom: "Vallée de la Tinée", selectionnee: true },
-    { nom: "Vallée de la B", selectionnee: true },
-  ])
-  const [difficultePhysique, setDifficultePhysique] = useState([
-    { niveau: 1, selectionnee: true },
-    { niveau: 2, selectionnee: true },
-    { niveau: 3, selectionnee: true },
-  ])
-  const [difficulteOrientation, setDifficulteOrientation] = useState([
-    { niveau: 1, selectionnee: true },
-    { niveau: 2, selectionnee: true },
-    { niveau: 3, selectionnee: true },
-  ])
+  const [typesParcours, setTypesParcours] = useState(
+    valeursFiltres.nomTypesParcours.map((nomType) => ({ nom: nomType, selectionne: true })),
+  )
+  const [vallees, setVallees] = useState(
+    valeursFiltres.nomVallees.map((nomVallee) => ({ nom: nomVallee, selectionne: true })),
+  )
+  const [difficultesTechniques, setDifficultesTechniques] = useState(
+    [...Array(valeursFiltres.difficulteTechniqueMax)].map((trash, i) => ({
+      niveau: i + 1,
+      selectionne: true,
+    })),
+  )
+  const [difficultesOrientation, setDifficultesOrientation] = useState(
+    [...Array(valeursFiltres.difficulteOrientationMax)].map((trash, i) => ({
+      niveau: i + 1,
+      selectionne: true,
+    })),
+  )
 
   // Autres
-  const [slideVerticalBloque, setSlideVerticalBloque] = useState(false);
+  const [slideVerticalBloque, setSlideVerticalBloque] = useState(false)
 
   // -- CallBacks --
   const clicType = (i) => {
     // Modification de l'état du type
-    const updatedTypes = [...types];
-    updatedTypes[i].estCoche = !updatedTypes[i].estCoche;
-    setTypes(updatedTypes);
+    const updatedTypesParcours = [...typesParcours]
+    updatedTypesParcours[i].selectionne = !updatedTypesParcours[i].selectionne
+    setTypesParcours(updatedTypesParcours)
   }
-  const clicZone = (i) => {
-    let newZones = [...zones];
-    newZones[i].selectionnee = !newZones[i].selectionnee;
-    setzones(newZones);
+  const clicVallee = (i: number) => {
+    let newVallees = [...vallees]
+    newVallees[i].selectionne = !newVallees[i].selectionne
+    setVallees(newVallees)
   }
-  const clicDifficultePhysique = (i) => {
-    let newDifficulte = [...difficultePhysique];
-    newDifficulte[i].selectionnee = !newDifficulte[i].selectionnee;
-    setDifficultePhysique(newDifficulte);
+  const clicDifficulteTechnique = (i: number) => {
+    let newDifficulte = [...difficultesTechniques]
+    newDifficulte[i].selectionne = !newDifficulte[i].selectionne
+    setDifficultesTechniques(newDifficulte)
   }
-  const clicDifficulteOrientation = (i) => {
-    let newDifficulte = [...difficulteOrientation];
-    newDifficulte[i].selectionnee = !newDifficulte[i].selectionnee;
-    setDifficulteOrientation(newDifficulte);
+  const clicDifficulteOrientation = (i: number) => {
+    let newDifficulte = [...difficultesOrientation]
+    newDifficulte[i].selectionne = !newDifficulte[i].selectionne
+    setDifficultesOrientation(newDifficulte)
   }
   const validerFiltres = () => {
     const filtres = {
-      critereTri: critereTri,
-      intervalleDistance: intervalleDistance,
-      intervalleDuree: intervalleDuree,
-      intervalleDenivele: intervalleDenivele,
-      types: types,
-      zones: zones,
-      difficultePhysique: difficultePhysique,
-      difficulteOrientation: difficulteOrientation,
-    };
-
-    navigation.navigate("Welcome", { filtres: filtres });
+      critereTri: criteresTri[critereTriSelectionne].nomCle,
+      intervalleDistance: { min: intervalleDistance[0], max: intervalleDistance[1] },
+      intervalleDuree: { min: intervalleDuree[0], max: intervalleDuree[1] },
+      intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
+      // On retire les type de parcours non selectionnees
+      typesParcours: typesParcours
+        .map((type) => (type.selectionne ? type.nom : null))
+        .filter((type) => type != null),
+      // On retire les vallees non selectionnees
+      vallees: vallees
+        .map((vallee) => (vallee.selectionne ? vallee.nom : null))
+        .filter((type) => type != null),
+      // On retire les difficultes techniques non selectionnees
+      difficultesTechniques: difficultesTechniques
+        .map((difficulteTechnique) =>
+          difficulteTechnique.selectionne ? difficulteTechnique.niveau : null,
+        )
+        .filter((type) => type != null),
+      // On retire les difficultes d orientation non selectionnes
+      difficultesOrientation: difficultesOrientation
+        .map((difficultesOrientation) =>
+          difficultesOrientation.selectionne ? difficultesOrientation.niveau : null,
+        )
+        .filter((type) => type != null),
+    }
+    navigation.navigate("Excursions", { Filtres: filtres })
   }
 
-  return <ScrollView
-    style={$container}
-    scrollEnabled={!slideVerticalBloque}
-  >
-    <Button
-      text="Valider filtres"
-      style={$boutonValidation}
-      onPress={() => validerFiltres()}
-    />
+  return (
+    <Screen
+      preset="fixed"
+      safeAreaEdges={["top"]}
+      style={$container}
+    >
+      <Button text="Valider filtres" style={$boutonValidation} onPress={() => validerFiltres()} />
+      <ScrollView
+        scrollEnabled={!slideVerticalBloque}
+      >
+        <Text style={$h1}>Trier par</Text>
+        <View>
+          {criteresTri.map((critere, i) => (
+            <TouchableOpacity
+              onPress={() => setCritereTriSelectionne(i)}
+              style={$critereTri}
+              key={i}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image source={critere.logo} style={$logoCritere} />
+                <Text style={$filtres}>{critere.nom}</Text>
+              </View>
+              {i == critereTriSelectionne && <Image source={logoCheck} style={$logoCheck} />}
+            </TouchableOpacity>
+          ))}
+        </View>
 
-    <Text style={$h1}>Trier par</Text>
-    <View>
-      {
-        criteresTri.map((critere, i) =>
-          <TouchableOpacity onPress={() => setCritereTri(i)} style={$critereTri}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image source={critere.logo} style={$logoCritere} />
-              <Text style={$criteresTri} >{critere.texte}</Text>
-            </View>
-            {i == critereTri &&
-              <Image source={logoCheck} style={$logoCheck} />
-            }
-          </TouchableOpacity>
-        )
-      }
-    </View>
+        <Text style={$h1}>Filtrer par</Text>
+        <Text style={$h2}>Distance (en km)</Text>
+        <Slider
+          min={0}
+          max={valeursFiltres.distanceMax}
+          increment={1}
+          values={intervalleDistance}
+          markerColor={colors.palette.vert}
+          onSlidingStart={() => setSlideVerticalBloque(true)}
+          onSlidingComplete={() => setSlideVerticalBloque(false)}
+          onChange={(value) => setIntervalleDistance(value)}
+          style={$slider}
+          labelStyle={{ backgroundColor: colors.fond }}
+        />
 
-    <Text style={$h1}>Filtrer par</Text>
-    <Text style={$h2}>Distance</Text>
-    <Slider
-      min={0}
-      max={distanceMax}
-      increment={1}
-      values={intervalleDistance}
-      markerColor={colors.palette.vert}
-      onSlidingStart={() => setSlideVerticalBloque(true)}
-      onSlidingComplete={() => setSlideVerticalBloque(false)}
-      onChange={(value) => setIntervalleDistance(value)}
-      style={$slider}
-    />
+        <Text style={$h2}>Durée (en h)</Text>
+        <Slider
+          min={0}
+          max={valeursFiltres.dureeMax}
+          increment={1}
+          values={intervalleDuree}
+          markerColor={colors.palette.vert}
+          onSlidingStart={() => setSlideVerticalBloque(true)}
+          onSlidingComplete={() => setSlideVerticalBloque(false)}
+          onChange={(value) => setIntervalleDuree(value)}
+          style={$slider}
+          labelStyle={{ backgroundColor: colors.fond }}
+        />
 
-    <Text style={$h2}>Durée</Text>
-    <Slider
-      min={0}
-      max={dureeMax}
-      increment={1}
-      values={intervalleDuree}
-      markerColor={colors.palette.vert}
-      onSlidingStart={() => setSlideVerticalBloque(true)}
-      onSlidingComplete={() => setSlideVerticalBloque(false)}
-      onChange={(value) => setIntervalleDuree(value)}
-      style={$slider}
-    />
+        <Text style={$h2}>Dénivelé (en m)</Text>
+        <Slider
+          min={0}
+          max={valeursFiltres.deniveleMax + incrementDenivele}
+          increment={incrementDenivele}
+          values={intervalleDenivele}
+          markerColor={colors.palette.vert}
+          onSlidingStart={() => setSlideVerticalBloque(true)}
+          onSlidingComplete={() => setSlideVerticalBloque(false)}
+          onChange={(value) => setIntervalleDenivele(value)}
+          style={$slider}
+          labelStyle={{ backgroundColor: colors.fond }}
+        />
 
-    <Text style={$h2}>Dénivelé</Text>
-    <Slider
-      min={0}
-      max={deniveleMax}
-      increment={200}
-      values={intervalleDenivele}
-      markerColor={colors.palette.vert}
-      onSlidingStart={() => setSlideVerticalBloque(true)}
-      onSlidingComplete={() => setSlideVerticalBloque(false)}
-      onChange={(value) => setIntervalleDenivele(value)}
-      style={$slider}
-    />
+        <Text style={$h2}>Type de parcours</Text>
+        <View>
+          {typesParcours.map((typeParcours, i) => (
+            <TouchableOpacity
+              onPress={() => clicType(i)}
+              style={{ flexDirection: "row", alignItems: "center" }}
+              key={i}
+            >
+              <Switch
+                trackColor={{ false: "onsenfout", true: colors.palette.gris }}
+                thumbColor={typeParcours.selectionne ? colors.bordure : colors.palette.blanc}
+                ios_backgroundColor={colors.palette.gris}
+                onValueChange={() => clicType(i)}
+                value={typeParcours.selectionne}
+                style={$switch}
+              />
+              <Text>{typeParcours.nom}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-    <Text style={$h2}>Type de parcours</Text>
-    <View>
-      {
-        types.map((type, i) =>
-          <TouchableOpacity onPress={() => clicType(i)} style={{ flexDirection: "row", alignItems: "center" }}>
-            <Switch
-              trackColor={{ false: 'onsenfout', true: colors.palette.grisFonce }}
-              thumbColor={type.estCoche ? colors.bordure : colors.palette.noir}
-              ios_backgroundColor={colors.palette.grisFonce}
-              onValueChange={() => clicType(i)}
-              value={type.estCoche}
-              style={$switch}
-            />
-            <Text>{type.texte}</Text>
-          </TouchableOpacity>
-        )
-      }
-    </View>
+        <Text style={$h2}>Vallées</Text>
+        <View style={$containerVallees}>
+          {vallees.map((vallee, i) => (
+            <TouchableOpacity
+              onPress={() => clicVallee(i)}
+              style={[
+                $vallee,
+                vallee.selectionne
+                  ? { backgroundColor: colors.palette.vert }
+                  : { backgroundColor: colors.palette.blanc },
+              ]}
+              key={i}
+            >
+              <Text
+                size="md"
+                style={
+                  vallee.selectionne
+                    ? { color: colors.palette.blanc }
+                    : { color: colors.palette.noir }
+                }
+              >
+                {vallee.nom}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-    <Text style={$h2}>Zones</Text>
-    <View style={$containerZones}>
-      {
-        zones.map((zone, i) =>
-          <Button
-            key={i}
-            text={zone.nom}
-            style={zone.selectionnee ? $zoneSelectionnee : $zone}
-            onPress={() => clicZone(i)}
-          />
-        )
-      }
-    </View>
+        <Text style={$h2}>Difficulté technique</Text>
+        <View style={$containerDiff}>
+          {difficultesTechniques.map((difficulte, i) => (
+            <TouchableOpacity
+              onPress={() => clicDifficulteTechnique(i)}
+              style={difficulte.selectionne ? $difficulteSelectionnee : $difficulte}
+              key={difficulte.niveau}
+            >
+              {[...Array(difficulte.niveau)].map((trash, i) => (
+                <Image
+                  source={logoDiffTech}
+                  style={$imageDifficulte}
+                  key={(i + 1) * difficulte.niveau}
+                />
+              ))}
+            </TouchableOpacity>
+          ))}
+        </View>
 
-    <Text style={$h2}>Difficulté physique</Text>
-    <View style={$containerDiff}>
-      {
-        difficultePhysique.map((difficulte, i) =>
-          <TouchableOpacity
-            key={difficulte.niveau}
-            onPress={() => clicDifficultePhysique(i)}
-            style={difficulte.selectionnee ? $difficulteSelectionnee : $difficulte}
-          >
-            {
-              [...Array(difficulte.niveau)].map(() =>
-                <Image source={logoDiffPhy} style={$imageDifficulte} />
-              )
-            }
-          </TouchableOpacity>
-        )
-      }
-    </View>
-
-    <Text style={$h2}>Difficulté d'orientation</Text>
-    <View style={[$containerDiff, { marginBottom: spacing.xxxl }]}>
-      {
-        difficulteOrientation.map((difficulte, i) =>
-          <TouchableOpacity
-            key={difficulte.niveau}
-            onPress={() => clicDifficulteOrientation(i)}
-            style={difficulte.selectionnee ? $difficulteSelectionnee : $difficulte}
-          >
-            {
-              [...Array(difficulte.niveau)].map(() =>
-                <Image source={logoDiffOri} style={$imageDifficulte} />
-              )
-            }
-          </TouchableOpacity>
-        )
-      }
-    </View>
-  </ScrollView>
+        <Text style={$h2}>Difficulté d'orientation</Text>
+        <View style={$containerDiffOrientation}>
+          {difficultesOrientation.map((difficulte, i) => (
+            <TouchableOpacity
+              onPress={() => clicDifficulteOrientation(i)}
+              style={difficulte.selectionne ? $difficulteSelectionnee : $difficulte}
+              key={difficulte.niveau}
+            >
+              {[...Array(difficulte.niveau)].map((trash, i) => (
+                <Image
+                  source={logoDiffOri}
+                  style={$imageDifficulte}
+                  key={(i + 1) * difficulte.niveau}
+                />
+              ))}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </Screen >
+  )
 })
-
-const $root: ViewStyle = {
-  flex: 1,
-}
-
-
-// ---- R E U T I L I S A B L E ----
-const $cadre: ViewStyle = {
-  borderRadius: 20,
-  borderWidth: 1,
-  margin: spacing.sm
-}
 
 // ---- V I E W S ----
 const $container: ViewStyle = {
-  flex: 1,
   backgroundColor: colors.fond,
-  padding: spacing.lg,
-
-  paddingTop: 50 // A SUPPRIMER
+  paddingRight: spacing.lg,
+  paddingLeft: spacing.lg,
+  height: "100%",
 }
 const $critereTri: ViewStyle = {
   flexDirection: "row",
@@ -276,37 +311,42 @@ const $critereTri: ViewStyle = {
   alignItems: "center",
   justifyContent: "space-between",
 }
-const $containerZones: ViewStyle = {
+const $containerVallees: ViewStyle = {
   display: "flex",
   flexDirection: "row",
   flexWrap: "wrap",
-
 }
-const $zone: ViewStyle = {
+const $vallee: ViewStyle = {
   borderColor: colors.palette.vert,
   borderRadius: 15,
-  margin: spacing.xs,
+  borderWidth: 1,
+  margin: spacing.xxs,
+  padding: spacing.sm,
+  paddingBottom: spacing.xs,
+  paddingTop: spacing.xs,
 }
-const $zoneSelectionnee: ViewStyle = {
-  ...$zone,
-  backgroundColor: colors.palette.vert,
+const $containerDiff: ViewStyle = {
+  flexDirection: "row",
+  flexWrap: "wrap",
+}
+const $containerDiffOrientation: ViewStyle = {
+  ...$containerDiff,
+  marginBottom: 100,
+  /**@warning cette marge est a supprimer */
 }
 const $difficulte: ViewStyle = {
   flexDirection: "row",
   borderRadius: 20,
+  borderColor: colors.palette.vert,
   borderWidth: 1,
-  margin: spacing.md,
-  padding: 8,
+  margin: spacing.xs,
+  marginBottom: 0,
+  padding: spacing.sm,
 }
 const $difficulteSelectionnee: ViewStyle = {
   ...$difficulte,
   backgroundColor: colors.palette.vert,
 }
-const $containerDiff: ViewStyle = {
-  flexDirection: "row",
-  justifyContent: "space-around",
-}
-
 
 // ---- I M A G E S ----
 const $logoCritere: ImageStyle = {
@@ -324,11 +364,12 @@ const $logoCheck: ImageStyle = {
   marginRight: spacing.lg,
 }
 const $imageDifficulte: ImageStyle = {
-  width: 30,
-  height: 30,
-  resizeMode: "contain",
+  width: 20,
+  height: 20,
+  resizeMode: "stretch",
+  tintColor: colors.palette.noir,
+  marginRight: 2,
 }
-
 
 // ---- T E X T S ----
 const $h1: TextStyle = {
@@ -339,18 +380,26 @@ const $h1: TextStyle = {
 const $h2: TextStyle = {
   fontSize: 20,
   marginTop: spacing.lg,
+  marginBottom: spacing.sm,
 }
-const $criteresTri: TextStyle = {
+const $filtres: TextStyle = {
   fontSize: 15,
 }
-
 
 // ---- A U T R E S ----
 const $boutonValidation: ViewStyle = {
   borderRadius: 15,
   borderWidth: 2,
   padding: 0,
-  backgroundColor: colors.palette.vert,
+  marginBottom: spacing.xs,
+  backgroundColor: colors.fond,
+  borderColor: colors.bordure,
+  width: "70%",
+
+  position: "absolute",
+  bottom: 0,
+  left: "15%",
+  zIndex: 1,
 }
 const $switch: ViewStyle = {
   backgroundColor: "transparent",
