@@ -14,58 +14,47 @@ import welcomeLogo from "../../assets/images/logo.png"
 import welcomeFace from "../../assets/images/welcome-face.png"
 
 import * as fileSystem from 'expo-file-system';
-
-
+import {Asset, useAssets} from "expo-asset";
+import formatRequire from "../services/importAssets/assetRequire";
 
 // src/app/screens/WelcomeScreen.tsx
 // src/app/utils/tiles_struct.json
 
 import fichier_json_aled_jenpeuxPlus from '../../assets/tiles_struct.json';
 
-const url = 'https://valpineta.eu/wp-json/api-wp/dl-file?file=carte/Chupaca';
-export const folder_dest = `${fileSystem.documentDirectory}cartes/Chupaca`;
+export const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 let FINAL_IMAGE_MESCOuiLLEs;
+let COMPTEUR = 0;
 
 const create_folder_struct = async (
-  folder_struct: any,
-  folder_path: string = folder_dest
+    folder_struct: any,
+    folder_path: string = folder_dest,
+    assets_list: Promise<Asset[]>
 ) => {
   for (const folder in folder_struct) {
     if (folder_struct.hasOwnProperty(folder)) {
       if (typeof folder_struct[folder] === 'string') {
         const file_name = folder_struct[folder].split('/').pop();
-
         // remove 'folder_dest' from 'folder_path'
         let file_folder = folder_path.replace(folder_dest, '');
-        const final_url = url + file_folder + '/' + file_name;
-
-        console.log(`DL_DEST --- ${folder_dest}${file_folder}/${file_name}`);
 
         await fileSystem.makeDirectoryAsync(`${folder_dest}${file_folder}`, {
           intermediates: true,
         });
 
+        const assets_list_uri = assets_list[COMPTEUR].localUri;
+        COMPTEUR++;
+        console.log(COMPTEUR)
 
-        const dl_file = await fileSystem.downloadAsync(
-            final_url,
-            `${folder_dest}${file_folder}/${file_name}`, {
-              cache: true,
-
-            });
-
-        if (dl_file.status === 200) {
-          console.log(`File downloaded: ${final_url}`);
-          FINAL_IMAGE_MESCOuiLLEs = dl_file.uri;
-        }
-        console.log(`${file_folder}`);
-
-
-
-
+        await fileSystem.copyAsync(
+            {
+                from: assets_list_uri,
+                to: `${folder_dest}${file_folder}/${file_name}`
+            }
+        );
       } else {
-        console.log(`Folder name: ${folder}`);
-        await create_folder_struct(folder_struct[folder], `${folder_path}/${folder}`);
+        await create_folder_struct(folder_struct[folder], `${folder_path}/${folder}`, assets_list, COMPTEUR);
       }
     }
   }
@@ -77,32 +66,27 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
     _props
 ) {
 
+  const assets_list:Asset[] = formatRequire();
+  // Export the result to a file
+
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
 
   const imgRef = React.useRef(null)
 
   const { navigation } = _props
 
-  const onPress = async () => {
+  const onPress = async (assets: Promise<Asset[]>) => {
     console.log("Downloading files...");
-
-
 
     create_folder_struct(
       fichier_json_aled_jenpeuxPlus,
-      folder_dest
+      folder_dest,
+      await assets
     )
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
-        console.log("FIIINIIIIIIIIIIIIIIII");
-
-        fileSystem.readDirectoryAsync(FINAL_IMAGE_MESCOuiLLEs.split('/').slice(0, -1).join('/'))
-
-        .then((result) => {
-          console.log(result);
-        })
 
       });
   }
@@ -143,7 +127,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
         <Button
           title="Go to EcranTest"
           tx={"welcomeScreen.button"}
-          onPress={onPress}
+          onPress={onPress.bind(null, assets_list)}
         />
       </View>
 

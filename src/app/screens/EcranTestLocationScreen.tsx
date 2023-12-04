@@ -213,8 +213,8 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   const { width, height } = Dimensions.get('window');
 
   const ASPECT_RATIO = width / height;
-  const LATITUDE = -12.054985242912784;
-  const LONGITUDE = -75.24545159952076;
+  const LATITUDE = 42.63099943470989;
+  const LONGITUDE = 0.21949934093707602;
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
@@ -284,6 +284,8 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
                   zoomControlEnabled={true}
                   zoomEnabled={true}
+                  minZoomLevel={12} // Niveau de zoom minimum
+                  maxZoomLevel={15} // Niveau de zoom maximum
                 >
 
                   <UrlTile
