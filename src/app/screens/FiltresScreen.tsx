@@ -18,7 +18,7 @@ import { colors, spacing } from "../theme"
 
 /**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
 
-interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {}
+interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> { }
 
 export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresScreen(
   props: FiltresScreenProps,
@@ -114,17 +114,21 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       intervalleDistance: { min: intervalleDistance[0], max: intervalleDistance[1] },
       intervalleDuree: { min: intervalleDuree[0], max: intervalleDuree[1] },
       intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
+      // On retire les type de parcours non selectionnees
       typesParcours: typesParcours
         .map((type) => (type.selectionne ? type.nom : null))
         .filter((type) => type != null),
+      // On retire les vallees non selectionnees
       vallees: vallees
         .map((vallee) => (vallee.selectionne ? vallee.nom : null))
         .filter((type) => type != null),
+      // On retire les difficultes techniques non selectionnees
       difficultesTechniques: difficultesTechniques
         .map((difficulteTechnique) =>
           difficulteTechnique.selectionne ? difficulteTechnique.niveau : null,
         )
         .filter((type) => type != null),
+      // On retire les difficultes d orientation non selectionnes
       difficultesOrientation: difficultesOrientation
         .map((difficultesOrientation) =>
           difficultesOrientation.selectionne ? difficultesOrientation.niveau : null,
@@ -137,12 +141,13 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   return (
     <Screen
       preset="fixed"
-      safeAreaEdges={["top", "bottom"]}
+      safeAreaEdges={["top"]}
       style={$container}
-      ScrollViewProps={{ scrollEnabled: !slideVerticalBloque }}
     >
       <Button text="Valider filtres" style={$boutonValidation} onPress={() => validerFiltres()} />
-      <ScrollView>
+      <ScrollView
+        scrollEnabled={!slideVerticalBloque}
+      >
         <Text style={$h1}>Trier par</Text>
         <View>
           {criteresTri.map((critere, i) => (
@@ -238,7 +243,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
               key={i}
             >
               <Text
-                size="xs"
+                size="md"
                 style={
                   vallee.selectionne
                     ? { color: colors.palette.blanc }
@@ -289,7 +294,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
       </ScrollView>
-    </Screen>
+    </Screen >
   )
 })
 
@@ -326,7 +331,8 @@ const $containerDiff: ViewStyle = {
 }
 const $containerDiffOrientation: ViewStyle = {
   ...$containerDiff,
-  marginBottom: "25%",
+  marginBottom: 100,
+  /**@warning cette marge est a supprimer */
 }
 const $difficulte: ViewStyle = {
   flexDirection: "row",
@@ -335,7 +341,7 @@ const $difficulte: ViewStyle = {
   borderWidth: 1,
   margin: spacing.xs,
   marginBottom: 0,
-  padding: 8,
+  padding: spacing.sm,
 }
 const $difficulteSelectionnee: ViewStyle = {
   ...$difficulte,
