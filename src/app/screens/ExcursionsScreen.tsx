@@ -293,7 +293,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
               excursionsFiltrees2.length == 0 ?
                 <Text>Aucune excursion ne porte ce nom.</Text>
                 :
-                <ScrollView>
+                <ScrollView style={styles.scrollContainer}>
                   {
                     excursionsFiltrees2.map((excursion, i) => (
                       <CarteExcursion
@@ -327,6 +327,9 @@ const $root: ViewStyle = {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    marginBottom: 30,
+  },
   searchBox: {
     display: "flex",
     flexDirection: "row",
