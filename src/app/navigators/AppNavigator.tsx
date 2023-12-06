@@ -84,7 +84,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 
       <Tab.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName={"Stack"}
+        initialRouteName={"Carte"}
         screenOptions={() => ({
           headerShown: false,
           tabBarStyle: {

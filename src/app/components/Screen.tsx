@@ -201,7 +201,7 @@ export function Screen(props: ScreenProps) {
   const $containerInsets = useSafeAreaInsetsStyle()
 
   return (
-    <SafeAreaView  style={[$containerStyle, { backgroundColor }, $containerInsets]}>
+    <View  style={[$containerStyle, { backgroundColor }, $containerInsets]}>
       <StatusBar style={statusBarStyle} {...StatusBarProps} />
 
       <KeyboardAvoidingView
@@ -216,7 +216,7 @@ export function Screen(props: ScreenProps) {
           <ScreenWithScrolling {...props} />
         )}
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   )
 }
 
