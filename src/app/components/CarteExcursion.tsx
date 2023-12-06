@@ -6,6 +6,8 @@ import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text, TextProps } from "./Text"
 
+/**@warning L absence de parametre n est pas geree */
+
 interface CarteExcursionProps extends TouchableOpacityProps {
   excursion: JSON
   navigation: any
@@ -149,7 +151,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
       marginEnd: spacing.xxs,
       color: coeurTouche ? colors.palette.rouge : null,
     },
-    zoneFavori: {
+    valleeFavori: {
       marginEnd: spacing.xxs,
     },
   })

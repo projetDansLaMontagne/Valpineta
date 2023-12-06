@@ -11,7 +11,6 @@ import {
   StyleProp,
   View,
   ViewStyle,
-  SafeAreaView,
 } from "react-native"
 import { colors, spacing } from "../theme"
 import { ExtendedEdge, useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
@@ -30,8 +29,8 @@ interface BaseScreenProps {
    */
   contentContainerStyle?: StyleProp<ViewStyle>
   /**
-   * Override the default edges for the safe area.
-   */
+ * Override the default edges for the safe area.
+ */
   safeAreaEdges?: ExtendedEdge[]
   /**
    * Background color
@@ -198,10 +197,10 @@ export function Screen(props: ScreenProps) {
     statusBarStyle = "dark",
   } = props
 
-  const $containerInsets = useSafeAreaInsetsStyle()
+  const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges)
 
   return (
-    <View  style={[$containerStyle, { backgroundColor }, $containerInsets]}>
+    <View style={[$containerStyle, { backgroundColor }, $containerInsets]}>
       <StatusBar style={statusBarStyle} {...StatusBarProps} />
 
       <KeyboardAvoidingView
