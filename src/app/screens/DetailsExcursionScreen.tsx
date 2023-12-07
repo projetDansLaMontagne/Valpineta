@@ -22,32 +22,20 @@ import { nettoyageTexte } from "./DescriptionScreen"
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  navigation: any
-  route: any
   temps: Record<'h' | 'm', number>,
-
+  navigation: any
+  excursion: any
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { navigation } = props
-    const { excursion } = props.route.params
 
-    var nomExcursion;
-    var temps;
-    var distance;
-    var difficulteParcours;
-    var difficulteOrientation;
-    var navigation = props.navigation;
-
-    /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
-    if (props.route.params !== undefined) {
-      nomExcursion = props.route.params.nomExcursion || "";
-      temps = props.route.params.temps || 0;
-      distance = props.route.params.distance || 0;
-      difficulteParcours = props.route.params.difficulteParcours || 0;
-      difficulteOrientation = props.route.params.difficulteOrientation || 0;
+    var navigation = undefined
+    if (props.navigation) {
+      navigation = props.navigation
     }
+    
+    const { excursion } = props.route.params 
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -101,6 +89,11 @@ function itemFull(
 ) {
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
 
+  var nomExcursion = ""
+  if (excursion!== undefined) {
+    nomExcursion = excursion.nom
+  }
+
   //Lance le chrono pour le chargement du graphique de dénivelé
   const chrono = () => {
     setTimeout(() => {
@@ -122,10 +115,11 @@ function itemFull(
     }
   }, [isLoading])
 
+
   return (
     <View style={$containerGrand}>
       <View style={$containerTitre}>
-        <Text text={excursion.nomExcursion} size="xl" style={$titre} />
+        <Text text={nomExcursion} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
@@ -180,10 +174,15 @@ function itemFull(
 }
 
 function afficherDescriptionCourte(description: string) {
-  const texteNettoye = nettoyageTexte(description)
-  const texteCoupe = texteNettoye.slice(0, 100)
-  const texteFinal = texteCoupe + "..."
-  return texteFinal
+  if (description == null) {
+    return null
+  }
+  else{
+    const texteNettoye = nettoyageTexte(description)
+    const texteCoupe = texteNettoye.slice(0, 100)
+    const texteFinal = texteCoupe + "..."
+    return texteFinal
+  }
 }
 
 /**
@@ -198,6 +197,22 @@ function infos(
 ) {
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
 
+  var duree = ""
+  var distance = ""
+  var difficulteOrientation = 0
+  var difficulteTechnique = 0
+  var description = ""
+  if (excursion!== undefined) {
+    duree = excursion.duree.h + "h"
+    if (excursion.duree.m !== 0) {
+      duree = duree + excursion.duree.m
+    }
+    distance = excursion.distance
+    difficulteTechnique = excursion.difficulteTechnique
+    difficulteOrientation = excursion.difficulteOrientation
+    excursion.description == null ? description = "Aucune desciption" : description = excursion.description
+  }
+
   return (
     <ScrollView>
       <TouchableWithoutFeedback>
@@ -208,28 +223,28 @@ function infos(
                 style={$iconInformation}
                 source={require("../../assets/icons/duree.png")}
               ></Image>
-              <Text text={excursion.duree} size="xs" />
+              <Text text={duree} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
               ></Image>
-              <Text text={excursion.distance + " km"} size="xs" />
+              <Text text={distance + " km"} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/difficulteParcours.png")}
               ></Image>
-              <Text text={excursion.difficulteParcours} size="xs" />
+              <Text text={difficulteTechnique} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
               ></Image>
-              <Text text={excursion.difficulteOrientation} size="xs" />
+              <Text text={difficulteOrientation} size="xs" />
             </View>
           </View>
           <View style={$containerDescriptionSignalements}>
@@ -237,7 +252,7 @@ function infos(
               <Text text="Description" size="lg" />
               <Text
                 style={$textDescription}
-                text={afficherDescriptionCourte(excursion.descriptionES)}
+                text={afficherDescriptionCourte(description)}
                 size="xxs"
               />
               <TouchableOpacity

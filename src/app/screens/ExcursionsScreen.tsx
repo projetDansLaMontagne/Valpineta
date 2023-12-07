@@ -152,7 +152,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         typeParcours: excursion.type_parcours.name,
         vallee: excursion.vallee,
         difficulteTechnique: excursion.difficulte_technique,
-        difficulteOrientation: excursion.difficulte_orientation
+        difficulteOrientation: excursion.difficulte_orientation,
+        description : excursion.post_content_fr
       }));
 
       // -- FORMATAGE DES DONNEES RECUPEREES --
@@ -250,7 +251,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
 
   useEffect(() => {
-    console.log('useEffect ExcursionsScreen')
     // Initialisation du filtre
     if (props.route.params) {
       filtres = props.route.params.Filtres;
@@ -298,14 +298,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                     excursionsFiltrees2.map((excursion, i) => (
                       <CarteExcursion
                         key={i}
-                        nom={excursion.nom}
-                        denivele={excursion.denivele}
-                        distance={excursion.distance}
-                        duree={excursion.duree}
-                        vallee={excursion.vallee}
-                        typeParcours={excursion.typeParcours}
-                        difficulteParcours={excursion.difficulteTechnique}
-                        difficulteOrientation={excursion.difficulteOrientation}
+                        excursion={excursion}
                         navigation={navigation}
                       />
                     ))

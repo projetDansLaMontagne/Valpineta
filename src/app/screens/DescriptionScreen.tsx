@@ -15,19 +15,23 @@ interface DescriptionScreenProps extends AppStackScreenProps<"Description"> {
   navigation: any
   route: any
 }
-
 export function nettoyageTexte(texte: string) {
-    // Supprimer les balises HTML
-    const tagsRemoved = texte.replace(/<[^>]+>/g, '');
+  if (texte == null) {
+      return null;
+  } else {
+      // Supprimer les balises HTML
+      const tagsRemoved = texte.replace(/<[^>]+>/g, '');
 
-    // Supprimer les deux \n au début
-    const newLineRemoved = tagsRemoved.replace(/^\n{2}/, '');
-  
-    // Supprimer tous les \t
-    const tabsRemoved = newLineRemoved.replace(/\t/g, '');
-  
-    return tabsRemoved;
+      // Supprimer les deux \n au début
+      const newLineRemoved = tagsRemoved.replace(/^\n{2}/, '');
+
+      // Supprimer tous les \t
+      const tabsRemoved = newLineRemoved.replace(/\t/g, '');
+
+      return tabsRemoved;
+  }
 }
+
 
 
 export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function DescriptionScreen(
@@ -35,6 +39,14 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
 ) {
   const { navigation } = props
   const { excursion } = props.route.params
+
+  var nomExcursion = ""
+  var description = ""
+
+  if (excursion) {
+    nomExcursion = excursion.nom
+    description = excursion.description
+  }
 
   return (
     <Screen style={$container} preset="fixed">
@@ -45,9 +57,9 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
         />
       </TouchableOpacity>
       <ScrollView style={$containerDescription}>
-        <Text size="xxl">{excursion.nomExcursion}</Text>
+        <Text size="xxl">{nomExcursion}</Text>
         <Text style={$texteDescription} size="sm">
-          {nettoyageTexte(excursion.descriptionFR)}
+          {nettoyageTexte(description)}
         </Text>
       </ScrollView>
     </Screen>
