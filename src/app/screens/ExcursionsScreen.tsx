@@ -1,7 +1,7 @@
 
 import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
-import { View, ViewStyle, ScrollView, Text, FlatList, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, ViewStyle, ScrollView, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
@@ -156,9 +156,9 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         description : excursion.post_content
       }));
 
+
       // -- FORMATAGE DES DONNEES RECUPEREES --
       const excursionsFormatees = formatageExcursions(excursionsBRUT);
-
 
       // -- TRI DES DONNEES RECUPEREES --
       const excursionsFiltrees = filtrageParametres(excursionsFormatees, filtres);  // Premier filtre
@@ -168,7 +168,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       // -- CALCUL DES VALEURS DE FILTRES --
       /**@warning : ligne inutile */
       /**@todo faire ceci automatiquement avec le formatage lors de la synchro descendante */
-      const valeursFiltres = calculValeursFiltres(excursionsFormatees);
+      // const valeursFiltres = calculValeursFiltres(excursionsFormatees);
       // console.log(valeursFiltres);
     }
     catch (error) {
@@ -184,6 +184,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    */
   function filtrageParametres(excursionsAFiltrer: excursionsType, filtres: typeof props.Filtres) {
     var excursionsFiltrees = excursionsAFiltrer;
+
 
     // Filtre de la page des filtres
     if (filtres !== undefined) {
