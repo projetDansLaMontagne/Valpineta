@@ -6,6 +6,8 @@ import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Button } from "app/c
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { CarteSignalement } from "app/components/CarteSignalement";
+import * as Location from 'expo-location';
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -75,6 +77,24 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       </SafeAreaView>
     );
 
+    // Fonction pour récupérer la localisation de l'utilisateur
+    function getUserLocation() {
+      return new Promise(async (resolve, reject) => {
+        try {
+          let { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            console.error('Permission to access location was denied');
+            resolve(null);
+          }
+
+          let location = await Location.getCurrentPositionAsync({});
+          resolve(location.coords);
+        } catch (error) {
+          console.error('Error getting location', error);
+          reject(error);
+        }
+      });
+    }
 
     /**
      *
@@ -118,8 +138,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           chrono();
         }
       }, [isLoading]);
-
-
 
       return (
         <View style={$containerGrand}>
@@ -168,36 +186,53 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     }
 
     function listeSignalements(setisAllSignalements, signalements) {
+      const [userLocation, setUserLocation] = useState(null);
+
+      useEffect(() => {
+        const fetchLocation = async () => {
+          const location = await getUserLocation();
+          setUserLocation(location);
+        };
+
+        fetchLocation();
+      }, []);
 
       return (
         <View style={$listeSignalements}>
           <ScrollView>
             <TouchableWithoutFeedback>
               <View>
+                {signalements?.avertissements?.map((avertissement, index) => {
+                  var coordAvertissement = { latitude: avertissement.coordonnees.latitude, longitude: avertissement.coordonnees.longitude };
+                  const distanceAvertissement = userLocation ? calculeDistanceUserSignalement(userLocation, coordAvertissement) : 0;
 
+                  return (
+                    <View key={index}>
+                      <CarteSignalement type="avertissement" details={true} nomSignalement={avertissement.nom_signalement} description={avertissement.description} coordonnes={distanceAvertissement.toFixed(2)} imageSignalement={avertissement.image} />
+                    </View>
+                  );
+                })}
+                {signalements?.pointsInteret?.map((pointInteret, index) => {
+                  var coordPointInteret = { latitude: pointInteret.coordonnees.latitude, longitude: pointInteret.coordonnees.longitude };
+                  const distancePointInteret = userLocation ? calculeDistanceUserSignalement(userLocation, coordPointInteret) : 0;
 
-                {signalements?.avertissements?.map((avertissement, index) => (
-                  <View key={index}>
-                    <CarteSignalement type="avertissement" details={true} nomSignalement={avertissement.nom_signalement} description={avertissement.description} coordonnes={avertissement.coordonnees.longitude} imageSignalement={avertissement.image} />
-                  </View>
-                ))}
-                {signalements?.pointsInteret?.map((pointInteret, index) => (
-                  <View key={index}>
-                    <CarteSignalement type="pointInteret" details={true} nomSignalement={pointInteret.nom_signalement} description={pointInteret.description} coordonnes={pointInteret.coordonnees.longitude} imageSignalement={pointInteret.image} />
-                  </View>
-                ))}
-
-
+                  return (
+                    <View key={index}>
+                      <CarteSignalement type="pointInteret" details={true} nomSignalement={pointInteret.nom_signalement} description={pointInteret.description} coordonnes={distancePointInteret.toFixed(2)} imageSignalement={pointInteret.image} />
+                    </View>
+                  );
+                })}
               </View>
             </TouchableWithoutFeedback>
           </ScrollView>
-          <View>
+          <View style={$sortirDetailSignalement}>
             <Button text="Revenir aux informations" onPress={() => setisAllSignalements(false)} />
-
           </View>
         </View>
-      )
+      );
     }
+
+
 
     /**
      *
@@ -206,7 +241,16 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      */
     function infos(isLoading: boolean, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number, setisAllSignalements, signalements) {
       const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
+      const [userLocation, setUserLocation] = useState(null);
 
+      useEffect(() => {
+        const fetchLocation = async () => {
+          const location = await getUserLocation();
+          setUserLocation(location);
+        };
+
+        fetchLocation();
+      }, []);
 
       return (
         <ScrollView>
@@ -216,30 +260,26 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                 <View style={$containerUneInformation}>
                   <Image style={$iconInformation}
                     source={require("../../assets/icons/temps.png")}
-                  >
-                  </Image>
-                  <Text text={temps} size="xs" />
+                  />
+                  <Text text={temps.toString()} size="xs" />
                 </View>
                 <View style={$containerUneInformation}>
                   <Image style={$iconInformation}
                     source={require("../../assets/icons/explorer.png")}
-                  >
-                  </Image>
+                  />
                   <Text text={distance + ' km'} size="xs" />
                 </View>
                 <View style={$containerUneInformation}>
                   <Image style={$iconInformation}
                     source={require("../../assets/icons/difficulteParcours.png")}
-                  >
-                  </Image>
-                  <Text text={difficulteParcours} size="xs" />
+                  />
+                  <Text text={difficulteParcours.toString()} size="xs" />
                 </View>
                 <View style={$containerUneInformation}>
                   <Image style={$iconInformation}
                     source={require("../../assets/icons/difficulteOrientation.png")}
-                  >
-                  </Image>
-                  <Text text={difficulteOrientation} size="xs" />
+                  />
+                  <Text text={difficulteOrientation.toString()} size="xs" />
                 </View>
               </View>
               <View style={$containerDescriptionSignalement}>
@@ -278,20 +318,32 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                     <ScrollView horizontal>
                       <TouchableWithoutFeedback>
                         <View style={$scrollLine}>
-                          {signalements?.avertissements?.map((avertissement, index) => (
-                            <View key={index}>
-                              <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                                <CarteSignalement type="avertissement" details={false} nomSignalement={avertissement.nom_signalement} coordonnes={avertissement.coordonnees.longitude} />
-                              </TouchableOpacity>
-                            </View>
-                          ))}
-                          {signalements?.pointsInteret?.map((pointInteret, index) => (
-                            <View key={index}>
-                              <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                                <CarteSignalement type="pointInteret" details={false} nomSignalement={pointInteret.nom_signalement} coordonnes={pointInteret.coordonnees.longitude} />
-                              </TouchableOpacity>
-                            </View>
-                          ))}
+                          {signalements?.avertissements?.map((avertissement, index) => {
+                            // Calcule de la distance pour chaque avertissement
+                            const coordAvertissement = { latitude: avertissement.coordonnees.latitude, longitude: avertissement.coordonnees.longitude };
+                            const distanceAvertissement = userLocation ? calculeDistanceUserSignalement(userLocation, coordAvertissement) : 0;
+
+                            return (
+                              <View key={index}>
+                                <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                                  <CarteSignalement type="avertissement" details={false} nomSignalement={avertissement.nom_signalement} coordonnes={`${distanceAvertissement.toFixed(2)}`} />
+                                </TouchableOpacity>
+                              </View>
+                            );
+                          })}
+                          {signalements?.pointsInteret?.map((pointInteret, index) => {
+                            // Calcule de la distance pour chaque point d'intérêt
+                            const coordPointInteret = { latitude: pointInteret.coordonnees.latitude, longitude: pointInteret.coordonnees.longitude };
+                            const distancePointInteret = userLocation ? calculeDistanceUserSignalement(userLocation, coordPointInteret) : 0;
+
+                            return (
+                              <View key={index}>
+                                <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                                  <CarteSignalement type="pointInteret" details={false} nomSignalement={pointInteret.nom_signalement} coordonnes={`${distancePointInteret.toFixed(2)}`} />
+                                </TouchableOpacity>
+                              </View>
+                            );
+                          })}
                           {signalements?.avertissements?.length > 0 || signalements?.pointsInteret?.length > 0 ? (
                             <TouchableOpacity onPress={() => setisAllSignalements(true)}>
                               <View style={$carteGlobale}>
@@ -304,7 +356,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                         </View>
                       </TouchableWithoutFeedback>
                     </ScrollView>
-
                   </View>
 
                 </View>
@@ -338,6 +389,34 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           </TouchableWithoutFeedback>
         </ScrollView>
       );
+    }
+
+    function calculeDistanceUserSignalement(coordUser, coordAvertissement) {
+      const R = 6371; // Rayon moyen de la Terre en kilomètres
+
+      function toRadians(degree) {
+        return degree * (Math.PI / 180);
+      }
+
+      const dLat = toRadians(coordAvertissement.latitude - coordUser.latitude);
+      const dLon = toRadians(coordAvertissement.longitude - coordUser.longitude);
+
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(coordUser.latitude)) *
+        Math.cos(toRadians(coordAvertissement.latitude)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+      const distance = R * c; // Distance en kilomètres
+
+      return distance;
+    }
+
+    function calculeDistanceUserDepartExcursion(coordUser) {
+
     }
   }
 );
@@ -497,4 +576,9 @@ const $carteGlobale: ViewStyle = {
   elevation: 6,
   borderRadius: 10,
   backgroundColor: colors.palette.blanc,
+}
+
+const $sortirDetailSignalement: ViewStyle = {
+  justifyContent: "center",
+  marginBottom: spacing.xl,
 }
