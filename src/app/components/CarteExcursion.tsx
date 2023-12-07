@@ -9,9 +9,8 @@ import { Text } from "./Text"
 /**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-  excursion: any
+  excursion: Record<string, unknown>
   navigation: any
-  route: any
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
@@ -47,13 +46,13 @@ export function CarteExcursion(props: CarteExcursionProps) {
 
   const imageRandonnee = require("../../assets/images/randonnee.png")
 
-  const [coeurTouche, setcoeurTouche] = useState(false)
+  const [coeurTouche, setCoeurTouche] = useState(false)
 
   const excursionFavorite = () => {
     if (coeurTouche) {
-      setcoeurTouche(false)
+      setCoeurTouche(false)
     } else {
-      setcoeurTouche(true)
+      setCoeurTouche(true)
     }
   }
 
@@ -119,8 +118,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
       flexWrap: "wrap",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingStart: spacing.xs,
-      paddingEnd: spacing.xs,
       paddingBottom: spacing.xxs,
       minWidth: "100%",
     },
@@ -199,7 +196,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={deniveleIcone} resizeMode="contain" />
-              <Text text={denivele + " m"} style={styles.content} />
+              <Text text={denivele + "m"} style={styles.content} />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={difficulteTechniqueIcone} resizeMode="contain" />

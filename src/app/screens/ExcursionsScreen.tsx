@@ -144,16 +144,16 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     try {
       // -- RECUPERATION DU FICHIER --
       var excursionsBRUT = require('../../assets/jsons/excursions.json');
-      excursionsBRUT = excursionsBRUT.data.map(excursion => ({
-        nom: excursion.nom_excursions,
+      excursionsBRUT = excursionsBRUT.map(excursion => ({
+        nom: excursion.nom_excursion,
         denivele: excursion.denivele,
         duree: excursion.duree,
         distance: excursion.distance_excursion,
-        typeParcours: excursion.type_parcours.name,
+        typeParcours: excursion.type_parcours,
         vallee: excursion.vallee,
         difficulteTechnique: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation,
-        description : excursion.post_content_fr
+        description : excursion.post_content
       }));
 
       // -- FORMATAGE DES DONNEES RECUPEREES --

@@ -17,14 +17,11 @@ import { AppStackScreenProps } from "app/navigators"
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components"
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
-import { nettoyageTexte } from "./DescriptionScreen"
 
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  temps: Record<'h' | 'm', number>,
-  navigation: any
-  excursion: any
+  excursion: Record<string, unknown>
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
@@ -178,10 +175,9 @@ function afficherDescriptionCourte(description: string) {
     return null
   }
   else{
-    const texteNettoye = nettoyageTexte(description)
-    const texteCoupe = texteNettoye.slice(0, 100)
-    const texteFinal = texteCoupe + "..."
-    return texteFinal
+    const descriptionCoupe = description.slice(0, 100)
+    const descriptionFinale = descriptionCoupe + "..."
+    return descriptionFinale
   }
 }
 
@@ -260,7 +256,10 @@ function infos(
                   navigation.navigate("Description", {excursion : excursion })
                 }}
               >
-                <Text style={$lienDescription} text="Lire la suite" size="xs" />
+                {
+                  description === "Aucune desciption" ? null :
+                  <Text style={$lienDescription} text="Lire la suite" size="xs" />
+                }
               </TouchableOpacity>
             </View>
             <View>

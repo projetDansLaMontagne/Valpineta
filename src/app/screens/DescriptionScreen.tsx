@@ -12,27 +12,8 @@ import { Text } from "app/components"
 const { width, height } = Dimensions.get("window")
 
 interface DescriptionScreenProps extends AppStackScreenProps<"Description"> {
-  navigation: any
-  route: any
+  excursion: Record<string, unknown>
 }
-export function nettoyageTexte(texte: string) {
-  if (texte == null) {
-      return null;
-  } else {
-      // Supprimer les balises HTML
-      const tagsRemoved = texte.replace(/<[^>]+>/g, '');
-
-      // Supprimer les deux \n au début
-      const newLineRemoved = tagsRemoved.replace(/^\n{2}/, '');
-
-      // Supprimer tous les \t
-      const tabsRemoved = newLineRemoved.replace(/\t/g, '');
-
-      return tabsRemoved;
-  }
-}
-
-
 
 export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function DescriptionScreen(
   props: DescriptionScreenProps,
@@ -59,7 +40,7 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
       <ScrollView style={$containerDescription}>
         <Text size="xxl">{nomExcursion}</Text>
         <Text style={$texteDescription} size="sm">
-          {nettoyageTexte(description)}
+          {description}
         </Text>
       </ScrollView>
     </Screen>
