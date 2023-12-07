@@ -26,13 +26,8 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-
-    var navigation = undefined
-    if (props.navigation) {
-      navigation = props.navigation
-    }
-    
-    const { excursion } = props.route.params 
+    const { navigation } = props
+    const { excursion } = props.route.params
 
     const [isLoading, setIsLoading] = useState(true);
 
