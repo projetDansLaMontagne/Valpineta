@@ -18,6 +18,7 @@ function formatGPXExcursions($gpxFile)
     }
 
 
+
     /* ------------------------- Mise en forme initiale ------------------------- */
     // Transformation de SimpleXMLElement  en Array
     $excursion = json_encode($excursion);
@@ -34,12 +35,11 @@ function formatGPXExcursions($gpxFile)
     // Extraction des points
     $points = array_map(function ($point) {
         return [
-            "lat" => $point["@attributes"]["lat"],
-            "lon" => $point["@attributes"]["lon"],
-            "alt" => $point["ele"] ?? 0,
+            "lat" => floatval($point["@attributes"]["lat"]),
+            "lon" => floatval($point["@attributes"]["lon"]),
+            "alt" => floatval($point["ele"] ?? "0"),
         ];
     }, $excursion["trk"]["trkseg"]["trkpt"]);
-
 
 
 
@@ -58,7 +58,7 @@ function formatGPXExcursions($gpxFile)
     }
 
 
-
+    
     /* ------------------ Completion des zones vides d altitude ----------------- */
     // Recherche des intervalles d altitudes nulles
     $i = 0;
@@ -112,6 +112,14 @@ function formatGPXExcursions($gpxFile)
     }
 
 
+    /* -------------------------- Arrondi des distances ------------------------- */
+    foreach ($points as &$point) {
+        $point["dist"] = round($point["dist"], 1);
+    }
+
+
+
+    /* --------------------------------- Retour --------------------------------- */
     return json_encode($points);
 }
 
