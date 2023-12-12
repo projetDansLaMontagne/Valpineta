@@ -5,10 +5,10 @@ import {
   SafeAreaView,
   View,
   StyleSheet,
-  Pressable,
   GestureResponderEvent,
   Platform,
-  TouchableOpacity, Image, ViewStyle, Dimensions,
+  ViewStyle,
+  Dimensions,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import {Button, Screen, Text} from "app/components"
@@ -16,9 +16,12 @@ import {spacing, colors} from "../theme";
 
 // location
 import * as Location from 'expo-location';
-import MapView, {LocalTile, PROVIDER_GOOGLE, UrlTile} from "react-native-maps"
+import MapView, {UrlTile} from "react-native-maps"
 import MapButton from "../components/MapButton";
-import {folder_dest} from "./WelcomeScreen";
+import {Asset} from "expo-asset";
+
+import * as fileSystem from 'expo-file-system';
+import formatRequire from "../services/importAssets/assetRequire";
 
 // variables
 interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
@@ -27,22 +30,88 @@ type T_animateToLocation = (
   passedLocation?: Location.LocationObject
 ) => void;
 
+let COMPTEUR = 0;
+import fichier_json_aled_jenpeuxPlus from '../../assets/Tiles/tiles_struct.json';
+const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
+
+// Fonction(s)
+const download_file = async () => {
+    console.log("Downloading files...");
+
+    const assets = await formatRequire();
+
+
+    return create_folder_struct(
+      fichier_json_aled_jenpeuxPlus,
+      folder_dest,
+      assets
+    );
+  }
+
+  /**
+   * Create the folder structure (recursively)
+   *
+   * @param folder_struct {Object} The folder structure
+   * @param folder_path {string} The path of the folder
+   * @param assets_list {Promise<Asset[]>} The list of assets
+   */
+  const create_folder_struct = async (
+      folder_struct: any,
+      folder_path: string = folder_dest,
+      assets_list: Promise<Asset[]>
+  ) => {
+    for (const folder in folder_struct) {
+      if (folder_struct.hasOwnProperty(folder)) {
+        if (typeof folder_struct[folder] === 'string') {
+          const file_name = folder_struct[folder].split('/').pop();
+          // remove 'folder_dest' from 'folder_path'
+          let file_folder = folder_path.replace(folder_dest, '');
+
+          await fileSystem.makeDirectoryAsync(`${folder_dest}${file_folder}`, {
+            intermediates: true,
+          });
+
+          const assets_list_uri = assets_list[COMPTEUR].localUri;
+          COMPTEUR++;
+          console.log(`downloaded ${COMPTEUR} files`);
+
+          await fileSystem.copyAsync(
+              {
+                  from: assets_list_uri,
+                  to: `${folder_dest}${file_folder}/${file_name}`
+              }
+          );
+        } else {
+          await create_folder_struct(
+            folder_struct[folder],
+            `${folder_path}/${folder}`,
+            assets_list
+          );
+        }
+      }
+    }
+  }
+
 // Component(s)
 export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function EcranTestScreen(
   _props,
 ) {
-  // Pull in one of our MST stores
-  // const { someStore, anotherStore } = useStores()
+  // Variables
+  const userLocationIntervalMs = 1000; // ! mabye change this value
 
   // State(s)
   const [gavePermission, setGavePermission] = useState(false);
   const [location, setLocation] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
+
+  // ! TO REMOVE BEFORE PRODUCTION
   const [nbFetch, setNbFetch] = useState(0);
+  // ! END TO REMOVE BEFORE PRODUCTION
   const [followUserLocation, setFollowUserLocation] = useState(false);
 
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
+  // Ref(s)
   const intervalRef = useRef(null);
 
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
@@ -51,16 +120,20 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   // buttons
   const followLocationButtonRef = useRef(null);
   const toggleBtnMenuRef = useRef(null);
-  const addPOVBtnRef = useRef(null);
+  const addPOIBtnRef = useRef(null);
   const addWarningBtnRef = useRef(null);
 
   // Animation(s)
   const buttonOpacity = useRef(new Animated.Value(0)).current;
 
   // Method(s)
-  const animateToLocation: T_animateToLocation = (passedLocation) => {
+  /**
+   * Animate the map to follow the user location.
+   * @param passedLocation {Location.LocationObject} The location to animate to
+   * @returns {void}
+   */
+  const animateToLocation: T_animateToLocation = (passedLocation: Location.LocationObject): void => {
     if (mapRef.current) {
-
       if (!location && !passedLocation) {
         console.log("location is null");
         return;
@@ -75,14 +148,17 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
         },
         pitch: 0,
         heading: 0,
-        altitude: 2000,
-        zoom: 15,
+        altitude: 2000, // ! mabye change this value
+        zoom: 17, // ! same here
       });
     } else {
       console.log("mapRef.current is null");
     }
   }
 
+  /**
+   * Remove the location subscription
+   */
   const removeLocationSubscription = () => {
     if (watchPositionSubscriptionRef.current) {
       console.log("watchPositionSubscriptionRef.current.remove() ");
@@ -92,9 +168,17 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
   }
 
-  const getLocationAsync = async () => {
-    console.log(`[EcranTestScreen] getLocationAsync()`);
-    console.log(`[EcranTestScreen] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`);
+  /**
+   * Get the user location (authorization is asked if not already given).
+   * @param debug {boolean} If true, log some debug information
+   * @returns {Promise<void>}
+   */
+  const getLocationAsync = async (debug?: boolean): Promise<void> => {
+    if (debug) {
+      console.log(`[EcranTestScreen] getLocationAsync()`);
+      console.log(`[EcranTestScreen] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`);
+    }
+
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
@@ -104,9 +188,12 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     // write code for the app to handle GPS changes
     watchPositionSubscriptionRef.current = await Location.watchPositionAsync({
       accuracy: Location.Accuracy.BestForNavigation,
-      timeInterval: 1000, distanceInterval: 1
+      timeInterval: userLocationIntervalMs,
+      distanceInterval: 1
     }, (location) => {
+      // ! TO REMOVE BEFORE PRODUCTION
       setNbFetch(nbFetch => nbFetch + 1);
+      // ! END TO REMOVE BEFORE PRODUCTION
       setLocation(location);
     });
   };
@@ -125,9 +212,9 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     return false
   }
 
-  const onPress = async () => {
+  const onLocationBtnPress = async () => {
+    console.log("[EcranTestScreen] onLocationBtnPress()");
     setIsFetching(true);
-    console.log("[EcranTestScreen] onPress()");
 
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -144,22 +231,30 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     setFollowUserLocation(!followUserLocation);
   }
 
-  const locateButtonOnPressIn = () => {
-    // change the background color of the button
-    followLocationButtonRef.current.setNativeProps({
-      style: {
-        backgroundColor: colors.palette.transparentButtonOnPress,
-      }
-    });
-  }
+  // ! TO REMOVE BEFORE PRODUCTION
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isMapDownloaded, setIsMapDownloaded] = useState(false);
+  const dl_btn_onPress = async () => {
+    if (isDownloading) {
+      console.log("Already downloading");
+      return;
+    }
 
-  const locateButtonOnPressOut = () => {
-    // change the background color of the button
-    followLocationButtonRef.current.setNativeProps({
-      style: {
-        backgroundColor: colors.palette.transparentButton,
-      }
-    });
+    setIsDownloading(true);
+    await download_file()
+      .then(() => {
+        console.log("Files downloaded");
+        setIsDownloading(false);
+        setIsMapDownloaded(true);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  // ! END TO REMOVE BEFORE PRODUCTION
+
+  const poiButtonOnPress = async () => {
+    console.log("poiButtonOnPress()");
   }
 
   const toggleMenu = () => {
@@ -181,7 +276,8 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     }
 
     setIsFetching(false);
-    // followUserLocation && animateToLocation(location);
+
+    followUserLocation && animateToLocation(location);
   }, [location]);
 
   useEffect(() => {
@@ -192,7 +288,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
   useEffect(() => {
     if (menuIsOpen) {
-      // animate the 'addPOVBtnRef' and 'addWarningBtnRef' buttons
+      // animate the 'addPOIBtnRef' and 'addWarningBtnRef' buttons
       Animated.sequence([
         Animated.timing(buttonOpacity, {
           toValue: 1,
@@ -204,6 +300,13 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   }, [menuIsOpen]);
 
   useEffect(() => {
+    // ! TO REMOVE BEFORE PRODUCTION
+     fileSystem.deleteAsync(folder_dest).then(() => {
+       console.log("Folder deleted");
+     }).catch((error) => {
+       console.log(error);
+     });
+    // ! END TO REMOVE BEFORE PRODUCTION
 
     return () => {
       removeLocationSubscription();
@@ -224,8 +327,6 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   }
-
-  const tilesPath = folder_dest + "/{z}/{x}/{y}.png";
 
   return (
     <Screen style={$container}>
@@ -293,54 +394,49 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                     tileSize={256}
                   />
                 </MapView>
-                {/*<View style={styles.mapOverlay}>*/}
-                {/*  {*/}
-                {/*    menuIsOpen && (*/}
-                {/*      <>*/}
-                {/*        <MapButton*/}
-                {/*          ref={addPOVBtnRef}*/}
-                {/*          style={{*/}
-                {/*            ...styles.actionsButtonContainer,*/}
-                {/*          }}*/}
 
-                {/*          // onPressIn={locateButtonOnPressIn}*/}
-                {/*          // onPressOut={locateButtonOnPressOut}*/}
-                {/*          // onPress={toggleFollowUserLocation}*/}
+                <View style={styles.mapOverlay}>
+                  {
+                    menuIsOpen && (
+                      <>
+                        <MapButton
+                          ref={addPOIBtnRef}
+                          style={{
+                            ...styles.actionsButtonContainer,
+                          }}
 
-                {/*          icon={'eye'}*/}
-                {/*          iconSize={spacing.lg}*/}
-                {/*          iconColor={colors.palette.neutral200}*/}
-                {/*        />*/}
-                {/*        <MapButton*/}
-                {/*          ref={addWarningBtnRef}*/}
-                {/*          style={{*/}
-                {/*            ...styles.actionsButtonContainer,*/}
-                {/*          }}*/}
+                          onPress={poiButtonOnPress}
 
-                {/*          // onPressIn={locateButtonOnPressIn}*/}
-                {/*          // onPressOut={locateButtonOnPressOut}*/}
-                {/*          // onPress={toggleFollowUserLocation}*/}
+                          icon={'eye'}
+                          iconSize={spacing.lg}
+                          iconColor={colors.palette.neutral200}
+                        />
+                        <MapButton
+                          ref={addWarningBtnRef}
+                          style={{
+                            ...styles.actionsButtonContainer,
+                          }}
 
-                {/*          icon='exclamation-circle'*/}
-                {/*          iconSize={spacing.lg}*/}
-                {/*          iconColor={colors.palette.neutral200}*/}
-                {/*        />*/}
-                {/*      </>*/}
-                {/*    )*/}
-                {/*  }*/}
-                {/*  <MapButton*/}
-                {/*    ref={toggleBtnMenuRef}*/}
-                {/*    style={{*/}
-                {/*      ...styles.actionsButtonContainer,*/}
-                {/*    }}*/}
+                          icon='exclamation-circle'
+                          iconSize={spacing.lg}
+                          iconColor={colors.palette.neutral200}
+                        />
+                      </>
+                    )
+                  }
+                  <MapButton
+                    ref={toggleBtnMenuRef}
+                    style={{
+                      ...styles.actionsButtonContainer,
+                    }}
 
-                {/*    onPress={toggleMenu}*/}
+                    onPress={toggleMenu}
 
-                {/*    icon={menuIsOpen ? 'times' : 'map-marker-alt'}*/}
-                {/*    iconSize={spacing.lg}*/}
-                {/*    iconColor={colors.palette.neutral200}*/}
-                {/*  />*/}
-                {/*</View>*/}
+                    icon={menuIsOpen ? 'times' : 'map-marker-alt'}
+                    iconSize={spacing.lg}
+                    iconColor={colors.palette.neutral200}
+                  />
+                </View>
                 <View style={styles.mapOverlayLeft}>
 
                   <MapButton
@@ -355,6 +451,21 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                     iconSize={spacing.lg}
                     iconColor={followUserLocation ? colors.palette.locationBlue : colors.palette.locationBlueDisabled}
                   />
+
+                  {
+                    !isMapDownloaded &&
+                    <MapButton
+                      style={{
+                        ...styles.locateButtonContainer,
+                      }}
+
+                      onPress={dl_btn_onPress}
+
+                      icon='download'
+                      iconSize={spacing.lg}
+                      iconColor={colors.palette.neutral200}
+                    />
+                  }
                 </View>
               </>
             ) : (
@@ -368,11 +479,24 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
                     <>
                       <Text tx={"testScreen.locate.notLocated.title"} style={{color: "white"}} />
 
-                      <Button
-                        tx={"testScreen.locate.locate_btn"}
-                        onPress={onPress}
-                        style={styles.button}
-                      />
+
+                      {
+                        !isMapDownloaded ? (
+                            <Button
+                              tx={"testScreen.locate.dl_map_btn"}
+                              onPress={dl_btn_onPress}
+                              style={styles.button}
+                            />
+
+                          ) : (
+                            <Button
+                              tx={"testScreen.locate.locate_btn"}
+                              onPress={onLocationBtnPress}
+                              style={styles.button}
+                            />
+                        )
+                      }
+
                     </>
                   )
                 }

@@ -31,6 +31,7 @@ const fr: Translations = {
     title: "Ecran de test",
     locate: {
       locate_btn: "Localisez moi !",
+      dl_map_btn: "Télécharger la carte",
       stop_locate_btn: "Stopper la localisation",
       fetching: "Localisation en cours...",
       follow: "Me suivre",

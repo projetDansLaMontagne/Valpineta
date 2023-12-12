@@ -28,6 +28,7 @@ const en = {
     title: "Test Screen",
     locate: {
       locate_btn: "Locate me !",
+      dl_map_btn: "Download map",
       stop_locate_btn: "Stop locating",
       fetching: "Fetching location...",
       follow: "Follow me",
