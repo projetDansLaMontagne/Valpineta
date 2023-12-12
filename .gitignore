@@ -1,14 +1,13 @@
 # Folders
 .idea
-src/.expo
+node_modules
+build
+src/ios/Pods
 
-src/node_modules
-src/package-lock.json
-
-src/ios
-src/test/test-gpx
-
-# Files
-.commitignore
 .gitignore
+.DS_Store
+.commitignore
 commit_message.md
+
+package-lock.json
+src/ios/Podfile.lock
