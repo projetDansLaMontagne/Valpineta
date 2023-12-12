@@ -1,3 +1,9 @@
+/**
+ * TODO
+ * Regler pb de zoom au suivi de la loc + ne pas bouger la cam si la loc n'est
+ * pas dans la carte
+ */
+
 import React, {FC, useEffect, useRef, useState} from "react"
 import { observer } from "mobx-react-lite"
 import {
@@ -24,7 +30,7 @@ import * as fileSystem from 'expo-file-system';
 import formatRequire from "../services/importAssets/assetRequire";
 
 // variables
-interface EcranTestScreenProps extends AppStackScreenProps<"EcranTest"> {}
+interface EcranTestScreenProps extends AppStackScreenProps<"Map"> {}
 
 type T_animateToLocation = (
   passedLocation?: Location.LocationObject
@@ -39,7 +45,6 @@ const download_file = async () => {
     console.log("Downloading files...");
 
     const assets = await formatRequire();
-
 
     return create_folder_struct(
       fichier_json_aled_jenpeuxPlus,
@@ -58,7 +63,7 @@ const download_file = async () => {
   const create_folder_struct = async (
       folder_struct: any,
       folder_path: string = folder_dest,
-      assets_list: Promise<Asset[]>
+      assets_list: Asset[]
   ) => {
     for (const folder in folder_struct) {
       if (folder_struct.hasOwnProperty(folder)) {
@@ -146,10 +151,10 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
           latitude: finalLocation.coords.latitude,
           longitude: finalLocation.coords.longitude,
         },
-        pitch: 0,
-        heading: 0,
-        altitude: 2000, // ! mabye change this value
-        zoom: 17, // ! same here
+        // pitch: 0,
+        // heading: 0,
+        // altitude: 3000, // ! mabye change this value
+        // zoom: 15, // ! same here
       });
     } else {
       console.log("mapRef.current is null");
@@ -331,10 +336,6 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   return (
     <Screen style={$container}>
       <SafeAreaView style={styles.container} >
-        <Text
-          tx="testScreen.title"
-          preset="heading"
-        />
         <View style={styles.mapContainer}>
           {
             location ? (
@@ -409,7 +410,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
                           icon={'eye'}
                           iconSize={spacing.lg}
-                          iconColor={colors.palette.neutral200}
+                          iconColor={colors.palette.blanc}
                         />
                         <MapButton
                           ref={addWarningBtnRef}
@@ -419,7 +420,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
                           icon='exclamation-circle'
                           iconSize={spacing.lg}
-                          iconColor={colors.palette.neutral200}
+                          iconColor={colors.palette.blanc}
                         />
                       </>
                     )
@@ -434,7 +435,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
                     icon={menuIsOpen ? 'times' : 'map-marker-alt'}
                     iconSize={spacing.lg}
-                    iconColor={colors.palette.neutral200}
+                    iconColor={colors.palette.blanc}
                   />
                 </View>
                 <View style={styles.mapOverlayLeft}>
@@ -449,7 +450,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
                     icon='location-arrow'
                     iconSize={spacing.lg}
-                    iconColor={followUserLocation ? colors.palette.locationBlue : colors.palette.locationBlueDisabled}
+                    iconColor={followUserLocation ? colors.palette.bleuLocActive : colors.palette.bleuLocInactive}
                   />
 
                   {
@@ -463,7 +464,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
 
                       icon='download'
                       iconSize={spacing.lg}
-                      iconColor={colors.palette.neutral200}
+                      iconColor={colors.palette.bleuLocActive}
                     />
                   }
                 </View>
@@ -544,7 +545,7 @@ const buttonContainer: ViewStyle = {
   height: values.locateBtnContainerSize,
   width: values.locateBtnContainerSize,
 
-  backgroundColor: colors.valpinetaPalette.green,
+  backgroundColor: colors.palette.vert,
   borderRadius: values.locateBtnContainerSize / 2,
 
   display: 'flex',
@@ -580,11 +581,11 @@ const styles = StyleSheet.create({
   },
   locateButtonContainer: {
     ...buttonContainer,
-    backgroundColor: colors.palette.transparentButton,
+    backgroundColor: "#eeeeee50",
   },
   actionsButtonContainer: {
     ...buttonContainer,
-    backgroundColor: colors.valpinetaPalette.green,
+    backgroundColor: colors.palette.vert,
   },
   map: {
     ...StyleSheet.absoluteFillObject,

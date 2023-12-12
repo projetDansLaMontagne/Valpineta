@@ -45,7 +45,7 @@ const fr = {
           message: "Veuillez vérifier vos paramètres de localisation",
       },
     }
-  }
+  },
 
   carteComposant: {
     titre: "Le col de la marmotte",

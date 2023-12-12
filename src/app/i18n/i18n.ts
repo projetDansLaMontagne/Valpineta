@@ -13,7 +13,7 @@ i18n.fallbacks = true
  * the language code is the suffixed with "-US". i.e. if a device is set to English ("en"),
  * if you change to another language and then return to English language code is now "en-US".
  */
-i18n.translations = { fr }
+i18n.translations = { fr, en }
 
 const locales = Localization.getLocales() // This method is guaranteed to return at least one array item.
 // The preferred language is the first element in the array, however, we fallback to en-US, especially for tests.
