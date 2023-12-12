@@ -203,8 +203,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             <TouchableWithoutFeedback>
               <View>
                 {signalements?.avertissements?.map((avertissement, index) => {
-                  var coordAvertissement = { latitude: avertissement.coordonnees.latitude, longitude: avertissement.coordonnees.longitude };
-                  const distanceAvertissement = userLocation ? calculeDistanceUserSignalement(userLocation, coordAvertissement) : 0;
+                  var coordSignalement = { latitude: avertissement.coordonnees.latitude, longitude: avertissement.coordonnees.longitude };
+                  //Pour le moment je calcule juste le signalement par rapport a un track et pas par rapport a la pos GPS
+                  //Calcule la distance entre l'avertissement le plus proche et le signalement
+                  const distanceAvertissement = userLocation ? recupDistance(coordSignalement) : 0;
 
                   return (
                     <View key={index}>
@@ -214,7 +216,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                 })}
                 {signalements?.pointsInteret?.map((pointInteret, index) => {
                   var coordPointInteret = { latitude: pointInteret.coordonnees.latitude, longitude: pointInteret.coordonnees.longitude };
-                  const distancePointInteret = userLocation ? calculeDistanceUserSignalement(userLocation, coordPointInteret) : 0;
+                  const distancePointInteret = userLocation ? recupDistance(coordPointInteret) : 0;
 
                   return (
                     <View key={index}>
@@ -320,8 +322,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                         <View style={$scrollLine}>
                           {signalements?.avertissements?.map((avertissement, index) => {
                             // Calcule de la distance pour chaque avertissement
-                            const coordAvertissement = { latitude: avertissement.coordonnees.latitude, longitude: avertissement.coordonnees.longitude };
-                            const distanceAvertissement = userLocation ? calculeDistanceUserSignalement(userLocation, coordAvertissement) : 0;
+                            const coordSignalement = { latitude: avertissement.coordonnees.latitude, longitude: avertissement.coordonnees.longitude };
+                            const distanceAvertissement = userLocation ? recupDistance(coordSignalement) : 0;
 
                             return (
                               <View key={index}>
@@ -334,7 +336,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                           {signalements?.pointsInteret?.map((pointInteret, index) => {
                             // Calcule de la distance pour chaque point d'intérêt
                             const coordPointInteret = { latitude: pointInteret.coordonnees.latitude, longitude: pointInteret.coordonnees.longitude };
-                            const distancePointInteret = userLocation ? calculeDistanceUserSignalement(userLocation, coordPointInteret) : 0;
+                            const distancePointInteret = userLocation ? recupDistance(coordPointInteret) : 0;
 
                             return (
                               <View key={index}>
@@ -391,35 +393,84 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       );
     }
 
-    function calculeDistanceUserSignalement(coordUser, coordAvertissement) {
-      const R = 6371; // Rayon moyen de la Terre en kilomètres
-
-      function toRadians(degree) {
-        return degree * (Math.PI / 180);
+    // Fonction de calcul de distance entre deux coordonnées
+    function calculeDistanceEntreDeuxPoints(coord1, coord2) {
+      // Assurez-vous que coord1 et coord2 sont définis
+      if (!coord1 || !coord1.latitude || !coord1.longitude || !coord2 || !coord2.lat || !coord2.long) {
+        console.error('Coordonnées non valides');
+        return null;
       }
 
-      const dLat = toRadians(coordAvertissement.latitude - coordUser.latitude);
-      const dLon = toRadians(coordAvertissement.longitude - coordUser.longitude);
+      // Rayon moyen de la Terre en kilomètres
+      const R = 6371;
+
+      // Convertir les degrés en radians
+      const toRadians = (degree) => degree * (Math.PI / 180);
+
+      // Calcul des distances
+      const dLat = toRadians(coord2.lat - coord1.latitude);
+      const dLon = toRadians(coord2.long - coord1.longitude);
 
       const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRadians(coordUser.latitude)) *
-        Math.cos(toRadians(coordAvertissement.latitude)) *
+        Math.cos(toRadians(coord1.latitude)) *
+        Math.cos(toRadians(coord2.lat)) *
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
 
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      const distance = R * c; // Distance en kilomètres
+      // Distance en kilomètres
+      const distance = R * c;
 
       return distance;
     }
 
-    function calculeDistanceUserDepartExcursion(coordUser) {
+    //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
+    function recupDistance(coordonneeSignalement) {
+      // Charger le fichier JSON avec les coordonnées
+      const data = require('../../assets/jsons/uneExcursion.json');
 
+      // Assurez-vous que les coordonnées du signalement sont définies
+      if (!coordonneeSignalement || !coordonneeSignalement.latitude || !coordonneeSignalement.longitude) {
+        console.error('Coordonnées du signalement non valides');
+        return null;
+      }
+
+      // Initialiser la distance minimale avec une valeur élevée
+      let distanceMinimale = Number.MAX_VALUE;
+
+      var coordPointPlusProche;
+
+      // Parcourir toutes les coordonnées dans le fichier
+      for (const coord of data) {
+        // Assurez-vous que les coordonnées dans le fichier sont définies
+        if (!coord.lat || !coord.long) {
+          console.error('Coordonnées dans le fichier non valides');
+          continue;
+        }
+
+        // Calculer la distance entre le signalement et la coordonnée actuelle du fichier
+        const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(coordonneeSignalement, coord);
+
+        // Mettre à jour la distance minimale si la distance actuelle est plus petite
+        if (distanceSignalementPointLePlusProche < distanceMinimale) {
+          distanceMinimale = distanceSignalementPointLePlusProche;
+          coordPointPlusProche = coord;
+        }
+      }
+
+      const distanceDepartPointLePlusProche = coordPointPlusProche.dist / 1000
+
+      //Distance totale DANS UN MONDE PARFAIT
+      // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche;
+      // return distanceTotale;
+      return distanceDepartPointLePlusProche;
     }
   }
 );
+
+
 
 /* -------------------------------------------------------------------------- */
 /*                                   STYLES                                   */
