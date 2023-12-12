@@ -1,16 +1,14 @@
-const fr = {
+const es = {
   common: {
     ok: "OK !",
     cancel: "Annuler",
     back: "Retour",
-    accueil: "Accueil"
   },
   welcomeScreen: {
     postscript:
       "psst  — Ce n'est probablement pas à quoi ressemble votre application. (À moins que votre designer ne vous ait donné ces écrans, dans ce cas, mettez la en prod !)",
     readyForLaunch: "Votre application, presque prête pour le lancement !",
-    exciting: "(ohh, c'est excitant !)",
-    button: "Allons-y !",
+    exciting: "(ESPAGNOLLLL !)",
   },
   errorScreen: {
     title: "Quelque chose s'est mal passé !",
@@ -26,43 +24,12 @@ const fr = {
       button: "Essayons à nouveau",
     },
   },
-  testScreen: {
-    title: "Ecran de test",
-    locate: {
-      locate_btn: "Localisez moi !",
-      dl_map_btn: "Télécharger la carte",
-      stop_locate_btn: "Stopper la localisation",
-      fetching: "Localisation en cours...",
-      follow: "Me suivre",
-      stopFollowing: "Arrêter de me suivre",
-      located: {
-          title: "Vous êtes ici !",
-          latitude: "Latitude : ",
-          longitude: "Longitude : ",
-      },
-      notLocated: {
-          title: "Impossible de vous localiser",
-          message: "Veuillez vérifier vos paramètres de localisation",
-      },
-    }
-  }
 
   carteComposant: {
-    titre: "Le col de la marmotte",
-    zone: "Pineta",
-    parcours: "Allez/Retour",
-    temps: "7h30",
-    distance: "13,5 km",
-    denivelePositif: "1350 m",
-    difficulteParcours: "2",
-    difficulteOrientation: "1",
+    titre: "Título de la tarjeta",
+    localisation: "Ubicación",
+    parcours: "Ida y vuelta",
   },
-  footer: {
-    accueil: "Accueil",
-    carte: "Carte",
-    parametres: "Parametres",
-  }
 }
 
-export default fr
-export type Translations = typeof fr
+export default es

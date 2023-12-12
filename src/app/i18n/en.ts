@@ -44,6 +44,30 @@ const en = {
       },
     }
   }
+  footer: {
+    accueil: "Accueil",
+    carte: "Carte",
+    parametres: "Parametres",
+  },
+  testScreen: {
+    title: "Test Screen",
+    locate: {
+      locate_btn: "Locate me !",
+      stop_locate_btn: "Stop locating",
+      fetching: "Fetching location...",
+      follow: "Follow me",
+      stopFollowing: "Stop following",
+      located: {
+        title: "You are here !",
+        latitude: "Latitude : ",
+        longitude: "Longitude : ",
+      },
+      notLocated: {
+          title: "impossible to locate you",
+          message: "Please check your location settings",
+      },
+    }
+  }
 }
 
 export default en

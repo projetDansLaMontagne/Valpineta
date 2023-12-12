@@ -46,7 +46,20 @@ if (isExpo) {
          */
         resolveRequest: MetroSymlinksResolver(),
         assetExts: [...defaultConfig.resolver.assetExts, "bin"],
+        //assetExts: [assetExts, 'txt', 'xml', 'png', 'jpg', 'pb', 'tflite'],
+        sourceExts: [...defaultConfig.resolver.sourceExts, "xml", "gpx"], // Add your extensions here
       },
+      // transformer: {
+      //   babelTransformerPath: require.resolve("metro-react-native-babel-transformer"),
+      //   assetRegistryPath: require.resolve("metro-config/src/defaults/assetRegistryPath"),
+      //   // Add specific transformers for xml and gpx files
+      //   getTransformOptions: async () => ({
+      //     transform: {
+      //       experimentalImportSupport: false,
+      //       inlineRequires: false,
+      //     },
+      //   }),
+      // },
     })
   })()
 }
