@@ -1,6 +1,6 @@
 export * from "./ErrorScreen/ErrorBoundary"
 // export other screens here
-export * from "./EcranTestLocationScreen"
+export * from "./MapScreen"
 export * from "./FiltresScreen"
 export * from "./ExcursionsScreen"
 export * from "./ParametresScreen"

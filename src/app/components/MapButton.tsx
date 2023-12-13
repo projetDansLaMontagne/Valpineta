@@ -10,15 +10,11 @@ import {
   GestureResponderEvent,
   PressableProps,
   StyleProp,
-  TextStyle,
   TouchableOpacity,
   ViewStyle
 } from "react-native";
 import {FontAwesome5} from "@expo/vector-icons";
-import { Text, TextProps } from "./Text"
-import {colors, spacing} from "../theme";
-import {ComponentType, forwardRef, RefObject} from "react";
-import {ButtonAccessoryProps} from "./Button";
+import {forwardRef, RefObject} from "react";
 // END IMPORTS ==========================================================================================   END IMPORTS
 
 // VARIABLES ================================================================================================ VARIABLE
@@ -27,11 +23,11 @@ export interface MapButtonProps extends PressableProps {
    * Called when the touch is released,
    * but not if cancelled (e.g. by a scroll that steals the responder lock).
    */
-  onPress?: ((event: GestureResponderEvent) => void) | undefined;
+  onPress?: (event: GestureResponderEvent) => void;
 
-  onPressIn?: ((event: GestureResponderEvent) => void) | undefined;
+  onPressIn?: (event: GestureResponderEvent) => void;
 
-  onPressOut?: ((event: GestureResponderEvent) => void) | undefined;
+  onPressOut?: (event: GestureResponderEvent) => void;
 
   icon?: string;
   iconSize?: number;
@@ -63,7 +59,6 @@ const MapButton = forwardRef((props: MapButtonProps, ref) => {
     iconColor,
 
     style,
-    ...rest
   } = props
 
 
