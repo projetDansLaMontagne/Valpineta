@@ -1,13 +1,18 @@
 <?php
 /**
- * Fichier GPX des excursions --> Fichier JSON formaté
+ * Fichier GPX des excursions --> Fichier JSON formaté 
  * Amelioration par rapport au GPX initial :
  * - La distance de chaque point est calculee
  * - Les zones vides sont completees
  * - Retourne un JSON "purifié" et traité
  * 
  * @param string $gpxFile Fichier gpx à convertir
- * @return string JSON de chaque point de la forme [lat, long, alt, dist]
+ * @return string JSON de chaque point de la forme :
+ * {
+ *    lat: latitude
+ *    long: longitude
+ *    alt: altitude en metre
+ *    dist: distance en metre arrondie au dixieme
  */
 function formatGPXExcursions($gpxFile)
 {
