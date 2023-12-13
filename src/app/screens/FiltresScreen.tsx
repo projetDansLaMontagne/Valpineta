@@ -39,7 +39,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   // Recuperation des valeurs de filtres
   try {
     // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
-    valeursFiltres = require("../../assets/jsons/valeurs_filtres.json")
+    valeursFiltres = require("../../assets/JSON/valeurs_filtres.json")
   } catch (error) {
     // Erreur critique si on n a pas les valeurs de filtres
     navigation.navigate("Excursions")
