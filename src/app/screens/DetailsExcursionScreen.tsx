@@ -8,11 +8,7 @@ import SwipeUpDown from "react-native-swipe-up-down";
 import { CarteSignalement } from "app/components/CarteSignalement";
 import * as Location from 'expo-location';
 
-
 const { width, height } = Dimensions.get("window");
-
-
-
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
 }
 
@@ -202,28 +198,36 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           <ScrollView>
             <TouchableWithoutFeedback>
               <View>
-                {signalements?.avertissements?.map((avertissement, index) => {
-                  var coordSignalement = { latitude: avertissement.coordonnees.latitude, longitude: avertissement.coordonnees.longitude };
-                  //Pour le moment je calcule juste le signalement par rapport a un track et pas par rapport a la pos GPS
-                  //Calcule la distance entre l'avertissement le plus proche et le signalement
-                  const distanceAvertissement = userLocation ? recupDistance(coordSignalement) : 0;
+                {signalements?.map((signalement, index) => {
+                  if (signalement.type == "avertissement") {
+                    var coordSignalement = { latitude: signalement.coordonnees.latitude, longitude: signalement.coordonnees.longitude };
+                    //Pour le moment je calcule juste le signalement par rapport a un track et pas par rapport a la pos GPS
+                    //Calcule la distance entre l'avertissement le plus proche et le signalement
+                    const distanceAvertissement = userLocation ? recupDistance(coordSignalement) : 0;
 
-                  return (
-                    <View key={index}>
-                      <CarteSignalement type="avertissement" details={true} nomSignalement={avertissement.nom_signalement} description={avertissement.description} coordonnes={distanceAvertissement.toFixed(2)} imageSignalement={avertissement.image} />
-                    </View>
-                  );
-                })}
-                {signalements?.pointsInteret?.map((pointInteret, index) => {
-                  var coordPointInteret = { latitude: pointInteret.coordonnees.latitude, longitude: pointInteret.coordonnees.longitude };
-                  const distancePointInteret = userLocation ? recupDistance(coordPointInteret) : 0;
+                    return (
+                      <View key={index}>
+                        <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom_signalement} description={signalement.description} coordonnes={distanceAvertissement.toFixed(2)} imageSignalement={signalement.image} />
+                      </View>
+                    );
+                  }
+                  else {
+                    var coordSignalement = { latitude: signalement.coordonnees.latitude, longitude: signalement.coordonnees.longitude };
+                    //Pour le moment je calcule juste le signalement par rapport a un track et pas par rapport a la pos GPS
+                    //Calcule la distance entre l'avertissement le plus proche et le signalement
+                    const distancePointInteret = userLocation ? recupDistance(coordSignalement) : 0;
 
-                  return (
-                    <View key={index}>
-                      <CarteSignalement type="pointInteret" details={true} nomSignalement={pointInteret.nom_signalement} description={pointInteret.description} coordonnes={distancePointInteret.toFixed(2)} imageSignalement={pointInteret.image} />
-                    </View>
-                  );
-                })}
+                    return (
+                      <View key={index}>
+                        <CarteSignalement type="PointInteret" details={true} nomSignalement={signalement.nom_signalement} description={signalement.description} coordonnes={distancePointInteret.toFixed(2)} imageSignalement={signalement.image} />
+                      </View>
+                    );
+                  }
+                }
+
+                )}
+
+
               </View>
             </TouchableWithoutFeedback>
           </ScrollView>
