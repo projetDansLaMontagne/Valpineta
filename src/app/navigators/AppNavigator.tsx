@@ -45,7 +45,7 @@ export type AppStackParamList = {
   Excursions: undefined
   Map: undefined
   DetailsExcursion: undefined
-  Parametres: undefined
+  Parametres: undefined,
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -82,7 +82,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     >
 
       <Tab.Navigator
-        screenOptions={{ headerShown: false }}
         initialRouteName={"Carte"}
         screenOptions={{
           headerShown: false,
@@ -115,7 +114,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
         />
         <Tab.Screen
           name="Carte"
-          component={Screens.CarteScreen}
+          component={Screens.MapScreen}
           options={{
             tabBarIcon: (props) => (
               <Image

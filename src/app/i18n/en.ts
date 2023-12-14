@@ -24,15 +24,11 @@ const en = {
       button: "Let's try this again",
     },
   },
-  footer: {
-    accueil: "Accueil",
-    carte: "Carte",
-    parametres: "Parametres",
-  },
   testScreen: {
     title: "Test Screen",
     locate: {
       locate_btn: "Locate me !",
+      dl_map_btn: "Download map",
       stop_locate_btn: "Stop locating",
       fetching: "Fetching location...",
       follow: "Follow me",
@@ -47,7 +43,12 @@ const en = {
           message: "Please check your location settings",
       },
     }
-  }
+  },
+  footer: {
+    accueil: "Accueil",
+    carte: "Carte",
+    parametres: "Parametres",
+  },
 }
 
 export default en

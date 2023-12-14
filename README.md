@@ -32,3 +32,7 @@ Le [refuge de Pineta](https://www.valpineta.eu/fr/el-refugio/) et ses randonneur
 
 - .gitignore :
   - ce fichier les fichiers ou dossiers qui ne seront pas à pousser sur github 
+
+## Pour installer les tuiles
+
+- Mettre le dossier `Tiles` dans `src/assets/` avec le fichier `tiles_struct.json` à l'intérieur.
