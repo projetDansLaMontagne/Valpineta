@@ -15,58 +15,46 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const [excursions, setExcursions] = useState(undefined);
   const [searchQuery, setSearchQuery] = useState('');
 
-
-  // Fonctions 
   const loadExcursions = async () => {
     try {
       const jsonData = require('../../assets/jsons/excursions.json');
 
-      const excursionsJSON = jsonData.data.map(excursion => ({
-
+      const excursionsJSON = jsonData.map(excursion => ({
         nom_excursions: excursion.nom_excursions,
         duree: excursion.duree,
-        typeParcours: excursion.type_parcours.name,
+        typeParcours: excursion.type_parcours, // Correction ici
         zone: excursion.vallee,
         distance: excursion.distance_excursion,
         denivelePositif: excursion.denivele,
         difficulteParcours: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation,
 
-        signalements: {
-          pointsInteret: excursion.signalements.point_interet.map(pointInteret => ({
-            nom_signalement: pointInteret.nom_signalement,
-            description: pointInteret.description,
-            coordonnees: pointInteret.coordonnes,
-            image: pointInteret.image
-          })),
-          avertissements: excursion.signalements.avertissement.map(avertissement => ({
-            nom_signalement: avertissement.nom_signalement,
-            description: avertissement.description,
-            coordonnees: avertissement.coordonnes,
-            image: avertissement.image
-          }))
-        }
 
+        signalements: excursion.signalements.map(signalement => ({
+          id: signalement.id,
+          nom: signalement.nom,
+          type: signalement.type,
+          description: signalement.description,
+          image: signalement.image,
+          latitude: signalement.latitude,
+          longitude: signalement.longitude,
+          id_excursion: signalement.id_excursion,
+        })),
       }));
 
       setExcursions(excursionsJSON);
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Erreur lors du chargement du fichier JSON :', error);
     }
   };
+
+
   const handleFilterPress = () => {
     // Faites ce que vous souhaitez lorsqu'on appuie sur l'icône de filtre
     console.log('Filtrer les excursions');
     // Autres actions à effectuer
   };
-  // const excursionsFiltrees = () => {
-  //   return excursionsData.filter(excursion =>
-  //     excursion.nom_excursions.toLowerCase().includes(searchQuery.toLowerCase())
-  //   );
-  // };
 
-  var filteredExcursions;
   useEffect(() => {
     loadExcursions();
   }, []);
@@ -94,7 +82,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   return <Screen style={$root} >
     <View>
-      
+
     </View>
     <View>
       <View style={styles.searchBox}>

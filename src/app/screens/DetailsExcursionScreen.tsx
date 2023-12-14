@@ -199,34 +199,28 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             <TouchableWithoutFeedback>
               <View>
                 {signalements?.map((signalement, index) => {
-                  if (signalement.type == "avertissement") {
-                    var coordSignalement = { latitude: signalement.coordonnees.latitude, longitude: signalement.coordonnees.longitude };
-                    //Pour le moment je calcule juste le signalement par rapport a un track et pas par rapport a la pos GPS
-                    //Calcule la distance entre l'avertissement le plus proche et le signalement
-                    const distanceAvertissement = userLocation ? recupDistance(coordSignalement) : 0;
+                  // Calcule de la distance pour chaque avertissement
+                  const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
+                  const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
 
+                  if (signalement.type == "Avertissement")
                     return (
                       <View key={index}>
-                        <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom_signalement} description={signalement.description} coordonnes={distanceAvertissement.toFixed(2)} imageSignalement={signalement.image} />
+                        <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                          <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} description={signalement.description} />
+                        </TouchableOpacity>
                       </View>
                     );
-                  }
                   else {
-                    var coordSignalement = { latitude: signalement.coordonnees.latitude, longitude: signalement.coordonnees.longitude };
-                    //Pour le moment je calcule juste le signalement par rapport a un track et pas par rapport a la pos GPS
-                    //Calcule la distance entre l'avertissement le plus proche et le signalement
-                    const distancePointInteret = userLocation ? recupDistance(coordSignalement) : 0;
-
                     return (
                       <View key={index}>
-                        <CarteSignalement type="PointInteret" details={true} nomSignalement={signalement.nom_signalement} description={signalement.description} coordonnes={distancePointInteret.toFixed(2)} imageSignalement={signalement.image} />
+                        <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                          <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} description={signalement.description} />
+                        </TouchableOpacity>
                       </View>
                     );
                   }
-                }
-
-                )}
-
+                })}
 
               </View>
             </TouchableWithoutFeedback>
@@ -237,8 +231,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </View>
       );
     }
-
-
 
     /**
      *
@@ -295,76 +287,59 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                 </View>
 
                 <View>
-                  {signalements?.avertissements?.length > 0 && signalements?.pointsInteret?.length > 0 ? (
+                  {signalements?.length > 0 ? (
                     <View>
                       <Text text="Signalements" size="lg" />
                     </View>
                   ) : (
                     <View>
-                      {signalements?.avertissements?.length == 0 && signalements?.pointsInteret?.length > 0 ? (
-                        <View>
-                          <Text text="Points d'interets" size="lg" />
-                        </View>
+                      <Text text="Aucun signalement" size="lg" />
+                    </View>
+                  )
+                  }
+                </View>
+              </View>
+
+              <View>
+                <ScrollView horizontal>
+                  <TouchableWithoutFeedback>
+                    <View style={$scrollLine}>
+                      {signalements?.map((signalement, index) => {
+                        // Calcule de la distance pour chaque avertissement
+                        const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
+                        const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+
+                        if (signalement.type == "Avertissement")
+                          return (
+                            <View key={index}>
+                              <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                                <CarteSignalement type="avertissement" details={false} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} />
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        else {
+                          return (
+                            <View key={index}>
+                              <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                                <CarteSignalement type="pointInteret" details={false} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} />
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        }
+                      })}
+
+                      {signalements?.length > 0 ? (
+                        <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                          <View style={$carteGlobale}>
+                            <Text text="Voir détails" size="sm" style={$tousLesSignalements} />
+                          </View>
+                        </TouchableOpacity>
                       ) : (
-                        <View>
-                          {signalements?.avertissements?.length > 0 && signalements?.pointsInteret?.length == 0 ? (
-                            <View>
-                              <Text text="Avertissements" size="lg" />
-                            </View>
-                          ) : (
-                            <View>
-                              <Text text="Aucun signalement" size="lg" />
-                            </View>
-                          )}
-                        </View>
+                        <View></View>
                       )}
                     </View>
-                  )}
-                  <View>
-                    <ScrollView horizontal>
-                      <TouchableWithoutFeedback>
-                        <View style={$scrollLine}>
-                          {signalements?.avertissements?.map((avertissement, index) => {
-                            // Calcule de la distance pour chaque avertissement
-                            const coordSignalement = { latitude: avertissement.coordonnees.latitude, longitude: avertissement.coordonnees.longitude };
-                            const distanceAvertissement = userLocation ? recupDistance(coordSignalement) : 0;
-
-                            return (
-                              <View key={index}>
-                                <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                                  <CarteSignalement type="avertissement" details={false} nomSignalement={avertissement.nom_signalement} coordonnes={`${distanceAvertissement.toFixed(2)}`} />
-                                </TouchableOpacity>
-                              </View>
-                            );
-                          })}
-                          {signalements?.pointsInteret?.map((pointInteret, index) => {
-                            // Calcule de la distance pour chaque point d'intérêt
-                            const coordPointInteret = { latitude: pointInteret.coordonnees.latitude, longitude: pointInteret.coordonnees.longitude };
-                            const distancePointInteret = userLocation ? recupDistance(coordPointInteret) : 0;
-
-                            return (
-                              <View key={index}>
-                                <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                                  <CarteSignalement type="pointInteret" details={false} nomSignalement={pointInteret.nom_signalement} coordonnes={`${distancePointInteret.toFixed(2)}`} />
-                                </TouchableOpacity>
-                              </View>
-                            );
-                          })}
-                          {signalements?.avertissements?.length > 0 || signalements?.pointsInteret?.length > 0 ? (
-                            <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                              <View style={$carteGlobale}>
-                                <Text text="Voir détails" size="sm" style={$tousLesSignalements} />
-                              </View>
-                            </TouchableOpacity>
-                          ) : (
-                            <View></View>
-                          )}
-                        </View>
-                      </TouchableWithoutFeedback>
-                    </ScrollView>
-                  </View>
-
-                </View>
+                  </TouchableWithoutFeedback>
+                </ScrollView>
               </View>
 
               <View style={$containerDenivele}>
