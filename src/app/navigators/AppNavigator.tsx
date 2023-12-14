@@ -129,7 +129,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
         />
         <Tab.Screen
           name="Parametres"
-          component={Screens.NouveauSignalementScreen}
+          component={Screens.ParametresScreen}
           options={{
             tabBarIcon: (props) => (
               <Image
@@ -168,6 +168,7 @@ function StackNavigator() {
       <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
       <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
       <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
+      <Stack.Screen name="NouveauSignalement" component={Screens.NouveauSignalementScreen} />
     </Stack.Navigator>
   )
 }
