@@ -1,3 +1,4 @@
+
 import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
@@ -37,6 +38,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     const [isAllSignalements, setisAllSignalements] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
+
 
     return (
       <SafeAreaView style={$container}>
@@ -101,7 +104,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setisAllSignalements) {
 
-      const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
 
       //Lance le chrono pour le chargement du graphique de dénivelé
       const chrono = () => {
@@ -124,41 +126,46 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           chrono();
         }
       }, [isLoading]);
-      {
-        isAllSignalements ? listeSignalements(setisAllSignalements, signalements) : <></>
-
-        return (
-
-          <View style={$containerGrand}>
-            <View style={$containerTitre}>
-              <Text text={nomExcursion} size="xl" style={$titre} />
-              <GpxDownloader />
-            </View>
-            <View>
-              <View style={$containerBouton}>
-                <TouchableOpacity onPress={() => {
-                  //lancement du chrono pour le loading
-                  setIsLoading(true),
-                    isLoading ? chrono() : null
-                  setcontainerInfoAffiche(true)
-                }} style={$boutonInfoAvis} >
-                  <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => {
-                  //Loading à false pour pouvoir relancer le chrono
-                  setIsLoading(true)
-                  setcontainerInfoAffiche(false)
-                }} style={$boutonInfoAvis}>
-                  <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
-                </TouchableOpacity>
-              </View>
-              <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
-              </View>
-              {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements, signalements) : avis()}
-            </View>
-          </View >
-        )
+      if (isAllSignalements) {
+        return listeSignalements(setisAllSignalements, signalements);
       }
+      else {
+        return (
+          <View style={$containerGrand}>
+            {
+              <View>
+                <View style={$containerTitre}>
+                  <Text text={nomExcursion} size="xl" style={$titre} />
+                  <GpxDownloader />
+                </View>
+                <View>
+                  <View style={$containerBouton}>
+                    <TouchableOpacity onPress={() => {
+                      //lancement du chrono pour le loading
+                      setIsLoading(true),
+                        isLoading ? chrono() : null
+                      setcontainerInfoAffiche(true)
+                    }} style={$boutonInfoAvis} >
+                      <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {
+                      //Loading à false pour pouvoir relancer le chrono
+                      setIsLoading(true)
+                      setcontainerInfoAffiche(false)
+                    }} style={$boutonInfoAvis}>
+                      <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
+                  </View>
+                  {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements, signalements) : avis()}
+                </View>
+              </View >
+            }
+          </View>
+        );
+      }
+
     }
 
     function listeSignalements(setisAllSignalements, signalements) {
@@ -174,39 +181,41 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }, []);
 
       return (
-        <View style={$listeSignalements}>
-          <ScrollView>
-            <TouchableWithoutFeedback>
-              <View>
-                {signalements?.map((signalement, index) => {
-                  // Calcule de la distance pour chaque avertissement
-                  const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
-                  const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+        <View style={$containerGrand}>
+          <View style={$listeSignalements}>
+            <ScrollView>
+              <TouchableWithoutFeedback>
+                <View>
+                  {signalements?.map((signalement, index) => {
+                    // Calcule de la distance pour chaque avertissement
+                    const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
+                    const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
 
-                  if (signalement.type == "Avertissement")
-                    return (
-                      <View key={index}>
-                        <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                          <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} description={signalement.description} />
-                        </TouchableOpacity>
-                      </View>
-                    );
-                  else {
-                    return (
-                      <View key={index}>
-                        <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                          <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} description={signalement.description} />
-                        </TouchableOpacity>
-                      </View>
-                    );
-                  }
-                })}
+                    if (signalement.type == "Avertissement")
+                      return (
+                        <View key={index}>
+                          <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                            <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} description={signalement.description} />
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    else {
+                      return (
+                        <View key={index}>
+                          <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                            <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} description={signalement.description} />
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    }
+                  })}
 
-              </View>
-            </TouchableWithoutFeedback>
-          </ScrollView>
-          <View style={$sortirDetailSignalement}>
-            <Button text="Revenir aux informations" onPress={() => setisAllSignalements(false)} />
+                </View>
+              </TouchableWithoutFeedback>
+            </ScrollView>
+            <View style={$sortirDetailSignalement}>
+              <Button text="Revenir aux informations" onPress={() => setisAllSignalements(false)} />
+            </View>
           </View>
         </View>
       );
