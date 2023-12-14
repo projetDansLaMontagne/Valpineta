@@ -104,7 +104,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           tabBarInactiveTintColor: colors.text,
           tabBarLabelStyle: { color: colors.bouton },
         }} name="Excursions" />
-        <Tab.Screen component={Screens.EcranTestScreen} options={{
+        <Tab.Screen component={Screens.MapScreen} options={{
           tabBarIcon: (props) => (
             <Image
               source={carteLogo}

@@ -33,7 +33,7 @@ local.properties
 
 # node.js
 #
-node_modules/
+src/node_modules/
 npm-debug.log
 yarn-error.log
 
@@ -84,3 +84,6 @@ web-build/
 # Configurations
 !env.js
 package-lock.json
+
+# Tiles
+assets/Tiles

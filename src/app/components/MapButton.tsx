@@ -41,7 +41,6 @@ export interface MapButtonProps extends PressableProps {
 // END VARIABLES ======================================================================================= END VARIABLES
 
 // COMPONENENT  ============================================================================================= COMPONENT
-
 /**
  * MapButton component
  * @return
@@ -61,12 +60,6 @@ const MapButton = forwardRef((props: MapButtonProps, ref) => {
     style,
   } = props
 
-
-  // Ref(s)
-
-  // Method(s)
-
-  // Effect(s)
 
   // Render
   return (

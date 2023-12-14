@@ -30,7 +30,7 @@ import * as fileSystem from 'expo-file-system';
 import formatRequire from "../services/importAssets/assetRequire";
 
 // variables
-interface EcranTestScreenProps extends AppStackScreenProps<"Map"> {}
+interface MapScreenProps extends AppStackScreenProps<"Map"> {}
 
 type T_animateToLocation = (
   passedLocation?: Location.LocationObject
@@ -98,7 +98,7 @@ const download_file = async () => {
   }
 
 // Component(s)
-export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function EcranTestScreen(
+export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   _props,
 ) {
   // Variables
@@ -218,7 +218,7 @@ export const EcranTestScreen: FC<EcranTestScreenProps> = observer(function Ecran
   }
 
   const onLocationBtnPress = async () => {
-    console.log("[EcranTestScreen] onLocationBtnPress()");
+    console.log("[MapScreen] onLocationBtnPress()");
     setIsFetching(true);
 
     const { status } = await Location.requestForegroundPermissionsAsync();
