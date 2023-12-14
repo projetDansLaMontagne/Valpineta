@@ -196,6 +196,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
       timeInterval: userLocationIntervalMs,
       distanceInterval: 1
     }, (location) => {
+
+      if (debug) {
+        console.log(`[EcranTestScreen] watchPositionAsync()`);
+        console.log(`[EcranTestScreen] location.coords.latitude: ${location.coords.latitude}`);
+        console.log(`[EcranTestScreen] location.coords.longitude: ${location.coords.longitude}`);
+      }
       // ! TO REMOVE BEFORE PRODUCTION
       setNbFetch(nbFetch => nbFetch + 1);
       // ! END TO REMOVE BEFORE PRODUCTION
@@ -223,9 +229,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
 
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
+      console.log('Permission to access location was denied');
       setGavePermission(false);
       return;
     }
+
+    console.log("Permission granted");
 
     setGavePermission(true);
     await getLocationAsync();
@@ -303,6 +312,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
       ]).start();
     }
   }, [menuIsOpen]);
+
+  useEffect(() => {
+    console.log(`[EcranTestScreen] followUserLocation: ${followUserLocation}`);
+  }, [followUserLocation]);
 
   useEffect(() => {
     // ! TO REMOVE BEFORE PRODUCTION
@@ -480,7 +493,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                     <>
                       <Text tx={"testScreen.locate.notLocated.title"} style={{color: "white"}} />
 
-
                       {
                         !isMapDownloaded ? (
                             <Button
@@ -518,7 +530,7 @@ const $container: ViewStyle = {
   display: 'flex',
 }
 
-const mapOverlayStyle = {
+const mapOverlayStyle: ViewStyle = {
   position: 'absolute',
   bottom: 0,
   right: 0,
@@ -533,7 +545,6 @@ const mapOverlayStyle = {
   gap: spacing.sm,
 
   paddingBottom: spacing.xl,
-  pointerEvents: 'none',
 
   zIndex: 1000,
 }
@@ -597,10 +608,10 @@ const styles = StyleSheet.create({
 
   },
   mapOverlay: {
-    ...(mapOverlayStyle as ViewStyle),
+    ...mapOverlayStyle,
   },
   mapOverlayLeft: {
-    ...(mapOverlayStyle as ViewStyle),
+    ...mapOverlayStyle,
     left: 0,
   },
 });
