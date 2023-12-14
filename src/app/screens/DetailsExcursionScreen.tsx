@@ -16,20 +16,20 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
 
-    var nomExcursion;
-    var temps;
-    var distance;
-    var difficulteParcours;
-    var difficulteOrientation;
+    var nomExcursion = "";
+    var temps = { h: 0, m: 0 };
+    var distance = 0;
+    var difficulteParcours = 0;
+    var difficulteOrientation = 0;
     var navigation = props.navigation;
 
     /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
     if (props.route.params !== undefined) {
-      nomExcursion = props.route.params.nomExcursion || "";
-      temps = props.route.params.temps || 0;
-      distance = props.route.params.distance || 0;
-      difficulteParcours = props.route.params.difficulteParcours || 0;
-      difficulteOrientation = props.route.params.difficulteOrientation || 0;
+      nomExcursion = props.route.params.nomExcursion
+      temps = props.route.params.temps
+      distance = props.route.params.distance
+      difficulteParcours = props.route.params.difficulteParcours
+      difficulteOrientation = props.route.params.difficulteOrientation
     }
 
     const [isLoading, setIsLoading] = useState(true);

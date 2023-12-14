@@ -143,7 +143,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const loadExcursions = async (): Promise<void> => {
     try {
       // -- RECUPERATION DU FICHIER --
-      var excursionsBRUT = require('../../assets/jsons/excursions.json');
+      var excursionsBRUT = require('../../assets/JSON/excursions.json');
       excursionsBRUT = excursionsBRUT.data.map(excursion => ({
         nom: excursion.nom_excursions,
         denivele: excursion.denivele,
