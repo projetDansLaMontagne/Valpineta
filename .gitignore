@@ -5,7 +5,7 @@ build
 
 
 # Files
-*.DS_Store
+.DS_Store
 .commitignore
 
 commit_message.txt
@@ -85,7 +85,7 @@ src/buck-out/
 .vscode
 
 # Expo
-.expo/*
+.expo
 bin/Exponent.app
 
 npm-debug.*
