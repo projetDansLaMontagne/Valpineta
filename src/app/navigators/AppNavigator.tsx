@@ -47,7 +47,7 @@ export type AppStackParamList = {
   DetailsExcursion: undefined
   Parametres: undefined
   ListeSignalements: undefined
-	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**
@@ -85,45 +85,61 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       <Tab.Navigator
         screenOptions={{ headerShown: false }}
         initialRouteName={"Carte"}
-        screenOptions={() => ({
+        screenOptions={{
           headerShown: false,
           tabBarStyle: {
             padding: 5,
             backgroundColor: colors.fond,
-            borderTopColor: colors.bordure,
-          },
-        })}
+            borderTopColor: colors.bordure,       // une bordure n a rien a faire  dans colors
+          }
+        }}
       >
-        <Tab.Screen component={StackNavigator} name="Stack" options={{ tabBarButton: () => null, }} />
-        <Tab.Screen component={Screens.ExcursionsScreen} options={{
-          tabBarIcon: () => (
-            <Image
-              source={explorerLogo}
-              style={$icon}
-            />
-          ),
-          tabBarActiveTintColor: colors.bouton,
-          tabBarInactiveTintColor: colors.text,
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Excursions" />
-        <Tab.Screen component={Screens.CarteScreen} options={{
-          tabBarIcon: (props) => (
-            <Image
-              source={carteLogo}
-              style={$icon}
-            />
-          ),
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Carte" />
-        <Tab.Screen component={Screens.ParametresScreen} options={{
-          tabBarIcon: (props) => (
-            <Image
-              source={parametresLogo}
-              style={$icon}
-            />
-          ),
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Parametres" />
+        <Tab.Screen
+          name="Stack"
+          component={StackNavigator}
+          options={{ tabBarButton: () => null, }}
+        />
+        <Tab.Screen
+          name="Excursions"
+          component={Screens.ExcursionsScreen}
+          options={{
+            tabBarIcon: () => (
+              <Image
+                source={explorerLogo}
+                style={$icon}
+              />
+            ),
+            // tabBarActiveTintColor: colors.bouton,
+            // tabBarInactiveTintColor: colors.text,
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
+        <Tab.Screen
+          name="Carte"
+          component={Screens.CarteScreen}
+          options={{
+            tabBarIcon: (props) => (
+              <Image
+                source={carteLogo}
+                style={$icon}
+              />
+            ),
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
+        <Tab.Screen
+          name="Parametres"
+          component={Screens.ParametresScreen}
+          options={{
+            tabBarIcon: (props) => (
+              <Image
+                source={parametresLogo}
+                style={$icon}
+              />
+            ),
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   )

@@ -10,36 +10,29 @@ import * as Location from 'expo-location';
 
 const { width, height } = Dimensions.get("window");
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
+  temps: Record<'h' | 'm', number>,
+
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
 
-    let nomExcursion = "";
-    let temps = 0;
-    let distance = 0;
-    let difficulteParcours = 0;
-    let difficulteOrientation = 0;
-    let signalements = [];
-    let navigation = props.navigation;
+    var nomExcursion = "";
+    var temps = { h: 0, m: 0 };
+    var distance = 0;
+    var difficulteParcours = 0;
+    var difficulteOrientation = 0;
+    var navigation = props.navigation;
+    var signalements = [];
 
-
-    if (props.route.params) {
-      const routeParams = props.route.params as {
-        nomExcursion?: string;
-        temps?: number;
-        distance?: number;
-        difficulteParcours?: number;
-        difficulteOrientation?: number;
-        signalements?: any[];
-      };
-
-      nomExcursion = routeParams.nomExcursion || "";
-      temps = routeParams.temps || 0;
-      distance = routeParams.distance || 0;
-      difficulteParcours = routeParams.difficulteParcours || 0;
-      difficulteOrientation = routeParams.difficulteOrientation || 0;
-      signalements = routeParams.signalements || [];
+    /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
+    if (props.route.params !== undefined) {
+      nomExcursion = props.route.params.nomExcursion
+      temps = props.route.params.temps
+      distance = props.route.params.distance
+      difficulteParcours = props.route.params.difficulteParcours
+      difficulteOrientation = props.route.params.difficulteOrientation
+      signalements = props.route.params.signalements
     }
 
     const [isAllSignalements, setisAllSignalements] = useState(false);
@@ -107,9 +100,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     }
 
     function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setisAllSignalements) {
-      /**
-       * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
-       */
 
       const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
 
@@ -134,51 +124,41 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           chrono();
         }
       }, [isLoading]);
+      {
+        isAllSignalements ? listeSignalements(setisAllSignalements, signalements) : <></>
 
-      return (
-        <View style={$containerGrand}>
-          <Image
-            source={require("../../assets/icons/swipe-up.png")}
-          />
-          {isAllSignalements ? listeSignalements(setisAllSignalements, signalements) : infosGenerales(nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements, signalements, containerInfoAffiche, setcontainerInfoAffiche)}
+        return (
 
-        </View >
-      )
-
-    }
-
-    function infosGenerales(nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements, signalements, containerInfoAffiche, setcontainerInfoAffiche) {
-
-      return (
-        <View>
-          <View style={$containerTitre}>
-            <Text text={nomExcursion} size="xl" style={$titre} />
-            <GpxDownloader />
-          </View>
-          <View>
-            <View style={$containerBouton}>
-              <TouchableOpacity onPress={() => {
-                //lancement du chrono pour le loading
-                setIsLoading(true),
-                  isLoading ? chrono() : null
-                setcontainerInfoAffiche(true)
-              }} style={$boutonInfoAvis} >
-                <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => {
-                //Loading à false pour pouvoir relancer le chrono
-                setIsLoading(true)
-                setcontainerInfoAffiche(false)
-              }} style={$boutonInfoAvis}>
-                <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
-              </TouchableOpacity>
+          <View style={$containerGrand}>
+            <View style={$containerTitre}>
+              <Text text={nomExcursion} size="xl" style={$titre} />
+              <GpxDownloader />
             </View>
-            <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
+            <View>
+              <View style={$containerBouton}>
+                <TouchableOpacity onPress={() => {
+                  //lancement du chrono pour le loading
+                  setIsLoading(true),
+                    isLoading ? chrono() : null
+                  setcontainerInfoAffiche(true)
+                }} style={$boutonInfoAvis} >
+                  <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                  //Loading à false pour pouvoir relancer le chrono
+                  setIsLoading(true)
+                  setcontainerInfoAffiche(false)
+                }} style={$boutonInfoAvis}>
+                  <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
+                </TouchableOpacity>
+              </View>
+              <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
+              </View>
+              {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements, signalements) : avis()}
             </View>
-            {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements, signalements) : avis()}
           </View >
-        </View >
-      )
+        )
+      }
     }
 
     function listeSignalements(setisAllSignalements, signalements) {
@@ -237,7 +217,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * @param isLoading
      * @returns les informations de l'excursion
      */
-    function infos(isLoading: boolean, temps: number, distance: number, difficulteParcours: number, difficulteOrientation: number, setisAllSignalements, signalements) {
+    function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number, setisAllSignalements, signalements) {
       const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
       const [userLocation, setUserLocation] = useState(null);
 
@@ -259,7 +239,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   <Image style={$iconInformation}
                     source={require("../../assets/icons/temps.png")}
                   />
-                  <Text text={temps.toString()} size="xs" />
+                  <Text text={temps.h + "h" + temps.m} size="xs" />
                 </View>
                 <View style={$containerUneInformation}>
                   <Image style={$iconInformation}
@@ -280,7 +260,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   <Text text={difficulteOrientation.toString()} size="xs" />
                 </View>
               </View>
-              <View style={$containerDescriptionSignalement}>
+              <View>
                 <View>
                   <Text text="Description" size="lg" />
                   <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
@@ -375,8 +355,33 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     // Fonction de calcul de distance entre deux coordonnées
     function calculeDistanceEntreDeuxPoints(coord1, coord2) {
       // Assurez-vous que coord1 et coord2 sont définis
-      if (!coord1 || !coord1.latitude || !coord1.longitude || !coord2 || !coord2.lat || !coord2.long) {
-        console.error('Coordonnées non valides');
+      if (!coord1) {
+        console.error('Coordonnées 1 non valides');
+        return null;
+      }
+
+      if (!coord1.latitude) {
+        console.error('Latitude pour les coordonnées 1 manquante');
+        return null;
+      }
+
+      if (!coord1.longitude) {
+        console.error('Longitude pour les coordonnées 1 manquante');
+        return null;
+      }
+
+      if (!coord2) {
+        console.error('Coordonnées 2 non valides');
+        return null;
+      }
+
+      if (!coord2.lat) {
+        console.error('Latitude pour les coordonnées 2 manquante');
+        return null;
+      }
+
+      if (!coord2.lon) {
+        console.error('Longitude pour les coordonnées 2 manquante');
         return null;
       }
 
@@ -388,7 +393,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
       // Calcul des distances
       const dLat = toRadians(coord2.lat - coord1.latitude);
-      const dLon = toRadians(coord2.long - coord1.longitude);
+      const dLon = toRadians(coord2.lon - coord1.longitude);
 
       const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -408,7 +413,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
     function recupDistance(coordonneeSignalement) {
       // Charger le fichier JSON avec les coordonnées
-      const data = require('../../assets/jsons/uneExcursion.json');
+      const data = require('../../assets/JSON/exemple_cruz_del_guardia.json');
 
       // Assurez-vous que les coordonnées du signalement sont définies
       if (!coordonneeSignalement || !coordonneeSignalement.latitude || !coordonneeSignalement.longitude) {
@@ -424,7 +429,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       // Parcourir toutes les coordonnées dans le fichier
       for (const coord of data) {
         // Assurez-vous que les coordonnées dans le fichier sont définies
-        if (!coord.lat || !coord.long) {
+        if (!coord.lat || !coord.lon) {
           console.error('Coordonnées dans le fichier non valides');
           continue;
         }
@@ -438,8 +443,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           coordPointPlusProche = coord;
         }
       }
-
-      const distanceDepartPointLePlusProche = coordPointPlusProche.dist / 1000
+      console.log(coordonneeSignalement, "coordonneeSignalement")
+      console.log(coordPointPlusProche, "coordPointPlusProche")
+      const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
 
       //Distance totale DANS UN MONDE PARFAIT
       // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche;
@@ -448,8 +454,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     }
   }
 );
-
-
 
 /* -------------------------------------------------------------------------- */
 /*                                   STYLES                                   */
@@ -555,7 +559,10 @@ const $iconInformation: ImageStyle = {
   marginRight: spacing.xs,
 }
 
-const $containerDescriptionSignalement: ViewStyle = {
+//Style de la description et des signalements
+
+const $containerDescriptionSignalements: ViewStyle = {
+  flexDirection: "row",
   justifyContent: "space-around",
   paddingLeft: spacing.xl,
   paddingRight: spacing.xl,

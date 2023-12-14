@@ -17,8 +17,8 @@
                 "type": "PointInteret",
                 "description": "\"Meilleur endroit pour voir le couch\u00e9 de soleil\"",
                 "image": "",
-                "latitude": "45.55",
-                "longitude": "48.99",
+                "latitude": "42.621927",
+                "longitude": "0.241864",
                 "id_excursion": "1079"
             },
             {
@@ -27,8 +27,8 @@
                 "type": "PointInteret",
                 "description": "\"Meilleur endroit pour voir les marmottes\"",
                 "image": "",
-                "latitude": "45.55",
-                "longitude": "48.99",
+                "latitude": "42.622241",
+                "longitude": "0.2390199",
                 "id_excursion": "1079"
             }
         ]
