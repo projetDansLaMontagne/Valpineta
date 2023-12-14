@@ -54,6 +54,7 @@
     "expo-document-picker": "^11.7.0",
     "expo-file-system": "~15.2.1",
     "expo-font": "~11.1.1",
+    "expo-image-picker": "~14.1.1",
     "expo-linking": "~4.0.1",
     "expo-localization": "~14.1.1",
     "expo-media-library": "^15.6.0",
@@ -90,7 +91,8 @@
     "reactotron-react-js": "^3.3.7",
     "reactotron-react-native": "5.0.3",
     "rn-fetch-blob": "^0.12.0",
-    "styled-components": "^6.1.0"
+    "styled-components": "^6.1.0",
+    "expo-camera": "~13.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

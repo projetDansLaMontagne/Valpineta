@@ -46,7 +46,8 @@ export type AppStackParamList = {
   Map: undefined
   DetailsExcursion: undefined
   Parametres: undefined
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  NouveauSignalement: undefined
+	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**
@@ -128,7 +129,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
         />
         <Tab.Screen
           name="Parametres"
-          component={Screens.ParametresScreen}
+          component={Screens.NouveauSignalementScreen}
           options={{
             tabBarIcon: (props) => (
               <Image

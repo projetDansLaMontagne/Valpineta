@@ -56,7 +56,16 @@
       "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
     },
     "plugins": [
-      "expo-localization"
+      "expo-localization",
+      "expo-image-picker",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "isAccessMediaLocationEnabled": "true"
+        }
+      ]
     ]
     
   }
