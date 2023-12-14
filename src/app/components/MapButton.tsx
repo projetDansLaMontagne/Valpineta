@@ -60,7 +60,6 @@ const MapButton = forwardRef((props: MapButtonProps, ref) => {
     style,
   } = props
 
-
   // Render
   return (
     <Animated.View>

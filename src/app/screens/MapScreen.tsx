@@ -518,7 +518,7 @@ const $container: ViewStyle = {
   display: 'flex',
 }
 
-const mapOverlayStyle: ViewStyle = {
+const mapOverlayStyle = {
   position: 'absolute',
   bottom: 0,
   right: 0,
@@ -533,11 +533,12 @@ const mapOverlayStyle: ViewStyle = {
   gap: spacing.sm,
 
   paddingBottom: spacing.xl,
+  pointerEvents: 'none',
 
   zIndex: 1000,
 }
 
-const buttonContainer: ViewStyle = {
+const buttonContainer = {
   height: values.locateBtnContainerSize,
   width: values.locateBtnContainerSize,
 
@@ -547,6 +548,9 @@ const buttonContainer: ViewStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+
+  pointerEvents: 'auto',
+
 }
 
 const styles = StyleSheet.create({
@@ -572,11 +576,11 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   locateButtonContainer: {
-    ...buttonContainer,
+    ...(buttonContainer as ViewStyle),
     backgroundColor: "#eeeeee50",
   },
   actionsButtonContainer: {
-    ...buttonContainer,
+    ...(buttonContainer as ViewStyle) ,
     backgroundColor: colors.palette.vert,
   },
   map: {
@@ -593,10 +597,10 @@ const styles = StyleSheet.create({
 
   },
   mapOverlay: {
-    ...mapOverlayStyle
+    ...(mapOverlayStyle as ViewStyle),
   },
   mapOverlayLeft: {
-    ...mapOverlayStyle,
+    ...(mapOverlayStyle as ViewStyle),
     left: 0,
   },
 });
