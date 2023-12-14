@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components"
+import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen } from "app/components"
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
 
@@ -26,12 +26,23 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { navigation } = props
-    const { excursion } = props.route.params
-
+    const { navigation } = props;
+    
+    const [excursion, setExcursion] = useState("");  
     const [isLoading, setIsLoading] = useState(true);
 
-    return (
+    useEffect(() => {
+      if (props.route.params !== undefined) {
+        setExcursion(props.route.params.excursion);
+      }
+    }, [props.route.params]);
+
+    return excursion === undefined ? (
+      <Screen safeAreaEdges={["top", "bottom"]} style={$containerErreur} preset="fixed">
+        <Text text="Erreur" size="xxl" />
+        <Text text="Une erreur est survenue" size="xxs" />
+      </Screen>
+    ) : (
       <SafeAreaView style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
@@ -54,9 +65,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           swipeHeight={100}
         />
       </SafeAreaView>
-    )
+    );    
   },
-)
+);
+
 
 /**
  *
@@ -193,7 +205,7 @@ function infos(
   var difficulteOrientation = 0
   var difficulteTechnique = 0
   var description = ""
-  if (excursion!== undefined) {
+  if (excursion.duree!== undefined || excursion.distance!== undefined || excursion.difficulteOrientation!== undefined || excursion.difficulteTechnique!== undefined || excursion.description!== undefined) {
     duree = excursion.duree.h + "h"
     if (excursion.duree.m !== 0) {
       duree = duree + excursion.duree.m
@@ -327,6 +339,14 @@ const $container: ViewStyle = {
   width: width,
   height: height,
   backgroundColor: colors.erreur,
+}
+
+const $containerErreur: ViewStyle = {
+  flex: 1,
+  width: width,
+  height: height,
+  alignItems: "center",
+  justifyContent: "center",
 }
 
 //Style de itemMini

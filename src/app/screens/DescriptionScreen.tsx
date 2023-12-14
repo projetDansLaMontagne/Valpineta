@@ -30,7 +30,7 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
   }
 
   return (
-    <Screen style={$container} preset="fixed">
+    <Screen style={$container} preset="fixed" >
       <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
         <Image
           style={{ tintColor: colors.bouton }}
