@@ -269,7 +269,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   <Text text={difficulteOrientation.toString()} size="xs" />
                 </View>
               </View>
-              <View>
+              <View style={$containerDescriptionSignalements}>
                 <View>
                   <Text text="Description" size="lg" />
                   <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
@@ -289,7 +289,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                 </View>
               </View>
 
-              <View>
+              <View style={$listeSignalementsHorizontale}>
                 <ScrollView horizontal>
                   <TouchableWithoutFeedback>
                     <View style={$scrollLine}>
@@ -452,8 +452,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           coordPointPlusProche = coord;
         }
       }
-      console.log(coordonneeSignalement, "coordonneeSignalement")
-      console.log(coordPointPlusProche, "coordPointPlusProche")
+
       const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
 
       //Distance totale DANS UN MONDE PARFAIT
@@ -571,7 +570,7 @@ const $iconInformation: ImageStyle = {
 //Style de la description et des signalements
 
 const $containerDescriptionSignalements: ViewStyle = {
-  flexDirection: "row",
+  // flexDirection: "row",
   justifyContent: "space-around",
   paddingLeft: spacing.xl,
   paddingRight: spacing.xl,
@@ -627,4 +626,8 @@ const $carteGlobale: ViewStyle = {
 const $sortirDetailSignalement: ViewStyle = {
   justifyContent: "center",
   marginBottom: spacing.xl,
+}
+
+const $listeSignalementsHorizontale: ViewStyle = {
+  paddingLeft: spacing.md
 }
