@@ -36,9 +36,41 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       signalements = props.route.params.signalements
     }
 
+    //Lance le chrono pour le chargement du graphique de dénivelé
+    const chrono = () => {
+      setTimeout(() => {
+        setIsLoading(false)
+      }
+        , 1000);
+    }
+
     const [isAllSignalements, setisAllSignalements] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
+    const [userLocation, setUserLocation] = useState(null);
+
+    useEffect(() => {
+      const fetchLocation = async () => {
+        const location = await getUserLocation();
+        setUserLocation(location);
+      };
+
+      fetchLocation();
+    }, []);
+
+    //Observateur de l'état du containerInfoAffiche
+    useEffect(() => {
+      if (containerInfoAffiche) {
+        chrono();
+      }
+    }, [containerInfoAffiche]);
+
+    //Observateur de l'état du containerInfoAffiche
+    useEffect(() => {
+      if (isLoading) {
+        chrono();
+      }
+    }, [isLoading]);
 
 
     return (
@@ -104,28 +136,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setisAllSignalements) {
 
-
-      //Lance le chrono pour le chargement du graphique de dénivelé
-      const chrono = () => {
-        setTimeout(() => {
-          setIsLoading(false)
-        }
-          , 1000);
-      }
-
-      //Observateur de l'état du containerInfoAffiche
-      useEffect(() => {
-        if (containerInfoAffiche) {
-          chrono();
-        }
-      }, [containerInfoAffiche]);
-
-      //Observateur de l'état du containerInfoAffiche
-      useEffect(() => {
-        if (isLoading) {
-          chrono();
-        }
-      }, [isLoading]);
       if (isAllSignalements) {
         return listeSignalements(setisAllSignalements, signalements);
       }
@@ -169,17 +179,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     }
 
     function listeSignalements(setisAllSignalements, signalements) {
-      const [userLocation, setUserLocation] = useState(null);
-
-      useEffect(() => {
-        const fetchLocation = async () => {
-          const location = await getUserLocation();
-          setUserLocation(location);
-        };
-
-        fetchLocation();
-      }, []);
-
       return (
         <View style={$containerGrand}>
           <View style={$listeSignalements}>
@@ -228,16 +227,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      */
     function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number, setisAllSignalements, signalements) {
       const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
-      const [userLocation, setUserLocation] = useState(null);
 
-      useEffect(() => {
-        const fetchLocation = async () => {
-          const location = await getUserLocation();
-          setUserLocation(location);
-        };
-
-        fetchLocation();
-      }, []);
 
       return (
         <ScrollView>
@@ -364,33 +354,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     // Fonction de calcul de distance entre deux coordonnées
     function calculeDistanceEntreDeuxPoints(coord1, coord2) {
       // Assurez-vous que coord1 et coord2 sont définis
-      if (!coord1) {
-        console.error('Coordonnées 1 non valides');
-        return null;
-      }
-
-      if (!coord1.latitude) {
-        console.error('Latitude pour les coordonnées 1 manquante');
-        return null;
-      }
-
-      if (!coord1.longitude) {
-        console.error('Longitude pour les coordonnées 1 manquante');
-        return null;
-      }
-
-      if (!coord2) {
-        console.error('Coordonnées 2 non valides');
-        return null;
-      }
-
-      if (!coord2.lat) {
-        console.error('Latitude pour les coordonnées 2 manquante');
-        return null;
-      }
-
-      if (!coord2.lon) {
-        console.error('Longitude pour les coordonnées 2 manquante');
+      if (!coord1 || typeof coord1.latitude === 'undefined' || typeof coord1.longitude === 'undefined' || !coord2 || typeof coord2.lat === 'undefined' || typeof coord2.lon === 'undefined') {
+        console.error('Coordonnées non valides');
         return null;
       }
 
