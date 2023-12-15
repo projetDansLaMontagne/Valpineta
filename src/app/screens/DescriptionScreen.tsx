@@ -16,20 +16,6 @@ interface DescriptionScreenProps extends AppStackScreenProps<"Description"> {
   route: any
 }
 
-export function nettoyageTexte(texte: string) {
-    // Supprimer les balises HTML
-    const tagsRemoved = texte.replace(/<[^>]+>/g, '');
-
-    // Supprimer les deux \n au début
-    const newLineRemoved = tagsRemoved.replace(/^\n{2}/, '');
-  
-    // Supprimer tous les \t
-    const tabsRemoved = newLineRemoved.replace(/\t/g, '');
-  
-    return tabsRemoved;
-}
-
-
 export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function DescriptionScreen(
   props: DescriptionScreenProps,
 ) {
@@ -47,7 +33,7 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
       <ScrollView style={$containerDescription}>
         <Text size="xxl">{excursion.nomExcursion}</Text>
         <Text style={$texteDescription} size="sm">
-          {nettoyageTexte(excursion.descriptionFR)}
+          {excursion.description}
         </Text>
       </ScrollView>
     </Screen>

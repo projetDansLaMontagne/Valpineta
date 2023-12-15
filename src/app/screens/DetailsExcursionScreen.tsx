@@ -162,8 +162,7 @@ function itemFull(
 }
 
 function afficherDescriptionCourte(description: string) {
-  const texteNettoye = nettoyageTexte(description)
-  const texteCoupe = texteNettoye.slice(0, 100)
+  const texteCoupe = description.slice(0, 100)
   const texteFinal = texteCoupe + "..."
   return texteFinal
 }
@@ -219,7 +218,7 @@ function infos(
               <Text tx="detailsExcursion.titres.description" size="lg" />
               <Text
                 style={$textDescription}
-                text={afficherDescriptionCourte(excursion.descriptionES)}
+                text={afficherDescriptionCourte(excursion.description)}
                 size="xxs"
               />
               <TouchableOpacity

@@ -23,21 +23,26 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   // Fonctions 
   const loadExcursions = async () => {
     try {
-      const jsonData = require('../../assets/jsons/excursions.json');
+      let jsonData: Record<string, any>[] = [];
+      if(parametres.langues === "fr"){
+        jsonData = require('../../assets/JSON/excursionsFR.json');
+      }
+      else if (parametres.langues === "es"){
+        jsonData = require('../../assets/JSON/excursionsES.json');
+      }
 
-      const excursionsJSON = jsonData.data.map(excursion => ({
+      const excursionsJSON = jsonData.map(excursion => ({
 
         nomExcursion: excursion.nom_excursions,
         duree: excursion.duree,
-        typeParcours: excursion.type_parcours.name,
+        typeParcours: excursion.type_parcours,
         zone: excursion.vallee,
         distance: excursion.distance_excursion,
         denivelePositif: excursion.denivele,
         difficulteParcours: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation,
         signalements: excursion.signalements,
-        descriptionFR: excursion.post_content_fr,
-        descriptionES: excursion.post_content_es,
+        description: excursion.post_content,
       }));
       setExcursions(excursionsJSON);
     }
