@@ -64,7 +64,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   var filteredExcursions;
   useEffect(() => {
     loadExcursions();
-  }, []);
+  }, [parametres.langues]);
 
 
   const filtreIcone = require("../../assets/icons/filtre.png")
