@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import {
   View,
@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen } from "app/components"
+import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components"
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
 
@@ -28,7 +28,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { navigation } = props;
 
-    const [excursion, setExcursion] = useState(props.route.params);
+    const [excursion, setExcursion] = useState(props.route.params.excursion);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -81,7 +81,7 @@ function itemMini() {
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
 function itemFull(
-  excursion: any,
+  excursion: Record<string, unknown>,
   isLoading: boolean,
   setIsLoading: Function,
   navigation: any,
@@ -189,7 +189,7 @@ function afficherDescriptionCourte(description: string) {
  */
 function infos(
   isLoading: boolean,
-  excursion: any,
+  excursion: Record<string, unknown>,
   navigation: any,
 ) {
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
