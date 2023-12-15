@@ -27,8 +27,8 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { navigation } = props;
-    
-    const [excursion, setExcursion] = useState("");  
+
+    const [excursion, setExcursion] = useState(props.route.params);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -37,12 +37,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }
     }, [props.route.params]);
 
-    return excursion === undefined ? (
-      <Screen safeAreaEdges={["top", "bottom"]} style={$containerErreur} preset="fixed">
-        <Text text="Erreur" size="xxl" />
-        <Text text="Une erreur est survenue" size="xxs" />
-      </Screen>
-    ) : (
+    return excursion && (
       <SafeAreaView style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
@@ -118,7 +113,6 @@ function itemFull(
       chrono()
     }
   }, [isLoading])
-
 
   return (
     <View style={$containerGrand}>
