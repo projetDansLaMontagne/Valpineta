@@ -9,7 +9,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/logo.jpg",
     "splash": {
-      "image": "./assets/images/loading.jpg",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#191015"
     },
@@ -28,7 +28,7 @@
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
       },
       "splash": {
-        "image": "./assets/images/loading.jpg",
+        "image": "./assets/images/splash.png",
         "resizeMode": "contain",
         "backgroundColor": "#191015"
       }
@@ -38,8 +38,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.src",
       "splash": {
-        "image": "./assets/images/loading.jpg",
-        "tabletImage": "./assets/images/loading.jpg",
+        "image": "./assets/images/splash.png",
+        "tabletImage": "./assets/images/splash.png",
         "resizeMode": "contain",
         "backgroundColor": "#191015"
       }
@@ -47,7 +47,7 @@
     "web": {
       "favicon": "./assets/images/logo.jpg",
       "splash": {
-        "image": "./assets/images/loading.jpg",
+        "image": "./assets/images/splash.png",
         "resizeMode": "contain",
         "backgroundColor": "#191015"
       }
@@ -63,6 +63,11 @@
     },
     "plugins": [
       "expo-localization"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c6e6cfd6-6eae-4fd5-8c34-b1e8535e3478"
+      }
+    }
   }
 }
