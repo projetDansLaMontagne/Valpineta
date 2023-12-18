@@ -231,7 +231,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       return (
         <ScrollView>
           <TouchableWithoutFeedback>
-            <View>
+            <View style={$stylePage}>
               <View style={$containerInformations}>
                 <View style={$containerUneInformation}>
                   <Image style={$iconInformation}
@@ -258,27 +258,16 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   <Text text={difficulteOrientation.toString()} size="xs" />
                 </View>
               </View>
-              <View style={$containerDescriptionSignalements}>
-                <View>
-                  <Text text="Description" size="lg" />
-                  <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
-                </View>
-
-                <View>
-                  {signalements?.length > 0 ? (
-                    <View>
-                      <Text text="Signalements" size="lg" />
-                    </View>
-                  ) : (
-                    <View>
-                      <Text text="Aucun signalement" size="lg" />
-                    </View>
-                  )
-                  }
-                </View>
+              <View style={$containerDescriptionEtSignalements}>
+                <Text text="Description" size="lg" />
+                <Text text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
               </View>
-
-              <View style={$listeSignalementsHorizontale}>
+              <View style={$containerDescriptionEtSignalements}>
+                <View>
+                  {signalements?.length > 0 && (
+                    <Text text="Signalements" size="lg" />
+                  )}
+                </View>
                 <ScrollView horizontal>
                   <TouchableWithoutFeedback>
                     <View style={$scrollLine}>
@@ -305,7 +294,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                           );
                         }
                       })}
-
                       {signalements?.length > 0 ? (
                         <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
                           <View style={$carteGlobale}>
@@ -319,7 +307,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   </TouchableWithoutFeedback>
                 </ScrollView>
               </View>
-
               <View style={$containerDenivele}>
                 <Text text="Dénivelé" size="lg" />
                 {
@@ -431,6 +418,11 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 /*                                   STYLES                                   */
 /* -------------------------------------------------------------------------- */
 
+const $stylePage: ViewStyle = {
+  paddingRight: spacing.xl,
+  paddingLeft: spacing.xl,
+}
+
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.fond,
   borderWidth: 1,
@@ -517,7 +509,8 @@ const $souligneInfosAvis: ViewStyle = {
 const $containerInformations: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
-  padding: spacing.xl,
+  paddingTop: spacing.xl,
+  paddingBottom: spacing.xl
 }
 
 const $containerUneInformation: ViewStyle = {
@@ -532,17 +525,7 @@ const $iconInformation: ImageStyle = {
 }
 
 //Style de la description et des signalements
-
-const $containerDescriptionSignalements: ViewStyle = {
-  // flexDirection: "row",
-  justifyContent: "space-around",
-  paddingLeft: spacing.xl,
-  paddingRight: spacing.xl,
-}
-
-const $textDescription: TextStyle = {
-  width: "100%",
-  paddingRight: spacing.xl,
+const $containerDescriptionEtSignalements: ViewStyle = {
   paddingBottom: spacing.xl
 }
 
@@ -551,13 +534,11 @@ const $containerAvis: ViewStyle = {
 }
 
 const $containerDenivele: ViewStyle = {
-  padding: spacing.lg,
+  paddingBottom: spacing.xl,
 }
 
 const $tousLesSignalements: TextStyle = {
   justifyContent: "space-between",
-  paddingLeft: spacing.xl,
-  paddingRight: spacing.xl,
   color: colors.souligne,
 }
 const $listeSignalements: ViewStyle = {
@@ -569,7 +550,6 @@ const $scrollLine: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  marginTop: spacing.xs,
 }
 
 const $carteGlobale: ViewStyle = {
@@ -593,5 +573,6 @@ const $sortirDetailSignalement: ViewStyle = {
 }
 
 const $listeSignalementsHorizontale: ViewStyle = {
-  paddingLeft: spacing.md
+  paddingLeft: spacing.md,
+  paddingBottom: spacing.xl
 }

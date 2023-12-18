@@ -150,7 +150,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         denivele: excursion.denivele,
         duree: excursion.duree,
         distance: excursion.distance_excursion,
-        typeParcours: excursion.type_parcours.name,
+        typeParcours: excursion.type_parcours,
         vallee: excursion.vallee,
         difficulteTechnique: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation,
