@@ -83,7 +83,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     >
 
       <Tab.Navigator
-        screenOptions={{ headerShown: false }}
         initialRouteName={"Carte"}
         screenOptions={{
           headerShown: false,
@@ -116,7 +115,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
         />
         <Tab.Screen
           name="Carte"
-          component={Screens.CarteScreen}
+          component={Screens.MapScreen}
           options={{
             tabBarIcon: (props) => (
               <Image
