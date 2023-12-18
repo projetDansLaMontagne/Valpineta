@@ -1,10 +1,8 @@
 import * as React from "react"
-import { StyleProp, TextStyle, View, ViewStyle, StyleSheet, Image } from "react-native"
+import { View, StyleSheet, Image } from "react-native"
 import { observer } from "mobx-react-lite"
-import { colors, spacing, typography } from "app/theme"
+import { colors, spacing } from "app/theme"
 import { Text } from "app/components/Text"
-
-import { TextProps } from "./Text"
 
 export interface CarteSignalementProps {
   /**
@@ -13,15 +11,15 @@ export interface CarteSignalementProps {
 
   details?: boolean
 
-  type?: TextProps["text"]
+  type?: string
 
-  nomSignalement?: TextProps["text"]
+  nomSignalement?: string
 
-  description?: TextProps["text"]
+  description?: string
 
-  coordonnes?: TextProps["text"]
+  distanceDuDepart?: string
 
-  imageSignalement?: TextProps["text"]
+  imageSignalement?: string
 
 }
 
@@ -34,58 +32,74 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     type,
     nomSignalement,
     description,
-    coordonnes,
+    distanceDuDepart,
     imageSignalement
   } = props
 
-  return (
-    <>
-      {details ? (
-        <View style={styles.carteGlobale}>
-          <View style={styles.entete}>
-            {type === 'pointInteret' ? (
-              <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
-            ) : (
-              <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
-            )}
-            <Text style={styles.heading}>
-              {nomSignalement}
-            </Text>
-            <Text>
-              {coordonnes} km
-            </Text>
+  // if(!details || !type || !nomSignalement || !description || !distanceDuDepart || !imageSignalement){
+  const checkAndWarn = (paramName, paramValue) => {
+    if (!paramValue) {
+      console.warn(`CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`);
+    }
+  };
+
+  if (details) {
+    checkAndWarn('type', type);
+    checkAndWarn('nomSignalement', nomSignalement);
+    checkAndWarn('description', description);
+    checkAndWarn('distanceDuDepart', distanceDuDepart);
+    checkAndWarn('imageSignalement', imageSignalement);
+  } else {
+    checkAndWarn('type', type);
+    checkAndWarn('nomSignalement', nomSignalement);
+    checkAndWarn('distanceDuDepart', distanceDuDepart);
+  }
 
 
-          </View>
+  return details ?
+    <View style={styles.carteGlobale}>
+      <View style={styles.entete}>
+        {type === 'pointInteret' ? (
+          <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
+        ) : (
+          <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
+        )}
+        <Text style={styles.heading}>
+          {nomSignalement}
+        </Text>
+        <Text>
+          {distanceDuDepart} km
+        </Text>
 
-          <View style={styles.contenu}>
-            {/* {require(`../../assets/images/${imageSignalement}`)}  */}
-            <Text style={styles.texte}>
-              {description}
-            </Text>
-          </View>
+
+      </View>
+
+      <View style={styles.contenu}>
+        {/* {require(`../../assets/images/${imageSignalement}`)}  */}
+        <Text style={styles.texte}>
+          {description}
+        </Text>
+      </View>
+    </View>
+    :
+    <View>
+      <View style={styles.carteGlobale}>
+        <View style={styles.entete}>
+          {type === 'pointInteret' ? (
+            <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
+          ) : (
+            <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
+          )}
+          <Text style={styles.heading}>
+            {nomSignalement}
+          </Text>
+          <Text>
+            {distanceDuDepart} km
+          </Text>
         </View>
-      ) : (
-        <View>
-          <View style={styles.carteGlobale}>
-            <View style={styles.entete}>
-              {type === 'pointInteret' ? (
-                <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
-              ) : (
-                <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
-              )}
-              <Text style={styles.heading}>
-                {nomSignalement}
-              </Text>
-              <Text>
-                {coordonnes} km
-              </Text>
-            </View>
-          </View>
-        </View>
-      )}
-    </>
-  )
+      </View>
+    </View>
+
 })
 
 

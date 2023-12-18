@@ -1,8 +1,6 @@
-import React, { ComponentType, Fragment, ReactElement, useState } from "react"
-import { Image, ImageStyle, StyleSheet } from "react-native"
+import React, { useState } from "react"
+import { Image, StyleSheet } from "react-native"
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-
 
 import {
   TouchableOpacity,
@@ -10,7 +8,7 @@ import {
   View,
 } from "react-native"
 import { colors, spacing } from "../theme"
-import { Text, TextProps } from "./Text"
+import { Text } from "./Text"
 
 /**@warning L absence de parametre n est pas geree */
 
@@ -28,7 +26,6 @@ interface CarteExcursionProps extends TouchableOpacityProps {
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
-  const favoriIcone = require("../../assets/icons/favori.png")
   const valleeIcone = require("../../assets/icons/zone.png")
   const parcoursIcone = require("../../assets/icons/parcours.png")
   const tempsIcone = require("../../assets/icons/temps.png")
@@ -40,19 +37,36 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const imageRandonnee = require("../../assets/images/randonnee.png")
 
   const [coeurTouche, setCoeurTouche] = useState(false);
-  const detailExcursion = () => {
-    props.navigation.navigate('Stack', {
-      screen: 'DetailsExcursion',
-      params: {
-        nomExcursion: props.nom,
-        temps: props.duree,
-        distance: props.distance,
-        difficulteParcours: props.difficulteParcours,
-        difficulteOrientation: props.difficulteOrientation,
-        signalements: props.signalements
-      }
-    });
-  }
+
+  var detailExcursion = null;
+
+  detailExcursion = () => {
+    if (
+      props &&
+      props.nom !== undefined &&
+      props.duree !== undefined &&
+      props.distance !== undefined &&
+      props.difficulteParcours !== undefined &&
+      props.difficulteOrientation !== undefined &&
+      props.signalements !== undefined
+    ) {
+      props.navigation.navigate('Stack', {
+        screen: 'DetailsExcursion',
+        params: {
+          nomExcursion: props.nom,
+          temps: props.duree,
+          distance: props.distance,
+          difficulteParcours: props.difficulteParcours,
+          difficulteOrientation: props.difficulteOrientation,
+          signalements: props.signalements
+        }
+      });
+    } else {
+      // Gérer le cas où l'un des attributs n'est pas défini
+      console.error('Certains attributs de props ne sont pas définis.');
+    }
+  };
+
 
   const styles = StyleSheet.create({
     carteGlobale: {
@@ -169,7 +183,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
             <Icon
               name="heart-o"
               size={spacing.lg}
-              style={styles.coeur}
             />
           </TouchableOpacity>
         </View>

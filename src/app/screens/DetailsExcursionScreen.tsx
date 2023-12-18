@@ -28,7 +28,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
     if (props.route.params !== undefined) {
-      nomExcursion = props.route.params.nomExcursion
+      nomExcursion = props.route.params.nomExcursion;
       temps = props.route.params.temps
       distance = props.route.params.distance
       difficulteParcours = props.route.params.difficulteParcours
@@ -44,7 +44,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         , 1000);
     }
 
-    const [isAllSignalements, setisAllSignalements] = useState(false);
+    const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [userLocation, setUserLocation] = useState(null);
@@ -79,7 +79,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           style={$boutonRetour}
           onPress={() => {
             navigation.navigate("Excursions");
-            setisAllSignalements(false)
+            setIsAllSignalements(false)
           }
           }
         >
@@ -91,7 +91,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         <SwipeUpDown
           itemMini={itemMini()}
           disableSwipeIcon={true}
-          itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setisAllSignalements)}
+          itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements)}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
           animation="easeInEaseOut"
@@ -134,10 +134,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       )
     }
 
-    function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setisAllSignalements) {
+    function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements) {
 
       if (isAllSignalements) {
-        return listeSignalements(setisAllSignalements, signalements);
+        return listeSignalements(setIsAllSignalements, signalements);
       }
       else {
         return (
@@ -168,7 +168,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   </View>
                   <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
                   </View>
-                  {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation, setisAllSignalements, signalements) : avis()}
+                  {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation, setIsAllSignalements, signalements) : avis()}
                 </View>
               </View >
             }
@@ -178,7 +178,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     }
 
-    function listeSignalements(setisAllSignalements, signalements) {
+    function listeSignalements(setIsAllSignalements, signalements) {
       return (
         <View style={$containerGrand}>
           <View style={$listeSignalements}>
@@ -193,16 +193,16 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                     if (signalement.type == "Avertissement")
                       return (
                         <View key={index}>
-                          <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                            <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} description={signalement.description} />
+                          <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                            <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} />
                           </TouchableOpacity>
                         </View>
                       );
                     else {
                       return (
                         <View key={index}>
-                          <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                            <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} description={signalement.description} />
+                          <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                            <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} />
                           </TouchableOpacity>
                         </View>
                       );
@@ -213,7 +213,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
               </TouchableWithoutFeedback>
             </ScrollView>
             <View style={$sortirDetailSignalement}>
-              <Button text="Revenir aux informations" onPress={() => setisAllSignalements(false)} />
+              <Button text="Revenir aux informations" onPress={() => setIsAllSignalements(false)} />
             </View>
           </View>
         </View>
@@ -225,7 +225,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * @param isLoading
      * @returns les informations de l'excursion
      */
-    function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number, setisAllSignalements, signalements) {
+    function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number, setIsAllSignalements, signalements) {
       const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
 
 
@@ -291,16 +291,16 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                         if (signalement.type == "Avertissement")
                           return (
                             <View key={index}>
-                              <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                                <CarteSignalement type="avertissement" details={false} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} />
+                              <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                                <CarteSignalement type="avertissement" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
                               </TouchableOpacity>
                             </View>
                           );
                         else {
                           return (
                             <View key={index}>
-                              <TouchableOpacity onPress={() => setisAllSignalements(true)}>
-                                <CarteSignalement type="pointInteret" details={false} nomSignalement={signalement.nom} coordonnes={`${distanceSignalement}`} />
+                              <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                                <CarteSignalement type="pointInteret" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
                               </TouchableOpacity>
                             </View>
                           );
@@ -308,7 +308,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                       })}
 
                       {signalements?.length > 0 ? (
-                        <TouchableOpacity onPress={() => setisAllSignalements(true)}>
+                        <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
                           <View style={$carteGlobale}>
                             <Text text="Voir détails" size="sm" style={$tousLesSignalements} />
                           </View>

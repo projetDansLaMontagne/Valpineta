@@ -154,16 +154,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         vallee: excursion.vallee,
         difficulteTechnique: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation,
-        signalements: excursion.signalements.map(signalement => ({
-          id: signalement.id,
-          nom: signalement.nom,
-          type: signalement.type,
-          description: signalement.description,
-          image: signalement.image,
-          latitude: signalement.latitude,
-          longitude: signalement.longitude,
-          id_excursion: signalement.id_excursion,
-        })),
+        signalements: excursion.signalements
       }));
 
       // -- FORMATAGE DES DONNEES RECUPEREES --
