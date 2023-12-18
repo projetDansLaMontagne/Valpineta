@@ -19,8 +19,17 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
   props: DescriptionScreenProps,
 ) {
   const { navigation } = props
-  const { excursion } = props.route.params
+  const { route } = props
 
+  // Vérifier si "route" est défini
+  if (!route || !route.params || !route.params.excursion) {
+    // Si "route" ou "route.params.excursion" n'est pas défini, revenir en arrière
+    navigation.goBack()
+    console.log("Erreur: route.params.excursion n'est pas défini")
+    return null  // Important pour éviter l'exécution du reste du code
+  }
+
+  const { excursion } = route.params
   var nomExcursion = ""
   var description = ""
 
@@ -46,6 +55,7 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
     </Screen>
   )
 })
+
 
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.fond,

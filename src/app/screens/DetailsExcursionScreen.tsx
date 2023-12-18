@@ -26,17 +26,19 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { navigation } = props;
+    const { navigation, route } = props;
 
-    const [excursion, setExcursion] = useState(props.route.params.excursion);
+    // Utilisez le hook useState avec une valeur par défaut
+    const [excursion, setExcursion] = useState(route.params?.excursion || null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Utilisez le hook useEffect sans condition
     useEffect(() => {
-      if (props.route.params !== undefined) {
-        setExcursion(props.route.params.excursion);
-      }
-    }, [props.route.params]);
+      // Mettez à jour l'excursion lorsqu'il y a un changement dans route.params
+      setExcursion(route.params?.excursion || null);
+    }, [route.params]);
 
+    // Rendu du composant
     return excursion && (
       <SafeAreaView style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
@@ -60,9 +62,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           swipeHeight={100}
         />
       </SafeAreaView>
-    );    
+    )
   },
 );
+
 
 
 /**
