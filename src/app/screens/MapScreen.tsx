@@ -29,16 +29,21 @@ import {Asset} from "expo-asset";
 import * as fileSystem from 'expo-file-system';
 import formatRequire from "../services/importAssets/assetRequire";
 
+import fichier_json_aled_jenpeuxPlus from '../../assets/Tiles/tiles_struct.json';
+import {T_Point} from "./DetailsExcursionScreen";
+const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 // variables
-interface MapScreenProps extends AppStackScreenProps<"Map"> {}
+interface MapScreenProps extends AppStackScreenProps<"Map"> {
+  children?: React.ReactNode,
+  // startLocation: state d'un autre ecran
+  startLocation?: T_Point,
+}
 
 type T_animateToLocation = (
   passedLocation?: Location.LocationObject
 ) => void;
 
 let COMPTEUR = 0;
-import fichier_json_aled_jenpeuxPlus from '../../assets/Tiles/tiles_struct.json';
-const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
 const download_file = async () => {
@@ -271,6 +276,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
     console.log("poiButtonOnPress()");
   }
 
+  const reportButtonOnPress = async () => {
+    console.log("reportButtonOnPress()");
+  }
+
   const toggleMenu = () => {
     setMenuIsOpen(!menuIsOpen);
   }
@@ -318,6 +327,20 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   }, [followUserLocation]);
 
   useEffect(() => {
+    if (_props.startLocation) {
+      console.log(`[EcranTestScreen] _props.startLocation: ${JSON.stringify(_props.startLocation)}`);
+
+      const { lat, lon } = _props.startLocation;
+      animateToLocation({
+        coords: {
+          latitude: lat,
+          longitude: lon,
+        }
+      } as Location.LocationObject);
+    }
+  }, [_props.startLocation]);
+
+  useEffect(() => {
     // ! TO REMOVE BEFORE PRODUCTION
      fileSystem.deleteAsync(folder_dest).then(() => {
        console.log("Folder deleted");
@@ -340,8 +363,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
   const region = {
-    latitude: LATITUDE,
-    longitude: LONGITUDE,
+    latitude: _props.startLocation?.lat ??LATITUDE,
+    longitude: _props.startLocation?.lon ?? LONGITUDE,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   }
@@ -362,13 +385,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
 
                     ...styles.map
                   }}
-
-                  // initialRegion={{
-                  //   latitude: location.coords.latitude,
-                  //   longitude: location.coords.longitude,
-                  //   latitudeDelta: 0.0922,
-                  //   longitudeDelta: 0.0421,
-                  // }}
 
                   initialRegion={region}
 
@@ -407,6 +423,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                     urlTemplate={folder_dest + "/{z}/{x}/{y}.png"}
                     tileSize={256}
                   />
+
+                  {
+                    _props.children && _props.children
+                  }
+
                 </MapView>
 
                 <View style={styles.mapOverlay}>
@@ -430,6 +451,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                           style={{
                             ...styles.actionsButtonContainer,
                           }}
+
+                          onPress={reportButtonOnPress}
 
                           icon='exclamation-circle'
                           iconSize={spacing.lg}

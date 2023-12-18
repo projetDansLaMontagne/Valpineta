@@ -5,6 +5,8 @@ import { AppStackScreenProps } from "app/navigators";
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
+import {MapScreen} from "./MapScreen";
+import {Marker} from "react-native-maps";
 
 const { width, height } = Dimensions.get("window");
 
@@ -13,15 +15,38 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 
 }
 
+export type T_Point = {
+  lon: number,
+  lat: number,
+  alt: number | null,
+  dist: number,
+}
+type T_getExcursionTrackResponse = Promise<{
+  allPoints: T_Point[] | null,
+}>
+
+/**
+ * @function getExcursionTrack
+ * @description Récupère le fichier gpx de l'excursion afin de l'afficher sur la carte.
+ * @param nomExcursion
+ * @returns le fichier gpx de l'excursion
+ */
+const getExcursionTrack: (nomExcursion: string) => Promise<T_Point[]> = async (nomExcursion: string) => {
+  // les fichiers sont stockés dans le dossier assets/tracks
+  // ! TO REMOVE BEFORE PRODUCTION - name is hardcoded
+  return await require(`../../assets/tracks/caminokique.json`)
+    // .then((response) => response.json() as Promise<T_Point[]>)
+}
+
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
 
-    var nomExcursion = "";
-    var temps = { h: 0, m: 0 };
-    var distance = 0;
-    var difficulteParcours = 0;
-    var difficulteOrientation = 0;
-    var navigation = props.navigation;
+    let nomExcursion = "";
+    let temps = { h: 0, m: 0 };
+    let distance = 0;
+    let difficulteParcours = 0;
+    let difficulteOrientation = 0;
+    let navigation = props.navigation;
 
     /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
     if (props.route.params !== undefined) {
@@ -34,6 +59,26 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     const [isLoading, setIsLoading] = useState(true);
 
+    const [startPoint, setStartPoint] = useState<T_Point | null>(null);
+    const [allPoints, setAllPoints] = useState<T_Point[] | null>(null);
+    useEffect(() => {
+      console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion}`);
+
+      getExcursionTrack(nomExcursion)
+        .then((response) => {
+          console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion} - POINTS OK`);
+          setAllPoints(response);
+
+          setTimeout(() => {
+            console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion} - START POINT OK`);
+            setStartPoint(response[0]);
+          }, 5000)
+        })
+        .catch((error) => {
+          console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion} - error: ${error}`);
+        });
+    }, []);
+
     return (
       <SafeAreaView style={$container}>
         <TouchableOpacity
@@ -45,6 +90,29 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
+
+        <MapScreen
+          startLocation={startPoint}
+        >
+          {
+            allPoints &&
+            allPoints.map((point, index) => {
+              return (
+                <Marker
+                  coordinate={{
+                    latitude: point.lat,
+                    longitude: point.lon
+                  }}
+                  key={index}
+                  style={{
+                    zIndex: 999,
+                  }}
+                />
+              )
+            })
+          }
+        </MapScreen>
+
         <SwipeUpDown
           itemMini={itemMini()}
           itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation)}
@@ -232,6 +300,8 @@ const $boutonRetour: ViewStyle = {
   width: 50,
   position: "absolute",
   top: 15,
+
+  zIndex: 2,
 }
 
 const $container: ViewStyle = {
