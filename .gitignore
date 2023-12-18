@@ -1,18 +1,3 @@
-# Folders
-.idea
-node_modules
-build
-
-
-# Files
-*.DS_Store
-.commitignore
-
-commit_message.txt
-package-lock.json
-
-
-# src
 # OSX
 #
 .DS_Store
@@ -39,7 +24,7 @@ ios/.xcode.env.local
 
 # Android/IntelliJ
 #
-src/build/
+.idea
 .gradle
 local.properties
 *.iml
@@ -49,12 +34,11 @@ local.properties
 # node.js
 #
 src/node_modules/
-src/npm-debug.log
-src/yarn-error.log
-src/yarn.lock
+npm-debug.log
+yarn-error.log
 
 # BUCK
-src/buck-out/
+buck-out/
 \.buckd/
 *.keystore
 !debug.keystore
@@ -75,7 +59,7 @@ src/buck-out/
 *.jsbundle
 
 # CocoaPods
-/src/ios/Pods/
+/ios/Pods/
 
 # Ignite-specific items below
 # You can safely replace everything above this comment with whatever is
@@ -85,7 +69,7 @@ src/buck-out/
 .vscode
 
 # Expo
-.expo/*
+.expo
 bin/Exponent.app
 
 npm-debug.*
@@ -99,3 +83,7 @@ web-build/
 
 # Configurations
 !env.js
+package-lock.json
+
+# Tiles
+assets/Tiles

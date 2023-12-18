@@ -47,8 +47,7 @@ export type AppStackParamList = {
   Map: undefined
   DetailsExcursion: undefined
   Parametres: undefined
-  Description: undefined
-	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**
@@ -86,16 +85,15 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     >
 
       <Tab.Navigator
-        screenOptions={{ headerShown: false }}
         initialRouteName={"Carte"}
-        screenOptions={() => ({
+        screenOptions={{
           headerShown: false,
           tabBarStyle: {
             padding: 5,
             backgroundColor: colors.fond,
-            borderTopColor: colors.bordure,
-          },
-        })}
+            borderTopColor: colors.bordure,       // une bordure n a rien a faire  dans colors
+          }
+        }}
       >
         <Tab.Screen component={StackNavigator} name="Stack" options={{ tabBarButton: () => null, }} />
         <Tab.Screen component={Screens.ExcursionsScreen} options={{
@@ -108,7 +106,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           tabBarActiveTintColor: colors.bouton,
           tabBarInactiveTintColor: colors.text,
           tabBarLabelStyle: { color: colors.bouton },
-          tabBarLabel: parametres.langues === "fr" ? "Explorer" : "Explorar",
         }} name="Excursions" />
         <Tab.Screen component={Screens.CarteScreen} options={{
           tabBarIcon: (props) => (
@@ -118,7 +115,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
             />
           ),
           tabBarLabelStyle: { color: colors.bouton },
-          tabBarLabel: parametres.langues === "fr" ? "Carte" : "Mapa",
         }} name="Carte" />
         <Tab.Screen component={Screens.ParametresScreen} options={{
           tabBarIcon: (props) => (
@@ -128,7 +124,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
             />
           ),
           tabBarLabelStyle: { color: colors.bouton },
-          tabBarLabel: parametres.langues === "fr" ? "Paramètres" : "Ajustes",
         }} name="Parametres" />
       </Tab.Navigator>
     </NavigationContainer>

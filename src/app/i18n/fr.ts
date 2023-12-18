@@ -10,6 +10,7 @@ const fr = {
       "psst  — Ce n'est probablement pas à quoi ressemble votre application. (À moins que votre designer ne vous ait donné ces écrans, dans ce cas, mettez la en prod !)",
     readyForLaunch: "Votre application, presque prête pour le lancement !",
     exciting: "(ohh, c'est excitant !)",
+    button: "Allons-y !",
   },
   errorScreen: {
     title: "Quelque chose s'est mal passé !",
@@ -24,6 +25,26 @@ const fr = {
         "Aucune donnée trouvée pour le moment. Essayez de cliquer sur le bouton pour rafraîchir ou recharger l'application.",
       button: "Essayons à nouveau",
     },
+  },
+  testScreen: {
+    title: "Ecran de test",
+    locate: {
+      locate_btn: "Localisez moi !",
+      dl_map_btn: "Télécharger la carte",
+      stop_locate_btn: "Stopper la localisation",
+      fetching: "Localisation en cours...",
+      follow: "Me suivre",
+      stopFollowing: "Arrêter de me suivre",
+      located: {
+          title: "Vous êtes ici !",
+          latitude: "Latitude : ",
+          longitude: "Longitude : ",
+      },
+      notLocated: {
+          title: "Impossible de vous localiser",
+          message: "Veuillez vérifier vos paramètres de localisation",
+      },
+    }
   },
 
   carteComposant: {

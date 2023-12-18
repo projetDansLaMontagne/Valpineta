@@ -4,19 +4,19 @@ import Icon from "react-native-vector-icons/FontAwesome"
 
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
 import { colors, spacing } from "../theme"
-import { Text, TextProps } from "./Text"
+import { Text } from "./Text"
+import { navigate } from "app/navigators"
+
+/**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-  excursion: JSON
-  navigation: any
-  route: any
+  excursion: Record<string, any>
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
-  const { navigation } = props
 
   const {
-    nomExcursion,
+    nom,
     duree,
     typeParcours,
     zone,
@@ -47,7 +47,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   }
 
   const detailExcursion = () => {
-    navigation.navigate("Stack", {
+    navigate("Stack", {
       screen: "DetailsExcursion",
       params: { excursion: props.excursion, navigation: navigation },
     })
@@ -148,7 +148,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
       height: spacing.lg,
       marginEnd: spacing.xxs,
     },
-    zoneFavori: {
+    valleeFavori: {
       marginEnd: spacing.xxs,
     },
   })
@@ -158,7 +158,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
       <View style={styles.carteGlobale}>
         <View style={styles.entete}>
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
-          <Text weight="bold" text={nomExcursion} style={styles.heading} />
+          <Text weight="bold" text={nom} style={styles.heading} />
           <TouchableOpacity onPress={excursionFavorite}>
             <Icon
               name="heart-o"

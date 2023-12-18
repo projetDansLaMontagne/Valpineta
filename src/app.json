@@ -7,9 +7,9 @@
     "scheme": "src",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/app-icon-all.png",
+    "icon": "./assets/images/logo.jpg",
     "splash": {
-      "image": "./assets/images/splash-logo-all.png",
+      "image": "./assets/images/loading.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#191015"
     },
@@ -21,43 +21,48 @@
       "**/*"
     ],
     "android": {
-      "icon": "./assets/images/app-icon-android-legacy.png",
+      "icon": "./assets/images/logo.jpg",
       "package": "com.src",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
       },
       "splash": {
-        "image": "./assets/images/splash-logo-android-universal.png",
+        "image": "./assets/images/loading.jpg",
         "resizeMode": "contain",
         "backgroundColor": "#191015"
       }
     },
     "ios": {
-      "icon": "./assets/images/app-icon-ios.png",
+      "icon": "./assets/images/logo.jpg",
       "supportsTablet": true,
       "bundleIdentifier": "com.src",
       "splash": {
-        "image": "./assets/images/splash-logo-ios-mobile.png",
-        "tabletImage": "./assets/images/splash-logo-ios-tablet.png",
+        "image": "./assets/images/loading.jpg",
+        "tabletImage": "./assets/images/loading.jpg",
         "resizeMode": "contain",
         "backgroundColor": "#191015"
       }
     },
     "web": {
-      "favicon": "./assets/images/app-icon-web-favicon.png",
+      "favicon": "./assets/images/logo.jpg",
       "splash": {
-        "image": "./assets/images/splash-logo-web.png",
+        "image": "./assets/images/loading.jpg",
         "resizeMode": "contain",
         "backgroundColor": "#191015"
       }
     },
     "packagerOpts": {
-      "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
+      "sourceExts": [
+        "js",
+        "json",
+        "ts",
+        "tsx",
+        "jsx, xml, gpx"
+      ]
     },
     "plugins": [
       "expo-localization"
     ]
-    
   }
 }

@@ -16,26 +16,40 @@ import {
 import { AppStackScreenProps } from "app/navigators"
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components"
 import { spacing, colors } from "app/theme"
+import { navigate } from "app/navigators"
 import SwipeUpDown from "react-native-swipe-up-down"
-import { nettoyageTexte } from "./DescriptionScreen"
 
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  navigation: any
-  route: any
+  excursion: Record<string, any>
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { navigation } = props
-    const { excursion } = props.route.params
+    const { excursion } = props
 
-    const [isLoading, setIsLoading] = useState(true)
+    var nomExcursion = "";
+    var temps = { h: 0, m: 0 };
+    var distance = 0;
+    var difficulteParcours = 0;
+    var difficulteOrientation = 0;
+    var navigation = props.navigation;
+
+    /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
+    if (props.route.params !== undefined) {
+      nomExcursion = excursion.nomExcursion
+      temps = excursion.temps
+      distance = excursion.distance
+      difficulteParcours = excursion.difficulteParcours
+      difficulteOrientation = excursion.difficulteOrientation
+    }
+
+    const [isLoading, setIsLoading] = useState(true);
 
     return (
       <SafeAreaView style={$container}>
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigate({ name: "Excursions", params: undefined })}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
@@ -334,7 +348,7 @@ const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width - width / 5,
+  width: width - (width / 5),
   margin: spacing.lg,
 }
 
