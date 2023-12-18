@@ -162,6 +162,7 @@ function StackNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
+        
       }}
     >
       <Stack.Screen name="Description" component={Screens.DescriptionScreen} />

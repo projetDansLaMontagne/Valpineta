@@ -338,14 +338,6 @@ const $container: ViewStyle = {
   backgroundColor: colors.erreur,
 }
 
-const $containerErreur: ViewStyle = {
-  flex: 1,
-  width: width,
-  height: height,
-  alignItems: "center",
-  justifyContent: "center",
-}
-
 //Style de itemMini
 
 const $containerPetit: ViewStyle = {
@@ -453,4 +445,6 @@ const $containerAvis: ViewStyle = {
 
 const $containerDenivele: ViewStyle = {
   padding: spacing.lg,
+  // marginBottom: 100, pour pouvoir afficher le graphique
+  marginBottom: 100,
 }
