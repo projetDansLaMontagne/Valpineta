@@ -21,22 +21,14 @@ import SwipeUpDown from "react-native-swipe-up-down"
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  excursion: Record<string, unknown>
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { navigation, route } = props;
+    const { route, navigation } = props;
 
-    // Utilisez le hook useState avec une valeur par défaut
-    const [excursion, setExcursion] = useState(route.params?.excursion || null);
     const [isLoading, setIsLoading] = useState(true);
-
-    // Utilisez le hook useEffect sans condition
-    useEffect(() => {
-      // Mettez à jour l'excursion lorsqu'il y a un changement dans route.params
-      setExcursion(route.params?.excursion || null);
-    }, [route.params]);
+    const excursion = route.params?.excursion;
 
     // Rendu du composant
     return excursion && (
