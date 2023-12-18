@@ -1,5 +1,5 @@
 
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
@@ -12,7 +12,6 @@ import * as Location from 'expo-location';
 const { width, height } = Dimensions.get("window");
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   temps: Record<'h' | 'm', number>,
-
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(

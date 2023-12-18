@@ -8,7 +8,6 @@ export interface CarteSignalementProps {
   /**
    * An optional style override useful for padding & margin.
    */
-
   details?: boolean
 
   type?: string
@@ -36,7 +35,6 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     imageSignalement
   } = props
 
-  // if(!details || !type || !nomSignalement || !description || !distanceDuDepart || !imageSignalement){
   const checkAndWarn = (paramName, paramValue) => {
     if (!paramValue) {
       console.warn(`CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`);
