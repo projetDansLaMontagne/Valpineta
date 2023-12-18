@@ -58,9 +58,9 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     <View style={styles.carteGlobale}>
       <View style={styles.entete}>
         {type === 'pointInteret' ? (
-          <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
+          <Image source={require('../../assets/icons/pin.png')} style={{ width: 25, height: 25, tintColor: 'green' }} />
         ) : (
-          <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
+          <Image source={require('../../assets/icons/pin.png')} style={{ width: 25, height: 25, tintColor: 'red' }} />
         )}
         <Text style={styles.heading}>
           {nomSignalement}
@@ -104,7 +104,7 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
 
 const styles = StyleSheet.create({
   carteGlobale: {
-    padding: 5,
+    padding: spacing.sm,
     margin: 10,
     shadowColor: colors.palette.noir,
     shadowOffset: {
@@ -121,14 +121,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingStart: spacing.xs,
-    paddingEnd: spacing.xs,
     marginBottom: spacing.xxs,
   },
   contenu: {
     fontSize: 14,
     maxWidth: "100%",
-    textAlign: "center",
   },
   icone: {
     color: colors.palette.vert,
@@ -147,7 +144,8 @@ const styles = StyleSheet.create({
   texte: {
     fontSize: 14,
     maxWidth: "100%",
-    textAlign: "center",
+    paddingLeft: spacing.md,
+    paddingRight: spacing.md,
   },
 })
 
