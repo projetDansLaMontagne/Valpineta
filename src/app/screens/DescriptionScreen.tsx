@@ -97,4 +97,5 @@ const $containerDescription: ViewStyle = {
 const $texteDescription: TextStyle = {
   marginTop: spacing.lg,
   marginBottom: height / 2,
+  textAlign: "justify",
 }
