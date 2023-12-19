@@ -89,7 +89,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          disableSwipeIcon={true}
           itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements)}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
