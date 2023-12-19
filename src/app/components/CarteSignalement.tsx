@@ -5,26 +5,19 @@ import { colors, spacing } from "app/theme"
 import { Text } from "app/components/Text"
 
 export interface CarteSignalementProps {
-  /**
-   * An optional style override useful for padding & margin.
-   */
-  details?: boolean
+  details: boolean
 
-  type?: string
+  type: string
 
-  nomSignalement?: string
+  nomSignalement: string
 
   description?: string
 
-  distanceDuDepart?: string
+  distanceDuDepart: string
 
   imageSignalement?: string
-
 }
 
-/**
- * Describe your component here
- */
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
   const {
     details,
@@ -35,43 +28,37 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     imageSignalement
   } = props
 
-  const checkAndWarn = (paramName, paramValue) => {
+  if (details === undefined) {
+    console.error(`CarteSignalement : details non défini pour le signalement: ${nomSignalement}`);
+    console.log(details)
+  }
+
+  const check = (paramName, paramValue) => {
     if (!paramValue) {
-      console.warn(`CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`);
+      if (paramName != 'imageSignalement') {
+        console.error(`CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`);
+      }
+      else {
+        console.warn(`CarteSignalement : imageSignalement non défini pour le signalement: ${nomSignalement}`);
+      }
     }
   };
 
   if (details) {
-    checkAndWarn('type', type);
-    checkAndWarn('nomSignalement', nomSignalement);
-    checkAndWarn('description', description);
-    checkAndWarn('distanceDuDepart', distanceDuDepart);
-    checkAndWarn('imageSignalement', imageSignalement);
+    check('type', type);
+    check('nomSignalement', nomSignalement);
+    check('description', description);
+    check('distanceDuDepart', distanceDuDepart);
+    check('imageSignalement', imageSignalement);
   } else {
-    checkAndWarn('type', type);
-    checkAndWarn('nomSignalement', nomSignalement);
-    checkAndWarn('distanceDuDepart', distanceDuDepart);
+    check('type', type);
+    check('nomSignalement', nomSignalement);
+    check('distanceDuDepart', distanceDuDepart);
   }
-
 
   return details ?
     <View style={styles.carteGlobale}>
-      <View style={styles.entete}>
-        {type === 'pointInteret' ? (
-          <Image source={require('../../assets/icons/pin.png')} style={{ width: 25, height: 25, tintColor: 'green' }} />
-        ) : (
-          <Image source={require('../../assets/icons/pin.png')} style={{ width: 25, height: 25, tintColor: 'red' }} />
-        )}
-        <Text style={styles.heading}>
-          {nomSignalement}
-        </Text>
-        <Text>
-          {distanceDuDepart} km
-        </Text>
-
-
-      </View>
-
+      {entete(type, nomSignalement, distanceDuDepart)}
       <View style={styles.contenu}>
         {/* {require(`../../assets/images/${imageSignalement}`)}  */}
         <Text style={styles.texte}>
@@ -82,23 +69,28 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     :
     <View>
       <View style={styles.carteGlobale}>
-        <View style={styles.entete}>
-          {type === 'pointInteret' ? (
-            <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'green' }} />
-          ) : (
-            <Image source={require('../../assets/icons/pin.png')} style={{ width: 20, height: 20, tintColor: 'red' }} />
-          )}
-          <Text style={styles.heading}>
-            {nomSignalement}
-          </Text>
-          <Text>
-            {distanceDuDepart} km
-          </Text>
-        </View>
+        {entete(type, nomSignalement, distanceDuDepart)}
       </View>
     </View>
-
 })
+
+function entete(type, nomSignalement, distanceDuDepart) {
+  return (
+    <View style={styles.entete}>
+      {type === 'pointInteret' ? (
+        <Image source={require('../../assets/icons/pin.png')} style={{ width: 25, height: 25, tintColor: 'green' }} />
+      ) : (
+        <Image source={require('../../assets/icons/pin.png')} style={{ width: 25, height: 25, tintColor: 'red' }} />
+      )}
+      <Text style={styles.heading}>
+        {nomSignalement}
+      </Text>
+      <Text>
+        {distanceDuDepart} km
+      </Text>
+    </View>
+  )
+}
 
 const styles = StyleSheet.create({
   carteGlobale: {

@@ -12,28 +12,34 @@ import * as Location from 'expo-location';
 const { width, height } = Dimensions.get("window");
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   temps: Record<'h' | 'm', number>,
+  distance: number,
+  difficulteParcours: number,
+  difficulteOrientation: number,
+  signalements: any,
+  nomExcursion: string,
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-
-    var nomExcursion = "";
-    var temps = { h: 0, m: 0 };
-    var distance = 0;
-    var difficulteParcours = 0;
-    var difficulteOrientation = 0;
-    var navigation = props.navigation;
-    var signalements = [];
-
-    /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
-    if (props.route.params !== undefined) {
-      nomExcursion = props.route.params.nomExcursion;
-      temps = props.route.params.temps
-      distance = props.route.params.distance
-      difficulteParcours = props.route.params.difficulteParcours
-      difficulteOrientation = props.route.params.difficulteOrientation
-      signalements = props.route.params.signalements
+    if (
+      !props?.route?.params ||
+      !props?.route?.params?.temps ||
+      !props?.route?.params?.distance ||
+      !props?.route?.params?.difficulteParcours ||
+      !props?.route?.params?.difficulteOrientation ||
+      !props?.route?.params?.signalements ||
+      !props?.route?.params?.nomExcursion
+    ) {
+      throw new Error("Mauvais parametres");
     }
+
+    var navigation = props.navigation;
+    var nomExcursion = props.route.params.nomExcursion;
+    var temps = props.route.params.temps
+    var distance = props.route.params.distance
+    var difficulteParcours = props.route.params.difficulteParcours
+    var difficulteOrientation = props.route.params.difficulteOrientation
+    var signalements = props.route.params.signalements
 
     //Lance le chrono pour le chargement du graphique de dénivelé
     const chrono = () => {
@@ -173,7 +179,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           </View>
         );
       }
-
     }
 
     function listeSignalements(setIsAllSignalements, signalements) {
@@ -191,17 +196,13 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                     if (signalement.type == "Avertissement")
                       return (
                         <View key={index}>
-                          <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                            <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} />
-                          </TouchableOpacity>
+                          <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} />
                         </View>
                       );
                     else {
                       return (
                         <View key={index}>
-                          <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                            <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} />
-                          </TouchableOpacity>
+                          <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} />
                         </View>
                       );
                     }
@@ -225,8 +226,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      */
     function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number, setIsAllSignalements, signalements) {
       const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
-
-
       return (
         <ScrollView>
           <TouchableWithoutFeedback>
@@ -542,6 +541,7 @@ const $tousLesSignalements: TextStyle = {
   color: colors.souligne,
 }
 const $listeSignalements: ViewStyle = {
+  marginTop: spacing.lg,
   height: "115%", //Si je met a 100% il descend pas jusqu'en bas voir avec reio prod
   width: "95%"
 }
