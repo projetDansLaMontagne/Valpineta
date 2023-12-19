@@ -155,7 +155,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
       width: spacing.lg,
       height: spacing.lg,
       marginEnd: spacing.xxs,
-      color: coeurTouche ? colors.palette.rouge : null,
     },
     valleeFavori: {
       marginEnd: spacing.xxs,
@@ -169,7 +168,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
           <Text weight="bold" text={nomExcursion} style={styles.heading} />
           <TouchableOpacity onPress={excursionFavorite}>
-            <Icon name="heart-o" size={spacing.lg} style={styles.icone} />
+            <Icon name="heart-o" size={spacing.lg} style={styles.icone} color={ coeurTouche ? colors.palette.rouge : colors.palette.noir} />
           </TouchableOpacity>
         </View>
         <View style={styles.tableauInfos}>

@@ -81,7 +81,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           tabBarStyle: {
             padding: 5,
             backgroundColor: colors.fond,
-            borderTopColor: colors.bordure, // une bordure n a rien a faire  dans colors
+            borderTopColor: colors.palette.vert
           },
         }}
       >
@@ -136,6 +136,7 @@ function StackNavigator() {
 
   return (
     <Stack.Navigator
+      initialRouteName={"Excursions"}
       screenOptions={{
         headerShown: false,
       }}
@@ -144,10 +145,6 @@ function StackNavigator() {
       <Stack.Screen
         name="DetailsExcursion"
         component={Screens.DetailsExcursionScreen}
-        options={({ route }) => ({
-          title: route.params.excursion.nom,
-          
-        })}
       />
       <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
       <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />

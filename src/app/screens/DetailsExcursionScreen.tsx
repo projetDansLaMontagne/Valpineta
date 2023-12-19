@@ -11,27 +11,26 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Dimensions,
-  ActivityIndicator,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components"
+import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen } from "app/components"
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
 
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
+  excursion: Record<string, unknown>
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { route, navigation } = props;
+    const { route, navigation } = props
+    const excursion = route.params?.excursion
+    const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
 
-    const [isLoading, setIsLoading] = useState(true);
-    const excursion = route.params?.excursion;
-
-    // Rendu du composant
-    return excursion && (
+    //si excursion est défini, on affiche les informations de l'excursion
+    return excursion ? (
       <SafeAreaView style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
@@ -41,24 +40,32 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(
-            excursion,
-            isLoading,
-            setIsLoading,
-            navigation
-          )}
-          onShowFull={() => setIsLoading(true)}
-          onShowMini={() => setIsLoading(false)}
+          itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche)}
           animation="easeInEaseOut"
           extraMarginTop={125}
           swipeHeight={100}
         />
       </SafeAreaView>
+    ) : 
+    //sinon on affiche une erreur
+    (
+      <Screen  preset="fixed">
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
+          <Image
+            style={{ tintColor: colors.bouton }}
+            source={require("../../assets/icons/back.png")}
+          />
+        </TouchableOpacity>
+        <View style={$containerErreur}>
+          <Text size="xxl">Erreur</Text>
+          <Text style={$texteErreur} size="sm">
+            Une erreur est survenue, veuillez réessayer
+          </Text>
+        </View>
+      </Screen>
     )
-  },
-);
-
-
+  }
+)
 
 /**
  *
@@ -77,37 +84,15 @@ function itemMini() {
  */
 function itemFull(
   excursion: Record<string, unknown>,
-  isLoading: boolean,
-  setIsLoading: Function,
   navigation: any,
+  containerInfoAffiche: boolean,
+  setcontainerInfoAffiche: any
 ) {
-  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
 
   var nomExcursion = ""
-  if (excursion!== undefined) {
+  if (excursion !== undefined) {
     nomExcursion = excursion.nom
   }
-
-  //Lance le chrono pour le chargement du graphique de dénivelé
-  const chrono = () => {
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-  }
-
-  //Observateur de l'état du containerInfoAffiche
-  useEffect(() => {
-    if (containerInfoAffiche) {
-      chrono()
-    }
-  }, [containerInfoAffiche])
-
-  //Observateur de l'état du containerInfoAffiche
-  useEffect(() => {
-    if (isLoading) {
-      chrono()
-    }
-  }, [isLoading])
 
   return (
     <View style={$containerGrand}>
@@ -119,8 +104,6 @@ function itemFull(
         <View style={$containerBouton}>
           <TouchableOpacity
             onPress={() => {
-              //lancement du chrono pour le loading
-              setIsLoading(true), isLoading ? chrono() : null
               setcontainerInfoAffiche(true)
             }}
             style={$boutonInfoAvis}
@@ -133,8 +116,6 @@ function itemFull(
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              //Loading à false pour pouvoir relancer le chrono
-              setIsLoading(true)
               setcontainerInfoAffiche(false)
             }}
             style={$boutonInfoAvis}
@@ -154,13 +135,7 @@ function itemFull(
               : { left: width - width / 2.5 - spacing.lg / 1.5 },
           ]}
         ></View>
-        {containerInfoAffiche
-          ? infos(
-              isLoading,
-              excursion,
-              navigation
-            )
-          : avis()}
+        {containerInfoAffiche ? infos(excursion, navigation) : avis()}
       </View>
     </View>
   )
@@ -169,8 +144,7 @@ function itemFull(
 function afficherDescriptionCourte(description: string) {
   if (description == null) {
     return null
-  }
-  else{
+  } else {
     const descriptionCoupe = description.slice(0, 100)
     const descriptionFinale = descriptionCoupe + "..."
     return descriptionFinale
@@ -182,11 +156,7 @@ function afficherDescriptionCourte(description: string) {
  * @param isLoading
  * @returns les informations de l'excursion
  */
-function infos(
-  isLoading: boolean,
-  excursion: Record<string, unknown>,
-  navigation: any,
-) {
+function infos( excursion: Record<string, unknown>, navigation: any) {
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
 
   var duree = ""
@@ -194,7 +164,13 @@ function infos(
   var difficulteOrientation = 0
   var difficulteTechnique = 0
   var description = ""
-  if (excursion.duree!== undefined || excursion.distance!== undefined || excursion.difficulteOrientation!== undefined || excursion.difficulteTechnique!== undefined || excursion.description!== undefined) {
+  if (
+    excursion.duree !== undefined ||
+    excursion.distance !== undefined ||
+    excursion.difficulteOrientation !== undefined ||
+    excursion.difficulteTechnique !== undefined ||
+    excursion.description !== undefined
+  ) {
     duree = excursion.duree.h + "h"
     if (excursion.duree.m !== 0) {
       duree = duree + excursion.duree.m
@@ -202,7 +178,9 @@ function infos(
     distance = excursion.distance
     difficulteTechnique = excursion.difficulteTechnique
     difficulteOrientation = excursion.difficulteOrientation
-    excursion.description == null ? description = "Aucune desciption" : description = excursion.description
+    excursion.description == null
+      ? (description = "Aucune desciption")
+      : (description = excursion.description)
   }
 
   return (
@@ -249,13 +227,12 @@ function infos(
               />
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Description", {excursion : excursion })
+                  navigation.navigate("Description", { excursion: excursion })
                 }}
               >
-                {
-                  description === "Aucune desciption" ? null :
+                {description === "Aucune desciption" ? null : (
                   <Text style={$lienDescription} text="Lire la suite" size="xs" />
-                }
+                )}
               </TouchableOpacity>
             </View>
             <View>
@@ -265,11 +242,7 @@ function infos(
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-            {isLoading ? (
-              <ActivityIndicator size="large" color={colors.bouton} />
-            ) : (
               <GraphiqueDenivele data={data} />
-            )}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -321,6 +294,7 @@ const $boutonRetour: ViewStyle = {
   width: 50,
   position: "absolute",
   top: 15,
+  zIndex: 1,
 }
 
 const $container: ViewStyle = {
@@ -363,7 +337,7 @@ const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width - (width / 5),
+  width: width - width / 5,
   margin: spacing.lg,
 }
 
@@ -439,4 +413,19 @@ const $containerDenivele: ViewStyle = {
   padding: spacing.lg,
   // marginBottom: 100, pour pouvoir afficher le graphique
   marginBottom: 100,
+}
+
+/* --------------------------------- ERREUR --------------------------------- */
+
+const $containerErreur: ViewStyle = {
+  justifyContent: "center",
+  alignItems: "center",
+  width: width,
+  height: height,
+  padding: spacing.lg,
+}
+
+const $texteErreur: TextStyle = {
+  marginTop: spacing.lg,
+  marginBottom: height / 2,
 }
