@@ -19,6 +19,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { Image, ImageStyle } from "react-native"
+import {T_MapProps} from "app/screens";
 
 
 const explorerLogo = require("./../../assets/icons/explorer.png")
@@ -43,10 +44,9 @@ export type AppStackParamList = {
   // 🔥 Your screens go here
   Filtres: undefined
   Excursions: undefined
-  Map: undefined
+  Map: T_MapProps;
   DetailsExcursion: undefined
   Parametres: undefined,
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**

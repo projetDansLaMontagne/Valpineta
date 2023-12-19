@@ -6,13 +6,12 @@ import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/component
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import {MapScreen} from "./MapScreen";
-import {Marker} from "react-native-maps";
+import {Marker, Polyline} from "react-native-maps";
 
 const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   temps: Record<'h' | 'm', number>,
-
 }
 
 export type T_Point = {
@@ -21,21 +20,69 @@ export type T_Point = {
   alt: number | null,
   dist: number,
 }
-type T_getExcursionTrackResponse = Promise<{
-  allPoints: T_Point[] | null,
-}>
 
+type T_Track = {
+  points: T_Point[],
+  typeParcours: "Ida y Vuelta" | "Circular" | "Ida"
+}
 /**
  * @function getExcursionTrack
  * @description Récupère le fichier gpx de l'excursion afin de l'afficher sur la carte.
  * @param nomExcursion
  * @returns le fichier gpx de l'excursion
  */
-const getExcursionTrack: (nomExcursion: string) => Promise<T_Point[]> = async (nomExcursion: string) => {
+const getExcursionTrack: (nomFichier) => Promise<T_Track> = async (nomExcursion: string) => {
   // les fichiers sont stockés dans le dossier assets/tracks
   // ! TO REMOVE BEFORE PRODUCTION - name is hardcoded
-  return await require(`../../assets/tracks/caminokique.json`)
-    // .then((response) => response.json() as Promise<T_Point[]>)
+  return {
+    points: await require(`../../assets/tracks/caminokique.json`),
+    typeParcours: "Ida y Vuelta"
+  } as T_Track;
+  // ! TO REMOVE BEFORE PRODUCTION - hardcoded
+}
+
+const startMiddleAndEndHandler = (track: T_Track) => {
+  console.log(JSON.stringify(track));
+
+  let points: T_Point[] = [];
+
+  let end = track.points[track.points.length - 1];
+
+  const middleDistance = Math.round(end.dist / 2);
+  const middle = track.points.find((point) => point.dist >= middleDistance);
+
+  points.push(track.points[0]);
+  points.push(middle);
+
+  if (track.typeParcours === "Ida") {
+    // Point d'arrivée
+    points.push(end);
+  }
+
+
+  return (
+    <>
+      {
+        points.map((point, index) => {
+          return (
+            <Marker
+              coordinate={{
+                latitude: point.lat,
+                longitude: point.lon
+              }}
+              key={point.dist}
+
+              pinColor={index === 1 ? colors.bouton : colors.text}
+
+              style={{
+                zIndex: 999,
+              }}
+            />
+          )
+        })
+      }
+    </>
+  )
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
@@ -46,9 +93,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     let distance = 0;
     let difficulteParcours = 0;
     let difficulteOrientation = 0;
+
+
     let navigation = props.navigation;
 
-    /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
     if (props.route.params !== undefined) {
       nomExcursion = props.route.params.nomExcursion
       temps = props.route.params.temps
@@ -67,11 +115,11 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       getExcursionTrack(nomExcursion)
         .then((response) => {
           console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion} - POINTS OK`);
-          setAllPoints(response);
+          setAllPoints(response.points);
 
           setTimeout(() => {
             console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion} - START POINT OK`);
-            setStartPoint(response[0]);
+            setStartPoint(response.points[0]);
           }, 5000)
         })
         .catch((error) => {
@@ -94,23 +142,54 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         <MapScreen
           startLocation={startPoint}
         >
+          {/*{*/}
+          {/*  allPoints &&*/}
+          {/*  allPoints.map((point, index) => {*/}
+          {/*    return (*/}
+          {/*      <Marker*/}
+          {/*        coordinate={{*/}
+          {/*          latitude: point.lat,*/}
+          {/*          longitude: point.lon*/}
+          {/*        }}*/}
+
+          {/*        tappable={false}*/}
+
+          {/*        key={index}*/}
+          {/*        style={{*/}
+          {/*          zIndex: 999,*/}
+          {/*        }}*/}
+          {/*      />*/}
+          {/*    )*/}
+          {/*  })*/}
+          {/*}*/}
+
           {
             allPoints &&
-            allPoints.map((point, index) => {
-              return (
-                <Marker
-                  coordinate={{
-                    latitude: point.lat,
-                    longitude: point.lon
-                  }}
-                  key={index}
-                  style={{
-                    zIndex: 999,
-                  }}
-                />
-              )
-            })
+            <>
+              <Polyline
+                coordinates={
+                  allPoints.map((point) => {
+                    return {
+                      latitude: point.lat,
+                      longitude: point.lon,
+                    }
+                  })
+                }
+                strokeColor={colors.bouton}
+                strokeWidth={10}
+              />
+
+              {
+                startMiddleAndEndHandler({
+                  points: allPoints,
+                  typeParcours: "Ida y Vuelta"
+                } as T_Track)
+              }
+            </>
           }
+
+
+
         </MapScreen>
 
         <SwipeUpDown

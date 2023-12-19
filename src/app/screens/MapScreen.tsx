@@ -16,7 +16,6 @@ import {
   ViewStyle,
   Dimensions,
 } from "react-native"
-import { AppStackScreenProps } from "app/navigators"
 import {Button, Screen, Text} from "app/components"
 import {spacing, colors} from "../theme";
 
@@ -33,15 +32,15 @@ import fichier_json_aled_jenpeuxPlus from '../../assets/Tiles/tiles_struct.json'
 import {T_Point} from "./DetailsExcursionScreen";
 const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 // variables
-interface MapScreenProps extends AppStackScreenProps<"Map"> {
-  children?: React.ReactNode,
-  // startLocation: state d'un autre ecran
-  startLocation?: T_Point,
-}
 
 type T_animateToLocation = (
   passedLocation?: Location.LocationObject
 ) => void;
+
+export type T_MapProps = {
+  children?: React.ReactNode,
+  startLocation?: T_Point,
+}
 
 let COMPTEUR = 0;
 
@@ -103,7 +102,7 @@ const download_file = async () => {
   }
 
 // Component(s)
-export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
+export const MapScreen: FC<T_MapProps> = observer(function EcranTestScreen(
   _props,
 ) {
   // Variables
