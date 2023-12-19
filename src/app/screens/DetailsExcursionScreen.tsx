@@ -178,9 +178,7 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
     distance = excursion.distance
     difficulteTechnique = excursion.difficulteTechnique
     difficulteOrientation = excursion.difficulteOrientation
-    excursion.description == null
-      ? (description = "Aucune desciption")
-      : (description = excursion.description)
+    description = excursion.description
   }
 
   return (

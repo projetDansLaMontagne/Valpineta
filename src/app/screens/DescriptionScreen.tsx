@@ -21,9 +21,9 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
 ) {
   const { route, navigation } = props
 
-  // Vérifier si "route" est défini
-  if (!route || !route.params || !route.params.excursion) {
-   return(
+  // Vérifier si "excursion" est défini
+  if (props?.route?.params?.excursion === undefined) {
+    return(
     <Screen style={$container} preset="fixed" >
       <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
         <Image
@@ -38,7 +38,7 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
         </Text>
       </ScrollView>
     </Screen>
-   )
+    )
   }
 
   const { excursion } = route.params
