@@ -228,8 +228,8 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
                   navigation.navigate("Description", { excursion: excursion })
                 }}
               >
-                {description === "Aucune desciption" ? null : (
-                  <Text style={$lienDescription} text="Lire la suite" size="xs" />
+                {description === "" ? null : (
+                  <Text style={$lienDescription} text="Voir plus" size="xxs" />
                 )}
               </TouchableOpacity>
             </View>
