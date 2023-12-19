@@ -40,6 +40,12 @@ const fr = {
     accueil: "Accueil",
     carte: "Carte",
     parametres: "Parametres",
+  },
+
+  detailEscursion: {
+    signalements: "Signalements",
+    voirDetails: "Voir détails",
+    bouttonRetourInformations: "Revenir aux informations",
   }
 }
 

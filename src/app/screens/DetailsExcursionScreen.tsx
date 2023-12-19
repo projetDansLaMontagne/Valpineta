@@ -212,7 +212,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
               </TouchableWithoutFeedback>
             </ScrollView>
             <View style={$sortirDetailSignalement}>
-              <Button text="Revenir aux informations" onPress={() => setIsAllSignalements(false)} />
+              <Button tx="detailEscursion.bouttonRetourInformations" onPress={() => setIsAllSignalements(false)} />
             </View>
           </View>
         </View>
@@ -265,7 +265,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
               <View style={$containerDescriptionEtSignalements}>
                 <View>
                   {signalements?.length > 0 && (
-                    <Text text="Signalements" size="lg" />
+                    <Text tx="detailEscursion.signalements" size="lg" />
                   )}
                 </View>
                 <ScrollView horizontal>
@@ -297,7 +297,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                       {signalements?.length > 0 ? (
                         <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
                           <View style={$carteGlobale}>
-                            <Text text="Voir détails" size="sm" style={$tousLesSignalements} />
+                            <Text tx="detailEscursion.voirDetails" style={$tousLesSignalements} />
                           </View>
                         </TouchableOpacity>
                       ) : (
@@ -538,6 +538,7 @@ const $containerDenivele: ViewStyle = {
 }
 
 const $tousLesSignalements: TextStyle = {
+  fontSize: spacing.md,
   justifyContent: "space-between",
   color: colors.souligne,
 }
@@ -553,7 +554,7 @@ const $scrollLine: ViewStyle = {
 }
 
 const $carteGlobale: ViewStyle = {
-  padding: 13,
+  padding: spacing.sm,
   margin: 10,
   shadowColor: colors.palette.noir,
   shadowOffset: {
@@ -572,7 +573,3 @@ const $sortirDetailSignalement: ViewStyle = {
   marginBottom: spacing.xl,
 }
 
-const $listeSignalementsHorizontale: ViewStyle = {
-  paddingLeft: spacing.md,
-  paddingBottom: spacing.xl
-}

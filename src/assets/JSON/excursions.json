@@ -30,6 +30,16 @@
                 "latitude": "42.622241",
                 "longitude": "0.2390199",
                 "id_excursion": "1079"
+            },
+            {
+                "id": "5",
+                "nom": "\"Marmotte\"",
+                "type": "Avertissement",
+                "description": "\"Attention ! marmottes agressives\"",
+                "image": "",
+                "latitude": "42.622241",
+                "longitude": "0.2350199",
+                "id_excursion": "1079"
             }
         ]
     },

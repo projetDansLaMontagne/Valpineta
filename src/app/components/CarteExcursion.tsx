@@ -1,41 +1,41 @@
-import React, { useState } from "react"
-import { Image, StyleSheet } from "react-native"
+import React, { useState, useEffect } from "react";
+import { Image, StyleSheet } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
-import { colors, spacing } from "../theme"
-import { Text } from "./Text"
+import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
+import { colors, spacing } from "../theme";
+import { Text } from "./Text";
 
-/**@warning L absence de parametre n est pas geree */
-
-interface CarteExcursionProps extends TouchableOpacityProps {
-  nom: string
-  vallee: string
-  typeParcours: string
-  duree: Record<"h" | "m", number>
-  distance: string
-  denivele: string
-  difficulteParcours: string
-  difficulteOrientation: string
-  navigation: any
-  signalements: any
+interface PropsCarteExcursion extends TouchableOpacityProps {
+  nom: string;
+  vallee: string;
+  typeParcours: string;
+  duree: Record<"h" | "m", number>;
+  distance: string;
+  denivele: string;
+  difficulteParcours: string;
+  difficulteOrientation: string;
+  navigation: any;
+  signalements: any;
 }
 
-export function CarteExcursion(props: CarteExcursionProps) {
-  const valleeIcone = require("../../assets/icons/zone.png")
-  const parcoursIcone = require("../../assets/icons/parcours.png")
-  const tempsIcone = require("../../assets/icons/temps.png")
-  const distanceIcone = require("../../assets/icons/distance.png")
-  const denivelePositifIcone = require("../../assets/icons/denivelePositif.png")
-  const difficulteParcoursIcone = require("../../assets/icons/difficulteParcours.png")
-  const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png")
+export function CarteExcursion(props: PropsCarteExcursion) {
+  const iconeVallee = require("../../assets/icons/zone.png");
+  const iconeParcours = require("../../assets/icons/parcours.png");
+  const iconeTemps = require("../../assets/icons/temps.png");
+  const iconeDistance = require("../../assets/icons/distance.png");
+  const iconeDenivelePositif = require("../../assets/icons/denivelePositif.png");
+  const iconeDifficulteParcours = require("../../assets/icons/difficulteParcours.png");
+  const iconeDifficulteOrientation = require("../../assets/icons/difficulteOrientation.png");
 
-  const imageRandonnee = require("../../assets/images/randonnee.png")
+  const imageRandonnee = require("../../assets/images/randonnee.png");
 
   const [coeurTouche, setCoeurTouche] = useState(false);
 
-  var detailExcursion = null;
+  useEffect(() => {
+    validerParams();
+  }, []);
 
-  detailExcursion = () => {
+  const validerParams = () => {
     if (
       props &&
       props.nom !== undefined &&
@@ -45,23 +45,29 @@ export function CarteExcursion(props: CarteExcursionProps) {
       props.difficulteOrientation !== undefined &&
       props.signalements !== undefined
     ) {
-      props.navigation.navigate('Stack', {
-        screen: 'DetailsExcursion',
-        params: {
-          nomExcursion: props.nom,
-          temps: props.duree,
-          distance: props.distance,
-          difficulteParcours: props.difficulteParcours,
-          difficulteOrientation: props.difficulteOrientation,
-          signalements: props.signalements
-        }
-      });
+      // Tous les paramètres sont définis, on peut naviguer en toute sécurité
     } else {
       // Gérer le cas où l'un des attributs n'est pas défini
       console.error('Certains attributs de props ne sont pas définis.');
     }
   };
 
+  const detailExcursion = () => {
+    validerParams(); // Valider à nouveau avant de naviguer
+
+    // Si tous les paramètres sont définis, naviguer vers l'écran 'DetailsExcursion'
+    props.navigation.navigate('Stack', {
+      screen: 'DetailsExcursion',
+      params: {
+        nomExcursion: props.nom,
+        temps: props.duree,
+        distance: props.distance,
+        difficulteParcours: props.difficulteParcours,
+        difficulteOrientation: props.difficulteOrientation,
+        signalements: props.signalements
+      }
+    });
+  };
 
   const styles = StyleSheet.create({
     carteGlobale: {
@@ -185,21 +191,21 @@ export function CarteExcursion(props: CarteExcursionProps) {
         <View style={styles.tableauInfos}>
           <View style={styles.ligneSup}>
             <View style={styles.groupeTexteIconeLigneSup}>
-              <Image style={styles.icone} source={valleeIcone} resizeMode="contain" />
+              <Image style={styles.icone} source={iconeVallee} resizeMode="contain" />
               <Text
                 text={props.vallee}
                 style={styles.content}
               />
             </View>
             <View style={styles.groupeTexteIconeLigneSup}>
-              <Image style={styles.icone} source={parcoursIcone} resizeMode="contain" />
+              <Image style={styles.icone} source={iconeParcours} resizeMode="contain" />
               <Text
                 text={props.typeParcours}
                 style={styles.content}
               />
             </View>
             <View style={styles.groupeTexteIconeLigneSup}>
-              <Image style={styles.icone} source={tempsIcone} resizeMode="contain" />
+              <Image style={styles.icone} source={iconeTemps} resizeMode="contain" />
               <Text
                 text={props.duree.h + "h" + (props.duree.m == 0 ? "" : props.duree.m)}
                 style={styles.content}
@@ -208,28 +214,28 @@ export function CarteExcursion(props: CarteExcursionProps) {
           </View>
           <View style={styles.ligneInf}>
             <View style={styles.groupeTexteIconeLigneInf}>
-              <Image style={styles.icone} source={distanceIcone} resizeMode="contain" />
+              <Image style={styles.icone} source={iconeDistance} resizeMode="contain" />
               <Text
                 text={props.distance + " km"}
                 style={styles.content}
               />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
-              <Image style={styles.icone} source={denivelePositifIcone} resizeMode="contain" />
+              <Image style={styles.icone} source={iconeDenivelePositif} resizeMode="contain" />
               <Text
                 text={props.denivele + " m"}
                 style={styles.content}
               />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
-              <Image style={styles.icone} source={difficulteParcoursIcone} resizeMode="contain" />
+              <Image style={styles.icone} source={iconeDifficulteParcours} resizeMode="contain" />
               <Text
                 text={props.difficulteParcours}
                 style={styles.content}
               />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
-              <Image style={styles.icone} source={difficulteOrientationIcone} resizeMode="contain" />
+              <Image style={styles.icone} source={iconeDifficulteOrientation} resizeMode="contain" />
               <Text
                 text={props.difficulteOrientation}
                 style={styles.content}

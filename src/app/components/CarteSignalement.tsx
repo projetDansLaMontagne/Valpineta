@@ -100,8 +100,6 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
 
 })
 
-
-
 const styles = StyleSheet.create({
   carteGlobale: {
     padding: spacing.sm,
@@ -121,7 +119,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: spacing.xxs,
   },
   contenu: {
     fontSize: 14,
@@ -131,10 +128,9 @@ const styles = StyleSheet.create({
     color: colors.palette.vert,
   },
   heading: {
-    fontSize: 16,
+    fontSize: spacing.md,
     paddingEnd: 15,
     paddingStart: 15,
-    padding: 5
   },
   imageSignalement: {
     width: "100%",

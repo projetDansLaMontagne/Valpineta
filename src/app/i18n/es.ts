@@ -30,6 +30,12 @@ const es = {
     localisation: "Ubicación",
     parcours: "Ida y vuelta",
   },
+
+  detailEscursion: {
+    signalements: "Informes",
+    voirDetails: "Ver detalles",
+    bouttonRetourInformations: "Volver a la información",
+  }
 }
 
 export default es
