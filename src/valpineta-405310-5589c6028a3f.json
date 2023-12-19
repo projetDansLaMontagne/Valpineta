@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "valpineta-405310",
+  "private_key_id": "5589c6028a3fa1829b01eda97ad01bf6936e1495",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCjKnPofMWQignA\nVbxy5ybDkFaAsWcCTXiiQvWCCfpogPs0Mp5P07s+5kXKr70OHnXCO1o/p0Tuqj/1\n9LiTygO+wF6MvPWX5W4+Q3sibiN18fVFa24E/1svozf3aBYMl3qi3DhnddC2CRp+\nmHv1DBWVzC43r8SryeOINZs7kwmKbEBsNJEwCr/uCci1U2zxj+dnwPzdybfGuQso\npbs5RT+7nqW444oMCJVSvk50b1Nb3Gs2dWjEeNZQR/RNzL8H5uZ5bkKQj5rVCZZP\nuZ04+zBgZ240BiYkbzA3CJJqPzjNp1UT36SOxkXf+DzQepsALMDvkfs3U3sdJVJa\nkNrZAudzAgMBAAECggEAN6m0aAQky/XjdLtq8hH8TewQLpAWsZjnRgesxION6xfR\nWtHH4zi6oK8i8Q3543atuqjP1XZFVFw9PLWTQEvC8lCjEMUnzX1mGhSgTbMgIsz7\n3QZUvpy0qXA3mA3os7v7iNKy5Uyyel9pq/VuGD9an8NLoxCx+d8CYcXT4sN7Fj7i\n0sSuxu/Y/FzAfANHZuE3wQDnxvoU5Ea5CfAXsRlrO74qF+vKqpi7bxkay1Cs9Ul+\nIA9qyjFvZ2SRt+sIM54sFtgl18HHUCjOSg7G//9ZlrXPRAyQHkQjiwZTh2PZj9rB\nypgij7rsMfunEDL8BGyVqK5GAmDSrUDvRvjrLlitKQKBgQDfCSw0bZUHigoP10Yy\nInv9Fa8lv0r1q+RzhhfystZSBrgvm7YVyAeVVl6oZvMy6twFeEn9rf8KzvqE2AtG\nRBzitoM3tO0DKPJmFs63ydpLqI07YWdghtjLA3xJt03T4YWGMJ6PDbPMgfAFBfgn\njArvtl1qiwcKgmYCRjBprfd56wKBgQC7SAbuN5JxuQO/qPzs7BMFSgqMifmXwHUp\ndVi4nNz5OUosJOKKIxF7d8AIYg0nLiqvM51j+0vAj4HDEIDuRwirGIj2d0/c/66e\nfvg/IfAjF80fYEMn/K3jReGjvOIY4O4V4xDvCGFoVgkq84Ss880+k5PbqMeQc93W\nxT9JNZSemQKBgQClHd9R+QZpjHIihBb9qrXsCY+e/F18PwNj2xQDow4zr7HP3RES\nUwH6NvTg60aEnYbBrenpGlVEJTMmAeNm46oW1VOTfCgzPK8nkR78xT0M4f2cxmGH\n/oykzzHGSSQfBkiZrYjVEynW7yNINMEgVfcKvBGwfLh7uUnXySqyMg6SfQKBgGr7\nSSI5UoluE8sfQGQisvbZhc8kXhSm1wa4xtamnMAtTsaKx3H7eFgcXvEq+bKA99cf\nV/AuM+aq04hXXB9BKp16JXsNSuzGjbxycWK3A1M4nG8o8RPdjoN+ftem5U0q6DZO\ngHTbR7FvPEtx0j9uAbeWW+clseI9neK6yF0Mo3o5AoGBANljgpNDEcJu5GaX1NJY\ndS9LtmhHHL0RgO+I323eUad1Ftakztb868TMAy+vY5a20ExopwiaYfInteRAytfZ\nR8hUcqzd2JVQbqiZlKU26AgeENlNLa80NRP4NQd5Y/+29fyq7ldVgvQq89FI9Uz9\n55F2Lna64hZYoBoHbYoOPGz1\n-----END PRIVATE KEY-----\n",
+  "client_email": "valpinetagoogleapi@valpineta-405310.iam.gserviceaccount.com",
+  "client_id": "115760355916645841941",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/valpinetagoogleapi%40valpineta-405310.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

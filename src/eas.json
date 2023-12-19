@@ -16,6 +16,11 @@
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "valpineta-405310-67920fadea9a.json",
+        "track": "internal"
+      }
+    }
   }
 }

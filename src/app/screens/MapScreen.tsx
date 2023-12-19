@@ -404,7 +404,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                 >
 
                   <UrlTile
-                    urlTemplate={folder_dest + "/{z}/{x}/{y}.png"}
+                    urlTemplate={folder_dest + "/{z}/{x}/{y}.jpg"}
                     tileSize={256}
                   />
                 </MapView>

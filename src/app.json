@@ -22,7 +22,7 @@
     ],
     "android": {
       "icon": "./assets/images/logo.jpg",
-      "package": "com.src",
+      "package": "com.valpineta.src",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
