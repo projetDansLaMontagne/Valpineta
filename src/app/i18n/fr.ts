@@ -80,6 +80,33 @@ const fr = {
       francais: "Français",
       espagnol: "Espagnol",
     }
+  },
+  pageFiltres:{
+    tri:{
+      titre: "Trier par",
+      distance: "Distance",
+      denivele: "Dénivelé",
+      difficulteTech: "Difficulté technique",
+      difficulteOrientation: "Difficulté d'orientation",
+    },
+    filtres:{
+      titre: "Filtrer par",
+      distance: 'Distance (en km)',
+      duree: 'Durée (en heures)',
+      denivele: 'Dénivelé (en m)',
+      parcours: 'Type de parcours',
+      typeParcours: {
+        aller: 'Aller simple',
+        allerRetour: 'Aller/Retour',
+        boucle: 'Boucle',
+      },
+      vallees: 'Vallées',
+      difficulteTech: 'Difficulté technique',
+      difficulteOrientation: 'Difficulté d\'orientation',
+    },
+    boutons:{
+      valider: "Valider",
+    }
   }
 }
 

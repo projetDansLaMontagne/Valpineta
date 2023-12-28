@@ -1,0 +1,23 @@
+{
+  "distanceMax": 41,
+  "dureeMax": 18,
+  "deniveleMax": 3300,
+  "nomTypesParcours": ["Ida simple", "Ida y vuelta", "Bucle", null],
+  "nomVallees": [
+    "Pineta/Refugio",
+    "Pineta/Pradera",
+    "Salcorz",
+    "Barrosa",
+    "Trigoniero",
+    "Bielsa",
+    "Real/Petramula",
+    "Pineta/Espierba",
+    "Túnel Boca Norte",
+    "Pineta/Embalse",
+    "Gavarnie/Troumouse",
+    "Túnel Boca Sur",
+    "Túnel - Barrosa"
+  ],
+  "difficulteTechniqueMax": 5,
+  "difficulteOrientationMax": 4
+}

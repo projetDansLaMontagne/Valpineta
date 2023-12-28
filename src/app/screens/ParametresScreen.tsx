@@ -6,7 +6,7 @@ import { Screen, Text } from "app/components"
 import { colors, spacing } from "app/theme"
 import Icon from "react-native-vector-icons/FontAwesome"
 import { useStores } from "app/models"
-import I18n, { translate } from "i18n-js"
+import I18n from "i18n-js"
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window")

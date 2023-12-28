@@ -6,7 +6,6 @@ import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
 import { useStores } from "app/models";
-import { translate } from "i18n-js";
 
 /**@warning La navigation vers filtres est dans le mauvais sens (l'écran slide vers la gauche au lieu de la droite) */
 
@@ -155,32 +154,19 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       }
 
       // -- RECUPERATION DU FICHIER --
-      var excursionsBRUT = require('../../assets/JSON/excursions.json');
-<<<<<<< HEAD
-      excursionsBRUT = excursionsBRUT.data.map(excursion => ({
-        nomExcursion: excursion.nom_excursion,
-=======
+      var excursionsBRUT = jsonData;
       excursionsBRUT = excursionsBRUT.map(excursion => ({
         nom: excursion.nom_excursion,
         denivele: excursion.denivele,
->>>>>>> main
         duree: excursion.duree,
         typeParcours: excursion.type_parcours,
         zone: excursion.vallee,
         distance: excursion.distance_excursion,
-<<<<<<< HEAD
-        denivelePositif: excursion.denivele,
-        difficulteParcours: excursion.difficulte_technique,
-        difficulteOrientation: excursion.difficulte_orientation,
-        signalements: excursion.signalements,
-        description: excursion.post_content,
-=======
         typeParcours: excursion.type_parcours,
         vallee: excursion.vallee,
         difficulteTechnique: excursion.difficulte_technique,
         difficulteOrientation: excursion.difficulte_orientation,
         description : excursion.post_content
->>>>>>> main
       }));
 
 
@@ -327,10 +313,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                       <CarteExcursion
                         key={i}
                         excursion={excursion}
-<<<<<<< HEAD
-=======
                         navigation={navigation}
->>>>>>> main
                       />
                     ))
                   }

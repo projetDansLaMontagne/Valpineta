@@ -41,10 +41,7 @@ export type AppStackParamList = {
   Map: undefined
   DetailsExcursion: undefined
   Parametres: undefined
-<<<<<<< HEAD
-=======
   Description: undefined
->>>>>>> main
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -91,45 +88,13 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           },
         }}
       >
-<<<<<<< HEAD
-        <Tab.Screen component={StackNavigator} name="Stack" options={{ tabBarButton: () => null, }} />
-        <Tab.Screen component={Screens.ExcursionsScreen} options={{
-          tabBarIcon: () => (
-            <Image
-              source={explorerLogo}
-              style={$icon}
-            />
-          ),
-          tabBarActiveTintColor: colors.bouton,
-          tabBarInactiveTintColor: colors.text,
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Excursions" />
-        <Tab.Screen component={Screens.CarteScreen} options={{
-          tabBarIcon: (props) => (
-            <Image
-              source={carteLogo}
-              style={$icon}
-            />
-          ),
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Carte" />
-        <Tab.Screen component={Screens.ParametresScreen} options={{
-          tabBarIcon: (props) => (
-            <Image
-              source={parametresLogo}
-              style={$icon}
-            />
-          ),
-          tabBarLabelStyle: { color: colors.bouton },
-        }} name="Parametres" />
-=======
         <Tab.Screen
           name="Stack"
           component={StackNavigator}
           options={{ tabBarButton: () => null }}
         />
         <Tab.Screen
-          name="Excursions"
+          name= { parametres.langues === "fr" ? "Excursions" : "Excursiones" }
           component={Screens.ExcursionsScreen}
           options={{
             tabBarIcon: () => <Image source={explorerLogo} style={$icon} />,
@@ -139,7 +104,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           }}
         />
         <Tab.Screen
-          name="Carte"
+          name={ parametres.langues === "fr" ? "Carte" : "Mapa" }
           component={Screens.MapScreen}
           options={{
             tabBarIcon: (props) => <Image source={carteLogo} style={$icon} />,
@@ -147,14 +112,13 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           }}
         />
         <Tab.Screen
-          name="Parametres"
+          name={ parametres.langues === "fr" ? "Paramètres" : "Ajustes" }
           component={Screens.ParametresScreen}
           options={{
             tabBarIcon: (props) => <Image source={parametresLogo} style={$icon} />,
             tabBarLabelStyle: { color: colors.bouton },
           }}
         />
->>>>>>> main
       </Tab.Navigator>
     </NavigationContainer>
   )
@@ -175,20 +139,15 @@ function StackNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName={"Excursions"}
       screenOptions={{
         headerShown: false,
       }}
     >
       <Stack.Screen name="Description" component={Screens.DescriptionScreen} />
-<<<<<<< HEAD
-      <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
-=======
       <Stack.Screen
         name="DetailsExcursion"
         component={Screens.DetailsExcursionScreen}
       />
->>>>>>> main
       <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
       <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
     </Stack.Navigator>

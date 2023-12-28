@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { FC, useEffect, useRef, useState } from "react"
-=======
 import React, { FC, useEffect, useState } from "react"
->>>>>>> main
 import { observer } from "mobx-react-lite"
 import {
   View,
@@ -15,58 +11,20 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Dimensions,
-<<<<<<< HEAD
-  ActivityIndicator,
-} from "react-native"
-import { AppStackScreenProps } from "app/navigators"
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components"
-import { spacing, colors } from "app/theme"
-import { navigate } from "app/navigators"
-=======
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen } from "app/components"
 import { spacing, colors } from "app/theme"
->>>>>>> main
 import SwipeUpDown from "react-native-swipe-up-down"
 
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-<<<<<<< HEAD
-  excursion: Record<string, any>
-=======
   excursion: Record<string, unknown>
->>>>>>> main
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-<<<<<<< HEAD
-    const { excursion } = props
-
-    var nomExcursion = "";
-    var temps = { h: 0, m: 0 };
-    var distance = 0;
-    var difficulteParcours = 0;
-    var difficulteOrientation = 0;
-    var navigation = props.navigation;
-
-    /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
-    if (props.route.params !== undefined) {
-      nomExcursion = excursion.nomExcursion
-      temps = excursion.temps
-      distance = excursion.distance
-      difficulteParcours = excursion.difficulteParcours
-      difficulteOrientation = excursion.difficulteOrientation
-    }
-
-    const [isLoading, setIsLoading] = useState(true);
-
-    return (
-      <SafeAreaView style={$container}>
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigate({ name: "Excursions", params: undefined })}>
-=======
     const { route, navigation } = props
     const excursion = route.params?.excursion
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
@@ -75,7 +33,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     return excursion ? (
       <SafeAreaView style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
->>>>>>> main
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
@@ -83,27 +40,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-<<<<<<< HEAD
-          itemFull={itemFull(
-            excursion,
-            isLoading,
-            setIsLoading,
-            navigation
-          )}
-          onShowFull={() => setIsLoading(true)}
-          onShowMini={() => setIsLoading(false)}
-=======
           itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche)}
->>>>>>> main
           animation="easeInEaseOut"
           extraMarginTop={125}
           swipeHeight={100}
         />
       </SafeAreaView>
-<<<<<<< HEAD
-    )
-  },
-=======
     ) : 
     //sinon on affiche une erreur
     (
@@ -123,7 +65,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       </Screen>
     )
   }
->>>>>>> main
 )
 
 /**
@@ -142,36 +83,6 @@ function itemMini() {
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
 function itemFull(
-<<<<<<< HEAD
-  excursion: any,
-  isLoading: boolean,
-  setIsLoading: Function,
-  navigation: any,
-) {
-  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
-
-  //Lance le chrono pour le chargement du graphique de dénivelé
-  const chrono = () => {
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-  }
-
-  //Observateur de l'état du containerInfoAffiche
-  useEffect(() => {
-    if (containerInfoAffiche) {
-      chrono()
-    }
-  }, [containerInfoAffiche])
-
-  //Observateur de l'état du containerInfoAffiche
-  useEffect(() => {
-    if (isLoading) {
-      chrono()
-    }
-  }, [isLoading])
-
-=======
   excursion: Record<string, unknown>,
   navigation: any,
   containerInfoAffiche: boolean,
@@ -183,53 +94,34 @@ function itemFull(
     nomExcursion = excursion.nom
   }
 
->>>>>>> main
   return (
     <View style={$containerGrand}>
       <View style={$containerTitre}>
-        <Text text={excursion.nomExcursion} size="xl" style={$titre} />
+        <Text text={excursion.nom} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
         <View style={$containerBouton}>
           <TouchableOpacity
             onPress={() => {
-<<<<<<< HEAD
-              //lancement du chrono pour le loading
-              setIsLoading(true), isLoading ? chrono() : null
-=======
->>>>>>> main
               setcontainerInfoAffiche(true)
             }}
             style={$boutonInfoAvis}
           >
             <Text
-<<<<<<< HEAD
               tx="detailsExcursion.titres.infos"
-=======
-              text="Infos"
->>>>>>> main
               size="lg"
               style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
             />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-<<<<<<< HEAD
-              //Loading à false pour pouvoir relancer le chrono
-              setIsLoading(true)
-=======
->>>>>>> main
               setcontainerInfoAffiche(false)
             }}
             style={$boutonInfoAvis}
           >
             <Text
-<<<<<<< HEAD
               tx="detailsExcursion.titres.avis"
-=======
-              text="Avis"
->>>>>>> main
               size="lg"
               style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
             />
@@ -243,28 +135,13 @@ function itemFull(
               : { left: width - width / 2.5 - spacing.lg / 1.5 },
           ]}
         ></View>
-<<<<<<< HEAD
-        {containerInfoAffiche
-          ? infos(
-              isLoading,
-              excursion,
-              navigation
-            )
-          : avis()}
-=======
         {containerInfoAffiche ? infos(excursion, navigation) : avis()}
->>>>>>> main
       </View>
     </View>
   )
 }
 
 function afficherDescriptionCourte(description: string) {
-<<<<<<< HEAD
-  const texteCoupe = description.slice(0, 100)
-  const texteFinal = texteCoupe + "..."
-  return texteFinal
-=======
   if (description == null) {
     return null
   } else {
@@ -272,7 +149,6 @@ function afficherDescriptionCourte(description: string) {
     const descriptionFinale = descriptionCoupe + "..."
     return descriptionFinale
   }
->>>>>>> main
 }
 
 /**
@@ -280,14 +156,6 @@ function afficherDescriptionCourte(description: string) {
  * @param isLoading
  * @returns les informations de l'excursion
  */
-<<<<<<< HEAD
-function infos(
-  isLoading: boolean,
-  excursion: any,
-  navigation: any,
-) {
-  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
-=======
 function infos( excursion: Record<string, unknown>, navigation: any) {
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
 
@@ -312,7 +180,6 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
     difficulteOrientation = excursion.difficulteOrientation
     description = excursion.description
   }
->>>>>>> main
 
   return (
     <ScrollView>
@@ -324,76 +191,46 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
                 style={$iconInformation}
                 source={require("../../assets/icons/duree.png")}
               ></Image>
-<<<<<<< HEAD
-              <Text text={excursion.duree} size="xs" />
-=======
               <Text text={duree} size="xs" />
->>>>>>> main
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
               ></Image>
-<<<<<<< HEAD
-              <Text text={excursion.distance + " km"} size="xs" />
-=======
               <Text text={distance + " km"} size="xs" />
->>>>>>> main
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/difficulteParcours.png")}
               ></Image>
-<<<<<<< HEAD
-              <Text text={excursion.difficulteParcours} size="xs" />
-=======
               <Text text={difficulteTechnique} size="xs" />
->>>>>>> main
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
               ></Image>
-<<<<<<< HEAD
-              <Text text={excursion.difficulteOrientation} size="xs" />
-=======
               <Text text={difficulteOrientation} size="xs" />
->>>>>>> main
             </View>
           </View>
           <View style={$containerDescriptionSignalements}>
             <View>
-<<<<<<< HEAD
               <Text tx="detailsExcursion.titres.description" size="lg" />
               <Text
                 style={$textDescription}
-                text={afficherDescriptionCourte(excursion.description)}
-=======
-              <Text text="Description" size="lg" />
-              <Text
-                style={$textDescription}
                 text={afficherDescriptionCourte(description)}
->>>>>>> main
                 size="xxs"
               />
               <TouchableOpacity
                 onPress={() => {
-<<<<<<< HEAD
-                  navigation.navigate("Description", {excursion : excursion })
-                }}
-              >
-                <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xs" />
-=======
                   navigation.navigate("Description", { excursion: excursion })
                 }}
               >
                 {description === "" ? null : (
-                  <Text style={$lienDescription} text="Voir plus" size="xxs" />
+                  <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
                 )}
->>>>>>> main
               </TouchableOpacity>
             </View>
             <View>
@@ -402,17 +239,8 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
             </View>
           </View>
           <View style={$containerDenivele}>
-<<<<<<< HEAD
             <Text tx="detailsExcursion.titres.denivele" size="xl" />
-            {isLoading ? (
-              <ActivityIndicator size="large" color={colors.bouton} />
-            ) : (
               <GraphiqueDenivele data={data} />
-            )}
-=======
-            <Text text="Dénivelé" size="xl" />
-              <GraphiqueDenivele data={data} />
->>>>>>> main
           </View>
         </View>
       </TouchableWithoutFeedback>

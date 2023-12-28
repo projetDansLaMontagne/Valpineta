@@ -54,6 +54,33 @@ const es = {
       espagnol: "Español",
     }
   },
+  pageFiltres:{
+    tri: {
+      titre: "Ordenar por",
+      distance: "Distancia",
+      denivele: "Desnivel",
+      difficulteTech: "Dificultad técnica",
+      difficulteOrientation: "Dificultad de orientación",
+    },
+    filtres: {
+      titre: "Filtrar por",
+      distance: 'Distancia (en km)',
+      duree: 'Duración (en horas)',
+      denivele: 'Desnivel (en m)',
+      parcours: 'Tipo de recorrido',
+      typeParcours: {
+        aller: 'Ida simple',
+        allerRetour: 'Ida y vuelta',
+        boucle: 'Bucle',
+      },
+      vallees: 'Valles',
+      difficulteTech: 'Dificultad técnica',
+      difficulteOrientation: 'Dificultad de orientación',
+    },
+    boutons: {
+      valider: "Validar",
+    }
+  }
 }
 
 export default es

@@ -1,42 +1,14 @@
-<<<<<<< HEAD
-import React, { ComponentType, Fragment, ReactElement, useState } from "react"
-import { Image, ImageStyle, StyleSheet } from "react-native"
-=======
 import React, { useState } from "react"
 import { Image, StyleSheet } from "react-native"
->>>>>>> main
 import Icon from "react-native-vector-icons/FontAwesome"
 
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text } from "./Text"
-<<<<<<< HEAD
-import { navigate } from "app/navigators"
-=======
->>>>>>> main
 
 /**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-<<<<<<< HEAD
-  excursion: Record<string, any>
-}
-
-export function CarteExcursion(props: CarteExcursionProps) {
-
-  const {
-    nom,
-    duree,
-    typeParcours,
-    zone,
-    distance,
-    denivelePositif,
-    difficulteParcours,
-    difficulteOrientation,
-  } = props.excursion
-
-  const zoneIcone = require("../../assets/icons/zone.png")
-=======
   excursion: Record<string, unknown>
   navigation: any
 }
@@ -65,7 +37,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
   }
 
   const valleeIcone = require("../../assets/icons/zone.png")
->>>>>>> main
   const typeParcoursIcone = require("../../assets/icons/parcours.png")
   const dureeIcone = require("../../assets/icons/duree.png")
   const distanceIcone = require("../../assets/icons/distance.png")
@@ -75,15 +46,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
 
   const imageRandonnee = require("../../assets/images/randonnee.png")
 
-<<<<<<< HEAD
-  const [coeurTouche, setcoeurTouche] = useState(false)
-
-  const excursionFavorite = () => {
-    if (coeurTouche) {
-      setcoeurTouche(false)
-    } else {
-      setcoeurTouche(true)
-=======
   const [coeurTouche, setCoeurTouche] = useState(false)
 
   const excursionFavorite = () => {
@@ -91,20 +53,13 @@ export function CarteExcursion(props: CarteExcursionProps) {
       setCoeurTouche(false)
     } else {
       setCoeurTouche(true)
->>>>>>> main
     }
   }
 
   const detailExcursion = () => {
-<<<<<<< HEAD
-    navigate("Stack", {
-      screen: "DetailsExcursion",
-      params: { excursion: props.excursion, navigation: navigation },
-=======
     navigation.navigate("Stack", {
       screen: "DetailsExcursion",
       params: { excursion: props.excursion },
->>>>>>> main
     })
   }
 
@@ -211,32 +166,16 @@ export function CarteExcursion(props: CarteExcursionProps) {
       <View style={styles.carteGlobale}>
         <View style={styles.entete}>
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
-<<<<<<< HEAD
-          <Text weight="bold" text={nom} style={styles.heading} />
-          <TouchableOpacity onPress={excursionFavorite}>
-            <Icon
-              name="heart-o"
-              size={spacing.lg}
-              style={styles.icone}
-              color={coeurTouche ? colors.palette.rouge : colors.palette.noir}
-            />
-=======
           <Text weight="bold" text={nomExcursion} style={styles.heading} />
           <TouchableOpacity onPress={excursionFavorite}>
             <Icon name="heart-o" size={spacing.lg} style={styles.icone} color={ coeurTouche ? colors.palette.rouge : colors.palette.noir} />
->>>>>>> main
           </TouchableOpacity>
         </View>
         <View style={styles.tableauInfos}>
           <View style={styles.ligneSup}>
             <View style={styles.groupeTexteIconeLigneSup}>
-<<<<<<< HEAD
-              <Image style={styles.icone} source={zoneIcone} resizeMode="contain" />
-              <Text text={zone} style={styles.content} />
-=======
               <Image style={styles.icone} source={valleeIcone} resizeMode="contain" />
               <Text text={vallee} style={styles.content} />
->>>>>>> main
             </View>
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={typeParcoursIcone} resizeMode="contain" />
@@ -244,13 +183,9 @@ export function CarteExcursion(props: CarteExcursionProps) {
             </View>
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={dureeIcone} resizeMode="contain" />
-<<<<<<< HEAD
-              <Text text={duree} style={styles.content} />
-=======
               <Text text={duree.h} style={styles.content} />
               <Text text={"h"} style={styles.content} />
               <Text text={duree.m} style={styles.content} />
->>>>>>> main
             </View>
           </View>
           <View style={styles.ligneInf}>
@@ -259,21 +194,12 @@ export function CarteExcursion(props: CarteExcursionProps) {
               <Text text={distance + " km"} style={styles.content} />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
-<<<<<<< HEAD
-              <Image style={styles.icone} source={denivelePositifIcone} resizeMode="contain" />
-              <Text text={denivelePositif + " m"} style={styles.content} />
-            </View>
-            <View style={styles.groupeTexteIconeLigneInf}>
-              <Image style={styles.icone} source={difficulteParcoursIcone} resizeMode="contain" />
-              <Text text={difficulteParcours} style={styles.content} />
-=======
               <Image style={styles.icone} source={deniveleIcone} resizeMode="contain" />
               <Text text={denivele + "m"} style={styles.content} />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={difficulteTechniqueIcone} resizeMode="contain" />
               <Text text={difficulteTechnique} style={styles.content} />
->>>>>>> main
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image
