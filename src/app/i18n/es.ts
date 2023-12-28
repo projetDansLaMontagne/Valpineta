@@ -25,13 +25,36 @@ const es = {
     },
   },
 
+  testScreen: {
+    title: "Pantalla de prueba",
+    locate: {
+      locate_btn: "¡Localízame!",
+      dl_map_btn: "Descargar el mapa",
+      stop_locate_btn: "Detener la localización",
+      fetching: "Localización en curso...",
+      follow: "Seguirme",
+      stopFollowing: "Dejar de seguirme",
+      located: {
+        title: "¡Estás aquí!",
+        latitude: "Latitud: ",
+        longitude: "Longitud: ",
+      },
+      notLocated: {
+        title: "No es posible localizarte",
+        message: "Por favor, verifica tu configuración de ubicación",
+      },
+    }
+  },
+  
+
   carteComposant: {
     titre: "Título de la tarjeta",
     localisation: "Ubicación",
     parcours: "Ida y vuelta",
   },
   excursion:{
-    erreur: "Ninguna excursión encontrada",
+    erreurChargement: "Ninguna excursión encontrada",
+    erreurNom: "Nombre de excursión no encontrado",
   },
   detailsExcursion:{
     titres:{
@@ -44,6 +67,11 @@ const es = {
     boutons:{
       lireSuite: "Leer más",
     },
+    erreur: {
+      titre: "Error",
+      message: "Se produjo un error. Por favor, inténtalo de nuevo.",
+    }
+    
   },
 
   parametres:{

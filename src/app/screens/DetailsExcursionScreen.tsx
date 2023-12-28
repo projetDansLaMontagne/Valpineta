@@ -57,10 +57,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           />
         </TouchableOpacity>
         <View style={$containerErreur}>
-          <Text size="xxl">Erreur</Text>
-          <Text style={$texteErreur} size="sm">
-            Une erreur est survenue, veuillez réessayer
-          </Text>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl"/>
+          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message"/>
         </View>
       </Screen>
     )

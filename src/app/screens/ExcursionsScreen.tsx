@@ -1,11 +1,12 @@
 
 import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
-import { View, ViewStyle, ScrollView, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, ViewStyle, ScrollView, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { AppStackScreenProps } from "app/navigators"
-import { Screen, CarteExcursion } from "app/components"
+import { Screen, CarteExcursion, Text } from "app/components"
 import { colors, spacing } from 'app/theme';
 import { useStores } from "app/models";
+
 
 /**@warning La navigation vers filtres est dans le mauvais sens (l'écran slide vers la gauche au lieu de la droite) */
 
@@ -300,12 +301,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     {
       excursionsFiltrees1 && (
         excursionsFiltrees1.length == 0 ?
-          <Text>Aucune excursion ne répond aux critères selectionnés.</Text>
+          <Text tx="excursion.erreurChargement"/>
           :
           (
             excursionsFiltrees2 && (
               excursionsFiltrees2.length == 0 ?
-                <Text>Aucune excursion ne porte ce nom.</Text>
+                <Text tx="excursion.erreurNom"/>
                 :
                 <ScrollView style={styles.scrollContainer}>
                   {

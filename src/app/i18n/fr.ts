@@ -58,7 +58,8 @@ const fr = {
     difficulteOrientation: "1",
   },
   excursion:{
-    erreur: "Aucune excursion trouvée",
+    erreurChargement: "Aucune excursion ne répond aux critères selectionnés",
+    erreurNom: "Aucune excursion ne porte ce nom.",
   },
   detailsExcursion:{
     titres:{
@@ -70,6 +71,10 @@ const fr = {
     },
     boutons:{
       lireSuite: "Lire la suite",
+    },
+    erreur: {
+      titre: "Erreur",
+      message: "Une erreur est survenue, veuillez réessayer",
     }
 
   },

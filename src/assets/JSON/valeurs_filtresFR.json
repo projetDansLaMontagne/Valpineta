@@ -2,7 +2,7 @@
   "distanceMax": 41,
   "dureeMax": 18,
   "deniveleMax": 3300,
-  "nomTypesParcours": ["Aller simple", "Aller/retour", "Circuit", null],
+  "nomTypesParcours": ["Aller simple", "Aller/retour", "Circuit"],
   "nomVallees": [
     "Pineta/Refugio",
     "Pineta/Pradera",

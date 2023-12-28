@@ -16,6 +16,7 @@ import { Text, Button, Screen } from "app/components"
 import { AppStackScreenProps } from "app/navigators"
 import { colors, spacing } from "../theme"
 import { useStores } from "../models"
+import { types } from "mobx-state-tree"
 
 /**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
 
@@ -51,6 +52,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     console.error("Page des filtres necessite les filtres appliques en parametres")
     return <></>
   }
+
   const incrementDenivele = 200
   const criteresTri = parametres.langues == "fr" ?
   [
@@ -152,6 +154,13 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     }
     navigation.navigate("Excursions", { Filtres: filtres })
   }
+
+  // USE EFFECTS
+  useEffect(() => {
+    setTypesParcours(
+      valeursFiltres.nomTypesParcours.map((nomType) => ({ nom: nomType, selectionne: true })),
+    )
+  }, [valeursFiltres.nomTypesParcours])
 
   return (
     <Screen
