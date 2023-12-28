@@ -4,11 +4,7 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import {
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-} from "@react-navigation/native"
+import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
 import React from "react"
@@ -21,11 +17,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { Image, ImageStyle } from "react-native"
 import { useStores } from "app/models"
 
-
 const explorerLogo = require("./../../assets/icons/explorer.png")
 const carteLogo = require("./../../assets/icons/carte.png")
 const parametresLogo = require("./../../assets/icons/parametres.png")
-
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -47,6 +41,10 @@ export type AppStackParamList = {
   Map: undefined
   DetailsExcursion: undefined
   Parametres: undefined
+<<<<<<< HEAD
+=======
+  Description: undefined
+>>>>>>> main
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -65,9 +63,8 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 /*                                APP NAVIGATOR                               */
 /* -------------------------------------------------------------------------- */
 
-
 export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer>> { }
+  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()
@@ -83,7 +80,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
       {...props}
     >
-
       <Tab.Navigator
         initialRouteName={"Carte"}
         screenOptions={{
@@ -91,10 +87,11 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           tabBarStyle: {
             padding: 5,
             backgroundColor: colors.fond,
-            borderTopColor: colors.bordure,       // une bordure n a rien a faire  dans colors
-          }
+            borderTopColor: colors.palette.vert
+          },
         }}
       >
+<<<<<<< HEAD
         <Tab.Screen component={StackNavigator} name="Stack" options={{ tabBarButton: () => null, }} />
         <Tab.Screen component={Screens.ExcursionsScreen} options={{
           tabBarIcon: () => (
@@ -125,6 +122,39 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           ),
           tabBarLabelStyle: { color: colors.bouton },
         }} name="Parametres" />
+=======
+        <Tab.Screen
+          name="Stack"
+          component={StackNavigator}
+          options={{ tabBarButton: () => null }}
+        />
+        <Tab.Screen
+          name="Excursions"
+          component={Screens.ExcursionsScreen}
+          options={{
+            tabBarIcon: () => <Image source={explorerLogo} style={$icon} />,
+            // tabBarActiveTintColor: colors.bouton,
+            // tabBarInactiveTintColor: colors.text,
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
+        <Tab.Screen
+          name="Carte"
+          component={Screens.MapScreen}
+          options={{
+            tabBarIcon: (props) => <Image source={carteLogo} style={$icon} />,
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
+        <Tab.Screen
+          name="Parametres"
+          component={Screens.ParametresScreen}
+          options={{
+            tabBarIcon: (props) => <Image source={parametresLogo} style={$icon} />,
+            tabBarLabelStyle: { color: colors.bouton },
+          }}
+        />
+>>>>>>> main
       </Tab.Navigator>
     </NavigationContainer>
   )
@@ -136,7 +166,6 @@ const $icon: ImageStyle = {
   tintColor: colors.bouton,
 }
 
-
 /* -------------------------------------------------------------------------- */
 /*                                   FOOTER                                   */
 /* -------------------------------------------------------------------------- */
@@ -146,12 +175,20 @@ function StackNavigator() {
 
   return (
     <Stack.Navigator
+      initialRouteName={"Excursions"}
       screenOptions={{
         headerShown: false,
       }}
     >
       <Stack.Screen name="Description" component={Screens.DescriptionScreen} />
+<<<<<<< HEAD
       <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
+=======
+      <Stack.Screen
+        name="DetailsExcursion"
+        component={Screens.DetailsExcursionScreen}
+      />
+>>>>>>> main
       <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
       <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
     </Stack.Navigator>
