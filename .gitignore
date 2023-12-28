@@ -86,4 +86,4 @@ web-build/
 package-lock.json
 
 # Tiles
-assets/Tiles
+src/assets/Tiles
