@@ -1,7 +1,7 @@
 
 import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
-import { View, ViewStyle, ScrollView, Text, FlatList, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, ViewStyle, ScrollView, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion } from "app/components"
 import { colors, spacing } from 'app/theme';
@@ -144,20 +144,21 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     try {
       // -- RECUPERATION DU FICHIER --
       var excursionsBRUT = require('../../assets/JSON/excursions.json');
-      excursionsBRUT = excursionsBRUT.data.map(excursion => ({
-        nom: excursion.nom_excursions,
+      excursionsBRUT = excursionsBRUT.map(excursion => ({
+        nom: excursion.nom_excursion,
         denivele: excursion.denivele,
         duree: excursion.duree,
         distance: excursion.distance_excursion,
-        typeParcours: excursion.type_parcours.name,
+        typeParcours: excursion.type_parcours,
         vallee: excursion.vallee,
         difficulteTechnique: excursion.difficulte_technique,
-        difficulteOrientation: excursion.difficulte_orientation
+        difficulteOrientation: excursion.difficulte_orientation,
+        description : excursion.post_content
       }));
+
 
       // -- FORMATAGE DES DONNEES RECUPEREES --
       const excursionsFormatees = formatageExcursions(excursionsBRUT);
-
 
       // -- TRI DES DONNEES RECUPEREES --
       const excursionsFiltrees = filtrageParametres(excursionsFormatees, filtres);  // Premier filtre
@@ -167,7 +168,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       // -- CALCUL DES VALEURS DE FILTRES --
       /**@warning : ligne inutile */
       /**@todo faire ceci automatiquement avec le formatage lors de la synchro descendante */
-      const valeursFiltres = calculValeursFiltres(excursionsFormatees);
+      // const valeursFiltres = calculValeursFiltres(excursionsFormatees);
       // console.log(valeursFiltres);
     }
     catch (error) {
@@ -183,6 +184,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    */
   function filtrageParametres(excursionsAFiltrer: excursionsType, filtres: typeof props.Filtres) {
     var excursionsFiltrees = excursionsAFiltrer;
+
 
     // Filtre de la page des filtres
     if (filtres !== undefined) {
@@ -250,7 +252,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
 
   useEffect(() => {
-    console.log('useEffect ExcursionsScreen')
     // Initialisation du filtre
     if (props.route.params) {
       filtres = props.route.params.Filtres;
@@ -298,14 +299,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                     excursionsFiltrees2.map((excursion, i) => (
                       <CarteExcursion
                         key={i}
-                        nom={excursion.nom}
-                        denivele={excursion.denivele}
-                        distance={excursion.distance}
-                        duree={excursion.duree}
-                        vallee={excursion.vallee}
-                        typeParcours={excursion.typeParcours}
-                        difficulteParcours={excursion.difficulteTechnique}
-                        difficulteOrientation={excursion.difficulteOrientation}
+                        excursion={excursion}
                         navigation={navigation}
                       />
                     ))

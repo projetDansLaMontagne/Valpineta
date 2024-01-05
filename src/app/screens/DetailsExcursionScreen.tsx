@@ -1,45 +1,38 @@
-import React, { FC, useEffect, useRef, useState } from "react";
-import { observer } from "mobx-react-lite";
-import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components";
-import { spacing, colors } from "app/theme";
-import SwipeUpDown from "react-native-swipe-up-down";
+import React, { FC, useEffect, useState } from "react"
+import { observer } from "mobx-react-lite"
+import {
+  View,
+  SafeAreaView,
+  ViewStyle,
+  TouchableOpacity,
+  Image,
+  TextStyle,
+  ImageStyle,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Dimensions,
+} from "react-native"
+import { AppStackScreenProps } from "app/navigators"
+import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen } from "app/components"
+import { spacing, colors } from "app/theme"
+import SwipeUpDown from "react-native-swipe-up-down"
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  temps: Record<'h' | 'm', number>,
-
+  excursion: Record<string, unknown>
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
+    const { route, navigation } = props
+    const excursion = route.params?.excursion
+    const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
 
-    var nomExcursion = "";
-    var temps = { h: 0, m: 0 };
-    var distance = 0;
-    var difficulteParcours = 0;
-    var difficulteOrientation = 0;
-    var navigation = props.navigation;
-
-    /**@warning A MODIFIER : peut generer des erreurs si params est undefined*/
-    if (props.route.params !== undefined) {
-      nomExcursion = props.route.params.nomExcursion
-      temps = props.route.params.temps
-      distance = props.route.params.distance
-      difficulteParcours = props.route.params.difficulteParcours
-      difficulteOrientation = props.route.params.difficulteOrientation
-    }
-
-    const [isLoading, setIsLoading] = useState(true);
-
-    return (
+    //si excursion est défini, on affiche les informations de l'excursion
+    return excursion ? (
       <SafeAreaView style={$container}>
-        <TouchableOpacity
-          style={$boutonRetour}
-          onPress={() => navigation.navigate("Excursions")}
-        >
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
@@ -47,17 +40,32 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation)}
-          onShowFull={() => setIsLoading(true)}
-          onShowMini={() => setIsLoading(false)}
+          itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche)}
           animation="easeInEaseOut"
           extraMarginTop={125}
           swipeHeight={100}
         />
       </SafeAreaView>
-    );
+    ) : 
+    //sinon on affiche une erreur
+    (
+      <Screen  preset="fixed">
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
+          <Image
+            style={{ tintColor: colors.bouton }}
+            source={require("../../assets/icons/back.png")}
+          />
+        </TouchableOpacity>
+        <View style={$containerErreur}>
+          <Text size="xxl">Erreur</Text>
+          <Text style={$texteErreur} size="sm">
+            Une erreur est survenue, veuillez réessayer
+          </Text>
+        </View>
+      </Screen>
+    )
   }
-);
+)
 
 /**
  *
@@ -66,9 +74,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 function itemMini() {
   return (
     <View style={$containerPetit}>
-      <Image
-        source={require("../../assets/icons/swipe-up.png")}
-      />
+      <Image source={require("../../assets/icons/swipe-up.png")} />
     </View>
   )
 }
@@ -76,34 +82,19 @@ function itemMini() {
 /**
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
-function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation) {
+function itemFull(
+  excursion: Record<string, unknown>,
+  navigation: any,
+  containerInfoAffiche: boolean,
+  setcontainerInfoAffiche: any
+) {
 
-  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
-
-  //Lance le chrono pour le chargement du graphique de dénivelé
-  const chrono = () => {
-    setTimeout(() => {
-      setIsLoading(false)
-    }
-      , 1000);
+  var nomExcursion = ""
+  if (excursion !== undefined) {
+    nomExcursion = excursion.nom
   }
 
-  //Observateur de l'état du containerInfoAffiche
-  useEffect(() => {
-    if (containerInfoAffiche) {
-      chrono();
-    }
-  }, [containerInfoAffiche]);
-
-  //Observateur de l'état du containerInfoAffiche
-  useEffect(() => {
-    if (isLoading) {
-      chrono();
-    }
-  }, [isLoading]);
-
   return (
-
     <View style={$containerGrand}>
       <View style={$containerTitre}>
         <Text text={nomExcursion} size="xl" style={$titre} />
@@ -111,28 +102,53 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, di
       </View>
       <View>
         <View style={$containerBouton}>
-          <TouchableOpacity onPress={() => {
-            //lancement du chrono pour le loading
-            setIsLoading(true),
-              isLoading ? chrono() : null
-            setcontainerInfoAffiche(true)
-          }} style={$boutonInfoAvis} >
-            <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
+          <TouchableOpacity
+            onPress={() => {
+              setcontainerInfoAffiche(true)
+            }}
+            style={$boutonInfoAvis}
+          >
+            <Text
+              text="Infos"
+              size="lg"
+              style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
+            />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            //Loading à false pour pouvoir relancer le chrono
-            setIsLoading(true)
-            setcontainerInfoAffiche(false)
-          }} style={$boutonInfoAvis}>
-            <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
+          <TouchableOpacity
+            onPress={() => {
+              setcontainerInfoAffiche(false)
+            }}
+            style={$boutonInfoAvis}
+          >
+            <Text
+              text="Avis"
+              size="lg"
+              style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
+            />
           </TouchableOpacity>
         </View>
-        <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
-        </View>
-        {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation) : avis()}
+        <View
+          style={[
+            $souligneInfosAvis,
+            containerInfoAffiche
+              ? { left: spacing.lg }
+              : { left: width - width / 2.5 - spacing.lg / 1.5 },
+          ]}
+        ></View>
+        {containerInfoAffiche ? infos(excursion, navigation) : avis()}
       </View>
-    </View >
+    </View>
   )
+}
+
+function afficherDescriptionCourte(description: string) {
+  if (description == null) {
+    return null
+  } else {
+    const descriptionCoupe = description.slice(0, 100)
+    const descriptionFinale = descriptionCoupe + "..."
+    return descriptionFinale
+  }
 }
 
 /**
@@ -140,9 +156,30 @@ function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, di
  * @param isLoading
  * @returns les informations de l'excursion
  */
-function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number) {
+function infos( excursion: Record<string, unknown>, navigation: any) {
+  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
 
-  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
+  var duree = ""
+  var distance = ""
+  var difficulteOrientation = 0
+  var difficulteTechnique = 0
+  var description = ""
+  if (
+    excursion.duree !== undefined ||
+    excursion.distance !== undefined ||
+    excursion.difficulteOrientation !== undefined ||
+    excursion.difficulteTechnique !== undefined ||
+    excursion.description !== undefined
+  ) {
+    duree = excursion.duree.h + "h"
+    if (excursion.duree.m !== 0) {
+      duree = duree + excursion.duree.m
+    }
+    distance = excursion.distance
+    difficulteTechnique = excursion.difficulteTechnique
+    difficulteOrientation = excursion.difficulteOrientation
+    description = excursion.description
+  }
 
   return (
     <ScrollView>
@@ -150,38 +187,51 @@ function infos(isLoading: boolean, temps, distance: number, difficulteParcours: 
         <View>
           <View style={$containerInformations}>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
-                source={require("../../assets/icons/temps.png")}
-              >
-              </Image>
-              <Text text={temps.h + "h" + temps.m} size="xs" />
+              <Image
+                style={$iconInformation}
+                source={require("../../assets/icons/duree.png")}
+              ></Image>
+              <Text text={duree} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/explorer.png")}
-              >
-              </Image>
-              <Text text={distance + ' km'} size="xs" />
+              ></Image>
+              <Text text={distance + " km"} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/difficulteParcours.png")}
-              >
-              </Image>
-              <Text text={difficulteParcours} size="xs" />
+              ></Image>
+              <Text text={difficulteTechnique} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
-              >
-              </Image>
+              ></Image>
               <Text text={difficulteOrientation} size="xs" />
             </View>
           </View>
           <View style={$containerDescriptionSignalements}>
             <View>
               <Text text="Description" size="lg" />
-              <Text style={$textDescription} text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
+              <Text
+                style={$textDescription}
+                text={afficherDescriptionCourte(description)}
+                size="xxs"
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Description", { excursion: excursion })
+                }}
+              >
+                {description === "" ? null : (
+                  <Text style={$lienDescription} text="Voir plus" size="xxs" />
+                )}
+              </TouchableOpacity>
             </View>
             <View>
               <Text text="Signalement" size="lg" />
@@ -190,9 +240,7 @@ function infos(isLoading: boolean, temps, distance: number, difficulteParcours: 
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-            {
-              isLoading ? <ActivityIndicator size="large" color={colors.bouton} /> : <GraphiqueDenivele data={data} />
-            }
+              <GraphiqueDenivele data={data} />
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -208,14 +256,26 @@ function avis() {
     <ScrollView style={$containerAvis}>
       <TouchableWithoutFeedback>
         <View>
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>
-  );
+  )
 }
 
 /* -------------------------------------------------------------------------- */
@@ -232,6 +292,7 @@ const $boutonRetour: ViewStyle = {
   width: 50,
   position: "absolute",
   top: 15,
+  zIndex: 1,
 }
 
 const $container: ViewStyle = {
@@ -274,7 +335,7 @@ const $containerTitre: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  width: width - (width / 5),
+  width: width - width / 5,
   margin: spacing.lg,
 }
 
@@ -336,10 +397,33 @@ const $textDescription: TextStyle = {
   paddingRight: spacing.xl,
 }
 
+const $lienDescription: TextStyle = {
+  color: colors.bouton,
+  paddingTop: spacing.xs,
+  textDecorationLine: "underline",
+}
+
 const $containerAvis: ViewStyle = {
   height: 200,
 }
 
 const $containerDenivele: ViewStyle = {
   padding: spacing.lg,
+  // marginBottom: 100, pour pouvoir afficher le graphique
+  marginBottom: 100,
+}
+
+/* --------------------------------- ERREUR --------------------------------- */
+
+const $containerErreur: ViewStyle = {
+  justifyContent: "center",
+  alignItems: "center",
+  width: width,
+  height: height,
+  padding: spacing.lg,
+}
+
+const $texteErreur: TextStyle = {
+  marginTop: spacing.lg,
+  marginBottom: height / 2,
 }

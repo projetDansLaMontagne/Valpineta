@@ -1,5 +1,5 @@
 // Librairies
-import React, { FC, useState, useRef, useEffect } from "react"
+import React, { FC, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { TextStyle, TextInput, Image, View, Dimensions, ViewStyle } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
@@ -16,40 +16,106 @@ interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSign
 
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
-
     //type de signalement
     let type = "signalement"
     if (props.route.params) {
       type = props.route.params.type
     }
 
+    // Variables
     const [titreSignalement, setTitreSignalement] = useState("")
     const [descriptionSignalement, setDescriptionSignalement] = useState("")
-    const [photoSignalement, setPhotoSignalement] = useState(null)
+    const [photoSignalement, setPhotoSignalement] = useState(undefined)
 
-    const [cameraPermission, setCameraPermission] = useState(null)
+    const [cameraPermission, setCameraPermission] = useState(false)
     const [LibrairiesPermission, setLibrairiesPermission] = useState(null)
 
-    //Demande de permission pour acceder a la camera et aux librairies
-    useEffect(() => {
-      ;(async () => {
-        const cameraStatus = await ImagePicker.requestCameraPermissionsAsync()
-        setCameraPermission(cameraStatus.granted)
-        const LibrairiesStatus = await ImagePicker.requestMediaLibraryPermissionsAsync()
-        setLibrairiesPermission(LibrairiesStatus.granted)
-      })()
-    }, [])
+    //Variables d'erreurs
+    const [titreError, setTitreError] = useState(false)
+    const [descriptionError, setDescriptionError] = useState(false)
+    const [photoError, setPhotoError] = useState(false)
 
     //Fonction pour prendre une photo
     const prendrePhoto = async () => {
-      let photo = await ImagePicker.launchCameraAsync()
-      setPhotoSignalement(photo.assets[0].uri)
+      if (cameraPermission) {
+        let photo = await ImagePicker.launchCameraAsync()
+        if (!photo.canceled) {
+          setPhotoSignalement(photo.assets[0].uri)
+        }
+      } else {
+        const cameraStatus = await ImagePicker.requestCameraPermissionsAsync()
+        if (cameraStatus.granted) {
+          setCameraPermission(true)
+          let photo = await ImagePicker.launchCameraAsync()
+          if (!photo.canceled) {
+            setPhotoSignalement(photo.assets[0].uri)
+          }
+        }
+      }
     }
 
     //Fonction pour choisir une photo
     const choisirPhoto = async () => {
-      let photo = await ImagePicker.launchImageLibraryAsync()
-      setPhotoSignalement(photo.assets[0].uri)
+      if (LibrairiesPermission) {
+        let photo = await ImagePicker.launchImageLibraryAsync()
+        if (!photo.canceled) {
+          setPhotoSignalement(photo.assets[0].uri)
+        }
+      } else {
+        const LibrairiesStatus = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (LibrairiesStatus.granted) {
+          setLibrairiesPermission(true)
+          let photo = await ImagePicker.launchImageLibraryAsync()
+          if (!photo.canceled) {
+            setPhotoSignalement(photo.assets[0].uri)
+          }
+        }
+      }
+    }
+
+    const envoyerSignalement = () => {
+
+      const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*-+,.:;"]+$/;
+
+
+      if (
+        titreSignalement === "" ||
+        !regex.test(titreSignalement) ||
+        titreSignalement.length < 3 ||
+        titreSignalement.length > 50
+      ) {
+        setTitreError(true)
+      } else {
+        setTitreError(false)
+      }
+
+      if (
+        descriptionSignalement === "" ||
+        !regex.test(descriptionSignalement) ||
+        descriptionSignalement.length < 10 ||
+        descriptionSignalement.length > 1000
+      ) {
+        setDescriptionError(true)
+      } else {
+        setDescriptionError(false)
+      }
+
+      if (photoSignalement === undefined || photoSignalement === null) {
+        setPhotoError(true)
+      } else {
+        // Vérification de la taille de la photo (max 5Mo) ainsi que du format
+        const imageFormats = ["jpg", "jpeg", "png", "gif"] // Liste des formats autorisés
+        const extension = photoSignalement.split(".").pop().toLowerCase()
+        if (!imageFormats.includes(extension)) {
+          setPhotoError(true)
+        } else {
+          setPhotoError(false)
+        }
+      }
+
+      if (photoError === false && descriptionError === false && titreError === false) {
+        console.log("envoyer")
+      }
     }
 
     return (
@@ -61,42 +127,75 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         />
         <Text text="Track : Col de la marmotte" size="lg" />
         <Text text="Insérez un titre et une description" size="sm" />
+        {titreError && (
+          <Text
+            text="Le titre doit contenir entre 3 et 50 caractères et ne doit pas contenir de caractères spéciaux"
+            size="sm"
+            style={{ color: colors.palette.rouge }}
+          />
+        )}
         <TextInput
           placeholder="Insérez un titre"
-          placeholderTextColor={colors.text}
+          placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
           onChangeText={setTitreSignalement}
           value={titreSignalement}
-          style={$inputTitre}
+          style={[
+            { ...$inputTitre },
+            titreError
+              ? { borderColor: colors.palette.rouge }
+              : { borderColor: colors.palette.vert },
+          ]}
         />
+        {descriptionError && (
+          <Text
+            text="La description doit contenir entre 10 et 1000 caractères et ne doit pas contenir de caractères spéciaux"
+            size="sm"
+            style={{ color: colors.palette.rouge }}
+          />
+        )}
         <TextInput
           placeholder="Insérez une description"
-          placeholderTextColor={colors.text}
+          placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
           onChangeText={setDescriptionSignalement}
           multiline={true}
           value={descriptionSignalement}
-          style={$inputDescription}
+          style={[
+            { ...$inputDescription },
+            descriptionError
+              ? { borderColor: colors.palette.rouge }
+              : { borderColor: colors.palette.vert },
+          ]}
         />
-        {cameraPermission && LibrairiesPermission ? (
-          <View>
-            {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}
-            <View style={{ flexDirection: "row" }}>
-              <Button
-                style={$bouton}
-                text="Prendre une photo"
-                onPress={prendrePhoto}
-                textStyle={$textBouton}
-              />
-              <Button
-                style={$bouton}
-                text="Choisir une photo"
-                onPress={choisirPhoto}
-                textStyle={$textBouton}
-              />
-            </View>
+        <View>
+          {photoError && !photoSignalement && (
+            <Text
+              text="Veuillez ajouter une photo dans un des formats : jpg, jpeg, png, gif avec une taille maximum de 5 mo"
+              size="sm"
+              style={$imageError}
+            />
+          )}
+          {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}
+          <View style={$boutonContainer}>
+            <Button
+              style={$bouton}
+              text="Prendre une photo"
+              onPress={prendrePhoto}
+              textStyle={$textBouton}
+            />
+            <Button
+              style={$bouton}
+              text="Choisir une photo"
+              onPress={choisirPhoto}
+              textStyle={$textBouton}
+            />
           </View>
-        ) : (
-          <Text text="Permission refusée" size="sm" />
-        )}
+          <Button
+            style={$bouton}
+            text="Envoyer"
+            onPress={envoyerSignalement}
+            textStyle={$textBouton}
+          />
+        </View>
       </Screen>
     )
   },
@@ -106,7 +205,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 
 const { width } = Dimensions.get("window")
 
-const $container: TextStyle = {
+const $container: ViewStyle = {
   paddingRight: spacing.sm,
   paddingLeft: spacing.sm,
 }
@@ -120,7 +219,6 @@ const $inputTitre: TextStyle = {
   borderRadius: spacing.sm,
   padding: spacing.sm,
   borderWidth: 1,
-  borderColor: colors.bordure,
   marginTop: spacing.sm,
   marginBottom: spacing.sm,
 }
@@ -138,11 +236,20 @@ const $image: TextStyle = {
   borderRadius: spacing.sm,
 }
 
+const $imageError: TextStyle = {
+  color: colors.palette.rouge,
+  marginBottom: spacing.sm,
+}
+
+const $boutonContainer: ViewStyle = {
+  justifyContent: "space-around",
+  flexDirection: "row",
+}
+
 const $bouton: TextStyle = {
   marginBottom: spacing.sm,
   borderRadius: spacing.sm,
   backgroundColor: colors.palette.vert,
-  marginRight: spacing.sm,
 }
 
 const $textBouton: TextStyle = {
