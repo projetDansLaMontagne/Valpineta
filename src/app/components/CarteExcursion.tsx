@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Image, StyleSheet } from "react-native"
 import Icon from "react-native-vector-icons/FontAwesome"
 
+<<<<<<< HEAD
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text } from "./Text"
@@ -43,25 +44,85 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const deniveleIcone = require("../../assets/icons/denivele.png")
   const difficulteTechniqueIcone = require("../../assets/icons/difficulteParcours.png")
   const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png")
+=======
+interface PropsCarteExcursion extends TouchableOpacityProps {
+  nom: string;
+  vallee: string;
+  typeParcours: string;
+  duree: Record<"h" | "m", number>;
+  distance: string;
+  denivele: string;
+  difficulteTechnique: string;
+  difficulteOrientation: string;
+  navigation: any;
+  signalements: any;
+}
+
+export function CarteExcursion(props: PropsCarteExcursion) {
+  const iconeVallee = require("../../assets/icons/zone.png");
+  const iconeParcours = require("../../assets/icons/parcours.png");
+  const iconeTemps = require("../../assets/icons/temps.png");
+  const iconeDistance = require("../../assets/icons/distance.png");
+  const iconeDenivelePositif = require("../../assets/icons/denivelePositif.png");
+  const iconeDifficulteTechnique = require("../../assets/icons/difficulteTechnique.png");
+  const iconeDifficulteOrientation = require("../../assets/icons/difficulteOrientation.png");
+>>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
 
   const imageRandonnee = require("../../assets/images/randonnee.png");
 
   const [coeurTouche, setCoeurTouche] = useState(false)
 
+<<<<<<< HEAD
   const excursionFavorite = () => {
     if (coeurTouche) {
       setCoeurTouche(false)
+=======
+  useEffect(() => {
+    validerParams();
+  }, []);
+
+  const validerParams = () => {
+    if (
+      props &&
+      props.nom !== undefined &&
+      props.duree !== undefined &&
+      props.distance !== undefined &&
+      props.difficulteTechnique !== undefined &&
+      props.difficulteOrientation !== undefined &&
+      props.signalements !== undefined
+    ) {
+      // Tous les paramètres sont définis, on peut naviguer en toute sécurité
+>>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
     } else {
       setCoeurTouche(true)
     }
   }
 
   const detailExcursion = () => {
+<<<<<<< HEAD
     navigation.navigate("Stack", {
       screen: "DetailsExcursion",
       params: { excursion: props.excursion },
     })
   }
+=======
+    // console.log("Détail de l'excursion " + props.nom, props.duree, props.distance, props.difficulteTechnique, props.difficulteOrientation, props.signalements);
+    validerParams(); // Valider à nouveau avant de naviguer
+
+    // Si tous les paramètres sont définis, naviguer vers l'écran 'DetailsExcursion'
+    props.navigation.navigate('Stack', {
+      screen: 'DetailsExcursion',
+      params: {
+        nomExcursion: props.nom,
+        temps: props.duree,
+        distance: props.distance,
+        difficulteTechnique: props.difficulteTechnique,
+        difficulteOrientation: props.difficulteOrientation,
+        signalements: props.signalements
+      }
+    });
+  };
+>>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
 
   const styles = StyleSheet.create({
     carteGlobale: {
@@ -198,8 +259,16 @@ export function CarteExcursion(props: CarteExcursionProps) {
               <Text text={denivele + "m"} style={styles.content} />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
+<<<<<<< HEAD
               <Image style={styles.icone} source={difficulteTechniqueIcone} resizeMode="contain" />
               <Text text={difficulteTechnique} style={styles.content} />
+=======
+              <Image style={styles.icone} source={iconeDifficulteTechnique} resizeMode="contain" />
+              <Text
+                text={props.difficulteTechnique}
+                style={styles.content}
+              />
+>>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image
