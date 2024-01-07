@@ -3,7 +3,7 @@
   "displayName": "Valpineta",
   "expo": {
     "name": "Valpineta",
-    "slug": "valpineta",
+    "slug": "src",
     "scheme": "valpineta",
     "version": "1.0.1",
     "orientation": "portrait",
@@ -21,8 +21,13 @@
       "**/*"
     ],
     "android": {
+      "permissions": [
+        "INTERNET",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "package": "com.valpineta.app",
-      "versionCode": 13,
+      "versionCode": 14,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"

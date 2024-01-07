@@ -45,6 +45,7 @@
     "@types/react-native-vector-icons": "^6.4.17",
     "apisauce": "2.1.5",
     "date-fns": "^2.29.2",
+    "eas-cli": "^5.9.3",
     "expo": "^49.0.0",
     "expo-asset": "~8.10.1",
     "expo-constants": "~14.4.2",

@@ -22,7 +22,7 @@ import {spacing, colors} from "../theme";
 
 // location
 import * as Location from 'expo-location';
-import MapView, {UrlTile} from "react-native-maps"
+import MapView, { UrlTile } from "react-native-maps"
 import MapButton from "../components/MapButton";
 import {Asset} from "expo-asset";
 
@@ -41,6 +41,24 @@ import fichier_json from '../../assets/Tiles/tiles_struct.json';
 const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
+const copyFilesInBatch = async (filesToCopy, batchCount) => {
+  for (let i = 0; i < filesToCopy.length; i += batchCount) {
+    const batchFiles = filesToCopy.slice(i, i + batchCount);
+
+    // Copie des fichiers dans ce lot
+    await Promise.all(
+      batchFiles.map(async file => {
+        // Effectuer la copie du fichier ici avec FileSystem.copyAsync
+        // (Exemple: À adapter selon votre structure de fichier)
+        await fileSystem.copyAsync({
+          from: file.source,
+          to: file.destination,
+        });
+      })
+    );
+  }
+};
+
 /**
  * Create the folder structure (recursively)
  *
@@ -49,9 +67,9 @@ const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
  * @param assets_list {Promise<Asset[]>} The list of assets
  */
 const create_folder_struct = async (
-    folder_struct: any,
-    folder_path: string = folder_dest,
-    assets_list: Asset[]
+  folder_struct,
+  folder_path = folder_dest,
+  assets_list
 ) => {
   for (const folder in folder_struct) {
     if (folder_struct.hasOwnProperty(folder)) {
@@ -68,13 +86,21 @@ const create_folder_struct = async (
         COMPTEUR++;
         console.log(`downloaded ${COMPTEUR} files`);
 
-        await fileSystem.copyAsync(
-            {
-                from: assets_list_uri,
-                to: `${folder_dest}${file_folder}/${file_name}`
-            }
-        );
+        // Copier les fichiers en lot en utilisant copyFilesInBatch
+        // Préparez la liste de fichiers à copier pour ce dossier
+        const filesToCopy = [
+          {
+            source: assets_list_uri,
+            destination: `${folder_dest}${file_folder}/${file_name}`,
+          },
+          // ... autres fichiers à copier pour ce dossier
+        ];
+
+        // Copie par lot des fichiers
+        const batchCount = 10; // Nombre de fichiers par lot
+        await copyFilesInBatch(filesToCopy, batchCount);
       } else {
+        // Récursivement créer la structure des dossiers pour les sous-dossiers
         await create_folder_struct(
           folder_struct[folder],
           `${folder_path}/${folder}`,
@@ -83,7 +109,7 @@ const create_folder_struct = async (
       }
     }
   }
-}
+};
 
 // Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
@@ -146,23 +172,36 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   }
 
   const downloadTiles = async () => {
-    // Vérifier si les tuiles sont déjà dl
-    const folderInfo = await fileSystem.getInfoAsync(folder_dest);
 
-    if (folderInfo.exists && folderInfo.isDirectory)
-    {
-      console.log("Tuiles déjà DL")
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
     }
     else
     {
-      const assets = await formatRequire();
+      console.log("Permission ok")
+      // Vérifier si les tuiles sont déjà dl cartes/OSM/17/65682/48390.jpg
+      const folderInfo = await fileSystem.getInfoAsync(folder_dest + "/17/65682/48390.jpg");
+      if (folderInfo.exists && folderInfo.isDirectory)
+      {
+        console.log("Tuiles déjà DL")
+      }
+      else
+      {
+        //Supprimer le dossier
+        await fileSystem.deleteAsync(folder_dest, {idempotent: true});
 
-      await create_folder_struct(
-        fichier_json,
-        folder_dest,
-        assets
-      )
+        const assets = await formatRequire();
+
+        await create_folder_struct(
+          fichier_json,
+          folder_dest,
+          assets
+        )
+      }
     }
+
   }
 
   /**
