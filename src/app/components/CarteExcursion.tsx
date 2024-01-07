@@ -12,7 +12,7 @@ interface PropsCarteExcursion extends TouchableOpacityProps {
   duree: Record<"h" | "m", number>;
   distance: string;
   denivele: string;
-  difficulteParcours: string;
+  difficulteTechnique: string;
   difficulteOrientation: string;
   navigation: any;
   signalements: any;
@@ -24,7 +24,7 @@ export function CarteExcursion(props: PropsCarteExcursion) {
   const iconeTemps = require("../../assets/icons/temps.png");
   const iconeDistance = require("../../assets/icons/distance.png");
   const iconeDenivelePositif = require("../../assets/icons/denivelePositif.png");
-  const iconeDifficulteParcours = require("../../assets/icons/difficulteParcours.png");
+  const iconeDifficulteTechnique = require("../../assets/icons/difficulteTechnique.png");
   const iconeDifficulteOrientation = require("../../assets/icons/difficulteOrientation.png");
 
   const imageRandonnee = require("../../assets/images/randonnee.png");
@@ -41,7 +41,7 @@ export function CarteExcursion(props: PropsCarteExcursion) {
       props.nom !== undefined &&
       props.duree !== undefined &&
       props.distance !== undefined &&
-      props.difficulteParcours !== undefined &&
+      props.difficulteTechnique !== undefined &&
       props.difficulteOrientation !== undefined &&
       props.signalements !== undefined
     ) {
@@ -53,6 +53,7 @@ export function CarteExcursion(props: PropsCarteExcursion) {
   };
 
   const detailExcursion = () => {
+    // console.log("Détail de l'excursion " + props.nom, props.duree, props.distance, props.difficulteTechnique, props.difficulteOrientation, props.signalements);
     validerParams(); // Valider à nouveau avant de naviguer
 
     // Si tous les paramètres sont définis, naviguer vers l'écran 'DetailsExcursion'
@@ -62,7 +63,7 @@ export function CarteExcursion(props: PropsCarteExcursion) {
         nomExcursion: props.nom,
         temps: props.duree,
         distance: props.distance,
-        difficulteParcours: props.difficulteParcours,
+        difficulteTechnique: props.difficulteTechnique,
         difficulteOrientation: props.difficulteOrientation,
         signalements: props.signalements
       }
@@ -228,9 +229,9 @@ export function CarteExcursion(props: PropsCarteExcursion) {
               />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
-              <Image style={styles.icone} source={iconeDifficulteParcours} resizeMode="contain" />
+              <Image style={styles.icone} source={iconeDifficulteTechnique} resizeMode="contain" />
               <Text
-                text={props.difficulteParcours}
+                text={props.difficulteTechnique}
                 style={styles.content}
               />
             </View>

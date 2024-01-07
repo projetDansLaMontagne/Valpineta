@@ -146,7 +146,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       // -- RECUPERATION DU FICHIER --
       var excursionsBRUT = require('../../assets/JSON/excursions.json');
       excursionsBRUT = excursionsBRUT.map(excursion => ({
-        nom: excursion.nom_excursions,
+        nom: excursion.nom_excursion,
         denivele: excursion.denivele,
         duree: excursion.duree,
         distance: excursion.distance_excursion,
@@ -306,7 +306,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                         duree={excursion.duree}
                         vallee={excursion.vallee}
                         typeParcours={excursion.typeParcours}
-                        difficulteParcours={excursion.difficulteTechnique}
+                        difficulteTechnique={excursion.difficulteTechnique}
                         difficulteOrientation={excursion.difficulteOrientation}
                         navigation={navigation}
                         signalements={excursion.signalements}

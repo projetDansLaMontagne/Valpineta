@@ -82,7 +82,9 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     >
 
       <Tab.Navigator
-        initialRouteName={"Carte"}
+        // initialRouteName={"Carte"}
+        initialRouteName={"Parametres"}
+
         screenOptions={{
           headerShown: false,
           tabBarStyle: {

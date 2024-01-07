@@ -13,7 +13,7 @@ const { width, height } = Dimensions.get("window");
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   temps: Record<'h' | 'm', number>,
   distance: number,
-  difficulteParcours: number,
+  difficulteTechnique: number,
   difficulteOrientation: number,
   signalements: any,
   nomExcursion: string,
@@ -21,25 +21,66 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
+    console.log("DetailsExcursionScreen");
+    var navigation;
+    var excursion;
+    var nomExcursion;
+    var temps;
+    var distance;
+    var difficulteTechnique;
+    var difficulteOrientation;
+    var signalements;
     if (
-      !props?.route?.params ||
-      !props?.route?.params?.temps ||
-      !props?.route?.params?.distance ||
-      !props?.route?.params?.difficulteParcours ||
-      !props?.route?.params?.difficulteOrientation ||
-      !props?.route?.params?.signalements ||
-      !props?.route?.params?.nomExcursion
+      props?.route?.params ||
+      props?.route?.params?.excursion ||
+      props?.route?.params?.excursion?.nom ||
+      props?.route?.params?.excursion?.duree ||
+      props?.route?.params?.excursion?.distance ||
+      props?.route?.params?.excursion?.difficulteTechnique ||
+      props?.route?.params?.excursion?.difficulteOrientation ||
+      props?.route?.params?.excursion?.signalements
     ) {
+      navigation = props.navigation;
+      excursion = props.route.params.excursion;
+      nomExcursion = excursion.nom;
+      temps = excursion.duree;
+      distance = excursion.distance;
+      difficulteTechnique = excursion.difficulteTechnique;
+      difficulteOrientation = excursion.difficulteOrientation;
+      signalements = excursion.signalements;
+      // console.log(nomExcursion, temps, distance, difficulteTechnique, difficulteOrientation, signalements, "if")
+      // console.log(excursion, "excursion")
+    }
+    else if (
+      props?.route?.params?.nom ||
+      props?.route?.params?.duree ||
+      props?.route?.params?.distance ||
+      props?.route?.params?.difficulteTechnique ||
+      props?.route?.params?.difficulteOrientation ||
+      props?.route?.params?.signalements
+    ) {
+
+      navigation = props.navigation;
+      nomExcursion = excursion.nom;
+      temps = excursion.duree;
+      distance = excursion.distance;
+      difficulteTechnique = excursion.difficulteTechnique;
+      difficulteOrientation = excursion.difficulteOrientation;
+      signalements = excursion.signalements;
+      // console.log(nomExcursion, temps, distance, difficulteTechnique, difficulteOrientation, signalements, "else if")
+    }
+    else {
+      // console.log(props?.route?.params?.excursion);
       throw new Error("Mauvais parametres");
     }
 
-    var navigation = props.navigation;
-    var nomExcursion = props.route.params.nomExcursion;
-    var temps = props.route.params.temps
-    var distance = props.route.params.distance
-    var difficulteParcours = props.route.params.difficulteParcours
-    var difficulteOrientation = props.route.params.difficulteOrientation
-    var signalements = props.route.params.signalements
+
+    // var nomExcursion = props.route.params.nomExcursion;
+    // var temps = props.route.params.duree
+    // var distance = props.route.params.distance
+    // var difficulteTechnique = props.route.params.difficulteTechnique
+    // var difficulteOrientation = props.route.params.difficulteOrientation
+    // var signalements = props.route.params.signalements
 
     //Lance le chrono pour le chargement du graphique de dénivelé
     const chrono = () => {
@@ -95,7 +136,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements)}
+          itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteTechnique, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements)}
           onShowFull={() => setIsLoading(true)}
           onShowMini={() => setIsLoading(false)}
           animation="easeInEaseOut"
@@ -138,7 +179,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       )
     }
 
-    function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteParcours, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements) {
+    function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteTechnique, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements) {
 
       if (isAllSignalements) {
         return listeSignalements(setIsAllSignalements, signalements);
@@ -172,7 +213,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   </View>
                   <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
                   </View>
-                  {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteParcours, difficulteOrientation, setIsAllSignalements, signalements) : avis()}
+                  {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteTechnique, difficulteOrientation, setIsAllSignalements, signalements) : avis()}
                 </View>
               </View >
             }
@@ -224,7 +265,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * @param isLoading
      * @returns les informations de l'excursion
      */
-    function infos(isLoading: boolean, temps, distance: number, difficulteParcours: number, difficulteOrientation: number, setIsAllSignalements, signalements) {
+    function infos(isLoading: boolean, temps, distance: number, difficulteTechnique: number, difficulteOrientation: number, setIsAllSignalements, signalements) {
       const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
       return (
         <ScrollView>
@@ -245,9 +286,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                 </View>
                 <View style={$containerUneInformation}>
                   <Image style={$iconInformation}
-                    source={require("../../assets/icons/difficulteParcours.png")}
+                    source={require("../../assets/icons/difficulteTechnique.png")}
                   />
-                  <Text text={difficulteParcours.toString()} size="xs" />
+                  <Text text={difficulteTechnique.toString()} size="xs" />
                 </View>
                 <View style={$containerUneInformation}>
                   <Image style={$iconInformation}
