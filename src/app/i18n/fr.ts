@@ -26,7 +26,7 @@ const fr = {
       button: "Essayons à nouveau",
     },
   },
-  testScreen: {
+  mapScreen: {
     title: "Ecran de test",
     locate: {
       locate_btn: "Localisez moi !",
@@ -47,16 +47,6 @@ const fr = {
     }
   },
 
-  carteComposant: {
-    titre: "Le col de la marmotte",
-    zone: "Pineta",
-    parcours: "Allez/Retour",
-    temps: "7h30",
-    distance: "13,5 km",
-    denivelePositif: "1350 m",
-    difficulteParcours: "2",
-    difficulteOrientation: "1",
-  },
   excursion:{
     erreurChargement: "Aucune excursion ne répond aux critères selectionnés",
     erreurNom: "Aucune excursion ne porte ce nom.",

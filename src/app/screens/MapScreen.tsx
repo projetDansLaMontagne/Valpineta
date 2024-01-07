@@ -37,7 +37,7 @@ type T_animateToLocation = (
 ) => void;
 
 let COMPTEUR = 0;
-import fichier_json_aled_jenpeuxPlus from '../../assets/Tiles/tiles_struct.json';
+// import fichier_json_aled_jenpeuxPlus from '../../assets/Tiles/tiles_struct.json';
 const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
@@ -487,23 +487,23 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                 {
                   isFetching ? (
                     <>
-                      <Text tx={"testScreen.locate.fetching"} style={{color: "white"}} />
+                      <Text tx={"mapScreen.locate.fetching"} style={{color: "white"}} />
                     </>
                   ) : (
                     <>
-                      <Text tx={"testScreen.locate.notLocated.title"} style={{color: "white"}} />
+                      <Text tx={"mapScreen.locate.notLocated.title"} style={{color: "white"}} />
 
                       {
                         !isMapDownloaded ? (
                             <Button
-                              tx={"testScreen.locate.dl_map_btn"}
+                              tx={"mapScreen.locate.dl_map_btn"}
                               onPress={dl_btn_onPress}
                               style={styles.button}
                             />
 
                           ) : (
                             <Button
-                              tx={"testScreen.locate.locate_btn"}
+                              tx={"mapScreen.locate.locate_btn"}
                               onPress={onLocationBtnPress}
                               style={styles.button}
                             />

@@ -25,7 +25,7 @@ const es = {
     },
   },
 
-  testScreen: {
+  mapScreen: {
     title: "Pantalla de prueba",
     locate: {
       locate_btn: "¡Localízame!",
@@ -46,12 +46,6 @@ const es = {
     }
   },
   
-
-  carteComposant: {
-    titre: "Título de la tarjeta",
-    localisation: "Ubicación",
-    parcours: "Ida y vuelta",
-  },
   excursion:{
     erreurChargement: "Ninguna excursión encontrada",
     erreurNom: "Nombre de excursión no encontrado",

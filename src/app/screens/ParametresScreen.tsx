@@ -1,12 +1,13 @@
 import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
 import { ViewStyle, TextStyle, Dimensions, View, TouchableOpacity } from "react-native"
-import { AppStackScreenProps } from "app/navigators"
+import { AppStackScreenProps, navigationRef } from "app/navigators"
 import { Screen, Text } from "app/components"
 import { colors, spacing } from "app/theme"
 import Icon from "react-native-vector-icons/FontAwesome"
 import { useStores } from "app/models"
 import I18n from "i18n-js"
+import { navigate } from "app/navigators"
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window")
