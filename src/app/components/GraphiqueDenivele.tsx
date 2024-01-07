@@ -34,19 +34,19 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
   /* -------------------------------- Fonctions ------------------------------- */
   /**
    * Formate les points de l excursion pour qu ils soient utilisables par le graphique
-   * @param points Les points de l excursion
+   * @param track Le track (points du track)
    * @param nbFragments Le nombre de points souhaités sur le diagrame (doit etre inferieur au nombre de points de l excursion)
-   * @returns
+   * @returns Les points formates
    */
-  const trackReduit = (points: T_Point[], nbFragments: number): T_Point[] => {
+  const trackReduit = (track: T_Point[], nbFragments: number): T_Point[] => {
     /* ---------------------- Verifications des parametres ---------------------- */
-    if (!points) {
+    if (!track) {
       throw new Error("Aucune excursion n'a été fournie")
     }
     if (!nbFragments) {
       throw new Error("Aucune precision n'a été fournie")
     }
-    if (nbFragments > points.length) {
+    if (nbFragments > track.length) {
       throw new Error(
         "Le nombre de points demandés doit être superieur au nombre de points du fichier GPX",
       )
@@ -56,9 +56,9 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     }
 
     /* -------------------------- Selection des points -------------------------- */
-    // (c est cette etape qui va assurer une distance plus ou moins egale entre les points)
-    var pointsFormates = []
-    const distanceTotale = points[points.length - 1].dist // Distance du dernier point
+    // (c est cette etape qui va assurer une distance equivalente entre les points)
+    var pointsSelectionnes = []
+    const distanceTotale = track[track.length - 1].dist // Distance du dernier point
     const incrementFragments = distanceTotale / (nbFragments - 1) // Increment (en m) entre chaque fragments
 
     // Variables de la boucle
@@ -76,7 +76,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
         // Dernier point atteint
         break
       } else {
-        const distancePoint = points[indexPoint].dist
+        const distancePoint = track[indexPoint].dist
         if (distancePoint < distanceIdeale) {
           // Le point est avant la distance ideale
           // On passe au points suivant
@@ -87,14 +87,14 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
           var pointLePlusProche
           if (ecartPointPrecedent < distancePoint - distanceIdeale) {
             // Le point precedent est plus proche
-            pointLePlusProche = points[indexPoint - 1]
+            pointLePlusProche = track[indexPoint - 1]
           } else {
             // Le point est plus proche que le precedent
-            pointLePlusProche = points[indexPoint]
+            pointLePlusProche = track[indexPoint]
           }
 
           // Sauvegarde du point le plus proche
-          pointsFormates.push(pointLePlusProche)
+          pointsSelectionnes.push(pointLePlusProche)
 
           // On passe a la prochaine distance ideale
           distanceIdeale += incrementFragments
@@ -103,13 +103,14 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
       }
     }
 
-    return pointsFormates
+    return pointsSelectionnes
   }
   /**
    * Calcul les donnees pour le graphique
    * Fonction asynchrone pour ne pas bloquer l affichage
    */
   const traitementDonneesGraphiques = async () => {
+    // Reduction du nombre de points
     const points = trackReduit(props.points, props.precision)
 
     // Calcul des absisses
@@ -121,6 +122,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
       abscisses.push("" + abscisse + " km")
     }
 
+    // Creation des donnees pour le graphique
     donnesGraphique = {
       labels: abscisses,
       datasets: [
