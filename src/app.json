@@ -2,10 +2,10 @@
   "name": "Valpineta",
   "displayName": "Valpineta",
   "expo": {
-    "name": "src",
-    "slug": "src",
-    "scheme": "src",
-    "version": "1.0.0",
+    "name": "Valpineta",
+    "slug": "valpineta",
+    "scheme": "valpineta",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/logo.jpg",
     "splash": {
@@ -21,36 +21,24 @@
       "**/*"
     ],
     "android": {
-      "icon": "./assets/images/logo.jpg",
-      "package": "com.valpineta.src",
+      "package": "com.valpineta.app",
+      "versionCode": 13,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
       },
-      "splash": {
-        "image": "./assets/images/splash.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#191015"
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAhbzEPoqamBm-RVtvrDXUSF_nJpHh_bjQ"
+        }
       }
     },
     "ios": {
-      "icon": "./assets/images/logo.jpg",
       "supportsTablet": true,
-      "bundleIdentifier": "com.src",
-      "splash": {
-        "image": "./assets/images/splash.png",
-        "tabletImage": "./assets/images/splash.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#191015"
-      }
+      "bundleIdentifier": "com.valpineta.app"
     },
     "web": {
-      "favicon": "./assets/images/logo.jpg",
-      "splash": {
-        "image": "./assets/images/splash.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#191015"
-      }
+      "favicon": "./assets/images/logo.jpg"
     },
     "packagerOpts": {
       "sourceExts": [
