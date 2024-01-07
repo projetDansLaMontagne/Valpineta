@@ -23,21 +23,11 @@ import SwipeUpDown from "react-native-swipe-up-down"
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-<<<<<<< HEAD
   excursion: Record<string, unknown>
-=======
-  temps: Record<'h' | 'm', number>,
-  distance: number,
-  difficulteTechnique: number,
-  difficulteOrientation: number,
-  signalements: any,
-  nomExcursion: string,
->>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-<<<<<<< HEAD
     const { route, navigation } = props
     const excursion = route.params?.excursion
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
@@ -45,70 +35,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [userLocation, setUserLocation] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-=======
-    console.log("DetailsExcursionScreen");
-    var navigation;
-    var excursion;
-    var nomExcursion;
-    var temps;
-    var distance;
-    var difficulteTechnique;
-    var difficulteOrientation;
-    var signalements;
-    if (
-      props?.route?.params ||
-      props?.route?.params?.excursion ||
-      props?.route?.params?.excursion?.nom ||
-      props?.route?.params?.excursion?.duree ||
-      props?.route?.params?.excursion?.distance ||
-      props?.route?.params?.excursion?.difficulteTechnique ||
-      props?.route?.params?.excursion?.difficulteOrientation ||
-      props?.route?.params?.excursion?.signalements
-    ) {
-      navigation = props.navigation;
-      excursion = props.route.params.excursion;
-      nomExcursion = excursion.nom;
-      temps = excursion.duree;
-      distance = excursion.distance;
-      difficulteTechnique = excursion.difficulteTechnique;
-      difficulteOrientation = excursion.difficulteOrientation;
-      signalements = excursion.signalements;
-      // console.log(nomExcursion, temps, distance, difficulteTechnique, difficulteOrientation, signalements, "if")
-      // console.log(excursion, "excursion")
-    }
-    else if (
-      props?.route?.params?.nom ||
-      props?.route?.params?.duree ||
-      props?.route?.params?.distance ||
-      props?.route?.params?.difficulteTechnique ||
-      props?.route?.params?.difficulteOrientation ||
-      props?.route?.params?.signalements
-    ) {
-
-      navigation = props.navigation;
-      nomExcursion = excursion.nom;
-      temps = excursion.duree;
-      distance = excursion.distance;
-      difficulteTechnique = excursion.difficulteTechnique;
-      difficulteOrientation = excursion.difficulteOrientation;
-      signalements = excursion.signalements;
-      // console.log(nomExcursion, temps, distance, difficulteTechnique, difficulteOrientation, signalements, "else if")
-    }
-    else {
-      // console.log(props?.route?.params?.excursion);
-      throw new Error("Mauvais parametres");
-    }
-
-
-    // var nomExcursion = props.route.params.nomExcursion;
-    // var temps = props.route.params.duree
-    // var distance = props.route.params.distance
-    // var difficulteTechnique = props.route.params.difficulteTechnique
-    // var difficulteOrientation = props.route.params.difficulteOrientation
-    // var signalements = props.route.params.signalements
-
-    //Lance le chrono pour le chargement du graphique de dénivelé
->>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
     const chrono = () => {
       setTimeout(() => {
         setIsLoading(false)
@@ -142,19 +68,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-<<<<<<< HEAD
           itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation, isLoading)}
-=======
-          itemFull={itemFull(isLoading, setIsLoading, nomExcursion, temps, distance, difficulteTechnique, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements)}
-          onShowFull={() => setIsLoading(true)}
-          onShowMini={() => setIsLoading(false)}
->>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
           animation="easeInEaseOut"
           extraMarginTop={125}
           swipeHeight={100}
         />
       </SafeAreaView>
-<<<<<<< HEAD
     ) :
       //sinon on affiche une erreur
       (
@@ -170,81 +89,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             <Text style={$texteErreur} size="sm">
               Une erreur est survenue, veuillez réessayer
             </Text>
-=======
-    );
-
-    // Fonction pour récupérer la localisation de l'utilisateur
-    function getUserLocation() {
-      return new Promise(async (resolve, reject) => {
-        try {
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status !== 'granted') {
-            console.error('Permission to access location was denied');
-            resolve(null);
-          }
-
-          let location = await Location.getCurrentPositionAsync({});
-          resolve(location.coords);
-        } catch (error) {
-          console.error('Error getting location', error);
-          reject(error);
-        }
-      });
-    }
-
-    /**
-     *
-     * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas
-     */
-    function itemMini() {
-      return (
-        <View style={$containerPetit}>
-          <Image
-            source={require("../../assets/icons/swipe-up.png")}
-          />
-        </View>
-      )
-    }
-
-    function itemFull(isLoading: boolean, setIsLoading: any, nomExcursion, temps, distance, difficulteTechnique, difficulteOrientation, signalements, isAllSignalements, setIsAllSignalements) {
-
-      if (isAllSignalements) {
-        return listeSignalements(setIsAllSignalements, signalements);
-      }
-      else {
-        return (
-          <View style={$containerGrand}>
-            {
-              <View>
-                <View style={$containerTitre}>
-                  <Text text={nomExcursion} size="xl" style={$titre} />
-                  <GpxDownloader />
-                </View>
-                <View>
-                  <View style={$containerBouton}>
-                    <TouchableOpacity onPress={() => {
-                      //lancement du chrono pour le loading
-                      setIsLoading(true),
-                        isLoading ? chrono() : null
-                      setcontainerInfoAffiche(true)
-                    }} style={$boutonInfoAvis} >
-                      <Text text="Infos" size="lg" style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {
-                      //Loading à false pour pouvoir relancer le chrono
-                      setIsLoading(true)
-                      setcontainerInfoAffiche(false)
-                    }} style={$boutonInfoAvis}>
-                      <Text text="Avis" size="lg" style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]} />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={[$souligneInfosAvis, containerInfoAffiche ? { left: spacing.lg } : { left: width - width / 2.5 - spacing.lg / 1.5 }]}>
-                  </View>
-                  {containerInfoAffiche ? infos(isLoading, temps, distance, difficulteTechnique, difficulteOrientation, setIsAllSignalements, signalements) : avis()}
-                </View>
-              </View >
-            }
->>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
           </View>
         </Screen>
       )
@@ -462,7 +306,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation}
-                source={require("../../assets/icons/difficulteParcours.png")}
+                source={require("../../assets/icons/difficulteTechnique.png")}
               />
               <Text text={difficulteTechnique.toString()} size="xs" />
             </View>
@@ -477,7 +321,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
             <Text text="Description" size="lg" />
             <Text text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
           </View>
-          <View>
+          <View style={$containerDescriptionEtSignalements}>
             <View>
               {signalements?.length > 0 && (
                 <Text tx="detailEscursion.signalements" size="lg" />
@@ -609,65 +453,8 @@ function recupDistance(coordonneeSignalement) {
       continue;
     }
 
-<<<<<<< HEAD
     // Calculer la distance entre le signalement et la coordonnée actuelle du fichier
     const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(coordonneeSignalement, coord);
-=======
-    /**
-     *
-     * @param isLoading
-     * @returns les informations de l'excursion
-     */
-    function infos(isLoading: boolean, temps, distance: number, difficulteTechnique: number, difficulteOrientation: number, setIsAllSignalements, signalements) {
-      const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
-      return (
-        <ScrollView>
-          <TouchableWithoutFeedback>
-            <View style={$stylePage}>
-              <View style={$containerInformations}>
-                <View style={$containerUneInformation}>
-                  <Image style={$iconInformation}
-                    source={require("../../assets/icons/temps.png")}
-                  />
-                  <Text text={temps.h + "h" + temps.m} size="xs" />
-                </View>
-                <View style={$containerUneInformation}>
-                  <Image style={$iconInformation}
-                    source={require("../../assets/icons/explorer.png")}
-                  />
-                  <Text text={distance + ' km'} size="xs" />
-                </View>
-                <View style={$containerUneInformation}>
-                  <Image style={$iconInformation}
-                    source={require("../../assets/icons/difficulteTechnique.png")}
-                  />
-                  <Text text={difficulteTechnique.toString()} size="xs" />
-                </View>
-                <View style={$containerUneInformation}>
-                  <Image style={$iconInformation}
-                    source={require("../../assets/icons/difficulteOrientation.png")}
-                  />
-                  <Text text={difficulteOrientation.toString()} size="xs" />
-                </View>
-              </View>
-              <View style={$containerDescriptionEtSignalements}>
-                <Text text="Description" size="lg" />
-                <Text text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
-              </View>
-              <View style={$containerDescriptionEtSignalements}>
-                <View>
-                  {signalements?.length > 0 && (
-                    <Text tx="detailEscursion.signalements" size="lg" />
-                  )}
-                </View>
-                <ScrollView horizontal>
-                  <TouchableWithoutFeedback>
-                    <View style={$scrollLine}>
-                      {signalements?.map((signalement, index) => {
-                        // Calcule de la distance pour chaque avertissement
-                        const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
-                        const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
->>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
 
     // Mettre à jour la distance minimale si la distance actuelle est plus petite
     if (distanceSignalementPointLePlusProche < distanceMinimale) {

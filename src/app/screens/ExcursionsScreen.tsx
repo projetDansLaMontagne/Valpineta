@@ -301,20 +301,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
                     excursionsFiltrees2.map((excursion, i) => (
                       <CarteExcursion
                         key={i}
-<<<<<<< HEAD
                         excursion={excursion}
-=======
-                        nom={excursion.nom}
-                        denivele={excursion.denivele}
-                        distance={excursion.distance}
-                        duree={excursion.duree}
-                        vallee={excursion.vallee}
-                        typeParcours={excursion.typeParcours}
-                        difficulteTechnique={excursion.difficulteTechnique}
-                        difficulteOrientation={excursion.difficulteOrientation}
->>>>>>> e2d17749 (test de resolution de bug avant merge mais pas concluant V333)
                         navigation={navigation}
-                        signalements={excursion.signalements}
                       />
                     ))
                   }
