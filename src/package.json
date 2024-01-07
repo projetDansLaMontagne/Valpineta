@@ -153,9 +153,14 @@
   },
   "prettier": {
     "printWidth": 100,
-    "semi": false,
+    "semi": true,
     "singleQuote": false,
-    "trailingComma": "all"
+    "jsxSingleQuote": false,
+    "trailingComma": "all",
+    "tabWidth": 2,
+    "arrowParens": "avoid",
+    "bracketSpacing": true,
+    "endOfLine": "auto"
   },
   "eslintConfig": {
     "root": true,
