@@ -147,7 +147,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
       <LineChart
         data={donnesGraphique}
         width={width - spacing.xl * 2}
-        height={300}
+        height={200}
         withVerticalLabels={true}
         withInnerLines={false}
         withOuterLines={false}
