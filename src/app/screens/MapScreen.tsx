@@ -42,60 +42,60 @@ const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
 const download_file = async () => {
-    console.log("Downloading files...");
+  console.log("Downloading files...");
 
-    const assets = await formatRequire();
+  const assets = [];
 
-    return create_folder_struct(
-      fichier_json_aled_jenpeuxPlus,
-      folder_dest,
-      assets
-    );
-  }
+  return create_folder_struct(
+    fichier_json_aled_jenpeuxPlus,
+    folder_dest,
+    assets
+  );
+}
 
-  /**
-   * Create the folder structure (recursively)
-   *
-   * @param folder_struct {Object} The folder structure
-   * @param folder_path {string} The path of the folder
-   * @param assets_list {Promise<Asset[]>} The list of assets
-   */
-  const create_folder_struct = async (
-      folder_struct: any,
-      folder_path: string = folder_dest,
-      assets_list: Asset[]
-  ) => {
-    for (const folder in folder_struct) {
-      if (folder_struct.hasOwnProperty(folder)) {
-        if (typeof folder_struct[folder] === 'string') {
-          const file_name = folder_struct[folder].split('/').pop();
-          // remove 'folder_dest' from 'folder_path'
-          let file_folder = folder_path.replace(folder_dest, '');
+/**
+ * Create the folder structure (recursively)
+ *
+ * @param folder_struct {Object} The folder structure
+ * @param folder_path {string} The path of the folder
+ * @param assets_list {Promise<Asset[]>} The list of assets
+ */
+const create_folder_struct = async (
+  folder_struct: any,
+  folder_path: string = folder_dest,
+  assets_list: Asset[]
+) => {
+  for (const folder in folder_struct) {
+    if (folder_struct.hasOwnProperty(folder)) {
+      if (typeof folder_struct[folder] === 'string') {
+        const file_name = folder_struct[folder].split('/').pop();
+        // remove 'folder_dest' from 'folder_path'
+        let file_folder = folder_path.replace(folder_dest, '');
 
-          await fileSystem.makeDirectoryAsync(`${folder_dest}${file_folder}`, {
-            intermediates: true,
-          });
+        await fileSystem.makeDirectoryAsync(`${folder_dest}${file_folder}`, {
+          intermediates: true,
+        });
 
-          const assets_list_uri = assets_list[COMPTEUR].localUri;
-          COMPTEUR++;
-          console.log(`downloaded ${COMPTEUR} files`);
+        const assets_list_uri = assets_list[COMPTEUR].localUri;
+        COMPTEUR++;
+        console.log(`downloaded ${COMPTEUR} files`);
 
-          await fileSystem.copyAsync(
-              {
-                  from: assets_list_uri,
-                  to: `${folder_dest}${file_folder}/${file_name}`
-              }
-          );
-        } else {
-          await create_folder_struct(
-            folder_struct[folder],
-            `${folder_path}/${folder}`,
-            assets_list
-          );
-        }
+        await fileSystem.copyAsync(
+          {
+            from: assets_list_uri,
+            to: `${folder_dest}${file_folder}/${file_name}`
+          }
+        );
+      } else {
+        await create_folder_struct(
+          folder_struct[folder],
+          `${folder_path}/${folder}`,
+          assets_list
+        );
       }
     }
   }
+}
 
 // Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
@@ -319,11 +319,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
 
   useEffect(() => {
     // ! TO REMOVE BEFORE PRODUCTION
-     fileSystem.deleteAsync(folder_dest).then(() => {
-       console.log("Folder deleted");
-     }).catch((error) => {
-       console.log(error);
-     });
+    fileSystem.deleteAsync(folder_dest).then(() => {
+      console.log("Folder deleted");
+    }).catch((error) => {
+      console.log(error);
+    });
     // ! END TO REMOVE BEFORE PRODUCTION
 
     return () => {
@@ -495,18 +495,18 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
 
                       {
                         !isMapDownloaded ? (
-                            <Button
-                              tx={"testScreen.locate.dl_map_btn"}
-                              onPress={dl_btn_onPress}
-                              style={styles.button}
-                            />
+                          <Button
+                            tx={"testScreen.locate.dl_map_btn"}
+                            onPress={dl_btn_onPress}
+                            style={styles.button}
+                          />
 
-                          ) : (
-                            <Button
-                              tx={"testScreen.locate.locate_btn"}
-                              onPress={onLocationBtnPress}
-                              style={styles.button}
-                            />
+                        ) : (
+                          <Button
+                            tx={"testScreen.locate.locate_btn"}
+                            onPress={onLocationBtnPress}
+                            style={styles.button}
+                          />
                         )
                       }
 

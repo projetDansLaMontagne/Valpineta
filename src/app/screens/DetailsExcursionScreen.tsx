@@ -21,6 +21,7 @@ const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   excursion: Record<string, unknown>
+  temps: Record<"h" | "m", number>
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
@@ -46,10 +47,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           swipeHeight={100}
         />
       </SafeAreaView>
-    ) : 
+    ) :
     //sinon on affiche une erreur
     (
-      <Screen  preset="fixed">
+    <Screen  preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
             style={{ tintColor: colors.bouton }}
@@ -157,9 +158,9 @@ function afficherDescriptionCourte(description: string) {
  * @returns les informations de l'excursion
  */
 function infos( excursion: Record<string, unknown>, navigation: any) {
-  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
+  const data = require("./../../assets/JSON/exemple_marcatiecho_circuito.json")
 
-  var duree = ""
+  var duree = { h: 0, m: 0 }
   var distance = ""
   var difficulteOrientation = 0
   var difficulteTechnique = 0
@@ -171,10 +172,7 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
     excursion.difficulteTechnique !== undefined ||
     excursion.description !== undefined
   ) {
-    duree = excursion.duree.h + "h"
-    if (excursion.duree.m !== 0) {
-      duree = duree + excursion.duree.m
-    }
+    duree = excursion.duree
     distance = excursion.distance
     difficulteTechnique = excursion.difficulteTechnique
     difficulteOrientation = excursion.difficulteOrientation
@@ -191,7 +189,7 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
                 style={$iconInformation}
                 source={require("../../assets/icons/duree.png")}
               ></Image>
-              <Text text={duree} size="xs" />
+              <Text text={duree.h + "h" + (duree.m == 0 ? "" : duree.m)} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
@@ -240,7 +238,7 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-              <GraphiqueDenivele data={data} />
+            <GraphiqueDenivele points={data} precision={40} />
           </View>
         </View>
       </TouchableWithoutFeedback>
