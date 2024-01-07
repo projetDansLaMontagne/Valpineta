@@ -4,7 +4,7 @@
  * pas dans la carte
  */
 
-import React, {FC, useEffect, useRef, useState} from "react"
+import React, { FC, useEffect, useRef, useState } from "react"
 import { observer } from "mobx-react-lite"
 import {
   Animated,
@@ -17,20 +17,20 @@ import {
   Dimensions,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import {Button, Screen, Text} from "app/components"
-import {spacing, colors} from "../theme";
+import { Button, Screen, Text } from "app/components"
+import { spacing, colors } from "../theme";
 
 // location
 import * as Location from 'expo-location';
-import MapView, {UrlTile} from "react-native-maps"
+import MapView, { UrlTile } from "react-native-maps"
 import MapButton from "../components/MapButton";
-import {Asset} from "expo-asset";
+import { Asset } from "expo-asset";
 
 import * as fileSystem from 'expo-file-system';
 import formatRequire from "../services/importAssets/assetRequire";
 
 // variables
-interface MapScreenProps extends AppStackScreenProps<"Map"> {}
+interface MapScreenProps extends AppStackScreenProps<"Map"> { }
 
 type T_animateToLocation = (
   passedLocation?: Location.LocationObject
@@ -42,60 +42,60 @@ const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
 const download_file = async () => {
-    console.log("Downloading files...");
+  console.log("Downloading files...");
 
-    const assets = await formatRequire();
+  const assets = await formatRequire();
 
-    return create_folder_struct(
-      fichier_json_aled_jenpeuxPlus,
-      folder_dest,
-      assets
-    );
-  }
+  return create_folder_struct(
+    fichier_json_aled_jenpeuxPlus,
+    folder_dest,
+    assets
+  );
+}
 
-  /**
-   * Create the folder structure (recursively)
-   *
-   * @param folder_struct {Object} The folder structure
-   * @param folder_path {string} The path of the folder
-   * @param assets_list {Promise<Asset[]>} The list of assets
-   */
-  const create_folder_struct = async (
-      folder_struct: any,
-      folder_path: string = folder_dest,
-      assets_list: Asset[]
-  ) => {
-    for (const folder in folder_struct) {
-      if (folder_struct.hasOwnProperty(folder)) {
-        if (typeof folder_struct[folder] === 'string') {
-          const file_name = folder_struct[folder].split('/').pop();
-          // remove 'folder_dest' from 'folder_path'
-          let file_folder = folder_path.replace(folder_dest, '');
+/**
+ * Create the folder structure (recursively)
+ *
+ * @param folder_struct {Object} The folder structure
+ * @param folder_path {string} The path of the folder
+ * @param assets_list {Promise<Asset[]>} The list of assets
+ */
+const create_folder_struct = async (
+  folder_struct: any,
+  folder_path: string = folder_dest,
+  assets_list: Asset[]
+) => {
+  for (const folder in folder_struct) {
+    if (folder_struct.hasOwnProperty(folder)) {
+      if (typeof folder_struct[folder] === 'string') {
+        const file_name = folder_struct[folder].split('/').pop();
+        // remove 'folder_dest' from 'folder_path'
+        let file_folder = folder_path.replace(folder_dest, '');
 
-          await fileSystem.makeDirectoryAsync(`${folder_dest}${file_folder}`, {
-            intermediates: true,
-          });
+        await fileSystem.makeDirectoryAsync(`${folder_dest}${file_folder}`, {
+          intermediates: true,
+        });
 
-          const assets_list_uri = assets_list[COMPTEUR].localUri;
-          COMPTEUR++;
-          console.log(`downloaded ${COMPTEUR} files`);
+        const assets_list_uri = assets_list[COMPTEUR].localUri;
+        COMPTEUR++;
+        console.log(`downloaded ${COMPTEUR} files`);
 
-          await fileSystem.copyAsync(
-              {
-                  from: assets_list_uri,
-                  to: `${folder_dest}${file_folder}/${file_name}`
-              }
-          );
-        } else {
-          await create_folder_struct(
-            folder_struct[folder],
-            `${folder_path}/${folder}`,
-            assets_list
-          );
-        }
+        await fileSystem.copyAsync(
+          {
+            from: assets_list_uri,
+            to: `${folder_dest}${file_folder}/${file_name}`
+          }
+        );
+      } else {
+        await create_folder_struct(
+          folder_struct[folder],
+          `${folder_path}/${folder}`,
+          assets_list
+        );
       }
     }
   }
+}
 
 // Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
@@ -319,11 +319,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
 
   useEffect(() => {
     // ! TO REMOVE BEFORE PRODUCTION
-     fileSystem.deleteAsync(folder_dest).then(() => {
-       console.log("Folder deleted");
-     }).catch((error) => {
-       console.log(error);
-     });
+    fileSystem.deleteAsync(folder_dest).then(() => {
+      console.log("Folder deleted");
+    }).catch((error) => {
+      console.log(error);
+    });
     // ! END TO REMOVE BEFORE PRODUCTION
 
     return () => {
@@ -487,26 +487,26 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                 {
                   isFetching ? (
                     <>
-                      <Text tx={"testScreen.locate.fetching"} style={{color: "white"}} />
+                      <Text tx={"testScreen.locate.fetching"} style={{ color: "white" }} />
                     </>
                   ) : (
                     <>
-                      <Text tx={"testScreen.locate.notLocated.title"} style={{color: "white"}} />
+                      <Text tx={"testScreen.locate.notLocated.title"} style={{ color: "white" }} />
 
                       {
                         !isMapDownloaded ? (
-                            <Button
-                              tx={"testScreen.locate.dl_map_btn"}
-                              onPress={dl_btn_onPress}
-                              style={styles.button}
-                            />
+                          <Button
+                            tx={"testScreen.locate.dl_map_btn"}
+                            onPress={dl_btn_onPress}
+                            style={styles.button}
+                          />
 
-                          ) : (
-                            <Button
-                              tx={"testScreen.locate.locate_btn"}
-                              onPress={onLocationBtnPress}
-                              style={styles.button}
-                            />
+                        ) : (
+                          <Button
+                            tx={"testScreen.locate.locate_btn"}
+                            onPress={onLocationBtnPress}
+                            style={styles.button}
+                          />
                         )
                       }
 
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#eeeeee50",
   },
   actionsButtonContainer: {
-    ...(buttonContainer as ViewStyle) ,
+    ...(buttonContainer as ViewStyle),
     backgroundColor: colors.palette.vert,
   },
   map: {
