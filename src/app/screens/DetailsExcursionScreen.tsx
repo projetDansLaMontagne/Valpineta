@@ -47,10 +47,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           swipeHeight={100}
         />
       </SafeAreaView>
-    ) :
-    //sinon on affiche une erreur
-    (
-    <Screen  preset="fixed">
+    ) : (
+      //sinon on affiche une erreur
+      <Screen preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
             style={{ tintColor: colors.bouton }}
@@ -65,7 +64,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </View>
       </Screen>
     )
-  }
+  },
 )
 
 /**
@@ -87,9 +86,8 @@ function itemFull(
   excursion: Record<string, unknown>,
   navigation: any,
   containerInfoAffiche: boolean,
-  setcontainerInfoAffiche: any
+  setcontainerInfoAffiche: any,
 ) {
-
   var nomExcursion = ""
   if (excursion !== undefined) {
     nomExcursion = excursion.nom
@@ -157,7 +155,7 @@ function afficherDescriptionCourte(description: string) {
  * @param isLoading
  * @returns les informations de l'excursion
  */
-function infos( excursion: Record<string, unknown>, navigation: any) {
+function infos(excursion: Record<string, unknown>, navigation: any) {
   const data = require("./../../assets/JSON/exemple_marcatiecho_circuito.json")
 
   var duree = { h: 0, m: 0 }
@@ -324,7 +322,9 @@ const $containerGrand: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.xs,
-  paddingBottom: 30,
+  // A SUPPRIMER : si le footer est reconnnu, il n y a pas besoins de mettre de marge
+  // Là, la popup se cache derriere le footer
+  marginBottom: 170,
 }
 
 //Style du container du titre et du bouton de téléchargement
@@ -407,7 +407,7 @@ const $containerAvis: ViewStyle = {
 
 const $containerDenivele: ViewStyle = {
   padding: spacing.lg,
-  // marginBottom: 100, pour pouvoir afficher le graphique
+  // A SUPPRIMER : on devrait pas avoir ca
   marginBottom: 100,
 }
 
