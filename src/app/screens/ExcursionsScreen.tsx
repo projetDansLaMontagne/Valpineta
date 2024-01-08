@@ -186,14 +186,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     }
   }
 
-  const telechargertracks = async () => {
-    try {
-      // tracks = await tracksRequire()
-      console.log(tracks)
-    } catch (error) {
-      console.error("Erreur lors du chargement du fichier JSON :", error)
-    }
-  }
 
   // -- FONCTIONS DE TRI --
   /**
@@ -279,7 +271,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   return (
     <Screen style={$root} safeAreaEdges={["top", "bottom"]}>
-      <Button text="Telecharger tracks" onPress={telechargertracks} />
       <View style={styles.searchBox}>
         <TextInput
           placeholder="Rechercher une excursion"
