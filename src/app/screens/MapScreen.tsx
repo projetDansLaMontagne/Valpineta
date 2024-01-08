@@ -37,10 +37,11 @@ type T_animateToLocation = (
 ) => void;
 
 let COMPTEUR = 0;
-import fichier_json_aled_jenpeuxPlus from '../../assets/Tiles/tiles_struct.json';
+import fichier_json from '../../assets/Tiles/tiles_struct.json';
 const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
+<<<<<<< HEAD
 const download_file = async () => {
   console.log("Downloading files...");
 
@@ -52,6 +53,25 @@ const download_file = async () => {
     assets
   );
 }
+=======
+const copyFilesInBatch = async (filesToCopy, batchCount) => {
+  for (let i = 0; i < filesToCopy.length; i += batchCount) {
+    const batchFiles = filesToCopy.slice(i, i + batchCount);
+
+    // Copie des fichiers dans ce lot
+    await Promise.all(
+      batchFiles.map(async file => {
+        // Effectuer la copie du fichier ici avec FileSystem.copyAsync
+        // (Exemple: À adapter selon votre structure de fichier)
+        await fileSystem.copyAsync({
+          from: file.source,
+          to: file.destination,
+        });
+      })
+    );
+  }
+};
+>>>>>>> main
 
 /**
  * Create the folder structure (recursively)
@@ -61,9 +81,15 @@ const download_file = async () => {
  * @param assets_list {Promise<Asset[]>} The list of assets
  */
 const create_folder_struct = async (
+<<<<<<< HEAD
   folder_struct: any,
   folder_path: string = folder_dest,
   assets_list: Asset[]
+=======
+  folder_struct,
+  folder_path = folder_dest,
+  assets_list
+>>>>>>> main
 ) => {
   for (const folder in folder_struct) {
     if (folder_struct.hasOwnProperty(folder)) {
@@ -80,6 +106,7 @@ const create_folder_struct = async (
         COMPTEUR++;
         console.log(`downloaded ${COMPTEUR} files`);
 
+<<<<<<< HEAD
         await fileSystem.copyAsync(
           {
             from: assets_list_uri,
@@ -87,6 +114,23 @@ const create_folder_struct = async (
           }
         );
       } else {
+=======
+        // Copier les fichiers en lot en utilisant copyFilesInBatch
+        // Préparez la liste de fichiers à copier pour ce dossier
+        const filesToCopy = [
+          {
+            source: assets_list_uri,
+            destination: `${folder_dest}${file_folder}/${file_name}`,
+          },
+          // ... autres fichiers à copier pour ce dossier
+        ];
+
+        // Copie par lot des fichiers
+        const batchCount = 10; // Nombre de fichiers par lot
+        await copyFilesInBatch(filesToCopy, batchCount);
+      } else {
+        // Récursivement créer la structure des dossiers pour les sous-dossiers
+>>>>>>> main
         await create_folder_struct(
           folder_struct[folder],
           `${folder_path}/${folder}`,
@@ -95,7 +139,11 @@ const create_folder_struct = async (
       }
     }
   }
+<<<<<<< HEAD
 }
+=======
+};
+>>>>>>> main
 
 // Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
@@ -107,11 +155,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   // State(s)
   const [gavePermission, setGavePermission] = useState(false);
   const [location, setLocation] = useState(null);
-  const [isFetching, setIsFetching] = useState(false);
 
-  // ! TO REMOVE BEFORE PRODUCTION
-  const [nbFetch, setNbFetch] = useState(0);
-  // ! END TO REMOVE BEFORE PRODUCTION
   const [followUserLocation, setFollowUserLocation] = useState(false);
 
   const [menuIsOpen, setMenuIsOpen] = useState(false);
@@ -151,14 +195,43 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
           latitude: finalLocation.coords.latitude,
           longitude: finalLocation.coords.longitude,
         },
-        // pitch: 0,
-        // heading: 0,
-        // altitude: 3000, // ! mabye change this value
-        // zoom: 15, // ! same here
       });
     } else {
       console.log("mapRef.current is null");
     }
+  }
+
+  const downloadTiles = async () => {
+
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+    }
+    else
+    {
+      console.log("Permission ok")
+      // Vérifier si les tuiles sont déjà dl cartes/OSM/17/65682/48390.jpg
+      const folderInfo = await fileSystem.getInfoAsync(folder_dest + "/17/65682/48390.jpg");
+      if (folderInfo.exists && folderInfo.isDirectory)
+      {
+        console.log("Tuiles déjà DL")
+      }
+      else
+      {
+        //Supprimer le dossier
+        await fileSystem.deleteAsync(folder_dest, {idempotent: true});
+
+        const assets = await formatRequire();
+
+        await create_folder_struct(
+          fichier_json,
+          folder_dest,
+          assets
+        )
+      }
+    }
+
   }
 
   /**
@@ -202,9 +275,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
         console.log(`[EcranTestScreen] location.coords.latitude: ${location.coords.latitude}`);
         console.log(`[EcranTestScreen] location.coords.longitude: ${location.coords.longitude}`);
       }
-      // ! TO REMOVE BEFORE PRODUCTION
-      setNbFetch(nbFetch => nbFetch + 1);
-      // ! END TO REMOVE BEFORE PRODUCTION
       setLocation(location);
     });
   };
@@ -223,49 +293,24 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
     return false
   }
 
-  const onLocationBtnPress = async () => {
-    console.log("[MapScreen] onLocationBtnPress()");
-    setIsFetching(true);
+  const toggleFollowUserLocation = () => {
+    if (!gavePermission) {
+      askUserLocation()
+        .then(() => console.log("aled"))
+    }
 
+    setFollowUserLocation(!followUserLocation);
+  }
+
+  const askUserLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       console.log('Permission to access location was denied');
       setGavePermission(false);
       return;
     }
-
-    console.log("Permission granted");
-
     setGavePermission(true);
-    await getLocationAsync();
-
   }
-
-  const toggleFollowUserLocation = () => {
-    setFollowUserLocation(!followUserLocation);
-  }
-
-  // ! TO REMOVE BEFORE PRODUCTION
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [isMapDownloaded, setIsMapDownloaded] = useState(false);
-  const dl_btn_onPress = async () => {
-    if (isDownloading) {
-      console.log("Already downloading");
-      return;
-    }
-
-    setIsDownloading(true);
-    await download_file()
-      .then(() => {
-        console.log("Files downloaded");
-        setIsDownloading(false);
-        setIsMapDownloaded(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-  // ! END TO REMOVE BEFORE PRODUCTION
 
   const poiButtonOnPress = async () => {
     console.log("poiButtonOnPress()");
@@ -284,21 +329,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   }, [gavePermission])
 
   useEffect(() => {
-    if (!location) {
-      setNbFetch(0)
-      return;
-    }
-
-    setIsFetching(false);
 
     followUserLocation && animateToLocation(location);
   }, [location]);
-
-  useEffect(() => {
-    if (isFetching) {
-      console.log("isFetching is true");
-    }
-  }, [isFetching])
 
   useEffect(() => {
     if (menuIsOpen) {
@@ -318,6 +351,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   }, [followUserLocation]);
 
   useEffect(() => {
+<<<<<<< HEAD
     // ! TO REMOVE BEFORE PRODUCTION
     fileSystem.deleteAsync(folder_dest).then(() => {
       console.log("Folder deleted");
@@ -325,6 +359,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
       console.log(error);
     });
     // ! END TO REMOVE BEFORE PRODUCTION
+=======
+    downloadTiles().then(() => console.log("PAGE CHARGEE"));
+>>>>>>> main
 
     return () => {
       removeLocationSubscription();
@@ -350,135 +387,68 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
     <Screen style={$container}>
       <SafeAreaView style={styles.container} >
         <View style={styles.mapContainer}>
-          {
-            location ? (
-              <>
-                <MapView
-                  mapType={Platform.OS == "android" ? "none" : "standard"}
-                  ref={mapRef}
-                  style={{
-                    height,
-                    width,
+          <>
+            <MapView
+              mapType={Platform.OS === "android" ? "none" : "standard"}
+              ref={mapRef}
+              style={{
+                height,
+                width,
 
-                    ...styles.map
-                  }}
+                ...styles.map
+              }}
 
-                  // initialRegion={{
-                  //   latitude: location.coords.latitude,
-                  //   longitude: location.coords.longitude,
-                  //   latitudeDelta: 0.0922,
-                  //   longitudeDelta: 0.0421,
-                  // }}
+              initialRegion={region}
 
-                  initialRegion={region}
+              initialCamera={{
+                center: {
+                  latitude: LATITUDE,
+                  longitude: LONGITUDE,
+                },
+                pitch: 0,
+                heading: 0,
+                altitude: 6000,
+                zoom: 5
+              }}
 
-                  initialCamera={{
-                    center: {
-                      // latitude: location.coords.latitude,
-                      // longitude: location.coords.longitude,
-                      latitude: LATITUDE,
-                      longitude: LONGITUDE,
-                    },
-                    pitch: 0,
-                    heading: 0,
-                    altitude: 6000,
-                    zoom: 5
-                  }}
+              onMoveShouldSetResponder={handleMapMoves}
 
-                  // onMapLoaded={() => {
-                  //   animateToLocation(location)
-                  // }}
-                  onMoveShouldSetResponder={handleMapMoves}
+              showsBuildings={true}
+              showsCompass={true}
+              showsMyLocationButton={false} // only for Android
+              shouldRasterizeIOS={true} // only for iOS
+              showsScale={true} // only for iOS
+              showsUserLocation={true}
 
-                  showsBuildings={true}
-                  showsCompass={true}
-                  showsMyLocationButton={true} // only for Android
-                  shouldRasterizeIOS={true} // only for iOS
-                  showsScale={true} // only for iOS
-                  showsUserLocation={true}
+              zoomControlEnabled={false}
+              zoomEnabled={true}
+              minZoomLevel={12} // Niveau de zoom minimum
+              maxZoomLevel={15} // Niveau de zoom maximum
+            >
 
-                  zoomControlEnabled={true}
-                  zoomEnabled={true}
-                  minZoomLevel={12} // Niveau de zoom minimum
-                  maxZoomLevel={15} // Niveau de zoom maximum
-                >
+              <UrlTile
+                urlTemplate={folder_dest + "/{z}/{x}/{y}.jpg"}
+                tileSize={256}
+              />
+            </MapView>
 
-                  <UrlTile
-                    urlTemplate={folder_dest + "/{z}/{x}/{y}.png"}
-                    tileSize={256}
-                  />
-                </MapView>
-
-                <View style={styles.mapOverlay}>
-                  {
-                    menuIsOpen && (
-                      <>
-                        <MapButton
-                          ref={addPOIBtnRef}
-                          style={{
-                            ...styles.actionsButtonContainer,
-                          }}
-
-                          onPress={poiButtonOnPress}
-
-                          icon={'eye'}
-                          iconSize={spacing.lg}
-                          iconColor={colors.palette.blanc}
-                        />
-                        <MapButton
-                          ref={addWarningBtnRef}
-                          style={{
-                            ...styles.actionsButtonContainer,
-                          }}
-
-                          icon='exclamation-circle'
-                          iconSize={spacing.lg}
-                          iconColor={colors.palette.blanc}
-                        />
-                      </>
-                    )
-                  }
-                  <MapButton
-                    ref={toggleBtnMenuRef}
-                    style={{
-                      ...styles.actionsButtonContainer,
-                    }}
-
-                    onPress={toggleMenu}
-
-                    icon={menuIsOpen ? 'times' : 'map-marker-alt'}
-                    iconSize={spacing.lg}
-                    iconColor={colors.palette.blanc}
-                  />
-                </View>
-                <View style={styles.mapOverlayLeft}>
-
-                  <MapButton
-                    ref={followLocationButtonRef}
-                    style={{
-                      ...styles.locateButtonContainer,
-                    }}
-
-                    onPress={toggleFollowUserLocation}
-
-                    icon='location-arrow'
-                    iconSize={spacing.lg}
-                    iconColor={followUserLocation ? colors.palette.bleuLocActive : colors.palette.bleuLocInactive}
-                  />
-
-                  {
-                    !isMapDownloaded &&
+            <View style={styles.mapOverlay}>
+              {
+                menuIsOpen && (
+                  <>
                     <MapButton
+                      ref={addPOIBtnRef}
                       style={{
-                        ...styles.locateButtonContainer,
+                        ...styles.actionsButtonContainer,
                       }}
 
-                      onPress={dl_btn_onPress}
+                      onPress={poiButtonOnPress}
 
-                      icon='download'
+                      icon={'eye'}
                       iconSize={spacing.lg}
-                      iconColor={colors.palette.bleuLocActive}
+                      iconColor={colors.palette.blanc}
                     />
+<<<<<<< HEAD
                   }
                 </View>
               </>
@@ -509,13 +479,50 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                           />
                         )
                       }
+=======
+                    <MapButton
+                      ref={addWarningBtnRef}
+                      style={{
+                        ...styles.actionsButtonContainer,
+                      }}
 
-                    </>
-                  )
-                }
-              </>
-            )
-          }
+                      icon='exclamation-circle'
+                      iconSize={spacing.lg}
+                      iconColor={colors.palette.blanc}
+                    />
+                  </>
+                )
+              }
+              <MapButton
+                ref={toggleBtnMenuRef}
+                style={{
+                  ...styles.actionsButtonContainer,
+                }}
+
+                onPress={toggleMenu}
+>>>>>>> main
+
+                icon={menuIsOpen ? 'times' : 'map-marker-alt'}
+                iconSize={spacing.lg}
+                iconColor={colors.palette.blanc}
+              />
+            </View>
+            <View style={styles.mapOverlayLeft}>
+
+              <MapButton
+                ref={followLocationButtonRef}
+                style={{
+                  ...styles.locateButtonContainer,
+                }}
+
+                onPress={toggleFollowUserLocation}
+
+                icon='location-arrow'
+                iconSize={spacing.lg}
+                iconColor={followUserLocation ? colors.palette.bleuLocActive : colors.palette.bleuLocInactive}
+              />
+            </View>
+          </>
         </View>
       </SafeAreaView>
     </Screen>
