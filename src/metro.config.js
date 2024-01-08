@@ -45,10 +45,15 @@ if (isExpo) {
          * You can disable it if you're not using pnpm or a monorepo or symlinks.
          */
         resolveRequest: MetroSymlinksResolver(),
-        assetExts: [...defaultConfig.resolver.assetExts, "bin"],
-        //assetExts: [assetExts, 'txt', 'xml', 'png', 'jpg', 'pb', 'tflite'],
         sourceExts: [...defaultConfig.resolver.sourceExts, "xml", "gpx"], // Add your extensions here
+        assetExts: [...defaultConfig.resolver.assetExts, "jpg", "jpeg", "png", "gif"],
       },
+      watchFolders: [
+        // Ajoutez ici le chemin vers le répertoire où se trouvent vos images.
+        'assets',
+        // Vous pouvez ajouter d'autres dossiers d'actifs si nécessaire.
+      ],
+
       // transformer: {
       //   babelTransformerPath: require.resolve("metro-react-native-babel-transformer"),
       //   assetRegistryPath: require.resolve("metro-config/src/defaults/assetRegistryPath"),
