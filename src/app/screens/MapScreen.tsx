@@ -41,19 +41,6 @@ import fichier_json from '../../assets/Tiles/tiles_struct.json';
 const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
-<<<<<<< HEAD
-const download_file = async () => {
-  console.log("Downloading files...");
-
-  const assets = await formatRequire();
-
-  return create_folder_struct(
-    fichier_json_aled_jenpeuxPlus,
-    folder_dest,
-    assets
-  );
-}
-=======
 const copyFilesInBatch = async (filesToCopy, batchCount) => {
   for (let i = 0; i < filesToCopy.length; i += batchCount) {
     const batchFiles = filesToCopy.slice(i, i + batchCount);
@@ -71,7 +58,6 @@ const copyFilesInBatch = async (filesToCopy, batchCount) => {
     );
   }
 };
->>>>>>> main
 
 /**
  * Create the folder structure (recursively)
@@ -81,15 +67,9 @@ const copyFilesInBatch = async (filesToCopy, batchCount) => {
  * @param assets_list {Promise<Asset[]>} The list of assets
  */
 const create_folder_struct = async (
-<<<<<<< HEAD
-  folder_struct: any,
-  folder_path: string = folder_dest,
-  assets_list: Asset[]
-=======
   folder_struct,
   folder_path = folder_dest,
   assets_list
->>>>>>> main
 ) => {
   for (const folder in folder_struct) {
     if (folder_struct.hasOwnProperty(folder)) {
@@ -106,15 +86,6 @@ const create_folder_struct = async (
         COMPTEUR++;
         console.log(`downloaded ${COMPTEUR} files`);
 
-<<<<<<< HEAD
-        await fileSystem.copyAsync(
-          {
-            from: assets_list_uri,
-            to: `${folder_dest}${file_folder}/${file_name}`
-          }
-        );
-      } else {
-=======
         // Copier les fichiers en lot en utilisant copyFilesInBatch
         // Préparez la liste de fichiers à copier pour ce dossier
         const filesToCopy = [
@@ -130,7 +101,6 @@ const create_folder_struct = async (
         await copyFilesInBatch(filesToCopy, batchCount);
       } else {
         // Récursivement créer la structure des dossiers pour les sous-dossiers
->>>>>>> main
         await create_folder_struct(
           folder_struct[folder],
           `${folder_path}/${folder}`,
@@ -139,11 +109,7 @@ const create_folder_struct = async (
       }
     }
   }
-<<<<<<< HEAD
-}
-=======
 };
->>>>>>> main
 
 // Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
@@ -208,19 +174,16 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
     if (status !== 'granted') {
       console.log('Permission to access location was denied');
     }
-    else
-    {
+    else {
       console.log("Permission ok")
       // Vérifier si les tuiles sont déjà dl cartes/OSM/17/65682/48390.jpg
       const folderInfo = await fileSystem.getInfoAsync(folder_dest + "/17/65682/48390.jpg");
-      if (folderInfo.exists && folderInfo.isDirectory)
-      {
+      if (folderInfo.exists && folderInfo.isDirectory) {
         console.log("Tuiles déjà DL")
       }
-      else
-      {
+      else {
         //Supprimer le dossier
-        await fileSystem.deleteAsync(folder_dest, {idempotent: true});
+        await fileSystem.deleteAsync(folder_dest, { idempotent: true });
 
         const assets = await formatRequire();
 
@@ -351,17 +314,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   }, [followUserLocation]);
 
   useEffect(() => {
-<<<<<<< HEAD
-    // ! TO REMOVE BEFORE PRODUCTION
-    fileSystem.deleteAsync(folder_dest).then(() => {
-      console.log("Folder deleted");
-    }).catch((error) => {
-      console.log(error);
-    });
-    // ! END TO REMOVE BEFORE PRODUCTION
-=======
     downloadTiles().then(() => console.log("PAGE CHARGEE"));
->>>>>>> main
 
     return () => {
       removeLocationSubscription();
@@ -448,38 +401,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                       iconSize={spacing.lg}
                       iconColor={colors.palette.blanc}
                     />
-<<<<<<< HEAD
-                  }
-                </View>
-              </>
-            ) : (
-              <>
-                {
-                  isFetching ? (
-                    <>
-                      <Text tx={"testScreen.locate.fetching"} style={{ color: "white" }} />
-                    </>
-                  ) : (
-                    <>
-                      <Text tx={"testScreen.locate.notLocated.title"} style={{ color: "white" }} />
-
-                      {
-                        !isMapDownloaded ? (
-                          <Button
-                            tx={"testScreen.locate.dl_map_btn"}
-                            onPress={dl_btn_onPress}
-                            style={styles.button}
-                          />
-
-                        ) : (
-                          <Button
-                            tx={"testScreen.locate.locate_btn"}
-                            onPress={onLocationBtnPress}
-                            style={styles.button}
-                          />
-                        )
-                      }
-=======
                     <MapButton
                       ref={addWarningBtnRef}
                       style={{
@@ -500,7 +421,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                 }}
 
                 onPress={toggleMenu}
->>>>>>> main
 
                 icon={menuIsOpen ? 'times' : 'map-marker-alt'}
                 iconSize={spacing.lg}
