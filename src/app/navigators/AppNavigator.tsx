@@ -75,7 +75,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        // initialRouteName={"Carte"}
         initialRouteName={"Parametres"}
 
         screenOptions={{

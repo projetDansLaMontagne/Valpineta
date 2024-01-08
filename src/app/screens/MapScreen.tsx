@@ -27,7 +27,7 @@ import MapButton from "../components/MapButton";
 import { Asset } from "expo-asset";
 
 import * as fileSystem from 'expo-file-system';
-import formatRequire from "../services/importAssets/assetRequire";
+// import formatRequire from "../services/importAssets/assetRequire";
 
 // variables
 interface MapScreenProps extends AppStackScreenProps<"Map"> { }

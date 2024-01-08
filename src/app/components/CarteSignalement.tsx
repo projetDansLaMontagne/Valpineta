@@ -1,4 +1,5 @@
-import * as React from "react"
+import React, { useEffect, useState } from 'react';
+import NetInfo from "@react-native-community/netinfo";
 import { View, StyleSheet, Image } from "react-native"
 import { observer } from "mobx-react-lite"
 import { colors, spacing } from "app/theme"
@@ -15,7 +16,7 @@ export interface CarteSignalementProps {
 
   distanceDuDepart: string
 
-  imageSignalement?: string
+  imageSignalement?: any
 }
 
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
@@ -27,6 +28,26 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     distanceDuDepart,
     imageSignalement
   } = props
+
+  const [isConnected, setIsConnected] = useState(true); // État de la connexion Internet
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      const netInfoState = await NetInfo.fetch();
+      setIsConnected(netInfoState.isConnected);
+    };
+
+    // Vérifier la connexion au montage du composant
+    checkConnection();
+
+    // Abonnement aux changements d'état de la connexion
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    // Nettoyage de l'abonnement lors du démontage du composant
+    return () => unsubscribe();
+  }, []);
 
   if (details === undefined) {
     console.error(`CarteSignalement : details non défini pour le signalement: ${nomSignalement}`);
@@ -56,31 +77,53 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     check('distanceDuDepart', distanceDuDepart);
   }
 
-  return details ?
-    <View style={styles.carteGlobale}>
-      {entete(type, nomSignalement, distanceDuDepart)}
-      <View style={styles.contenu}>
-        {/* {require(`../../assets/images/${imageSignalement}`)}  */}
+  const renderImage = () => {
+    if (isConnected && type === 'pointInteret' && imageSignalement) {
+      return (
+        <View style={styles.container}>
+          <Image
+            source={{ uri: `data:image/png;base64,${imageSignalement}` }}
+            style={styles.image}
+          />
+          <Text style={styles.texte}>
+            {description}
+          </Text>
+        </View>
+      );
+    } else {
+      return (
         <Text style={styles.texte}>
           {description}
         </Text>
+      );
+    }
+  };
+
+  return details ? (
+    <View style={styles.carteGlobale}>
+      {entete(type, nomSignalement, distanceDuDepart)}
+      <View style={styles.contenu}>
+        {renderImage()}
       </View>
     </View>
-    :
+  ) : (
     <View>
       <View style={styles.carteGlobale}>
         {entete(type, nomSignalement, distanceDuDepart)}
       </View>
     </View>
-})
+  );
+});
+
+
 
 function entete(type, nomSignalement, distanceDuDepart) {
   return (
     <View style={styles.entete}>
       {type === 'pointInteret' ? (
-        <Image source={require('../../assets/icons/pin.png')} style={{ width: 25, height: 25, tintColor: 'green' }} />
+        <Image source={require('../../assets/icons/pin.png')} style={styles.iconeVert} />
       ) : (
-        <Image source={require('../../assets/icons/pin.png')} style={{ width: 25, height: 25, tintColor: 'red' }} />
+        <Image source={require('../../assets/icons/pin.png')} style={styles.iconeRouge} />
       )}
       <Text style={styles.heading}>
         {nomSignalement}
@@ -131,9 +174,26 @@ const styles = StyleSheet.create({
   },
   texte: {
     fontSize: 14,
-    maxWidth: "100%",
-    paddingLeft: spacing.md,
-    paddingRight: spacing.md,
+    flex: 0.5,
+    // maxWidth: "50%",
   },
+  iconeRouge: {
+    width: 25, height: 25, tintColor: 'red'
+  },
+  iconeVert: {
+    width: 25, height: 25, tintColor: 'green'
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  image: {
+    flex: 0.5,
+    width: 100, // ajustez la largeur selon vos besoins
+    height: 100, // ajustez la hauteur selon vos besoins
+  },
+
 })
 

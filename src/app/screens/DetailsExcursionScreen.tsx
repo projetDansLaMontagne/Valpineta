@@ -228,13 +228,13 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
                 if (signalement.type == "Avertissement")
                   return (
                     <View key={index}>
-                      <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} />
+                      <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} imageSignalement={signalement.image} />
                     </View>
                   );
                 else {
                   return (
                     <View key={index}>
-                      <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} />
+                      <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} imageSignalement={signalement.image} />
                     </View>
                   );
                 }
@@ -243,8 +243,8 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>
-        <View style={$sortirDetailSignalement}>
-          <Button tx="detailEscursion.bouttonRetourInformations" onPress={() => setIsAllSignalements(false)} />
+        <View>
+          <Button style={$sortirDetailSignalement} tx="detailEscursion.bouttonRetourInformations" onPress={() => setIsAllSignalements(false)} />
         </View>
       </View>
     </View>
@@ -319,7 +319,19 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
           </View>
           <View style={$containerDescriptionEtSignalements}>
             <Text text="Description" size="lg" />
-            <Text text="Pourquoi les marmottes ne jouent-elles jamais aux cartes avec les blaireaux ? Parce qu'elles ont trop peur qu'elles 'marmottent' les règles !" size="xxs" />
+            <Text
+              text={afficherDescriptionCourte(description)}
+              size="xxs"
+            />
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Description", { excursion: excursion })
+              }}
+            >
+              {description === "" ? null : (
+                <Text style={$lienDescription} text="Voir plus" size="xxs" />
+              )}
+            </TouchableOpacity>
           </View>
           <View style={$containerDescriptionEtSignalements}>
             <View>
@@ -650,6 +662,15 @@ const $carteGlobale: ViewStyle = {
 
 const $sortirDetailSignalement: ViewStyle = {
   justifyContent: "center",
-  marginBottom: spacing.xl,
+  marginBottom: "5%",
+  borderRadius: 15,
+  borderWidth: 2,
+  padding: 0,
+  backgroundColor: colors.fond,
+  borderColor: colors.bordure,
+  width: "70%",
+  position: "absolute",
+  bottom: 0,
+  left: "15%",
+  zIndex: 1,
 }
-
