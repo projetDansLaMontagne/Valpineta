@@ -1,11 +1,7 @@
-import { useEffect, useState } from "react"
 import { StyleProp, View, ViewStyle, Dimensions } from "react-native"
 import { observer } from "mobx-react-lite"
 import { colors, spacing } from "app/theme"
 import { LineChart } from "react-native-chart-kit"
-// import { LineChart } from 'react-native-charts-wrapper'
-// import { LineChart } from "react-native-gifted-charts"
-import { Text } from "app/components"
 
 type T_Point = {
   lat: number
@@ -17,19 +13,16 @@ type T_Point = {
 export interface GraphiqueDeniveleProps {
   style?: StyleProp<ViewStyle>
 
-  // Liste de points formant l excursion
-  points: T_Point[]
-
-  // Precision de l altitude (nombre de points du graphique)
-  precision: number
+  // Nom du fichier JSON contenant les points de l excursion
+  nomFichier: string
 }
 
 export const GraphiqueDenivele = observer(function GraphiqueDenivele(
   props: GraphiqueDeniveleProps,
 ) {
-  /* -------------------------------- Variables ------------------------------- */
+  /* -------------------------------- Constantes ------------------------------- */
   const { width } = Dimensions.get("window")
-  var donnesGraphique: any | null = null
+  const precision = 40 // Precision de l altitude (nombre de points du graphique)
 
   /* -------------------------------- Fonctions ------------------------------- */
   /**
@@ -106,12 +99,19 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     return pointsSelectionnes
   }
   /**
-   * Calcul les donnees pour le graphique
+   * Calcul les donnees pour le graphique (les met dans donneesGraphique)
    * Fonction asynchrone pour ne pas bloquer l affichage
    */
-  const traitementDonneesGraphiques = async () => {
+  const traitementDonneesGraphiques = async (nomFichier: string) => {
+    // Recuperation du track
+    // const res = await fetch("/assets/tracks/" + nomFichier)
+    // console.log(res)
+    // var points: T_Point[] = await res.json()
+
+    var points: T_Point[] = require("./../../assets/JSON/exemple_marcatiecho_circuito.json")
+
     // Reduction du nombre de points
-    const points = trackReduit(props.points, props.precision)
+    points = trackReduit(points, precision)
 
     // Calcul des absisses
     var abscisses = []
@@ -135,9 +135,10 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
   }
 
   /* ------------------------- Verification parametres ------------------------ */
-  if (props.points && props.precision) {
+  var donnesGraphique: any | null = null
+  if (props.nomFichier) {
     // Parametres bien définis
-    traitementDonneesGraphiques()
+    traitementDonneesGraphiques(props.nomFichier)
   } else {
     throw new Error("GraphiqueDenivele : Mauvais parametres")
   }

@@ -11,8 +11,9 @@ import {
   TouchableOpacity,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import { Screen, CarteExcursion } from "app/components"
+import { Screen, CarteExcursion, Button } from "app/components"
 import { colors, spacing } from "app/theme"
+import tracksRequire from "../services/importAssets/tracksRequire"
 
 /**@warning La navigation vers filtres est dans le mauvais sens (l'écran slide vers la gauche au lieu de la droite) */
 
@@ -32,6 +33,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   var filtres: typeof props.Filtres
 
+  var tracks: any
   const [excursionsFiltrees1, setExcursionsFiltrees1] = useState(undefined) // Excursions triées par le 1e filtre (filtres en parametre)
   const [excursionsFiltrees2, setExcursionsFiltrees2] = useState(undefined) // Excursions triées par le 2e filtre (barre de recherche)
 
@@ -158,19 +160,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    */
   const loadExcursions = async (): Promise<void> => {
     try {
-      // -- RECUPERATION DU FICHIER --
-      var excursionsBRUT = require("../../assets/JSON/excursions.json")
-      excursionsBRUT = excursionsBRUT.map((excursion) => ({
-        nom: excursion.nom_excursion,
-        denivele: excursion.denivele,
-        duree: excursion.duree,
-        distance: excursion.distance_excursion,
-        typeParcours: excursion.type_parcours,
-        vallee: excursion.vallee,
-        difficulteTechnique: excursion.difficulte_technique,
-        difficulteOrientation: excursion.difficulte_orientation,
-        description: excursion.post_content,
-      }))
+      /* ----------------------- RECUPERATION DES EXCURSIONS ---------------------- */
+      const excursionsBRUT = require("../../assets/JSON/excursionsFr.json")
 
       // -- FORMATAGE DES DONNEES RECUPEREES --
       const excursionsFormatees = formatageExcursions(excursionsBRUT)
@@ -185,6 +176,20 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       /**@todo faire ceci automatiquement avec le formatage lors de la synchro descendante */
       // const valeursFiltres = calculValeursFiltres(excursionsFormatees);
       // console.log(valeursFiltres);
+
+      /* --------------------------- RECUPERATION TRACKS -------------------------- */
+      // Chargement des tracks
+      // tracks = await tracksRequire()
+      // console.log(tracks)
+    } catch (error) {
+      console.error("Erreur lors du chargement du fichier JSON :", error)
+    }
+  }
+
+  const telechargertracks = async () => {
+    try {
+      // tracks = await tracksRequire()
+      console.log(tracks)
     } catch (error) {
       console.error("Erreur lors du chargement du fichier JSON :", error)
     }
@@ -274,6 +279,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   return (
     <Screen style={$root} safeAreaEdges={["top", "bottom"]}>
+      <Button text="Telecharger tracks" onPress={telechargertracks} />
       <View style={styles.searchBox}>
         <TextInput
           placeholder="Rechercher une excursion"

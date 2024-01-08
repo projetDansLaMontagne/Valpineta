@@ -17,6 +17,7 @@ import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen } from "app/c
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
 
+
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
@@ -149,14 +150,13 @@ function afficherDescriptionCourte(description: string) {
     return descriptionFinale
   }
 }
-
 /**
  *
  * @param isLoading
  * @returns les informations de l'excursion
  */
-function infos(excursion: Record<string, unknown>, navigation: any) {
-  const data = require("./../../assets/JSON/exemple_marcatiecho_circuito.json")
+function infos(excursion: Record<string, any>, navigation: any) {
+  const nomFichier: string = excursion.nomTrackJson
 
   var duree = { h: 0, m: 0 }
   var distance = ""
@@ -236,7 +236,7 @@ function infos(excursion: Record<string, unknown>, navigation: any) {
           </View>
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="xl" />
-            <GraphiqueDenivele points={data} precision={40} />
+            {nomFichier && <GraphiqueDenivele nomFichier={nomFichier} />}
           </View>
         </View>
       </TouchableWithoutFeedback>
