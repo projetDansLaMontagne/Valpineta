@@ -317,7 +317,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
   }, [followUserLocation]);
 
   useEffect(() => {
-    downloadTiles().then(() => console.log("HIHI"));
+    downloadTiles().then(() => console.log("PAGE CHARGEE"));
 
     return () => {
       removeLocationSubscription();
