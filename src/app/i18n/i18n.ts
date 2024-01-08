@@ -4,7 +4,7 @@ import { I18nManager } from "react-native"
 
 // if English isn't your default language, move Translations to the appropriate language file.
 
-import  fr, { Translations } from './fr'
+import fr, { Translations } from './fr'
 import en from "./en"
 
 i18n.fallbacks = true
@@ -15,11 +15,10 @@ i18n.fallbacks = true
  */
 i18n.translations = { fr, en }
 
-const locales = Localization.getLocales() // This method is guaranteed to return at least one array item.
 // The preferred language is the first element in the array, however, we fallback to en-US, especially for tests.
 const preferredLanguage:
   | Localization.Locale
-  | { languageTag: string; textDirection: "ltr" | "rtl" } = locales[0] || {
+  | { languageTag: string; textDirection: "ltr" | "rtl" } = {
   languageTag: "fr",
   textDirection: "ltr",
 }
