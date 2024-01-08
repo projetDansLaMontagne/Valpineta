@@ -72,8 +72,17 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
   const currentRoute = navigationRef.current?.getCurrentRoute()
+  const { parametres } = useStores()
 
-  console.log("currentRoute", currentRoute)
+  useEffect(() => {
+    if(parametres.langues === "fr") {
+      I18n.locale = "fr"
+    }
+    if(parametres.langues === "es") {
+      I18n.locale = "es"
+    }
+  }
+  , [parametres.langues])
 
   return (
     <NavigationContainer
@@ -157,8 +166,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 })
 
 const $icon: ImageStyle = {
-  width: 30,
-  height: 30,
+  width: 25,
+  height: 25,
 }
 
 /* -------------------------------------------------------------------------- */

@@ -72,7 +72,7 @@ const es = {
   parametres:{
     titre: "Ajustes",
     changerLangue: {
-      titre: "Cambiar el idioma",
+      titre: "Idioma",
       francais: "Francés",
       espagnol: "Español",
     }

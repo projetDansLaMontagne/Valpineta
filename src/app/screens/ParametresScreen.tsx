@@ -15,6 +15,8 @@ const { width, height } = Dimensions.get("window")
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
   const { parametres } = useStores()
 
+  console.log(I18n.locale)
+
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
       <View style={$souligne}>
@@ -80,11 +82,12 @@ const $containerIconTexte: ViewStyle = {
 const $containerBoutons: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
+  marginHorizontal: spacing.sm,
 }
 
 
 const $texteParametre: TextStyle = {
-  marginStart: spacing.xs,
+  marginHorizontal: spacing.sm,
 }
 
 const $souligneBouton: ViewStyle = {

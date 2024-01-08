@@ -45,6 +45,7 @@ const en = {
     }
   },
   excursions:{
+    titre: "Excursions",
     erreurChargement: "No excursion found",
     erreurNom: "No excursion found",
   },
@@ -65,7 +66,7 @@ const en = {
   },parametres:{
     titre: "Settings",
     changerLangue: {
-      titre: "Change language",
+      titre: "Language",
       francais: "French",
       espagnol: "Spanish",
     }

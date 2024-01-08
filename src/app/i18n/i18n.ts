@@ -6,6 +6,7 @@ import { I18nManager } from "react-native"
 
 import  fr, { Translations } from './fr'
 import  es  from './es'
+import  en  from './en'
 
 i18n.fallbacks = true
 /**
@@ -13,17 +14,17 @@ i18n.fallbacks = true
  * the language code is the suffixed with "-US". i.e. if a device is set to English ("en"),
  * if you change to another language and then return to English language code is now "en-US".
  */
-i18n.translations = { fr, es }
+i18n.translations = { fr, es, en }
 
-const locales = Localization.getLocales() // This method is guaranteed to return at least one array item.
-// The preferred language is the first element in the array, however, we fallback to en-US, especially for tests.
 const preferredLanguage:
   | Localization.Locale
-  | { languageTag: string; textDirection: "ltr" | "rtl" } = locales[0] || {
+  | { languageTag: string; textDirection: "ltr" | "rtl" } =  {
   languageTag: "fr",
   textDirection: "ltr",
 }
 i18n.locale = preferredLanguage.languageTag
+console.log("i18n.locale", i18n.locale)
+console.log("preferredLanguage", preferredLanguage)
 
 // handle RTL languages
 export const isRTL = preferredLanguage.textDirection === "rtl"

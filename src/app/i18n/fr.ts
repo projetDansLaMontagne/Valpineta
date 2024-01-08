@@ -72,7 +72,7 @@ const fr = {
   parametres:{
     titre: "Paramètres",
     changerLangue: {
-      titre: "Changer la langue",
+      titre: "Langue",
       francais: "Français",
       espagnol: "Espagnol",
     }
