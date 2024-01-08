@@ -49,40 +49,36 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     return () => unsubscribe();
   }, []);
 
+  // Si on ne veut pas de détails, problème
   if (details === undefined) {
     console.error(`CarteSignalement : details non défini pour le signalement: ${nomSignalement}`);
     console.log(details)
   }
 
-  const check = (paramName, paramValue) => {
+  const check = (paramName, paramValue) => { // Vérification de la présence des paramètres
     if (!paramValue) {
-      if (paramName != 'imageSignalement') {
-        console.error(`CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`);
-      }
-      else {
-        console.warn(`CarteSignalement : imageSignalement non défini pour le signalement: ${nomSignalement}`);
-      }
+      console.error(`CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`);
     }
   };
 
-  if (details) {
+  if (details) { // Si on veut les détails, on vérifie la présence de toutes les données
     check('type', type);
     check('nomSignalement', nomSignalement);
-    check('description', description);
     check('distanceDuDepart', distanceDuDepart);
     check('imageSignalement', imageSignalement);
-  } else {
+    check('description', description);
+  } else { // Sinon, on vérifie seulement si type, nomSignalement et distanceDuDepart sont présents
     check('type', type);
     check('nomSignalement', nomSignalement);
     check('distanceDuDepart', distanceDuDepart);
   }
 
-  const renderImage = () => {
+  const renderImageEtDescription = () => { // Affichage de l'image si on est connecté et que c'est un point d'intérêt ; ou que c'est un avertissement
     if (isConnected && type === 'pointInteret' || type === 'avertissement' && imageSignalement) {
       return (
         <View style={styles.container}>
           <Image
-            source={{ uri: `data:image/png;base64,${imageSignalement}` }}
+            source={{ uri: `data:image/png;base64,${imageSignalement}` }} // On récupère l'image en base64
             style={styles.image}
           />
           <Text style={styles.texte}>
@@ -99,25 +95,23 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     }
   };
 
-  return details ? (
+  return details ? ( // Si on veut les détails, on affiche l'image et la description
     <View style={styles.carteGlobale}>
       {entete(type, nomSignalement, distanceDuDepart)}
       <View style={styles.contenu}>
-        {renderImage()}
+        {renderImageEtDescription()}
       </View>
     </View>
   ) : (
-    <View>
-      <View style={styles.carteGlobale}>
-        {entete(type, nomSignalement, distanceDuDepart)}
-      </View>
+    <View style={styles.carteGlobale}>
+      {entete(type, nomSignalement, distanceDuDepart)}
     </View>
   );
 });
 
 
 
-function entete(type, nomSignalement, distanceDuDepart) {
+function entete(type, nomSignalement, distanceDuDepart) { // Affichage de l'entête
   return (
     <View style={styles.entete}>
       {type === 'pointInteret' ? (
@@ -137,7 +131,10 @@ function entete(type, nomSignalement, distanceDuDepart) {
 
 const styles = StyleSheet.create({
   carteGlobale: {
-    padding: spacing.sm,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
+    paddingStart: spacing.xs,
+    paddingEnd: spacing.xs,
     margin: 10,
     shadowColor: colors.palette.noir,
     shadowOffset: {
@@ -164,8 +161,8 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: spacing.md,
-    paddingEnd: 15,
-    paddingStart: 15,
+    paddingEnd: spacing.xs,
+    paddingStart: spacing.xs,
   },
   imageSignalement: {
     width: "100%",

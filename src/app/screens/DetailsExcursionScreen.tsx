@@ -18,7 +18,7 @@ import { AppStackScreenProps } from "app/navigators"
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen, CarteSignalement, Button } from "app/components"
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
-// import { isLoading } from "expo-font"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 
 const { width, height } = Dimensions.get("window")
 
@@ -26,10 +26,32 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
   excursion: Record<string, unknown>
 }
 
+interface Coordonnees {
+  lat: number;
+  lon: number;
+  alt: number;
+  dist: number;
+}
+
+interface Signalement {
+  type: string;
+  nom: string;
+  description: string;
+  image: Image;
+  latitude: number;
+  longitude: number;
+}
+
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props
-    const excursion = route.params?.excursion
+    let excursion: Record<string, unknown>
+    let params: any
+    if (route?.params !== undefined) {
+      params = route?.params
+    }
+    params ? excursion = params.excursion : excursion = null //si params est défini, on récupère l'excursion, sinon on met excursion à null
+
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
@@ -108,22 +130,23 @@ function itemMini() {
 }
 
 /**
+ * @param excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation, isLoading
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
 function itemFull(
   excursion: Record<string, unknown>,
-  navigation: any,
+  navigation: NativeStackNavigationProp<any>,
   containerInfoAffiche: boolean,
-  setcontainerInfoAffiche: any,
-  isAllSignalements: any,
-  setIsAllSignalements: any,
-  userLocation: any,
-  isLoading: any
+  setcontainerInfoAffiche: React.Dispatch<any>,
+  isAllSignalements: boolean,
+  setIsAllSignalements: React.Dispatch<any>,
+  userLocation: Array<number>,
+  isLoading: boolean,
 ) {
 
-  var nomExcursion = ""
+  var nomExcursion: string = ""
   if (excursion !== undefined) {
-    nomExcursion = excursion.nom
+    nomExcursion = excursion.nom as string;
   }
   if (isAllSignalements) {
     return listeSignalements(setIsAllSignalements, excursion, userLocation);
@@ -177,6 +200,10 @@ function itemFull(
   }
 }
 
+/**
+ * @param description
+ * @returns la description courte
+ */
 function afficherDescriptionCourte(description: string) {
   if (description == null) {
     return null
@@ -187,18 +214,21 @@ function afficherDescriptionCourte(description: string) {
   }
 }
 
-
+/**
+ * 
+ * @returns les coordonnées de l'utilisateur
+ */
 function getUserLocation() {
   return new Promise(async (resolve, reject) => {
     try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Permission to access location was denied');
+      let { status } = await Location.requestForegroundPermissionsAsync(); // utiliser la fonction requestForegroundPermissionsAsync de Location pour demander la permission à l'utilisateur
+      if (status !== 'granted') { // Si l'utilisateur n'a pas accepté la permission
+        console.error('Permission to access location was denied'); // Afficher une erreur
         resolve(null);
       }
 
-      let location = await Location.getCurrentPositionAsync({}); // Use the getCurrentPositionAsync function from Location
-      resolve(location.coords);
+      let location = await Location.getCurrentPositionAsync({}); // utilise la fonction getCurrentPositionAsync de Location pour récupérer la position de l'utilisateur
+      resolve(location.coords); // Renvoie les coordonnées de l'utilisateur (latitude et longitude) pour pouvoir calculer la distance
     } catch (error) {
       console.error('Error getting location', error);
       reject(error);
@@ -208,11 +238,9 @@ function getUserLocation() {
 
 /**
  *
- * @param isLoading
- * @returns les informations de l'excursion
+ * @params setIsAllSignalements, excursion, userLocation
+ * @returns la liste des signalements
  */
-
-
 function listeSignalements(setIsAllSignalements, excursion, userLocation) {
   return (
     <View style={$containerGrand}>
@@ -222,7 +250,7 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
             <View>
               {excursion?.signalements?.map((signalement, index) => {
                 // Calcule de la distance pour chaque avertissement
-                const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
+                const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
                 const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
 
                 if (signalement.type == "Avertissement")
@@ -253,19 +281,17 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
 
 /**
  *
- * @param isLoading
+ * @params excursion, navigation, setIsAllSignalements, userLocation, isLoading
  * @returns les informations de l'excursion
  */
-
-
 function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSignalements, userLocation, isLoading) {
   const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
-  var duree = ""
-  var distance = ""
-  var difficulteOrientation = 0
-  var difficulteTechnique = 0
-  var description = ""
-  var signalements = []
+  var duree: string = ""
+  var distance: string = ""
+  var difficulteOrientation: number = 0
+  var difficulteTechnique: number = 0
+  var description: string = ""
+  var signalements: Signalement[] = []
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -274,18 +300,17 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
     excursion.description !== undefined ||
     excursion.signalements != undefined
   ) {
-    duree = excursion.duree.h + "h"
-    if (excursion.duree.m !== 0) {
-      duree = duree + excursion.duree.m
+    duree = (excursion.duree as { h: number }).h + "h";
+    if ((excursion.duree as { m: number }).m !== 0) {
+
+      duree = duree + (excursion.duree as { m: number }).m;
     }
-    distance = excursion.distance
-    difficulteTechnique = excursion.difficulteTechnique
-    difficulteOrientation = excursion.difficulteOrientation
-    description = excursion.description
-    signalements = excursion.signalements
+    distance = excursion.distance as string;
+    difficulteTechnique = excursion.difficulteTechnique as number;
+    difficulteOrientation = excursion.difficulteOrientation as number;
+    description = excursion.description as string;
+    signalements = excursion.signalements as Signalement[];
   }
-
-
 
   return (
     <ScrollView>
@@ -333,51 +358,48 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
               )}
             </TouchableOpacity>
           </View>
-          <View style={$containerDescriptionEtSignalements}>
-            <View>
-              {signalements?.length > 0 && (
-                <Text tx="detailEscursion.signalements" size="lg" />
-              )}
-            </View>
-            <ScrollView horizontal>
-              <TouchableWithoutFeedback>
-                <View style={$scrollLine}>
-                  {signalements?.map((signalement, index) => {
-                    // Calcule de la distance pour chaque avertissement
-                    const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
-                    const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
-
-                    if (signalement.type == "Avertissement")
-                      return (
-                        <View key={index}>
-                          <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                            <CarteSignalement type="avertissement" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
-                          </TouchableOpacity>
-                        </View>
-                      );
-                    else {
-                      return (
-                        <View key={index}>
-                          <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                            <CarteSignalement type="pointInteret" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
-                          </TouchableOpacity>
-                        </View>
-                      );
-                    }
-                  })}
-                  {signalements?.length > 0 ? (
-                    <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                      <View style={$carteGlobale}>
-                        <Text tx="detailEscursion.voirDetails" style={$tousLesSignalements} />
-                      </View>
-                    </TouchableOpacity>
-                  ) : (
-                    <View></View>
-                  )}
+          <View>
+            {signalements?.length > 0 && (
+              <>
+                <View>
+                  <Text tx="detailEscursion.signalements" size="lg" />
                 </View>
-              </TouchableWithoutFeedback>
-            </ScrollView>
+
+                <ScrollView horizontal>
+                  <TouchableWithoutFeedback>
+                    <View style={$scrollLine}>
+                      {signalements.map((signalement, index) => {
+                        // Calculate the distance for each warning
+                        const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
+                        const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+
+                        return (
+                          <View key={index}>
+                            <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                              {signalement.type === "Avertissement" ? (
+                                <CarteSignalement type="avertissement" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
+                              ) : (
+                                <CarteSignalement type="pointInteret" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
+                              )}
+                            </TouchableOpacity>
+                          </View>
+                        );
+                      })}
+
+                      {signalements.length > 0 && (
+                        <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                          <View style={$carteGlobale}>
+                            <Text tx="detailEscursion.voirDetails" style={$tousLesSignalements} />
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </TouchableWithoutFeedback>
+                </ScrollView>
+              </>
+            )}
           </View>
+
           <View style={$containerDenivele}>
             <Text text="Dénivelé" size="lg" />
             {
@@ -409,9 +431,9 @@ function avis() {
 }
 
 // Fonction de calcul de distance entre deux coordonnées
-function calculeDistanceEntreDeuxPoints(coord1, coord2) {
+function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees) {
   // Assurez-vous que coord1 et coord2 sont définis
-  if (!coord1 || typeof coord1.latitude === 'undefined' || typeof coord1.longitude === 'undefined' || !coord2 || typeof coord2.lat === 'undefined' || typeof coord2.lon === 'undefined') {
+  if (!coord1 || typeof coord1.lat === 'undefined' || typeof coord1.lon === 'undefined' || !coord2 || typeof coord2.lat === 'undefined' || typeof coord2.lon === 'undefined') {
     console.error('Coordonnées non valides');
     return null;
   }
@@ -423,12 +445,12 @@ function calculeDistanceEntreDeuxPoints(coord1, coord2) {
   const toRadians = (degree) => degree * (Math.PI / 180);
 
   // Calcul des distances
-  const dLat = toRadians(coord2.lat - coord1.latitude);
-  const dLon = toRadians(coord2.lon - coord1.longitude);
+  const dLat = toRadians(coord2.lat - coord1.lat);
+  const dLon = toRadians(coord2.lon - coord1.lon);
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(coord1.latitude)) *
+    Math.cos(toRadians(coord1.lat)) *
     Math.cos(toRadians(coord2.lat)) *
     Math.sin(dLon / 2) *
     Math.sin(dLon / 2);
@@ -442,20 +464,21 @@ function calculeDistanceEntreDeuxPoints(coord1, coord2) {
 }
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-function recupDistance(coordonneeSignalement) {
+function recupDistance(coordonneeSignalement: Coordonnees) {
   // Charger le fichier JSON avec les coordonnées
-  const data = require('../../assets/JSON/exemple_cruz_del_guardia.json');
+  const data: Coordonnees[] = require('../../assets/JSON/exemple_cruz_del_guardia.json');
+
 
   // Assurez-vous que les coordonnées du signalement sont définies
-  if (!coordonneeSignalement || !coordonneeSignalement.latitude || !coordonneeSignalement.longitude) {
-    console.error('Coordonnées du signalement non valides');
+  if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
+    console.error('Coordonnées du signalement non valides', coordonneeSignalement);
     return null;
   }
 
   // Initialiser la distance minimale avec une valeur élevée
-  let distanceMinimale = Number.MAX_VALUE;
+  let distanceMinimale: number = Number.MAX_VALUE;
 
-  var coordPointPlusProche;
+  let coordPointPlusProche: Coordonnees;
 
   // Parcourir toutes les coordonnées dans le fichier
   for (const coord of data) {
@@ -643,10 +666,11 @@ const $scrollLine: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
+  paddingBottom: spacing.xl
 }
 
 const $carteGlobale: ViewStyle = {
-  padding: spacing.sm,
+  padding: spacing.md,
   margin: 10,
   shadowColor: colors.palette.noir,
   shadowOffset: {
