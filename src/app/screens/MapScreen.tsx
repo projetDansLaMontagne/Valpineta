@@ -27,7 +27,7 @@ import MapButton from "../components/MapButton";
 import {Asset} from "expo-asset";
 
 import * as fileSystem from 'expo-file-system';
-// import formatRequire from "../services/importAssets/assetRequire";
+import formatRequire from "../services/importAssets/assetRequire";
 
 // variables
 interface MapScreenProps extends AppStackScreenProps<"Map"> {}
@@ -37,7 +37,7 @@ type T_animateToLocation = (
 ) => void;
 
 let COMPTEUR = 0;
-// import fichier_json from '../../assets/Tiles/tiles_struct.json';
+import fichier_json from '../../assets/Tiles/tiles_struct.json';
 const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
