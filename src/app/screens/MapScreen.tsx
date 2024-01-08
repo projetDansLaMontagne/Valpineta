@@ -44,7 +44,7 @@ const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 const download_file = async () => {
   console.log("Downloading files...");
 
-  const assets = await TilesRequire();
+  const assets = []; // remplacer par await TilesRequire();
 
   return create_folder_struct(
     fichier_json_aled_jenpeuxPlus,
