@@ -161,10 +161,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
           latitude: finalLocation.coords.latitude,
           longitude: finalLocation.coords.longitude,
         },
-        // pitch: 0,
-        // heading: 0,
-        // altitude: 3000, // ! mabye change this value
-        // zoom: 15, // ! same here
       });
     } else {
       console.log("mapRef.current is null");
