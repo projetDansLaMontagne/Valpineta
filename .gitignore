@@ -85,5 +85,6 @@ web-build/
 !env.js
 package-lock.json
 
-# Tiles
+# ASSETS
 src/assets/Tiles
+src/assets/tracks
