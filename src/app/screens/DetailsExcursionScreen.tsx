@@ -432,8 +432,7 @@ function avis() {
 function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees) {
   // Assurez-vous que coord1 et coord2 sont définis
   if (!coord1 || typeof coord1.lat === 'undefined' || typeof coord1.lon === 'undefined' || !coord2 || typeof coord2.lat === 'undefined' || typeof coord2.lon === 'undefined') {
-    console.error('Coordonnées non valides');
-    return null;
+    throw new Error('Coordonnées non valides');
   }
 
   // Rayon moyen de la Terre en kilomètres
@@ -469,8 +468,7 @@ function recupDistance(coordonneeSignalement: Coordonnees) {
 
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
-    console.error('Coordonnées du signalement non valides', coordonneeSignalement);
-    return null;
+    throw new Error('Coordonnées du signalement non valides');
   }
 
   // Initialiser la distance minimale avec une valeur élevée
