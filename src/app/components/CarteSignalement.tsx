@@ -16,7 +16,7 @@ export interface CarteSignalementProps {
 
   distanceDuDepart: string
 
-  imageSignalement?: any
+  imageSignalement?: Image
 }
 
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
@@ -78,7 +78,7 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
   }
 
   const renderImage = () => {
-    if (isConnected && type === 'pointInteret' && imageSignalement) {
+    if (isConnected && type === 'pointInteret' || type === 'avertissement' && imageSignalement) {
       return (
         <View style={styles.container}>
           <Image
@@ -175,7 +175,6 @@ const styles = StyleSheet.create({
   texte: {
     fontSize: 14,
     flex: 0.5,
-    // maxWidth: "50%",
   },
   iconeRouge: {
     width: 25, height: 25, tintColor: 'red'
