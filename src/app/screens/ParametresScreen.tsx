@@ -7,15 +7,16 @@ import { colors, spacing } from "app/theme"
 import Icon from "react-native-vector-icons/FontAwesome"
 import { useStores } from "app/models"
 import I18n from "i18n-js"
-import { navigate } from "app/navigators"
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window")
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
   const { parametres } = useStores()
-
-  console.log(I18n.locale)
+  
+  useEffect(() => {
+    parametres.setLangues(I18n.locale)
+  }, [])
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>

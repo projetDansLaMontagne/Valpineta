@@ -1,7 +1,7 @@
 import * as Localization from "expo-localization"
 import i18n from "i18n-js"
 import { I18nManager } from "react-native"
-
+import { useStores } from "app/models"
 // if English isn't your default language, move Translations to the appropriate language file.
 
 import  fr, { Translations } from './fr'
@@ -23,8 +23,6 @@ const preferredLanguage:
   textDirection: "ltr",
 }
 i18n.locale = preferredLanguage.languageTag
-console.log("i18n.locale", i18n.locale)
-console.log("preferredLanguage", preferredLanguage)
 
 // handle RTL languages
 export const isRTL = preferredLanguage.textDirection === "rtl"

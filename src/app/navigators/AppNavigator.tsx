@@ -7,7 +7,7 @@
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useColorScheme } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
@@ -18,6 +18,8 @@ import { Image, ImageStyle } from "react-native"
 import { useStores } from "app/models"
 import { Text } from "app/components"
 import I18n from "i18n-js"
+import { getActiveRouteName } from "./navigationUtilities"
+import { set } from "date-fns"
 
 const explorerLogo = require("./../../assets/icons/explorer.png")
 const carteLogo = require("./../../assets/icons/carte.png")
@@ -71,18 +73,16 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
-  const currentRoute = navigationRef.current?.getCurrentRoute()
   const { parametres } = useStores()
 
   useEffect(() => {
-    if(parametres.langues === "fr") {
+    if (parametres.langues === "fr") {
       I18n.locale = "fr"
     }
-    if(parametres.langues === "es") {
+    if (parametres.langues === "es") {
       I18n.locale = "es"
     }
-  }
-  , [parametres.langues])
+  }, [parametres.langues])
 
   return (
     <NavigationContainer
@@ -91,13 +91,13 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        initialRouteName={"Carte"}
+        initialRouteName="Carte"
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
             paddingTop: 10,
             backgroundColor: colors.fond,
-            borderTopColor: colors.palette.vert
+            borderTopColor: colors.palette.vert,
           },
         }}
       >
@@ -110,54 +110,76 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           name="Excursions"
           component={Screens.ExcursionsScreen}
           options={{
-            tabBarIcon: (props) => <Image source={explorerLogo} style={[ $icon, {tintColor: props.focused ? colors.palette.marron : colors.palette.vert && currentRoute?.name === "Excursions" ? colors.palette.marron : colors.palette.vert} ]} />,
-            tabBarLabel: ({ focused }) => {
-              return (
-                <Text
-                  style={{
-                    color: focused ? colors.palette.marron : colors.palette.vert,
-                    fontSize: 10,
-                  }}
-                  tx={"excursions.titre"}
-                />
-              )
-            },
+            tabBarIcon: (props) => (
+              <Image
+                source={explorerLogo}
+                style={[
+                  $icon,
+                  {
+                    tintColor: props.focused
+                      ? colors.palette.marron
+                      : colors.palette.vert 
+                  },
+                ]}
+              />
+            ),
+            tabBarLabel: ({ focused }) => (
+              <Text
+                style={{
+                  color: focused ? colors.palette.marron : colors.palette.vert,
+                  fontSize: 10,
+                }}
+                tx={"excursions.titre"}
+              />
+            ),
           }}
         />
         <Tab.Screen
           name="Carte"
           component={Screens.MapScreen}
           options={{
-            tabBarIcon: (props) => <Image source={carteLogo} style={[ $icon, {tintColor: props.focused ? colors.palette.marron : colors.palette.vert} ]} />,
-            tabBarLabel: ({ focused }) => {
-              return (
-                <Text
-                  style={{
-                    color: focused ? colors.palette.marron : colors.palette.vert,
-                    fontSize: 10,
-                  }}
-                  tx={"mapScreen.title"}
-                />
-              )
-            },
+            tabBarIcon: (props) => (
+              <Image
+                source={carteLogo}
+                style={[
+                  $icon,
+                  { tintColor: props.focused ? colors.palette.marron : colors.palette.vert },
+                ]}
+              />
+            ),
+            tabBarLabel: ({ focused }) => (
+              <Text
+                style={{
+                  color: focused ? colors.palette.marron : colors.palette.vert,
+                  fontSize: 10,
+                }}
+                tx={"mapScreen.title"}
+              />
+            ),
           }}
         />
         <Tab.Screen
           name="Parametres"
           component={Screens.ParametresScreen}
           options={{
-            tabBarIcon: (props) => <Image source={parametresLogo} style={[ $icon, {tintColor: props.focused ? colors.palette.marron : colors.palette.vert} ]} />,
-            tabBarLabel: ({ focused }) => {
-              return (
-                <Text
-                  style={{
-                    color: focused ? colors.palette.marron : colors.palette.vert,
-                    fontSize: 10,
-                  }}
-                  tx={"parametres.titre"}
-                />
-              )
-            },
+            tabBarIcon: (props) => (
+              <Image
+                source={parametresLogo}
+                style={[
+                  $icon,
+                  { tintColor: props.focused ? colors.palette.marron : colors.palette.vert },
+                ]}
+              />
+            ),
+            tabBarLabel: ({ focused }) => (
+              <Text
+                style={{
+                  color: focused ? colors.palette.marron : colors.palette.vert,
+                  fontSize: 10,
+                }}
+                tx={"parametres.titre"}
+              />
+            ),
           }}
         />
       </Tab.Navigator>
@@ -184,10 +206,7 @@ function StackNavigator() {
       }}
     >
       <Stack.Screen name="Description" component={Screens.DescriptionScreen} />
-      <Stack.Screen
-        name="DetailsExcursion"
-        component={Screens.DetailsExcursionScreen}
-      />
+      <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
       <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
       <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
     </Stack.Navigator>
