@@ -13,12 +13,10 @@ import {
 import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion, Button } from "app/components"
 import { colors, spacing } from "app/theme"
-import tracksRequire from "../services/importAssets/tracksRequire"
 
 /**@warning La navigation vers filtres est dans le mauvais sens (l'écran slide vers la gauche au lieu de la droite) */
 
 /**@warning Cliquer sur excursions dans le footer redirige vers la page en retirant les parametre "Filtres" mais donne un parametre buggé "filtres" */
-/**@warning Pas de gestion des erreurs de recuperation du track */
 
 /**@todo CSS : agrandir la zone de texte de recherche + la rendre fonctionnelle */
 /**@todo CSS : empecher le footer d etre au dessus de la derniere excursion */
@@ -33,7 +31,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   var filtres: typeof props.Filtres
 
-  var tracks: any
   const [excursionsFiltrees1, setExcursionsFiltrees1] = useState(undefined) // Excursions triées par le 1e filtre (filtres en parametre)
   const [excursionsFiltrees2, setExcursionsFiltrees2] = useState(undefined) // Excursions triées par le 2e filtre (barre de recherche)
 
@@ -161,7 +158,18 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const loadExcursions = async (): Promise<void> => {
     try {
       /* ----------------------- RECUPERATION DES EXCURSIONS ---------------------- */
-      const excursionsBRUT = require("../../assets/JSON/excursionsFr.json")
+      var excursionsBRUT = require("../../assets/JSON/excursions.json")
+
+      // ----> A SUPPRIMER AVEC LE CHANEGEMENT DE LANGUE
+      excursionsBRUT = excursionsBRUT.map((excursion) => {
+        return {
+          ...excursion,
+          nom: excursion.fr.nom,
+          description: excursion.fr.description,
+          typeParcours: excursion.fr.typeParcours,
+        }
+      })
+      // <---- FIN A SUPPRIMER
 
       // -- FORMATAGE DES DONNEES RECUPEREES --
       const excursionsFormatees = formatageExcursions(excursionsBRUT)
@@ -177,15 +185,10 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       // const valeursFiltres = calculValeursFiltres(excursionsFormatees);
       // console.log(valeursFiltres);
 
-      /* --------------------------- RECUPERATION TRACKS -------------------------- */
-      // Chargement des tracks
-      // tracks = await tracksRequire()
-      // console.log(tracks)
     } catch (error) {
       console.error("Erreur lors du chargement du fichier JSON :", error)
     }
   }
-
 
   // -- FONCTIONS DE TRI --
   /**

@@ -13,8 +13,7 @@ type T_Point = {
 export interface GraphiqueDeniveleProps {
   style?: StyleProp<ViewStyle>
 
-  // Nom du fichier JSON contenant les points de l excursion
-  nomFichier: string
+  points: T_Point[]
 }
 
 export const GraphiqueDenivele = observer(function GraphiqueDenivele(
@@ -102,14 +101,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
    * Calcul les donnees pour le graphique (les met dans donneesGraphique)
    * Fonction asynchrone pour ne pas bloquer l affichage
    */
-  const traitementDonneesGraphiques = async (nomFichier: string) => {
-    // Recuperation du track
-    // const res = await fetch("/assets/tracks/" + nomFichier)
-    // console.log(res)
-    // var points: T_Point[] = await res.json()
-
-    var points: T_Point[] = require("./../../assets/JSON/exemple_marcatiecho_circuito.json")
-
+  const traitementDonneesGraphiques = async (points: T_Point[]) => {
     // Reduction du nombre de points
     points = trackReduit(points, precision)
 
@@ -136,9 +128,9 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
 
   /* ------------------------- Verification parametres ------------------------ */
   var donnesGraphique: any | null = null
-  if (props.nomFichier) {
+  if (props.points) {
     // Parametres bien définis
-    traitementDonneesGraphiques(props.nomFichier)
+    traitementDonneesGraphiques(props.points)
   } else {
     throw new Error("GraphiqueDenivele : Mauvais parametres")
   }
