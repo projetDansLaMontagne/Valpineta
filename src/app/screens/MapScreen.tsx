@@ -358,19 +358,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                 ...styles.map
               }}
 
-              // initialRegion={{
-              //   latitude: location.coords.latitude,
-              //   longitude: location.coords.longitude,
-              //   latitudeDelta: 0.0922,
-              //   longitudeDelta: 0.0421,
-              // }}
-
               initialRegion={region}
 
               initialCamera={{
                 center: {
-                  // latitude: location.coords.latitude,
-                  // longitude: location.coords.longitude,
                   latitude: LATITUDE,
                   longitude: LONGITUDE,
                 },
@@ -380,9 +371,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(
                 zoom: 5
               }}
 
-              // onMapLoaded={() => {
-              //   animateToLocation(location)
-              // }}
               onMoveShouldSetResponder={handleMapMoves}
 
               showsBuildings={true}
