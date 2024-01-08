@@ -176,7 +176,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
         //Supprimer le dossier
         await fileSystem.deleteAsync(folder_dest, { idempotent: true })
 
-        const assets = await TilesRequire()
+        const assets = [] //await TilesRequire()
 
         await create_folder_struct(fichier_json, folder_dest, assets)
       }
