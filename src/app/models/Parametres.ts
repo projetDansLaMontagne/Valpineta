@@ -1,5 +1,6 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry"
 
 /**
  * Model description here for TypeScript hints.
@@ -13,7 +14,9 @@ export const ParametresModel = types
   .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions((self) => ({
     setLangues: (langues: string) => {
-      self.langues = langues
+      if (langues !== self.langues) {
+        self.langues = langues
+      }
     },
   })) // eslint-disable-line @typescript-eslint/no-unused-vars
 

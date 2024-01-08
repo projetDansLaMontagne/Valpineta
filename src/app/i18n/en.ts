@@ -25,7 +25,7 @@ const en = {
     },
   },
   mapScreen: {
-    title: "Test Screen",
+    title: "Map",
     locate: {
       locate_btn: "Locate me !",
       dl_map_btn: "Download map",
@@ -44,7 +44,7 @@ const en = {
       },
     }
   },
-  excursion:{
+  excursions:{
     erreurChargement: "No excursion found",
     erreurNom: "No excursion found",
   },

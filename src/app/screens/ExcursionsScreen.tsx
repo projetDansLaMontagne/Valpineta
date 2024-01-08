@@ -301,12 +301,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     {
       excursionsFiltrees1 && (
         excursionsFiltrees1.length == 0 ?
-          <Text tx="excursion.erreurChargement"/>
+          <Text tx="excursions.erreurChargement"/>
           :
           (
             excursionsFiltrees2 && (
               excursionsFiltrees2.length == 0 ?
-                <Text tx="excursion.erreurNom"/>
+                <Text tx="excursions.erreurNom"/>
                 :
                 <ScrollView style={styles.scrollContainer}>
                   {

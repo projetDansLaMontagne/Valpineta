@@ -27,7 +27,7 @@ const fr = {
     },
   },
   mapScreen: {
-    title: "Ecran de test",
+    title: "Carte",
     locate: {
       locate_btn: "Localisez moi !",
       dl_map_btn: "Télécharger la carte",
@@ -47,7 +47,8 @@ const fr = {
     }
   },
 
-  excursion:{
+  excursions:{
+    titre: "Excursions",
     erreurChargement: "Aucune excursion ne répond aux critères selectionnés",
     erreurNom: "Aucune excursion ne porte ce nom.",
   },

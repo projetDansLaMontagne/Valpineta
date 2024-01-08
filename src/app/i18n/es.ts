@@ -26,7 +26,7 @@ const es = {
   },
 
   mapScreen: {
-    title: "Pantalla de prueba",
+    title: "Mapa",
     locate: {
       locate_btn: "¡Localízame!",
       dl_map_btn: "Descargar el mapa",
@@ -46,7 +46,8 @@ const es = {
     }
   },
   
-  excursion:{
+  excursions:{
+    titre: "Excursiones",
     erreurChargement: "Ninguna excursión encontrada",
     erreurNom: "Nombre de excursión no encontrado",
   },

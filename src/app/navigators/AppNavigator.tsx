@@ -7,7 +7,7 @@
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
-import React from "react"
+import React, { useEffect } from "react"
 import { useColorScheme } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
@@ -16,6 +16,8 @@ import { colors } from "app/theme"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { Image, ImageStyle } from "react-native"
 import { useStores } from "app/models"
+import { Text } from "app/components"
+import I18n from "i18n-js"
 
 const explorerLogo = require("./../../assets/icons/explorer.png")
 const carteLogo = require("./../../assets/icons/carte.png")
@@ -67,9 +69,11 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   const colorScheme = useColorScheme()
   const Tab = createBottomTabNavigator()
 
-  const { parametres } = useStores()
-
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
+
+  const currentRoute = navigationRef.current?.getCurrentRoute()
+
+  console.log("currentRoute", currentRoute)
 
   return (
     <NavigationContainer
@@ -82,7 +86,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            padding: 5,
+            paddingTop: 10,
             backgroundColor: colors.fond,
             borderTopColor: colors.palette.vert
           },
@@ -94,29 +98,57 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           options={{ tabBarButton: () => null }}
         />
         <Tab.Screen
-          name= { parametres.langues === "fr" ? "Excursions" : "Excursiones" }
+          name="Excursions"
           component={Screens.ExcursionsScreen}
           options={{
-            tabBarIcon: () => <Image source={explorerLogo} style={$icon} />,
-            // tabBarActiveTintColor: colors.bouton,
-            // tabBarInactiveTintColor: colors.text,
-            tabBarLabelStyle: { color: colors.bouton },
+            tabBarIcon: (props) => <Image source={explorerLogo} style={[ $icon, {tintColor: props.focused ? colors.palette.marron : colors.palette.vert && currentRoute?.name === "Excursions" ? colors.palette.marron : colors.palette.vert} ]} />,
+            tabBarLabel: ({ focused }) => {
+              return (
+                <Text
+                  style={{
+                    color: focused ? colors.palette.marron : colors.palette.vert,
+                    fontSize: 10,
+                  }}
+                  tx={"excursions.titre"}
+                />
+              )
+            },
           }}
         />
         <Tab.Screen
-          name={ parametres.langues === "fr" ? "Carte" : "Mapa" }
+          name="Carte"
           component={Screens.MapScreen}
           options={{
-            tabBarIcon: (props) => <Image source={carteLogo} style={$icon} />,
-            tabBarLabelStyle: { color: colors.bouton },
+            tabBarIcon: (props) => <Image source={carteLogo} style={[ $icon, {tintColor: props.focused ? colors.palette.marron : colors.palette.vert} ]} />,
+            tabBarLabel: ({ focused }) => {
+              return (
+                <Text
+                  style={{
+                    color: focused ? colors.palette.marron : colors.palette.vert,
+                    fontSize: 10,
+                  }}
+                  tx={"mapScreen.title"}
+                />
+              )
+            },
           }}
         />
         <Tab.Screen
-          name={ parametres.langues === "fr" ? "Paramètres" : "Ajustes" }
+          name="Parametres"
           component={Screens.ParametresScreen}
           options={{
-            tabBarIcon: (props) => <Image source={parametresLogo} style={$icon} />,
-            tabBarLabelStyle: { color: colors.bouton },
+            tabBarIcon: (props) => <Image source={parametresLogo} style={[ $icon, {tintColor: props.focused ? colors.palette.marron : colors.palette.vert} ]} />,
+            tabBarLabel: ({ focused }) => {
+              return (
+                <Text
+                  style={{
+                    color: focused ? colors.palette.marron : colors.palette.vert,
+                    fontSize: 10,
+                  }}
+                  tx={"parametres.titre"}
+                />
+              )
+            },
           }}
         />
       </Tab.Navigator>
@@ -127,7 +159,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 const $icon: ImageStyle = {
   width: 30,
   height: 30,
-  tintColor: colors.bouton,
 }
 
 /* -------------------------------------------------------------------------- */
