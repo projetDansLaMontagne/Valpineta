@@ -364,7 +364,6 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
                 <View>
                   <Text tx="detailEscursion.signalements" size="lg" />
                 </View>
-
                 <ScrollView horizontal>
                   <TouchableWithoutFeedback>
                     <View style={$scrollLine}>
@@ -385,7 +384,6 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
                           </View>
                         );
                       })}
-
                       {signalements.length > 0 && (
                         <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
                           <View style={$carteGlobale}>
