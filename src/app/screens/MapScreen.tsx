@@ -27,7 +27,7 @@ import MapButton from "../components/MapButton";
 import {Asset} from "expo-asset";
 
 import * as fileSystem from 'expo-file-system';
-import formatRequire from "../services/importAssets/assetRequire";
+import TilesRequire from "../services/importAssets/tilesRequire";
 
 // variables
 interface MapScreenProps extends AppStackScreenProps<"Map"> {}
@@ -44,7 +44,7 @@ const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`;
 const download_file = async () => {
   console.log("Downloading files...");
 
-  const assets = [];
+  const assets = await TilesRequire();
 
   return create_folder_struct(
     fichier_json_aled_jenpeuxPlus,
