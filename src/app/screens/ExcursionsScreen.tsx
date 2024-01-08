@@ -146,49 +146,42 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    */
   const loadExcursions = async (): Promise<void> => {
     try {
-      let jsonData: Record<string, any>[] = [];
-      if(parametres.langues === "fr"){
-        jsonData = require('../../assets/JSON/excursionsFR.json');
-      }
-      else if (parametres.langues === "es"){
-        jsonData = require('../../assets/JSON/excursionsES.json');
-      }
-
       // -- RECUPERATION DU FICHIER --
-      var excursionsBRUT = jsonData;
-      excursionsBRUT = excursionsBRUT.map(excursion => ({
-        nom: excursion.nom_excursion,
-        denivele: excursion.denivele,
-        duree: excursion.duree,
-        typeParcours: excursion.type_parcours,
-        zone: excursion.vallee,
-        distance: excursion.distance_excursion,
-        typeParcours: excursion.type_parcours,
-        vallee: excursion.vallee,
-        difficulteTechnique: excursion.difficulte_technique,
-        difficulteOrientation: excursion.difficulte_orientation,
-        description : excursion.post_content
-      }));
-
-
+      let jsonData: Record<string, any>[] = require("../../assets/JSON/excursions.json");
+  
       // -- FORMATAGE DES DONNEES RECUPEREES --
-      const excursionsFormatees = formatageExcursions(excursionsBRUT);
-
+      const excursionsBRUT = jsonData.map((excursion) => {
+        const excursionData: Record<string, any> = {
+          denivele: excursion.denivele,
+          duree: excursion.duree,
+          zone: excursion.vallee,
+          distance: excursion.distance,
+          typeParcours: parametres.langues === "fr" ? excursion.fr.typeParcours : excursion.es.typeParcours,
+          vallee: excursion.vallee,
+          difficulteTechnique: excursion.difficulteTechnique,
+          difficulteOrientation: excursion.difficulteOrientation,
+          nom: parametres.langues === "fr" ? excursion.fr.nom : excursion.es.nom,
+          description: parametres.langues === "fr" ? excursion.fr.description : excursion.es.description,
+        };
+        return excursionData;
+      });
+  
       // -- TRI DES DONNEES RECUPEREES --
-      const excursionsFiltrees = filtrageParametres(excursionsFormatees, filtres);  // Premier filtre
+      const excursionsFormatees = formatageExcursions(excursionsBRUT);
+      const excursionsFiltrees = filtrageParametres(excursionsFormatees, filtres); // Premier filtre
       setExcursionsFiltrees1(excursionsFiltrees);
-      setExcursionsFiltrees2(excursionsFiltrees); // Copie car aucune recherche n a pu etre effectuee des le rendu
-
+      setExcursionsFiltrees2(excursionsFiltrees); // Copie car aucune recherche n'a pu être effectuée dès le rendu
+  
       // -- CALCUL DES VALEURS DE FILTRES --
       /**@warning : ligne inutile */
       /**@todo faire ceci automatiquement avec le formatage lors de la synchro descendante */
       // const valeursFiltres = calculValeursFiltres(excursionsFormatees);
       // console.log(valeursFiltres);
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Erreur lors du chargement du fichier JSON :', error);
     }
   };
+  
 
 
   // -- FONCTIONS DE TRI --
