@@ -121,7 +121,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     labels: abscises,
     datasets: [
       {
-        data: points.map((point) => point.alt ?? 0),
+        data: points.map(point => point.alt ?? 0),
         strokeWidth: 3,
       },
     ],
@@ -132,7 +132,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
       data={donneesGraphique}
       width={width - spacing.xl * 2}
       height={200}
-      formatYLabel={(y) => Math.round(y/50)*50 + " m"}
+      formatYLabel={y => Math.round(y / 50) * 50 + " m"}
       withVerticalLabels={true}
       withInnerLines={false}
       withOuterLines={false}

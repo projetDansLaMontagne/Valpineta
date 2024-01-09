@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Image, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
-import { colors, spacing } from "../theme"
-import { Text } from "./Text"
-import { GraphiqueDenivele } from "./GraphiqueDenivele"
+import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
+import { colors, spacing } from "../theme";
+import { Text } from "./Text";
+import { GraphiqueDenivele } from "./GraphiqueDenivele";
 
 /**@warning L absence de parametre n est pas geree */
 
@@ -15,28 +15,28 @@ interface CarteExcursionProps extends TouchableOpacityProps {
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
-  const navigation = props.navigation
+  const navigation = props.navigation;
 
-  var nomExcursion = ""
-  var vallee = ""
-  var typeParcours = ""
-  var duree = { h: 0, m: 0 }
-  var distance = 0
-  var denivele = 0
-  var difficulteTechnique = 0
-  var difficulteOrientation = 0
-  var track : any[] = []
+  var nomExcursion = "";
+  var vallee = "";
+  var typeParcours = "";
+  var duree = { h: 0, m: 0 };
+  var distance = 0;
+  var denivele = 0;
+  var difficulteTechnique = 0;
+  var difficulteOrientation = 0;
+  var track: any[] = [];
 
   if (props.excursion) {
-    nomExcursion = props.excursion.nom
-    vallee = props.excursion.vallee
-    typeParcours = props.excursion.typeParcours
-    duree = props.excursion.duree
-    distance = props.excursion.distance
-    denivele = props.excursion.denivele
-    difficulteTechnique = props.excursion.difficulteTechnique
-    difficulteOrientation = props.excursion.difficulteOrientation
-    track = props.excursion.track
+    nomExcursion = props.excursion.nom;
+    vallee = props.excursion.vallee;
+    typeParcours = props.excursion.typeParcours;
+    duree = props.excursion.duree;
+    distance = props.excursion.distance;
+    denivele = props.excursion.denivele;
+    difficulteTechnique = props.excursion.difficulteTechnique;
+    difficulteOrientation = props.excursion.difficulteOrientation;
+    track = props.excursion.track;
   }
 
   const valleeIcone = require("../../assets/icons/zone.png");
@@ -188,9 +188,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
               />
               <Text text={difficulteOrientation.toString()} style={styles.content} />
             </View>
-            <View>
-              {track && <GraphiqueDenivele points={track} />}
-            </View>
+            <View>{track && <GraphiqueDenivele points={track} />}</View>
           </View>
         </View>
       </View>
