@@ -65,7 +65,7 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 /* -------------------------------------------------------------------------- */
 
 export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
+  extends Partial<React.ComponentProps<typeof NavigationContainer>> { }
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()
@@ -91,7 +91,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        initialRouteName="Carte"
+        initialRouteName={"Carte"}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
@@ -118,7 +118,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
                   {
                     tintColor: props.focused
                       ? colors.palette.marron
-                      : colors.palette.vert 
+                      : colors.palette.vert
                   },
                 ]}
               />
