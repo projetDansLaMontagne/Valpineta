@@ -43,7 +43,7 @@ const es = {
         title: "No es posible localizarte",
         message: "Por favor, verifica tu configuración de ubicación",
       },
-    }
+    },
   },
 
   excursions: {
@@ -76,7 +76,7 @@ const es = {
       titre: "Idioma",
       francais: "Francés",
       espagnol: "Español",
-    }
+    },
   },
   pageFiltres: {
     tri: {
@@ -88,23 +88,23 @@ const es = {
     },
     filtres: {
       titre: "Filtrar por",
-      distance: 'Distancia (en km)',
-      duree: 'Duración (en horas)',
-      denivele: 'Desnivel (en m)',
-      parcours: 'Tipo de recorrido',
+      distance: "Distancia (en km)",
+      duree: "Duración (en horas)",
+      denivele: "Desnivel (en m)",
+      parcours: "Tipo de recorrido",
       typeParcours: {
-        aller: 'Ida simple',
-        allerRetour: 'Ida y vuelta',
-        boucle: 'Bucle',
+        aller: "Ida simple",
+        allerRetour: "Ida y vuelta",
+        boucle: "Bucle",
       },
-      vallees: 'Valles',
-      difficulteTech: 'Dificultad técnica',
-      difficulteOrientation: 'Dificultad de orientación',
+      vallees: "Valles",
+      difficulteTech: "Dificultad técnica",
+      difficulteOrientation: "Dificultad de orientación",
     },
     boutons: {
       valider: "Validar",
-    }
-  }
-}
+    },
+  },
+};
 
-export default es
+export default es;

@@ -3,7 +3,7 @@ const fr = {
     ok: "OK !",
     cancel: "Annuler",
     back: "Retour",
-    accueil: "Accueil"
+    accueil: "Accueil",
   },
   welcomeScreen: {
     postscript:
@@ -44,7 +44,7 @@ const fr = {
         title: "Impossible de vous localiser",
         message: "Veuillez vérifier vos paramètres de localisation",
       },
-    }
+    },
   },
 
   excursions: {
@@ -68,8 +68,7 @@ const fr = {
     erreur: {
       titre: "Erreur",
       message: "Une erreur est survenue, veuillez réessayer",
-    }
-
+    },
   },
   parametres: {
     titre: "Paramètres",
@@ -77,7 +76,7 @@ const fr = {
       titre: "Langue",
       francais: "Français",
       espagnol: "Espagnol",
-    }
+    },
   },
   pageFiltres: {
     tri: {
@@ -89,24 +88,24 @@ const fr = {
     },
     filtres: {
       titre: "Filtrer par",
-      distance: 'Distance (en km)',
-      duree: 'Durée (en heures)',
-      denivele: 'Dénivelé (en m)',
-      parcours: 'Type de parcours',
+      distance: "Distance (en km)",
+      duree: "Durée (en heures)",
+      denivele: "Dénivelé (en m)",
+      parcours: "Type de parcours",
       typeParcours: {
-        aller: 'Aller simple',
-        allerRetour: 'Aller/Retour',
-        boucle: 'Boucle',
+        aller: "Aller simple",
+        allerRetour: "Aller/Retour",
+        boucle: "Boucle",
       },
-      vallees: 'Vallées',
-      difficulteTech: 'Difficulté technique',
-      difficulteOrientation: 'Difficulté d\'orientation',
+      vallees: "Vallées",
+      difficulteTech: "Difficulté technique",
+      difficulteOrientation: "Difficulté d'orientation",
     },
     boutons: {
       valider: "Valider",
-    }
-  }
-}
+    },
+  },
+};
 
-export default fr
-export type Translations = typeof fr
+export default fr;
+export type Translations = typeof fr;

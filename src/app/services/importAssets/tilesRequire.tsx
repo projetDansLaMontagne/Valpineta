@@ -1,4 +1,4 @@
-import { Asset } from "expo-asset"
+import { Asset } from "expo-asset";
 
 export default () => {
   return Asset.loadAsync([
@@ -23970,5 +23970,5 @@ export default () => {
     require("../../../assets/Tiles/17/65682/48388.jpg"),
     require("../../../assets/Tiles/17/65682/48389.jpg"),
     require("../../../assets/Tiles/17/65682/48390.jpg"),
-  ])
-}
+  ]);
+};

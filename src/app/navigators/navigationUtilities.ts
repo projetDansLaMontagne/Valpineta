@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from "react"
-import { BackHandler, Platform } from "react-native"
-import { NavigationState, createNavigationContainerRef } from "@react-navigation/native"
-import Config from "../config"
-import type { PersistNavigationConfig } from "../config/config.base"
-import { useIsMounted } from "../utils/useIsMounted"
-import type { AppStackParamList, NavigationProps } from "./AppNavigator"
+import { useState, useEffect, useRef } from "react";
+import { BackHandler, Platform } from "react-native";
+import { NavigationState, createNavigationContainerRef } from "@react-navigation/native";
+import Config from "../config";
+import type { PersistNavigationConfig } from "../config/config.base";
+import { useIsMounted } from "../utils/useIsMounted";
+import type { AppStackParamList, NavigationProps } from "./AppNavigator";
 
-import * as storage from "../utils/storage"
+import * as storage from "../utils/storage";
 
-type Storage = typeof storage
+type Storage = typeof storage;
 
 /**
  * Reference to the root App Navigator.
@@ -20,7 +20,7 @@ type Storage = typeof storage
  * The types on this reference will only let you reference top level navigators. If you have
  * nested navigators, you'll need to use the `useNavigation` with the stack navigator's ParamList type.
  */
-export const navigationRef = createNavigationContainerRef<AppStackParamList>()
+export const navigationRef = createNavigationContainerRef<AppStackParamList>();
 
 /**
  * Gets the current screen from any navigation state.
@@ -28,13 +28,13 @@ export const navigationRef = createNavigationContainerRef<AppStackParamList>()
 export function getActiveRouteName(
   state: ReturnType<typeof navigationRef.getRootState>,
 ): keyof AppStackParamList {
-  const route = state.routes[state.index]
+  const route = state.routes[state.index];
 
   // Found the active route -- return the name
-  if (!route.state) return route.name as keyof AppStackParamList
+  if (!route.state) return route.name as keyof AppStackParamList;
 
   // Recursive call to deal with nested routers
-  return getActiveRouteName(route.state as NavigationState<AppStackParamList>)
+  return getActiveRouteName(route.state as NavigationState<AppStackParamList>);
 }
 
 /**
@@ -43,48 +43,48 @@ export function getActiveRouteName(
  */
 export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
   // ignore if iOS ... no back button!
-  if (Platform.OS === "ios") return
+  if (Platform.OS === "ios") return;
 
   // The reason we're using a ref here is because we need to be able
   // to update the canExit function without re-setting up all the listeners
-  const canExitRef = useRef(canExit)
+  const canExitRef = useRef(canExit);
 
   useEffect(() => {
-    canExitRef.current = canExit
-  }, [canExit])
+    canExitRef.current = canExit;
+  }, [canExit]);
 
   useEffect(() => {
     // We'll fire this when the back button is pressed on Android.
     const onBackPress = () => {
       if (!navigationRef.isReady()) {
-        return false
+        return false;
       }
 
       // grab the current route
-      const routeName = getActiveRouteName(navigationRef.getRootState())
+      const routeName = getActiveRouteName(navigationRef.getRootState());
 
       // are we allowed to exit?
       if (canExitRef.current(routeName)) {
         // exit and let the system know we've handled the event
-        BackHandler.exitApp()
-        return true
+        BackHandler.exitApp();
+        return true;
       }
 
       // we can't exit, so let's turn this into a back action
       if (navigationRef.canGoBack()) {
-        navigationRef.goBack()
-        return true
+        navigationRef.goBack();
+        return true;
       }
 
-      return false
-    }
+      return false;
+    };
 
     // Subscribe when we come to life
-    BackHandler.addEventListener("hardwareBackPress", onBackPress)
+    BackHandler.addEventListener("hardwareBackPress", onBackPress);
 
     // Unsubscribe when we're done
-    return () => BackHandler.removeEventListener("hardwareBackPress", onBackPress)
-  }, [])
+    return () => BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+  }, []);
 }
 
 /**
@@ -92,12 +92,12 @@ export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
  * based on a config setting and the __DEV__ environment (dev or prod).
  */
 function navigationRestoredDefaultState(persistNavigation: PersistNavigationConfig) {
-  if (persistNavigation === "always") return false
-  if (persistNavigation === "dev" && __DEV__) return false
-  if (persistNavigation === "prod" && !__DEV__) return false
+  if (persistNavigation === "always") return false;
+  if (persistNavigation === "dev" && __DEV__) return false;
+  if (persistNavigation === "prod" && !__DEV__) return false;
 
   // all other cases, disable restoration by returning true
-  return true
+  return true;
 }
 
 /**
@@ -105,46 +105,46 @@ function navigationRestoredDefaultState(persistNavigation: PersistNavigationConf
  */
 export function useNavigationPersistence(storage: Storage, persistenceKey: string) {
   const [initialNavigationState, setInitialNavigationState] =
-    useState<NavigationProps["initialState"]>()
-  const isMounted = useIsMounted()
+    useState<NavigationProps["initialState"]>();
+  const isMounted = useIsMounted();
 
-  const initNavState = navigationRestoredDefaultState(Config.persistNavigation)
-  const [isRestored, setIsRestored] = useState(initNavState)
+  const initNavState = navigationRestoredDefaultState(Config.persistNavigation);
+  const [isRestored, setIsRestored] = useState(initNavState);
 
-  const routeNameRef = useRef<keyof AppStackParamList | undefined>()
+  const routeNameRef = useRef<keyof AppStackParamList | undefined>();
 
-  const onNavigationStateChange: NavigationProps["onStateChange"] = (state) => {
-    const previousRouteName = routeNameRef.current
-    const currentRouteName = getActiveRouteName(state)
+  const onNavigationStateChange: NavigationProps["onStateChange"] = state => {
+    const previousRouteName = routeNameRef.current;
+    const currentRouteName = getActiveRouteName(state);
 
     if (previousRouteName !== currentRouteName) {
       // track screens.
       if (__DEV__) {
-        console.tron.log(currentRouteName)
+        console.tron.log(currentRouteName);
       }
     }
 
     // Save the current route name for later comparison
-    routeNameRef.current = currentRouteName
+    routeNameRef.current = currentRouteName;
 
     // Persist state to storage
-    storage.save(persistenceKey, state)
-  }
+    storage.save(persistenceKey, state);
+  };
 
   const restoreState = async () => {
     try {
-      const state = (await storage.load(persistenceKey)) as NavigationProps["initialState"] | null
-      if (state) setInitialNavigationState(state)
+      const state = (await storage.load(persistenceKey)) as NavigationProps["initialState"] | null;
+      if (state) setInitialNavigationState(state);
     } finally {
-      if (isMounted()) setIsRestored(true)
+      if (isMounted()) setIsRestored(true);
     }
-  }
+  };
 
   useEffect(() => {
-    if (!isRestored) restoreState()
-  }, [isRestored])
+    if (!isRestored) restoreState();
+  }, [isRestored]);
 
-  return { onNavigationStateChange, restoreState, isRestored, initialNavigationState }
+  return { onNavigationStateChange, restoreState, isRestored, initialNavigationState };
 }
 
 /**
@@ -154,7 +154,7 @@ export function useNavigationPersistence(storage: Storage, persistenceKey: strin
  */
 export function navigate(...args: Parameters<typeof navigationRef.navigate>) {
   if (navigationRef.isReady()) {
-    navigationRef.navigate(...args)
+    navigationRef.navigate(...args);
   }
 }
 
@@ -166,7 +166,7 @@ export function navigate(...args: Parameters<typeof navigationRef.navigate>) {
  */
 export function goBack() {
   if (navigationRef.isReady() && navigationRef.canGoBack()) {
-    navigationRef.goBack()
+    navigationRef.goBack();
   }
 }
 
@@ -177,6 +177,6 @@ export function resetRoot(
   state: Parameters<typeof navigationRef.resetRoot>[0] = { index: 0, routes: [] },
 ) {
   if (navigationRef.isReady()) {
-    navigationRef.resetRoot(state)
+    navigationRef.resetRoot(state);
   }
 }

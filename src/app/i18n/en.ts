@@ -39,65 +39,66 @@ const en = {
         longitude: "Longitude : ",
       },
       notLocated: {
-          title: "impossible to locate you",
-          message: "Please check your location settings",
+        title: "impossible to locate you",
+        message: "Please check your location settings",
       },
-    }
+    },
   },
-  excursions:{
+  excursions: {
     titre: "Excursions",
     erreurChargement: "No excursion found",
     erreurNom: "No excursion found",
   },
-  detailsExcursion:{
-    titres:{
+  detailsExcursion: {
+    titres: {
       infos: "Infos",
       avis: "Reviews",
       description: "Description",
       signalements: "Reports",
     },
-    boutons:{
+    boutons: {
       lireSuite: "Read more",
     },
-    erreur:{
+    erreur: {
       titre: "Error",
-      message : " An error has occured, please try again."
-    }
-  },parametres:{
+      message: " An error has occured, please try again.",
+    },
+  },
+  parametres: {
     titre: "Settings",
     changerLangue: {
       titre: "Language",
       francais: "French",
       espagnol: "Spanish",
-    }
+    },
   },
-  pageFiltres:{
-    tri:{
+  pageFiltres: {
+    tri: {
       titre: "Sort by",
       distance: "Distance",
       denivele: "Denivelation",
       difficulteTech: "Technical difficulty",
       difficulteOrientation: "Orientation difficulty",
     },
-    filtres:{
+    filtres: {
       titre: "Filters",
-      distance: 'Distance (en km)',
-      duree: 'Duration (en hours)',
-      denivele: 'Denivelation (en m)',
-      parcours: 'Type of course',
+      distance: "Distance (en km)",
+      duree: "Duration (en hours)",
+      denivele: "Denivelation (en m)",
+      parcours: "Type of course",
       typeParcours: {
-        aller: 'One way',
-        allerRetour: 'Round trip',
-        boucle: 'Loop',
+        aller: "One way",
+        allerRetour: "Round trip",
+        boucle: "Loop",
       },
-      vallees: 'Valleys',
-      difficulteTech: 'Technical difficulty',
-      difficulteOrientation: 'Orientation difficulty',
+      vallees: "Valleys",
+      difficulteTech: "Technical difficulty",
+      difficulteOrientation: "Orientation difficulty",
     },
-    boutons:{
+    boutons: {
       valider: "Validate",
-    }
-  }
-}
+    },
+  },
+};
 
-export default en
+export default en;

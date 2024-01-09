@@ -1,6 +1,6 @@
-import React, { useState } from "react"
-import { Image, StyleSheet } from "react-native"
-import Icon from "react-native-vector-icons/FontAwesome"
+import React, { useState } from "react";
+import { Image, StyleSheet } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
 import { colors, spacing } from "../theme"
@@ -10,8 +10,8 @@ import { GraphiqueDenivele } from "./GraphiqueDenivele"
 /**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-  excursion: Record<string, unknown>
-  navigation: any
+  excursion: Record<string, unknown>;
+  navigation: any;
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
@@ -39,20 +39,20 @@ export function CarteExcursion(props: CarteExcursionProps) {
     track = props.excursion.track
   }
 
-  const valleeIcone = require("../../assets/icons/zone.png")
-  const typeParcoursIcone = require("../../assets/icons/parcours.png")
-  const dureeIcone = require("../../assets/icons/duree.png")
-  const distanceIcone = require("../../assets/icons/distance.png")
-  const deniveleIcone = require("../../assets/icons/denivele.png")
-  const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png")
-  const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png")
+  const valleeIcone = require("../../assets/icons/zone.png");
+  const typeParcoursIcone = require("../../assets/icons/parcours.png");
+  const dureeIcone = require("../../assets/icons/duree.png");
+  const distanceIcone = require("../../assets/icons/distance.png");
+  const deniveleIcone = require("../../assets/icons/denivele.png");
+  const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png");
+  const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png");
 
   const detailExcursion = () => {
     navigation.navigate("Stack", {
       screen: "DetailsExcursion",
       params: { excursion: props.excursion },
-    })
-  }
+    });
+  };
 
   const styles = StyleSheet.create({
     carteGlobale: {
@@ -142,7 +142,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
     valleeFavori: {
       marginEnd: spacing.xxs,
     },
-  })
+  });
 
   return (
     <TouchableOpacity onPress={detailExcursion}>
@@ -195,5 +195,5 @@ export function CarteExcursion(props: CarteExcursionProps) {
         </View>
       </View>
     </TouchableOpacity>
-  )
+  );
 }

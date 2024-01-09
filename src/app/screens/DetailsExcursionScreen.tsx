@@ -1,6 +1,6 @@
-import React, { FC, useState, useEffect } from "react"
-import { observer } from "mobx-react-lite"
-import * as Location from 'expo-location';
+import React, { FC, useState, useEffect } from "react";
+import { observer } from "mobx-react-lite";
+import * as Location from "expo-location";
 import {
   View,
   SafeAreaView,
@@ -12,19 +12,27 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Dimensions,
-} from "react-native"
-import { AppStackScreenProps } from "app/navigators"
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen, CarteSignalement, Button } from "app/components"
-import { spacing, colors } from "app/theme"
-import SwipeUpDown from "react-native-swipe-up-down"
+} from "react-native";
+import { AppStackScreenProps } from "app/navigators";
+import {
+  Text,
+  CarteAvis,
+  GraphiqueDenivele,
+  GpxDownloader,
+  Screen,
+  CarteSignalement,
+  Button,
+} from "app/components";
+import { spacing, colors } from "app/theme";
+import SwipeUpDown from "react-native-swipe-up-down";
 import HTML from 'react-native-render-html';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  excursion: Record<string, unknown>
-  temps: Record<"h" | "m", number>
+  excursion: Record<string, unknown>;
+  temps: Record<"h" | "m", number>;
 }
 
 interface Coordonnees {
@@ -45,15 +53,15 @@ interface Signalement {
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { route, navigation } = props
-    let excursion: Record<string, unknown>
-    let params: any
+    const { route, navigation } = props;
+    let excursion: Record<string, unknown>;
+    let params: any;
     if (route?.params !== undefined) {
-      params = route?.params
+      params = route?.params;
     }
-    params ? excursion = params.excursion : excursion = null //si params est défini, on récupère l'excursion, sinon on met excursion à null
+    params ? (excursion = params.excursion) : (excursion = null); //si params est défini, on récupère l'excursion, sinon on met excursion à null
 
-    const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
+    const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
     const footerHeight = useBottomTabBarHeight();
@@ -78,7 +86,16 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation, footerHeight)}
+          itemFull={itemFull(
+            excursion,
+            navigation,
+            containerInfoAffiche,
+            setcontainerInfoAffiche,
+            isAllSignalements,
+            setIsAllSignalements,
+            userLocation,
+            footerHeight,
+          )}
           animation="easeInEaseOut"
           swipeHeight={30 + footerHeight}
           disableSwipeIcon={true}
@@ -98,9 +115,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
         </View>
       </Screen>
-    )
+    );
   },
-)
+);
 
 /**
  * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas
@@ -110,7 +127,7 @@ function itemMini() {
     <View style={$containerPetit}>
       <Image source={require("../../assets/icons/swipe-up.png")} />
     </View>
-  )
+  );
 }
 
 /**
@@ -125,17 +142,15 @@ function itemFull(
   isAllSignalements: boolean,
   setIsAllSignalements: React.Dispatch<any>,
   userLocation: Array<number>,
-  footerHeight: number
+  footerHeight: number,
 ) {
-
-  var nomExcursion: string = ""
+  var nomExcursion: string = "";
   if (excursion !== undefined) {
     nomExcursion = excursion.nom as string;
   }
   if (isAllSignalements) {
     return listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight);
-  }
-  else {
+  } else {
     return (
       <View style={$containerGrand}>
         <View style={$containerTitre}>
@@ -146,7 +161,7 @@ function itemFull(
           <View style={$containerBouton}>
             <TouchableOpacity
               onPress={() => {
-                setcontainerInfoAffiche(true)
+                setcontainerInfoAffiche(true);
               }}
               style={$boutonInfoAvis}
             >
@@ -158,7 +173,7 @@ function itemFull(
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                setcontainerInfoAffiche(false)
+                setcontainerInfoAffiche(false);
               }}
               style={$boutonInfoAvis}
             >
@@ -177,10 +192,12 @@ function itemFull(
                 : { left: width - width / 2.5 - spacing.lg / 1.5 },
             ]}
           ></View>
-          {containerInfoAffiche ? infos(excursion, navigation, setIsAllSignalements, userLocation) : avis()}
+          {containerInfoAffiche
+            ? infos(excursion, navigation, setIsAllSignalements, userLocation)
+            : avis()}
         </View>
       </View>
-    )
+    );
   }
 }
 
@@ -190,7 +207,7 @@ function itemFull(
  */
 function afficherDescriptionCourte(description: string) {
   if (description == null) {
-    return null
+    return null;
   } else {
     const descriptionCoupe : string = description.slice(0, 100)
     let descriptionFinale : string = descriptionCoupe + "..."
@@ -206,15 +223,16 @@ function getUserLocation() {
   return new Promise(async (resolve, reject) => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync(); // utiliser la fonction requestForegroundPermissionsAsync de Location pour demander la permission à l'utilisateur
-      if (status !== 'granted') { // Si l'utilisateur n'a pas accepté la permission
-        console.error('Permission to access location was denied'); // Afficher une erreur
+      if (status !== "granted") {
+        // Si l'utilisateur n'a pas accepté la permission
+        console.error("Permission to access location was denied"); // Afficher une erreur
         resolve(null);
       }
 
       let location = await Location.getCurrentPositionAsync({}); // utilise la fonction getCurrentPositionAsync de Location pour récupérer la position de l'utilisateur
       resolve(location.coords); // Renvoie les coordonnées de l'utilisateur (latitude et longitude) pour pouvoir calculer la distance
     } catch (error) {
-      console.error('Error getting location', error);
+      console.error("Error getting location", error);
       reject(error);
     }
   });
@@ -226,17 +244,22 @@ function getUserLocation() {
  * @returns la liste des signalements
  */
 function listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight) {
-
   return (
     <View style={$containerGrand}>
-      <ScrollView >
+      <ScrollView>
         <TouchableWithoutFeedback>
           <View style={$containerSignalements}>
             {excursion?.signalements?.map((signalement, index) => {
               // Calcule de la distance pour chaque avertissement
-              const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
+              const coordSignalement = {
+                lat: signalement.latitude,
+                lon: signalement.longitude,
+                alt: null,
+                dist: null,
+              };
               const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
-              const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+              const carteType =
+                signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
               return (
                 <View key={index}>
                   <CarteSignalement
@@ -248,14 +271,17 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
                     imageSignalement={signalement.image}
                   />
                 </View>
-              )
+              );
             })}
-
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
       <View>
-        <Button style={[$sortirDetailSignalement, { bottom: footerHeight }]} tx="detailsExcursion.boutons.retourInformations" onPress={() => setIsAllSignalements(false)} />
+        <Button
+          style={[$sortirDetailSignalement, { bottom: footerHeight }]}
+          tx="detailsExcursion.boutons.retourInformations"
+          onPress={() => setIsAllSignalements(false)}
+        />
       </View>
     </View>
   );
@@ -266,13 +292,18 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
  * @params excursion, navigation, setIsAllSignalements, userLocation
  * @returns les informations de l'excursion
  */
-function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSignalements, userLocation) {
-  var duree: string = ""
-  var distance: string = ""
-  var difficulteOrientation: number = 0
-  var difficulteTechnique: number = 0
-  var description: string = ""
-  var signalements: Signalement[] = []
+function infos(
+  excursion: Record<string, unknown>,
+  navigation: any,
+  setIsAllSignalements,
+  userLocation,
+) {
+  var duree: string = "";
+  var distance: string = "";
+  var difficulteOrientation: number = 0;
+  var difficulteTechnique: number = 0;
+  var description: string = "";
+  var signalements: Signalement[] = [];
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -282,7 +313,8 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
     excursion.signalements != undefined
   ) {
     duree = (excursion.duree as { h: number }).h + "h";
-    if ((excursion.duree as { m: number }).m !== 0) { // Si la durée en minutes est différente de 0, on l'affiche en plus de la durée en heures
+    if ((excursion.duree as { m: number }).m !== 0) {
+      // Si la durée en minutes est différente de 0, on l'affiche en plus de la durée en heures
       duree = duree + (excursion.duree as { m: number }).m;
     }
     distance = excursion.distance as string;
@@ -298,25 +330,23 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
         <View style={$stylePage}>
           <View style={$containerInformations}>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
-                source={require("../../assets/icons/temps.png")}
-              />
+              <Image style={$iconInformation} source={require("../../assets/icons/temps.png")} />
               <Text text={duree} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
-                source={require("../../assets/icons/explorer.png")}
-              />
-              <Text text={distance + ' km'} size="xs" />
+              <Image style={$iconInformation} source={require("../../assets/icons/explorer.png")} />
+              <Text text={distance + " km"} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/difficulteTechnique.png")}
               />
               <Text text={difficulteTechnique.toString()} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
               />
               <Text text={difficulteOrientation.toString()} size="xs" />
@@ -324,13 +354,10 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
           </View>
           <View style={$containerDescriptionEtSignalements}>
             <Text text="Description" size="lg" />
-            <Text
-              text={afficherDescriptionCourte(description)}
-              size="xxs"
-            />
+            <Text text={afficherDescriptionCourte(description)} size="xxs" />
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("Description", { excursion: excursion })
+                navigation.navigate("Description", { excursion: excursion });
               }}
             >
               {description === "" ? null : (
@@ -348,7 +375,11 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
                   <View>
                     {signalements.length > 0 && (
                       <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                        <Text style={$lienSignalements} tx="detailsExcursion.boutons.voirDetails" size="xs" />
+                        <Text
+                          style={$lienSignalements}
+                          tx="detailsExcursion.boutons.voirDetails"
+                          size="xs"
+                        />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -358,9 +389,17 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
                     <View style={$scrollLine}>
                       {signalements.map((signalement, index) => {
                         // Calculate the distance for each warning
-                        const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
-                        const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
-                        const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+                        const coordSignalement = {
+                          lat: signalement.latitude,
+                          lon: signalement.longitude,
+                          alt: null,
+                          dist: null,
+                        };
+                        const distanceSignalement = userLocation
+                          ? recupDistance(coordSignalement)
+                          : 0;
+                        const carteType =
+                          signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
 
                         return (
                           <View key={index}>
@@ -381,6 +420,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
               </>
             )}
           </View>
+
           <View style={$containerDenivele}>
             <Text tx="detailsExcursion.titres.denivele" size="xl" />
             {excursion.track && <GraphiqueDenivele points={excursion.track} />}
@@ -388,7 +428,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>
-  )
+  );
 }
 
 /**
@@ -399,10 +439,22 @@ function avis() {
     <ScrollView>
       <TouchableWithoutFeedback>
         <View style={$containerAvis}>
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>
@@ -412,15 +464,22 @@ function avis() {
 // Fonction de calcul de distance entre deux coordonnées
 function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees) {
   // Assurez-vous que coord1 et coord2 sont définis
-  if (!coord1 || typeof coord1.lat === 'undefined' || typeof coord1.lon === 'undefined' || !coord2 || typeof coord2.lat === 'undefined' || typeof coord2.lon === 'undefined') {
-    throw new Error('Coordonnées non valides');
+  if (
+    !coord1 ||
+    typeof coord1.lat === "undefined" ||
+    typeof coord1.lon === "undefined" ||
+    !coord2 ||
+    typeof coord2.lat === "undefined" ||
+    typeof coord2.lon === "undefined"
+  ) {
+    throw new Error("Coordonnées non valides");
   }
 
   // Rayon moyen de la Terre en kilomètres
   const R = 6371;
 
   // Convertir les degrés en radians
-  const toRadians = (degree) => degree * (Math.PI / 180);
+  const toRadians = degree => degree * (Math.PI / 180);
 
   // Calcul des distances
   const dLat = toRadians(coord2.lat - coord1.lat);
@@ -430,9 +489,9 @@ function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-    Math.cos(toRadians(coord2.lat)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos(toRadians(coord2.lat)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -446,12 +505,11 @@ function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
 function recupDistance(coordonneeSignalement: Coordonnees) {
   // Charger le fichier JSON avec les coordonnées
-  const data: Coordonnees[] = require('../../assets/JSON/exemple_cruz_del_guardia.json');
-
+  const data: Coordonnees[] = require("../../assets/JSON/exemple_cruz_del_guardia.json");
 
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
-    throw new Error('Coordonnées du signalement non valides');
+    throw new Error("Coordonnées du signalement non valides");
   }
 
   // Initialiser la distance minimale avec une valeur élevée
@@ -463,12 +521,15 @@ function recupDistance(coordonneeSignalement: Coordonnees) {
   for (const coord of data) {
     // Assurez-vous que les coordonnées dans le fichier sont définies
     if (!coord.lat || !coord.lon) {
-      console.error('Coordonnées dans le fichier non valides');
+      console.error("Coordonnées dans le fichier non valides");
       continue;
     }
 
     // Calculer la distance entre le signalement et la coordonnée actuelle du fichier
-    const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(coordonneeSignalement, coord);
+    const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(
+      coordonneeSignalement,
+      coord,
+    );
 
     // Mettre à jour la distance minimale si la distance actuelle est plus petite
     if (distanceSignalementPointLePlusProche < distanceMinimale) {
@@ -492,7 +553,7 @@ function recupDistance(coordonneeSignalement: Coordonnees) {
 const $stylePage: ViewStyle = {
   paddingRight: spacing.lg,
   paddingLeft: spacing.lg,
-}
+};
 
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.fond,
@@ -505,14 +566,14 @@ const $boutonRetour: ViewStyle = {
   position: "absolute",
   top: 15,
   zIndex: 1,
-}
+};
 
 const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
   backgroundColor: colors.erreur,
-}
+};
 
 //Style de itemMini
 
@@ -525,20 +586,19 @@ const $containerPetit: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.xxs,
-}
+};
 
 //Style de itemFull
 
 const $containerGrand: ViewStyle = {
   flex: 1,
-  alignItems: "center",
   width: width,
   backgroundColor: colors.fond,
   borderWidth: 1,
   borderColor: colors.bordure,
   borderRadius: 10,
-  marginTop: height / 4
-}
+  marginTop: height / 4,
+};
 
 //Style du container du titre et du bouton de téléchargement
 
@@ -548,12 +608,12 @@ const $containerTitre: ViewStyle = {
   alignItems: "center",
   width: width - width / 5,
   margin: spacing.lg,
-}
+};
 
 const $titre: ViewStyle = {
   marginTop: spacing.xs,
   paddingRight: spacing.xl,
-}
+};
 
 //Style du container des boutons infos et avis
 
@@ -561,19 +621,19 @@ const $containerBouton: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   width: width,
-}
+};
 
 const $boutonInfoAvis: ViewStyle = {
   paddingLeft: spacing.xxl,
   paddingRight: spacing.xxl,
-}
+};
 
 const $souligneInfosAvis: ViewStyle = {
   backgroundColor: colors.bouton,
   height: 2,
   width: width / 2.5,
   position: "relative",
-}
+};
 
 //Style des informations
 
@@ -581,48 +641,48 @@ const $containerInformations: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   paddingTop: spacing.xl,
-  paddingBottom: spacing.xl
-}
+  paddingBottom: spacing.xl,
+};
 
 const $containerUneInformation: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",
-}
+};
 
 const $iconInformation: ImageStyle = {
   width: spacing.lg,
   height: spacing.lg,
   marginRight: spacing.xs,
-}
+};
 
 //Style de la description et des signalements
 const $containerDescriptionEtSignalements: ViewStyle = {
-  paddingBottom: spacing.xl
-}
+  paddingBottom: spacing.xl,
+};
 
 const $lienDescription: TextStyle = {
   color: colors.bouton,
   paddingTop: spacing.xs,
   textDecorationLine: "underline",
-}
+};
 
 const $containerAvis: ViewStyle = {
-  paddingBottom: height / 3 //pour pouvoir afficher les avis
-}
+  paddingBottom: height / 3, //pour pouvoir afficher les avis
+};
 
 const $containerDenivele: ViewStyle = {
-  marginBottom: height / 3 //pour pouvoir afficher le graphique
-}
+  marginBottom: height / 3, //pour pouvoir afficher le graphique
+};
 
 const $scrollLine: ViewStyle = {
   flexDirection: "row",
-  paddingBottom: spacing.xl
-}
+  paddingBottom: spacing.xl,
+};
 
 const $containerSignalements: ViewStyle = {
   margin: spacing.xs,
   paddingBottom: height / 2,
-}
+};
 
 const $sortirDetailSignalement: ViewStyle = {
   borderRadius: 15,
@@ -633,18 +693,18 @@ const $sortirDetailSignalement: ViewStyle = {
   height: 50,
   position: "absolute",
   alignSelf: "center",
-}
+};
 
 const $headerSignalement: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",
-}
+};
 
 const $lienSignalements: TextStyle = {
   textDecorationLine: "underline",
   color: colors.bouton,
   paddingStart: spacing.xs,
-}
+};
 
 /* --------------------------------- ERREUR --------------------------------- */
 
@@ -654,9 +714,9 @@ const $containerErreur: ViewStyle = {
   width: width,
   height: height,
   padding: spacing.lg,
-}
+};
 
 const $texteErreur: TextStyle = {
   marginTop: spacing.lg,
   marginBottom: height / 2,
-}
+};
