@@ -1,66 +1,66 @@
-import React, { useState } from "react"
-import { Image, StyleSheet } from "react-native"
-import Icon from "react-native-vector-icons/FontAwesome"
+import React, { useState } from "react";
+import { Image, StyleSheet } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
-import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
-import { colors, spacing } from "../theme"
-import { Text } from "./Text"
+import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
+import { colors, spacing } from "../theme";
+import { Text } from "./Text";
 
 /**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-  excursion: Record<string, unknown>
-  navigation: any
+  excursion: Record<string, unknown>;
+  navigation: any;
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
-  const navigation = props.navigation
-  var nomExcursion: string = ""
-  var vallee: string = ""
-  var typeParcours: string = ""
-  var duree: { h: number; m: number } = { h: 0, m: 0 }
-  var distance: number = 0
-  var denivele: number = 0
-  var difficulteTechnique: number = 0
-  var difficulteOrientation: number = 0
+  const navigation = props.navigation;
+  var nomExcursion: string = "";
+  var vallee: string = "";
+  var typeParcours: string = "";
+  var duree: { h: number; m: number } = { h: 0, m: 0 };
+  var distance: number = 0;
+  var denivele: number = 0;
+  var difficulteTechnique: number = 0;
+  var difficulteOrientation: number = 0;
 
   if (props.excursion) {
-    nomExcursion = props.excursion.nom as string
-    vallee = props.excursion.vallee as string
-    typeParcours = props.excursion.typeParcours as string
-    duree = props.excursion.duree as { h: number; m: number }
-    distance = props.excursion.distance as number
-    denivele = props.excursion.denivele as number
-    difficulteTechnique = props.excursion.difficulteTechnique as number
-    difficulteOrientation = props.excursion.difficulteOrientation as number
+    nomExcursion = props.excursion.nom as string;
+    vallee = props.excursion.vallee as string;
+    typeParcours = props.excursion.typeParcours as string;
+    duree = props.excursion.duree as { h: number; m: number };
+    distance = props.excursion.distance as number;
+    denivele = props.excursion.denivele as number;
+    difficulteTechnique = props.excursion.difficulteTechnique as number;
+    difficulteOrientation = props.excursion.difficulteOrientation as number;
   }
 
-  const valleeIcone = require("../../assets/icons/zone.png")
-  const typeParcoursIcone = require("../../assets/icons/parcours.png")
-  const dureeIcone = require("../../assets/icons/duree.png")
-  const distanceIcone = require("../../assets/icons/distance.png")
-  const deniveleIcone = require("../../assets/icons/denivele.png")
-  const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png")
-  const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png")
+  const valleeIcone = require("../../assets/icons/zone.png");
+  const typeParcoursIcone = require("../../assets/icons/parcours.png");
+  const dureeIcone = require("../../assets/icons/duree.png");
+  const distanceIcone = require("../../assets/icons/distance.png");
+  const deniveleIcone = require("../../assets/icons/denivele.png");
+  const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png");
+  const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png");
 
   const imageRandonnee = require("../../assets/images/randonnee.png");
 
-  const [coeurTouche, setCoeurTouche] = useState(false)
+  const [coeurTouche, setCoeurTouche] = useState(false);
 
   const excursionFavorite = () => {
     if (coeurTouche) {
-      setCoeurTouche(false)
+      setCoeurTouche(false);
     } else {
-      setCoeurTouche(true)
+      setCoeurTouche(true);
     }
-  }
+  };
 
   const detailExcursion = () => {
     navigation.navigate("Stack", {
       screen: "DetailsExcursion",
       params: { excursion: props.excursion },
-    })
-  }
+    });
+  };
 
   const styles = StyleSheet.create({
     carteGlobale: {
@@ -158,7 +158,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
     valleeFavori: {
       marginEnd: spacing.xxs,
     },
-  })
+  });
 
   return (
     <TouchableOpacity onPress={detailExcursion}>
@@ -167,7 +167,12 @@ export function CarteExcursion(props: CarteExcursionProps) {
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
           <Text weight="bold" text={nomExcursion} style={styles.heading} />
           <TouchableOpacity onPress={excursionFavorite}>
-            <Icon name="heart-o" size={spacing.lg} style={styles.icone} color={coeurTouche ? colors.palette.rouge : colors.palette.noir} />
+            <Icon
+              name="heart-o"
+              size={spacing.lg}
+              style={styles.icone}
+              color={coeurTouche ? colors.palette.rouge : colors.palette.noir}
+            />
           </TouchableOpacity>
         </View>
         <View style={styles.tableauInfos}>
@@ -212,5 +217,5 @@ export function CarteExcursion(props: CarteExcursionProps) {
         </View>
       </View>
     </TouchableOpacity>
-  )
+  );
 }

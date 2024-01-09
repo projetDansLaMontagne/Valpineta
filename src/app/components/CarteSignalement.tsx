@@ -1,33 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
-import { View, StyleSheet, Image } from "react-native"
-import { observer } from "mobx-react-lite"
-import { colors, spacing } from "app/theme"
-import { Text } from "app/components/Text"
+import { View, StyleSheet, Image } from "react-native";
+import { observer } from "mobx-react-lite";
+import { colors, spacing } from "app/theme";
+import { Text } from "app/components/Text";
 
 export interface CarteSignalementProps {
-  details: boolean
+  details: boolean;
 
-  type: string
+  type: string;
 
-  nomSignalement: string
+  nomSignalement: string;
 
-  description?: string
+  description?: string;
 
-  distanceDuDepart: string
+  distanceDuDepart: string;
 
-  imageSignalement?: Image
+  imageSignalement?: Image;
 }
 
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
-  const {
-    details,
-    type,
-    nomSignalement,
-    description,
-    distanceDuDepart,
-    imageSignalement
-  } = props
+  const { details, type, nomSignalement, description, distanceDuDepart, imageSignalement } = props;
 
   const [isConnected, setIsConnected] = useState(true); // État de la connexion Internet
 
@@ -41,7 +34,7 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
     checkConnection();
 
     // Abonnement aux changements d'état de la connexion
-    const unsubscribe = NetInfo.addEventListener((state) => {
+    const unsubscribe = NetInfo.addEventListener(state => {
       setIsConnected(state.isConnected);
     });
 
@@ -52,81 +45,75 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
   // Si on ne veut pas de détails, problème
   if (details === undefined) {
     console.error(`CarteSignalement : details non défini pour le signalement: ${nomSignalement}`);
-    console.log(details)
+    console.log(details);
   }
 
-  const check = (paramName, paramValue) => { // Vérification de la présence des paramètres
+  const check = (paramName, paramValue) => {
+    // Vérification de la présence des paramètres
     if (!paramValue) {
-      console.error(`CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`);
+      console.error(
+        `CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`,
+      );
     }
   };
 
-  if (details) { // Si on veut les détails, on vérifie la présence de toutes les données
-    check('type', type);
-    check('nomSignalement', nomSignalement);
-    check('distanceDuDepart', distanceDuDepart);
-    check('imageSignalement', imageSignalement);
-    check('description', description);
-  } else { // Sinon, on vérifie seulement si type, nomSignalement et distanceDuDepart sont présents
-    check('type', type);
-    check('nomSignalement', nomSignalement);
-    check('distanceDuDepart', distanceDuDepart);
+  if (details) {
+    // Si on veut les détails, on vérifie la présence de toutes les données
+    check("type", type);
+    check("nomSignalement", nomSignalement);
+    check("distanceDuDepart", distanceDuDepart);
+    check("imageSignalement", imageSignalement);
+    check("description", description);
+  } else {
+    // Sinon, on vérifie seulement si type, nomSignalement et distanceDuDepart sont présents
+    check("type", type);
+    check("nomSignalement", nomSignalement);
+    check("distanceDuDepart", distanceDuDepart);
   }
 
-  const renderImageEtDescription = () => { // Affichage de l'image si on est connecté et que c'est un point d'intérêt ; ou que c'est un avertissement
-    if (isConnected && type === 'pointInteret' || type === 'avertissement' && imageSignalement) {
+  const renderImageEtDescription = () => {
+    // Affichage de l'image si on est connecté et que c'est un point d'intérêt ; ou que c'est un avertissement
+    if (
+      (isConnected && type === "pointInteret") ||
+      (type === "avertissement" && imageSignalement)
+    ) {
       return (
         <View style={styles.container}>
           <Image
             source={{ uri: `data:image/png;base64,${imageSignalement}` }} // On récupère l'image en base64
             style={styles.image}
           />
-          <Text style={styles.texte}>
-            {description}
-          </Text>
+          <Text style={styles.texte}>{description}</Text>
         </View>
       );
     } else {
-      return (
-        <Text style={styles.texte}>
-          {description}
-        </Text>
-      );
+      return <Text style={styles.texte}>{description}</Text>;
     }
   };
 
   return details ? ( // Si on veut les détails, on affiche l'image et la description
     <View style={styles.carteGlobale}>
       {entete(type, nomSignalement, distanceDuDepart)}
-      <View style={styles.contenu}>
-        {renderImageEtDescription()}
-      </View>
+      <View style={styles.contenu}>{renderImageEtDescription()}</View>
     </View>
   ) : (
-    <View style={styles.carteGlobale}>
-      {entete(type, nomSignalement, distanceDuDepart)}
-    </View>
+    <View style={styles.carteGlobale}>{entete(type, nomSignalement, distanceDuDepart)}</View>
   );
 });
 
-
-
-function entete(type, nomSignalement, distanceDuDepart) { // Affichage de l'entête
+function entete(type, nomSignalement, distanceDuDepart) {
+  // Affichage de l'entête
   return (
     <View style={styles.entete}>
-      {type === 'pointInteret' ? (
-        <Image source={require('../../assets/icons/pin.png')} style={styles.iconeVert} />
+      {type === "pointInteret" ? (
+        <Image source={require("../../assets/icons/pin.png")} style={styles.iconeVert} />
       ) : (
-        <Image source={require('../../assets/icons/pin.png')} style={styles.iconeRouge} />
+        <Image source={require("../../assets/icons/pin.png")} style={styles.iconeRouge} />
       )}
-      <Text style={styles.heading}>
-        {nomSignalement}
-      </Text>
-      <Text>
-        {distanceDuDepart} km
-      </Text>
+      <Text style={styles.heading}>{nomSignalement}</Text>
+      <Text>{distanceDuDepart} km</Text>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -174,22 +161,24 @@ const styles = StyleSheet.create({
     flex: 0.5,
   },
   iconeRouge: {
-    width: 25, height: 25, tintColor: 'red'
+    width: 25,
+    height: 25,
+    tintColor: "red",
   },
   iconeVert: {
-    width: 25, height: 25, tintColor: 'green'
+    width: 25,
+    height: 25,
+    tintColor: "green",
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
   },
   image: {
     flex: 0.5,
     width: 100, // ajustez la largeur selon vos besoins
     height: 100, // ajustez la hauteur selon vos besoins
   },
-
-})
-
+});
