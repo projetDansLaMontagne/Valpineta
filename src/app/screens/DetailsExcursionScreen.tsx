@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useState, useEffect } from "react"
 import { observer } from "mobx-react-lite"
 import * as Location from 'expo-location';
 import {
@@ -12,7 +12,6 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Dimensions,
-  ActivityIndicator,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen, CarteSignalement, Button } from "app/components"
@@ -24,6 +23,7 @@ const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   excursion: Record<string, unknown>
+  temps: Record<"h" | "m", number>
 }
 
 interface Coordonnees {
@@ -96,25 +96,22 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           disableSwipeIcon={true}
         />
       </SafeAreaView>
-    ) :
+    ) : (
       //sinon on affiche une erreur
-      (
-        <Screen preset="fixed">
-          <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
-            <Image
-              style={{ tintColor: colors.bouton }}
-              source={require("../../assets/icons/back.png")}
-            />
-          </TouchableOpacity>
-          <View style={$containerErreur}>
-            <Text size="xxl">Erreur</Text>
-            <Text style={$texteErreur} size="sm">
-              Une erreur est survenue, veuillez réessayer
-            </Text>
-          </View>
-        </Screen>
-      )
-  }
+      <Screen preset="fixed">
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
+          <Image
+            style={{ tintColor: colors.bouton }}
+            source={require("../../assets/icons/back.png")}
+          />
+        </TouchableOpacity>
+        <View style={$containerErreur}>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
+          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
+        </View>
+      </Screen>
+    )
+  },
 )
 
 /**
@@ -166,7 +163,7 @@ function itemFull(
               style={$boutonInfoAvis}
             >
               <Text
-                text="Infos"
+                tx="detailsExcursion.titres.infos"
                 size="lg"
                 style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
               />
@@ -178,7 +175,7 @@ function itemFull(
               style={$boutonInfoAvis}
             >
               <Text
-                text="Avis"
+                tx="detailsExcursion.titres.avis"
                 size="lg"
                 style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
               />
@@ -212,7 +209,6 @@ function afficherDescriptionCourte(description: string) {
     return descriptionFinale
   }
 }
-
 /**
  * 
  * @returns les coordonnées de l'utilisateur
@@ -272,7 +268,7 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
         </TouchableWithoutFeedback>
       </ScrollView>
       <View>
-        <Button style={[$sortirDetailSignalement, { bottom: tabBarHeight }]} tx="detailEscursion.bouttonRetourInformations" onPress={() => setIsAllSignalements(false)} />
+        <Button style={[$sortirDetailSignalement, { bottom: tabBarHeight }]} tx="detailsExcursion.boutons.retourInformations" onPress={() => setIsAllSignalements(false)} />
       </View>
     </View>
   );
@@ -284,7 +280,6 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
  * @returns les informations de l'excursion
  */
 function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSignalements, userLocation, isLoading) {
-  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
   var duree: string = ""
   var distance: string = ""
   var difficulteOrientation: number = 0
@@ -352,7 +347,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
               }}
             >
               {description === "" ? null : (
-                <Text style={$lienDescription} text="Voir plus" size="xs" />
+                <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
               )}
             </TouchableOpacity>
           </View>
@@ -361,12 +356,12 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
               <>
                 <View style={$headerSignalement}>
                   <View>
-                    <Text tx="detailEscursion.signalements" size="lg" />
+                    <Text tx="detailsExcursion.titres.signalements" size="lg" />
                   </View>
                   <View>
                     {signalements.length > 0 && (
                       <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                        <Text style={$lienSignalements} tx="detailEscursion.voirDetails" size="xs" />
+                        <Text style={$lienSignalements} tx="detailsExcursion.boutons.voirDetails" size="xs" />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -401,14 +396,12 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
           </View>
 
           <View style={$containerDenivele}>
-            <Text text="Dénivelé" size="lg" />
-            {
-              isLoading ? <ActivityIndicator size="large" color={colors.bouton} /> : <GraphiqueDenivele data={data} />
-            }
-          </View >
-        </View >
-      </TouchableWithoutFeedback >
-    </ScrollView >
+            <Text tx="detailsExcursion.titres.denivele" size="xl" />
+            {excursion.track && <GraphiqueDenivele points={excursion.track} />}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </ScrollView>
   )
 }
 
@@ -417,9 +410,9 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
  */
 function avis() {
   return (
-    <ScrollView style={$containerAvis}>
+    <ScrollView>
       <TouchableWithoutFeedback>
-        <View>
+        <View style={$containerAvis}>
           <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
           <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
           <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
@@ -627,11 +620,11 @@ const $lienDescription: TextStyle = {
 }
 
 const $containerAvis: ViewStyle = {
-  height: 200,
+  paddingBottom: height / 3 //pour pouvoir afficher les avis
 }
 
 const $containerDenivele: ViewStyle = {
-  marginBottom: 100 //pour pouvoir afficher le graphique
+  marginBottom: height / 3 //pour pouvoir afficher le graphique
 }
 
 const $scrollLine: ViewStyle = {
@@ -643,7 +636,6 @@ const $containerSignalements: ViewStyle = {
   margin: spacing.xs,
   paddingBottom: height / 2,
 }
-
 
 const $sortirDetailSignalement: ViewStyle = {
   borderRadius: 15,
