@@ -132,6 +132,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
       data={donneesGraphique}
       width={width - spacing.xl * 2}
       height={200}
+      formatYLabel={(y) => Math.round(y/50)*50 + " m"}
       withVerticalLabels={true}
       withInnerLines={false}
       withOuterLines={false}

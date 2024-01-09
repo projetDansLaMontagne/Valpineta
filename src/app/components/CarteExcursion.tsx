@@ -44,18 +44,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const difficulteTechniqueIcone = require("../../assets/icons/difficulteParcours.png")
   const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png")
 
-  const imageRandonnee = require("../../assets/images/randonnee.png")
-
-  const [coeurTouche, setCoeurTouche] = useState(false)
-
-  const excursionFavorite = () => {
-    if (coeurTouche) {
-      setCoeurTouche(false)
-    } else {
-      setCoeurTouche(true)
-    }
-  }
-
   const detailExcursion = () => {
     navigation.navigate("Stack", {
       screen: "DetailsExcursion",
@@ -79,8 +67,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
       backgroundColor: colors.palette.blanc,
     },
     heading: {
-      maxWidth: "50%",
-      marginEnd: spacing.xl,
+      maxWidth: "100%",
       fontSize: 16,
     },
     content: {
@@ -139,17 +126,10 @@ export function CarteExcursion(props: CarteExcursionProps) {
       justifyContent: "center",
     },
     entete: {
-      flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
       paddingStart: spacing.xs,
       paddingEnd: spacing.xs,
       marginBottom: spacing.xxs,
-    },
-    imageRando: {
-      width: 80,
-      height: 50,
-      borderRadius: spacing.xs,
     },
     icone: {
       width: spacing.lg,
@@ -165,11 +145,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
     <TouchableOpacity onPress={detailExcursion}>
       <View style={styles.carteGlobale}>
         <View style={styles.entete}>
-          <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
           <Text weight="bold" text={nomExcursion} style={styles.heading} />
-          <TouchableOpacity onPress={excursionFavorite}>
-            <Icon name="heart-o" size={spacing.lg} style={styles.icone} color={ coeurTouche ? colors.palette.rouge : colors.palette.noir} />
-          </TouchableOpacity>
         </View>
         <View style={styles.tableauInfos}>
           <View style={styles.ligneSup}>
