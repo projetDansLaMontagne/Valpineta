@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react"
+import React, { FC, useState, useEffect } from "react"
 import { observer } from "mobx-react-lite"
 import * as Location from 'expo-location';
 import {
@@ -14,7 +14,7 @@ import {
   Dimensions,
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen } from "app/components"
+import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen, CarteSignalement, Button } from "app/components"
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
 import HTML from 'react-native-render-html';
