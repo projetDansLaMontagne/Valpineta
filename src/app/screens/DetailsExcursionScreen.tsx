@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useState } from "react"
 import { observer } from "mobx-react-lite"
 import {
   View,
@@ -57,10 +57,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           />
         </TouchableOpacity>
         <View style={$containerErreur}>
-          <Text size="xxl">Erreur</Text>
-          <Text style={$texteErreur} size="sm">
-            Une erreur est survenue, veuillez réessayer
-          </Text>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl"/>
+          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message"/>
         </View>
       </Screen>
     )
@@ -96,7 +94,7 @@ function itemFull(
   return (
     <View style={$containerGrand}>
       <View style={$containerTitre}>
-        <Text text={nomExcursion} size="xl" style={$titre} />
+        <Text text={excursion.nom} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
@@ -108,7 +106,7 @@ function itemFull(
             style={$boutonInfoAvis}
           >
             <Text
-              text="Infos"
+              tx="detailsExcursion.titres.infos"
               size="lg"
               style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
             />
@@ -120,7 +118,7 @@ function itemFull(
             style={$boutonInfoAvis}
           >
             <Text
-              text="Avis"
+              tx="detailsExcursion.titres.avis"
               size="lg"
               style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
             />
@@ -210,7 +208,7 @@ function infos(excursion: Record<string, any>, navigation: any) {
           </View>
           <View style={$containerDescriptionSignalements}>
             <View>
-              <Text text="Description" size="lg" />
+              <Text tx="detailsExcursion.titres.description" size="lg" />
               <Text
                 style={$textDescription}
                 text={afficherDescriptionCourte(description)}
@@ -222,17 +220,17 @@ function infos(excursion: Record<string, any>, navigation: any) {
                 }}
               >
                 {description === "" ? null : (
-                  <Text style={$lienDescription} text="Voir plus" size="xxs" />
+                  <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
                 )}
               </TouchableOpacity>
             </View>
             <View>
-              <Text text="Signalement" size="lg" />
+              <Text tx="detailsExcursion.titres.signalement" size="lg" />
               <Text text="signalement" size="xs" />
             </View>
           </View>
           <View style={$containerDenivele}>
-            <Text text="Dénivelé" size="xl" />
+            <Text tx="detailsExcursion.titres.denivele" size="xl" />
             {excursion.track && <GraphiqueDenivele points={excursion.track} />}
           </View>
         </View>

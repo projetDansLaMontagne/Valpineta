@@ -27,7 +27,7 @@ import MapButton from "../components/MapButton"
 import { Asset } from "expo-asset"
 
 import * as fileSystem from "expo-file-system"
-import TilesRequire from "../services/importAssets/tilesRequire"
+// import TilesRequire from "../services/importAssets/tilesRequire"
 
 // variables
 interface MapScreenProps extends AppStackScreenProps<"Map"> {}
@@ -35,7 +35,7 @@ interface MapScreenProps extends AppStackScreenProps<"Map"> {}
 type T_animateToLocation = (passedLocation?: Location.LocationObject) => void
 
 let COMPTEUR = 0
-import fichier_json from "../../assets/Tiles/tiles_struct.json"
+// import fichier_json from "../../assets/Tiles/tiles_struct.json"
 const folder_dest = `${fileSystem.documentDirectory}cartes/OSM`
 
 // Fonction(s)

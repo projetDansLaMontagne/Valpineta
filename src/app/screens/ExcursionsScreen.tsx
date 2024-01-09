@@ -13,6 +13,8 @@ import {
 import { AppStackScreenProps } from "app/navigators"
 import { Screen, CarteExcursion, Button } from "app/components"
 import { colors, spacing } from "app/theme"
+import { useStores } from "app/models"
+
 
 /**@warning La navigation vers filtres est dans le mauvais sens (l'écran slide vers la gauche au lieu de la droite) */
 
@@ -29,8 +31,9 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 ) {
   type excursionsType = Array<Record<string, any>>
 
-  var filtres: typeof props.Filtres
+  const { parametres } = useStores()
 
+  var filtres: typeof props.Filtres;
   const [excursionsFiltrees1, setExcursionsFiltrees1] = useState(undefined) // Excursions triées par le 1e filtre (filtres en parametre)
   const [excursionsFiltrees2, setExcursionsFiltrees2] = useState(undefined) // Excursions triées par le 2e filtre (barre de recherche)
 
@@ -160,17 +163,16 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       /* ----------------------- RECUPERATION DES EXCURSIONS ---------------------- */
       var excursionsBRUT = require("../../assets/JSON/excursions.json")
 
-      // ----> A SUPPRIMER AVEC LE CHANEGEMENT DE LANGUE
       excursionsBRUT = excursionsBRUT.map((excursion) => {
         return {
           ...excursion,
-          nom: excursion.fr.nom,
-          description: excursion.fr.description,
-          typeParcours: excursion.fr.typeParcours,
+          nom: parametres.langues === "fr" ? excursion.fr.nom : excursion.es.nom,
+          description: parametres.langues === "fr" ? excursion.fr.description : excursion.es.description,
+          typeParcours: parametres.langues === "fr" ? excursion.fr.typeParcours : excursion.es.typeParcours,
         }
       })
-      // <---- FIN A SUPPRIMER
 
+      
       // -- FORMATAGE DES DONNEES RECUPEREES --
       const excursionsFormatees = formatageExcursions(excursionsBRUT)
 
@@ -202,6 +204,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     if (filtres !== undefined) {
       // Application des filtres en parametre
       excursionsFiltrees = excursionsFiltrees.filter((excursion) => {
+
         if (
           excursion.distance < filtres.intervalleDistance.min ||
           excursion.distance > filtres.intervalleDistance.max ||
@@ -270,13 +273,13 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     loadExcursions()
 
     // Changement apporté : Ajout de props.route.params en dependance pour que loadExcurison soit appelé a chaque changement de filtre
-  }, [props.route.params])
+  }, [props.route.params, parametres.langues])
 
   return (
     <Screen style={$root} safeAreaEdges={["top", "bottom"]}>
       <View style={styles.searchBox}>
         <TextInput
-          placeholder="Rechercher une excursion"
+          placeholder={ parametres.langues === "fr" ? "Rechercher une excursion" : "Buscar una excursión"}
           autoCorrect={false}
           onChangeText={(text) => clicRecherche(text)}
           placeholderTextColor={colors.palette.grisFonce}
@@ -290,23 +293,34 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         </TouchableOpacity>
       </View>
 
-      {excursionsFiltrees1 &&
-        (excursionsFiltrees1.length == 0 ? (
-          <Text>Aucune excursion ne répond aux critères selectionnés.</Text>
-        ) : (
-          excursionsFiltrees2 &&
-          (excursionsFiltrees2.length == 0 ? (
-            <Text>Aucune excursion ne porte ce nom.</Text>
-          ) : (
-            <ScrollView style={styles.scrollContainer}>
-              {excursionsFiltrees2.map((excursion, i) => (
-                <CarteExcursion key={i} excursion={excursion} navigation={navigation} />
-              ))}
-            </ScrollView>
-          ))
-        ))}
-    </Screen>
+    {
+      excursionsFiltrees1 && (
+        excursionsFiltrees1.length == 0 ?
+          <Text tx="excursions.erreurChargement"/>
+          :
+          (
+            excursionsFiltrees2 && (
+              excursionsFiltrees2.length == 0 ?
+                <Text tx="excursions.erreurNom"/>
+                :
+                <ScrollView style={styles.scrollContainer}>
+                  {
+                    excursionsFiltrees2.map((excursion, i) => (
+                      <CarteExcursion
+                        key={i}
+                        excursion={excursion}
+                        navigation={navigation}
+                      />
+                    ))
+                  }
+                </ScrollView>
+            )
+          )
+      )
+    }
+  </Screen>
   )
+
 })
 
 const $root: ViewStyle = {

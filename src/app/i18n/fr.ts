@@ -26,8 +26,8 @@ const fr = {
       button: "Essayons à nouveau",
     },
   },
-  testScreen: {
-    title: "Ecran de test",
+  mapScreen: {
+    title: "Carte",
     locate: {
       locate_btn: "Localisez moi !",
       dl_map_btn: "Télécharger la carte",
@@ -47,20 +47,62 @@ const fr = {
     }
   },
 
-  carteComposant: {
-    titre: "Le col de la marmotte",
-    zone: "Pineta",
-    parcours: "Allez/Retour",
-    temps: "7h30",
-    distance: "13,5 km",
-    denivelePositif: "1350 m",
-    difficulteParcours: "2",
-    difficulteOrientation: "1",
+  excursions:{
+    titre: "Excursions",
+    erreurChargement: "Aucune excursion ne répond aux critères selectionnés",
+    erreurNom: "Aucune excursion ne porte ce nom.",
   },
-  footer: {
-    accueil: "Accueil",
-    carte: "Carte",
-    parametres: "Parametres",
+  detailsExcursion:{
+    titres:{
+      infos: "Infos",
+      avis: "Avis",
+      description: "Description",
+      signalement: "Signalement",
+      denivele: "Denivelé",
+    },
+    boutons:{
+      lireSuite: "Lire la suite",
+    },
+    erreur: {
+      titre: "Erreur",
+      message: "Une erreur est survenue, veuillez réessayer",
+    }
+
+  },
+  parametres:{
+    titre: "Paramètres",
+    changerLangue: {
+      titre: "Langue",
+      francais: "Français",
+      espagnol: "Espagnol",
+    }
+  },
+  pageFiltres:{
+    tri:{
+      titre: "Trier par",
+      distance: "Distance",
+      denivele: "Dénivelé",
+      difficulteTech: "Difficulté technique",
+      difficulteOrientation: "Difficulté d'orientation",
+    },
+    filtres:{
+      titre: "Filtrer par",
+      distance: 'Distance (en km)',
+      duree: 'Durée (en heures)',
+      denivele: 'Dénivelé (en m)',
+      parcours: 'Type de parcours',
+      typeParcours: {
+        aller: 'Aller simple',
+        allerRetour: 'Aller/Retour',
+        boucle: 'Boucle',
+      },
+      vallees: 'Vallées',
+      difficulteTech: 'Difficulté technique',
+      difficulteOrientation: 'Difficulté d\'orientation',
+    },
+    boutons:{
+      valider: "Valider",
+    }
   }
 }
 
