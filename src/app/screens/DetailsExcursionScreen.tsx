@@ -19,10 +19,7 @@ import SwipeUpDown from "react-native-swipe-up-down"
 
 const { width, height } = Dimensions.get("window")
 
-interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  excursion: Record<string, unknown>
-  temps: Record<"h" | "m", number>
-}
+interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
@@ -33,7 +30,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     //si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <SafeAreaView style={$container}>
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
@@ -50,7 +47,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     ) : (
       //sinon on affiche une erreur
       <Screen preset="fixed">
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}

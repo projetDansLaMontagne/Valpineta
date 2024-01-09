@@ -135,7 +135,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
         )
         .filter((type) => type != null),
     }
-    navigation.navigate("Excursions", { Filtres: filtres })
+    navigation.navigate("Excursions", { filtres: filtres })
   }
 
   return (

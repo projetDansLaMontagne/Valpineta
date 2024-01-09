@@ -30,7 +30,7 @@ import * as fileSystem from "expo-file-system"
 import TilesRequire from "../services/importAssets/tilesRequire"
 
 // variables
-interface MapScreenProps extends AppStackScreenProps<"Map"> {}
+interface MapScreenProps extends AppStackScreenProps<"Carte"> {}
 
 type T_animateToLocation = (passedLocation?: Location.LocationObject) => void
 

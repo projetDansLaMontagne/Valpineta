@@ -57,7 +57,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   }
 
   const detailExcursion = () => {
-    navigation.navigate("Stack", {
+    navigation.navigate("CarteStack", {
       screen: "DetailsExcursion",
       params: { excursion: props.excursion },
     })
@@ -168,7 +168,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
           <Text weight="bold" text={nomExcursion} style={styles.heading} />
           <TouchableOpacity onPress={excursionFavorite}>
-            <Icon name="heart-o" size={spacing.lg} style={styles.icone} color={ coeurTouche ? colors.palette.rouge : colors.palette.noir} />
+          <Icon name="heart-o" size={spacing.lg} style={styles.icone} color={ coeurTouche ? colors.palette.rouge : colors.palette.noir} />
           </TouchableOpacity>
         </View>
         <View style={styles.tableauInfos}>

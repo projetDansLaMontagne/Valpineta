@@ -2,7 +2,7 @@
 import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
 import { ViewStyle, TouchableOpacity, Image, Dimensions, ScrollView, TextStyle } from "react-native"
-// import { AppStackScreenProps } from "app/navigators"
+import { AppStackScreenProps } from "app/navigators"
 
 // Composants
 import { Screen } from "app/components"
@@ -13,7 +13,6 @@ import { Text } from "app/components"
 const { width, height } = Dimensions.get("window")
 
 interface DescriptionScreenProps extends AppStackScreenProps<"Description"> {
-  excursion: Record<string, unknown>
 }
 
 export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function DescriptionScreen(
