@@ -26,7 +26,7 @@ interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(
   props: ExcursionsScreenProps,
 ) {
-  const filtres = props.route.params.filtres
+  const filtres = props.route.params?.filtres
 
   const [excursionsFiltrees1, setExcursionsFiltrees1] = useState(undefined) // Excursions triées par le 1e filtre (filtres en parametre)
   const [excursionsFiltrees2, setExcursionsFiltrees2] = useState(undefined) // Excursions triées par le 2e filtre (barre de recherche)
@@ -265,10 +265,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           placeholderTextColor={colors.palette.grisFonce}
           style={styles.barreRecherche}
         />
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Stack", { screen: "Filtres" })}
-          style={styles.valleeIcone}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate("Filtres")} style={styles.valleeIcone}>
           <Image style={styles.iconeFiltre} source={filtreIcone} />
         </TouchableOpacity>
       </View>

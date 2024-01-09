@@ -324,8 +324,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }
 
   return (
-    <Screen style={$container}>
-      <SafeAreaView style={styles.container}>
+    <Screen style={$container} safeAreaEdges={["bottom"]}>
+      <View style={styles.container}>
         <View style={styles.mapContainer}>
           <>
             <MapView
@@ -414,7 +414,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             </View>
           </>
         </View>
-      </SafeAreaView>
+      </View>
     </Screen>
   )
 })
