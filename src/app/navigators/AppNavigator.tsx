@@ -8,17 +8,14 @@ import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
 import React from "react"
-import { useColorScheme } from "react-native"
+import { ImageSourcePropType, useColorScheme } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs"
 import { Image, ImageStyle } from "react-native"
-
-const explorerLogo = require("./../../assets/icons/explorer.png")
-const carteLogo = require("./../../assets/icons/carte.png")
-const parametresLogo = require("./../../assets/icons/parametres.png")
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -33,15 +30,72 @@ const parametresLogo = require("./../../assets/icons/parametres.png")
  *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
+
+/* ---------------------------------- Types --------------------------------- */
+export type T_valeurs_filtres = {
+  distanceMax: number
+  dureeMax: number
+  deniveleMax: number
+  typesParcours: string[]
+  vallees: string[]
+  difficulteTechniqueMax: number
+  difficulteOrientationMax: number
+}
+export type T_point = {
+  alt: number // Altitude
+  dist: number // Distance par rapport au point de départ
+  lat: number // Latitude
+  lon: number // Longitude
+  pos: number // Denivele positif
+}
+export type T_filtres = {
+  critereTri: string
+  intervalleDistance: { min: number; max: number }
+  intervalleDuree: { min: number; max: number }
+  intervalleDenivele: { min: number; max: number }
+  typesParcours: string[]
+  vallees: string[]
+  difficultesTechniques: number[]
+  difficultesOrientation: number[]
+}
+export type T_signalement = {
+  description: string
+  image: string
+  latitude: number
+  longitude: number
+  nom: string
+  type: "PointInteret" | "Avertissement"
+}
+export type T_infoLangue = {
+  nom: string
+  description: string
+  typeParcours: string
+}
+
+export type T_excursion = {
+  denivele: number
+  description: string
+  difficulteOrientation: number
+  difficulteTechnique: number
+  distance: number
+  duree: { h: number; m: number }
+  nomTrackGpx: string
+  vallee: string
+
+  es?: T_infoLangue
+  fr?: T_infoLangue
+
+  signalements: T_signalement[]
+  track: T_point[]
+}
+
 export type AppStackParamList = {
-  // 🔥 Your screens go here
   Filtres: undefined
-  Excursions: undefined
-  Map: undefined
-  DetailsExcursion: undefined
+  Excursions: undefined | { filtres?: T_filtres }
+  Carte: undefined
+  DetailsExcursion: { excursion: T_excursion }
   Parametres: undefined
-  Description: undefined
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  Description: { excursion: T_excursion }
 }
 
 /**
@@ -62,11 +116,27 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
+const Tab = createBottomTabNavigator()
+const Stack = createNativeStackNavigator()
+
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()
-  const Tab = createBottomTabNavigator()
+  /* --------------------------------- Assets --------------------------------- */
+  const excursionLogo = require("./../../assets/icons/explorer.png")
+  const carteLogo = require("./../../assets/icons/carte.png")
+  const parametresLogo = require("./../../assets/icons/parametres.png")
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
+
+  const optionsBoutons = (
+    titre: string,
+    logo: ImageSourcePropType,
+  ): BottomTabNavigationOptions => ({
+    title: titre,
+    tabBarIcon: ({ color }) => (
+      <Image source={logo} style={{ width: 30, height: 30, tintColor: color }} />
+    ),
+  })
 
   return (
     <NavigationContainer
@@ -75,79 +145,74 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        initialRouteName={"Carte"}
+        initialRouteName={"Excursions"}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
             padding: 5,
             backgroundColor: colors.fond,
-            borderTopColor: colors.palette.vert
+            borderTopColor: colors.palette.vert,
           },
+          tabBarActiveTintColor: colors.palette.noir, // Couleur de l'onglet actif
+          tabBarInactiveTintColor: colors.palette.vert, // Couleur de l'onglet inactif
         }}
       >
         <Tab.Screen
-          name="Stack"
-          component={StackNavigator}
-          options={{ tabBarButton: () => null }}
+          name="ExcursionsStack"
+          component={ExcursionStack}
+          options={optionsBoutons("Excursions", excursionLogo)}
         />
         <Tab.Screen
-          name="Excursions"
-          component={Screens.ExcursionsScreen}
-          options={{
-            tabBarIcon: () => <Image source={explorerLogo} style={$icon} />,
-            // tabBarActiveTintColor: colors.bouton,
-            // tabBarInactiveTintColor: colors.text,
-            tabBarLabelStyle: { color: colors.bouton },
-          }}
+          name="CarteStack"
+          component={CarteStack}
+          options={optionsBoutons("Carte", carteLogo)}
         />
         <Tab.Screen
-          name="Carte"
-          component={Screens.MapScreen}
-          options={{
-            tabBarIcon: (props) => <Image source={carteLogo} style={$icon} />,
-            tabBarLabelStyle: { color: colors.bouton },
-          }}
-        />
-        <Tab.Screen
-          name="Parametres"
-          component={Screens.ParametresScreen}
-          options={{
-            tabBarIcon: (props) => <Image source={parametresLogo} style={$icon} />,
-            tabBarLabelStyle: { color: colors.bouton },
-          }}
+          name="ParametresStack"
+          component={ParametresStack}
+          options={optionsBoutons("Paramètres", parametresLogo)}
         />
       </Tab.Navigator>
     </NavigationContainer>
   )
 })
 
-const $icon: ImageStyle = {
-  width: 30,
-  height: 30,
-  tintColor: colors.bouton,
-}
-
 /* -------------------------------------------------------------------------- */
 /*                                   FOOTER                                   */
 /* -------------------------------------------------------------------------- */
 
-function StackNavigator() {
-  const Stack = createNativeStackNavigator()
+const ExcursionStack = () => (
+  <Stack.Navigator
+    initialRouteName={"Excursions"}
+    screenOptions={{
+      headerShown: false,
+    }}
+  >
+    <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
+    <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
+  </Stack.Navigator>
+)
 
-  return (
-    <Stack.Navigator
-      initialRouteName={"Excursions"}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="Description" component={Screens.DescriptionScreen} />
-      <Stack.Screen
-        name="DetailsExcursion"
-        component={Screens.DetailsExcursionScreen}
-      />
-      <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
-      <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
-    </Stack.Navigator>
-  )
-}
+const CarteStack = () => (
+  <Stack.Navigator
+    initialRouteName={"Carte"}
+    screenOptions={{
+      headerShown: false,
+    }}
+  >
+    <Stack.Screen name="Carte" component={Screens.MapScreen} />
+    <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
+    <Stack.Screen name="Description" component={Screens.DescriptionScreen} />
+  </Stack.Navigator>
+)
+
+const ParametresStack = () => (
+  <Stack.Navigator
+    initialRouteName={"Parametres"}
+    screenOptions={{
+      headerShown: false,
+    }}
+  >
+    <Stack.Screen name="Parametres" component={Screens.ParametresScreen} />
+  </Stack.Navigator>
+)
