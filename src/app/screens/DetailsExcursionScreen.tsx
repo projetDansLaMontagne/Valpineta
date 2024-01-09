@@ -55,14 +55,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    const chrono = () => {
-      setTimeout(() => {
-        setIsLoading(false)
-      }
-        , 1000);
-    }
+    const footerHeight = useBottomTabBarHeight();
 
     useEffect(() => {
       const fetchLocation = async () => {
@@ -72,12 +65,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
       fetchLocation();
     }, []);
-
-    useEffect(() => {
-      if (isLoading) {
-        chrono();
-      }
-    }, [isLoading]);
 
     //si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
@@ -90,9 +77,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation, isLoading)}
+          itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation, footerHeight)}
           animation="easeInEaseOut"
-          swipeHeight={30 + useBottomTabBarHeight()}
+          swipeHeight={30 + footerHeight}
           disableSwipeIcon={true}
         />
       </SafeAreaView>
@@ -126,7 +113,7 @@ function itemMini() {
 }
 
 /**
- * @param excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation, isLoading
+ * @param excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation,
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
 function itemFull(
@@ -137,7 +124,7 @@ function itemFull(
   isAllSignalements: boolean,
   setIsAllSignalements: React.Dispatch<any>,
   userLocation: Array<number>,
-  isLoading: boolean,
+  footerHeight: number
 ) {
 
   var nomExcursion: string = ""
@@ -145,7 +132,7 @@ function itemFull(
     nomExcursion = excursion.nom as string;
   }
   if (isAllSignalements) {
-    return listeSignalements(setIsAllSignalements, excursion, userLocation);
+    return listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight);
   }
   else {
     return (
@@ -189,7 +176,7 @@ function itemFull(
                 : { left: width - width / 2.5 - spacing.lg / 1.5 },
             ]}
           ></View>
-          {containerInfoAffiche ? infos(excursion, navigation, setIsAllSignalements, userLocation, isLoading) : avis()}
+          {containerInfoAffiche ? infos(excursion, navigation, setIsAllSignalements, userLocation) : avis()}
         </View>
       </View>
     )
@@ -236,9 +223,7 @@ function getUserLocation() {
  * @params setIsAllSignalements, excursion, userLocation
  * @returns la liste des signalements
  */
-function listeSignalements(setIsAllSignalements, excursion, userLocation) {
-
-  const tabBarHeight = useBottomTabBarHeight();
+function listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight) {
 
   return (
     <View style={$containerGrand}>
@@ -268,7 +253,7 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
         </TouchableWithoutFeedback>
       </ScrollView>
       <View>
-        <Button style={[$sortirDetailSignalement, { bottom: tabBarHeight }]} tx="detailsExcursion.boutons.retourInformations" onPress={() => setIsAllSignalements(false)} />
+        <Button style={[$sortirDetailSignalement, { bottom: footerHeight }]} tx="detailsExcursion.boutons.retourInformations" onPress={() => setIsAllSignalements(false)} />
       </View>
     </View>
   );
@@ -276,10 +261,10 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
 
 /**
  *
- * @params excursion, navigation, setIsAllSignalements, userLocation, isLoading
+ * @params excursion, navigation, setIsAllSignalements, userLocation
  * @returns les informations de l'excursion
  */
-function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSignalements, userLocation, isLoading) {
+function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSignalements, userLocation) {
   var duree: string = ""
   var distance: string = ""
   var difficulteOrientation: number = 0
