@@ -121,7 +121,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     labels: abscises,
     datasets: [
       {
-        data: points.map((point) => point.alt),
+        data: points.map((point) => point.alt ?? 0),
         strokeWidth: 3,
       },
     ],

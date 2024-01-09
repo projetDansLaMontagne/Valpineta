@@ -5,6 +5,7 @@ import Icon from "react-native-vector-icons/FontAwesome"
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text } from "./Text"
+import { GraphiqueDenivele } from "./GraphiqueDenivele"
 
 /**@warning L absence de parametre n est pas geree */
 
@@ -24,6 +25,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   var denivele = 0
   var difficulteTechnique = 0
   var difficulteOrientation = 0
+  var track : any[] = []
 
   if (props.excursion) {
     nomExcursion = props.excursion.nom
@@ -34,6 +36,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
     denivele = props.excursion.denivele
     difficulteTechnique = props.excursion.difficulteTechnique
     difficulteOrientation = props.excursion.difficulteOrientation
+    track = props.excursion.track
   }
 
   const valleeIcone = require("../../assets/icons/zone.png")
@@ -184,6 +187,9 @@ export function CarteExcursion(props: CarteExcursionProps) {
                 resizeMode="contain"
               />
               <Text text={difficulteOrientation} style={styles.content} />
+            </View>
+            <View>
+              {track && <GraphiqueDenivele points={track} />}
             </View>
           </View>
         </View>
