@@ -16,6 +16,7 @@ import { AppStackScreenProps } from "app/navigators"
 import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen } from "app/components"
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
+import HTML from 'react-native-render-html';
 
 const { width, height } = Dimensions.get("window")
 
@@ -142,8 +143,9 @@ function afficherDescriptionCourte(description: string) {
   if (description == null) {
     return null
   } else {
-    const descriptionCoupe = description.slice(0, 100)
-    const descriptionFinale = descriptionCoupe + "..."
+    const descriptionCoupe : string = description.slice(0, 100)
+    let descriptionFinale : string = descriptionCoupe + "..."
+    descriptionFinale = descriptionFinale.replace(/<[^>]*>?/gm, '')
     return descriptionFinale
   }
 }
