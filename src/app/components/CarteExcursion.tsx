@@ -15,25 +15,24 @@ interface CarteExcursionProps extends TouchableOpacityProps {
 
 export function CarteExcursion(props: CarteExcursionProps) {
   const navigation = props.navigation
-
-  var nomExcursion = ""
-  var vallee = ""
-  var typeParcours = ""
-  var duree = { h: 0, m: 0 }
-  var distance = 0
-  var denivele = 0
-  var difficulteTechnique = 0
-  var difficulteOrientation = 0
+  var nomExcursion: string = ""
+  var vallee: string = ""
+  var typeParcours: string = ""
+  var duree: { h: number; m: number } = { h: 0, m: 0 }
+  var distance: number = 0
+  var denivele: number = 0
+  var difficulteTechnique: number = 0
+  var difficulteOrientation: number = 0
 
   if (props.excursion) {
-    nomExcursion = props.excursion.nom
-    vallee = props.excursion.vallee
-    typeParcours = props.excursion.typeParcours
-    duree = props.excursion.duree
-    distance = props.excursion.distance
-    denivele = props.excursion.denivele
-    difficulteTechnique = props.excursion.difficulteTechnique
-    difficulteOrientation = props.excursion.difficulteOrientation
+    nomExcursion = props.excursion.nom as string
+    vallee = props.excursion.vallee as string
+    typeParcours = props.excursion.typeParcours as string
+    duree = props.excursion.duree as { h: number; m: number }
+    distance = props.excursion.distance as number
+    denivele = props.excursion.denivele as number
+    difficulteTechnique = props.excursion.difficulteTechnique as number
+    difficulteOrientation = props.excursion.difficulteOrientation as number
   }
 
   const valleeIcone = require("../../assets/icons/zone.png")
@@ -41,10 +40,10 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const dureeIcone = require("../../assets/icons/duree.png")
   const distanceIcone = require("../../assets/icons/distance.png")
   const deniveleIcone = require("../../assets/icons/denivele.png")
-  const difficulteTechniqueIcone = require("../../assets/icons/difficulteParcours.png")
+  const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png")
   const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png")
 
-  const imageRandonnee = require("../../assets/images/randonnee.png")
+  const imageRandonnee = require("../../assets/images/randonnee.png");
 
   const [coeurTouche, setCoeurTouche] = useState(false)
 
@@ -168,7 +167,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
           <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
           <Text weight="bold" text={nomExcursion} style={styles.heading} />
           <TouchableOpacity onPress={excursionFavorite}>
-            <Icon name="heart-o" size={spacing.lg} style={styles.icone} color={ coeurTouche ? colors.palette.rouge : colors.palette.noir} />
+            <Icon name="heart-o" size={spacing.lg} style={styles.icone} color={coeurTouche ? colors.palette.rouge : colors.palette.noir} />
           </TouchableOpacity>
         </View>
         <View style={styles.tableauInfos}>
@@ -183,9 +182,9 @@ export function CarteExcursion(props: CarteExcursionProps) {
             </View>
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={dureeIcone} resizeMode="contain" />
-              <Text text={duree.h} style={styles.content} />
+              <Text text={duree.h.toString()} style={styles.content} />
               <Text text={"h"} style={styles.content} />
-              <Text text={duree.m} style={styles.content} />
+              <Text text={duree.m.toString()} style={styles.content} />
             </View>
           </View>
           <View style={styles.ligneInf}>
@@ -199,7 +198,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={difficulteTechniqueIcone} resizeMode="contain" />
-              <Text text={difficulteTechnique} style={styles.content} />
+              <Text text={difficulteTechnique.toString()} style={styles.content} />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image
@@ -207,7 +206,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
                 source={difficulteOrientationIcone}
                 resizeMode="contain"
               />
-              <Text text={difficulteOrientation} style={styles.content} />
+              <Text text={difficulteOrientation.toString()} style={styles.content} />
             </View>
           </View>
         </View>

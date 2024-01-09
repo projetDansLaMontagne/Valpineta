@@ -25,11 +25,86 @@ const es = {
     },
   },
 
-  carteComposant: {
-    titre: "Título de la tarjeta",
-    localisation: "Ubicación",
-    parcours: "Ida y vuelta",
+  mapScreen: {
+    title: "Mapa",
+    locate: {
+      locate_btn: "¡Localízame!",
+      dl_map_btn: "Descargar el mapa",
+      stop_locate_btn: "Detener la localización",
+      fetching: "Localización en curso...",
+      follow: "Seguirme",
+      stopFollowing: "Dejar de seguirme",
+      located: {
+        title: "¡Estás aquí!",
+        latitude: "Latitud: ",
+        longitude: "Longitud: ",
+      },
+      notLocated: {
+        title: "No es posible localizarte",
+        message: "Por favor, verifica tu configuración de ubicación",
+      },
+    }
   },
+
+  excursions: {
+    titre: "Excursiones",
+    erreurChargement: "Ninguna excursión encontrada",
+    erreurNom: "Nombre de excursión no encontrado",
+  },
+  detailsExcursion: {
+    titres: {
+      infos: "Infos",
+      avis: "Aviso",
+      description: "Descripción",
+      signalements: "Informes",
+      denivele: "Desnivel",
+    },
+    boutons: {
+      lireSuite: "Leer más",
+      voirDetails: "Ver detalles",
+      retourInformations: "Volver a la información",
+    },
+    erreur: {
+      titre: "Error",
+      message: "Se produjo un error. Por favor, inténtalo de nuevo.",
+    },
+  },
+
+  parametres: {
+    titre: "Ajustes",
+    changerLangue: {
+      titre: "Idioma",
+      francais: "Francés",
+      espagnol: "Español",
+    }
+  },
+  pageFiltres: {
+    tri: {
+      titre: "Ordenar por",
+      distance: "Distancia",
+      denivele: "Desnivel",
+      difficulteTech: "Dificultad técnica",
+      difficulteOrientation: "Dificultad de orientación",
+    },
+    filtres: {
+      titre: "Filtrar por",
+      distance: 'Distancia (en km)',
+      duree: 'Duración (en horas)',
+      denivele: 'Desnivel (en m)',
+      parcours: 'Tipo de recorrido',
+      typeParcours: {
+        aller: 'Ida simple',
+        allerRetour: 'Ida y vuelta',
+        boucle: 'Bucle',
+      },
+      vallees: 'Valles',
+      difficulteTech: 'Dificultad técnica',
+      difficulteOrientation: 'Dificultad de orientación',
+    },
+    boutons: {
+      valider: "Validar",
+    }
+  }
 }
 
 export default es

@@ -7,4 +7,5 @@ import { LogBox } from "react-native"
 // prettier-ignore
 LogBox.ignoreLogs([
   "Require cycle:",
+  'Non-serializable values were found in the navigation state',
 ])
