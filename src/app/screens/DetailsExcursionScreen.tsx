@@ -19,6 +19,7 @@ import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen, CarteSignale
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
+import { ca } from "date-fns/locale";
 
 const { width, height } = Dimensions.get("window")
 
@@ -252,22 +253,20 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
                 // Calcule de la distance pour chaque avertissement
                 const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
                 const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
-
-                if (signalement.type == "Avertissement")
-                  return (
-                    <View key={index}>
-                      <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} imageSignalement={signalement.image} />
-                    </View>
-                  );
-                else {
-                  return (
-                    <View key={index}>
-                      <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} imageSignalement={signalement.image} />
-                    </View>
-                  );
-                }
+                const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+                return (
+                  <View key={index}>
+                    <CarteSignalement
+                      type={carteType}
+                      details={true}
+                      nomSignalement={signalement.nom}
+                      distanceDuDepart={`${distanceSignalement}`}
+                      description={signalement.description}
+                      imageSignalement={signalement.image}
+                    />
+                  </View>
+                )
               })}
-
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>
@@ -301,8 +300,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
     excursion.signalements != undefined
   ) {
     duree = (excursion.duree as { h: number }).h + "h";
-    if ((excursion.duree as { m: number }).m !== 0) {
-
+    if ((excursion.duree as { m: number }).m !== 0) { // Si la durée en minutes est différente de 0, on l'affiche en plus de la durée en heures
       duree = duree + (excursion.duree as { m: number }).m;
     }
     distance = excursion.distance as string;
@@ -361,8 +359,17 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
           <View>
             {signalements?.length > 0 && (
               <>
-                <View>
-                  <Text tx="detailEscursion.signalements" size="lg" />
+                <View style={$headerSignalement}>
+                  <View>
+                    <Text tx="detailEscursion.signalements" size="lg" />
+                  </View>
+                  <View>
+                    {signalements.length > 0 && (
+                      <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                        <Text style={$lienSignalements} tx="detailEscursion.voirDetails" size="xxs" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </View>
                 <ScrollView horizontal>
                   <TouchableWithoutFeedback>
@@ -371,26 +378,21 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
                         // Calculate the distance for each warning
                         const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
                         const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+                        const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
 
                         return (
                           <View key={index}>
                             <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                              {signalement.type === "Avertissement" ? (
-                                <CarteSignalement type="avertissement" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
-                              ) : (
-                                <CarteSignalement type="pointInteret" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
-                              )}
+                              <CarteSignalement
+                                type={carteType}
+                                details={false}
+                                nomSignalement={signalement.nom}
+                                distanceDuDepart={`${distanceSignalement}`}
+                              />
                             </TouchableOpacity>
                           </View>
                         );
                       })}
-                      {signalements.length > 0 && (
-                        <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                          <View style={$carteGlobale}>
-                            <Text tx="detailEscursion.voirDetails" style={$tousLesSignalements} />
-                          </View>
-                        </TouchableOpacity>
-                      )}
                     </View>
                   </TouchableWithoutFeedback>
                 </ScrollView>
@@ -445,6 +447,7 @@ function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees
   const dLat = toRadians(coord2.lat - coord1.lat);
   const dLon = toRadians(coord2.lon - coord1.lon);
 
+  // Formule de Haversine pour calculer la distance entre deux points
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
@@ -452,6 +455,7 @@ function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees
     Math.sin(dLon / 2) *
     Math.sin(dLon / 2);
 
+  // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   // Distance en kilomètres
@@ -496,8 +500,8 @@ function recupDistance(coordonneeSignalement: Coordonnees) {
 
   const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
 
-  //Distance totale DANS UN MONDE PARFAIT
-  // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche;
+  //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
+  // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche; //c'est donc pas vraiment ce calcul qu'il faut faire
   // return distanceTotale;
   return distanceDepartPointLePlusProche;
 }
@@ -632,26 +636,7 @@ const $containerDenivele: ViewStyle = {
   marginBottom: 100 //pour pouvoir afficher le graphique
 }
 
-/* --------------------------------- ERREUR --------------------------------- */
 
-const $containerErreur: ViewStyle = {
-  justifyContent: "center",
-  alignItems: "center",
-  width: width,
-  height: height,
-  padding: spacing.lg,
-}
-
-const $texteErreur: TextStyle = {
-  marginTop: spacing.lg,
-  marginBottom: height / 2,
-}
-
-const $tousLesSignalements: TextStyle = {
-  fontSize: spacing.md,
-  justifyContent: "space-between",
-  color: colors.souligne,
-}
 const $listeSignalements: ViewStyle = {
   marginTop: spacing.lg,
   height: "115%", //Si je met a 100% il descend pas jusqu'en bas voir avec reio prod
@@ -665,20 +650,7 @@ const $scrollLine: ViewStyle = {
   paddingBottom: spacing.xl
 }
 
-const $carteGlobale: ViewStyle = {
-  padding: spacing.md,
-  margin: 10,
-  shadowColor: colors.palette.noir,
-  shadowOffset: {
-    width: 0,
-    height: 3,
-  },
-  shadowOpacity: 0.27,
-  shadowRadius: 4.65,
-  elevation: 6,
-  borderRadius: 10,
-  backgroundColor: colors.palette.blanc,
-}
+
 
 const $sortirDetailSignalement: ViewStyle = {
   justifyContent: "center",
@@ -693,4 +665,31 @@ const $sortirDetailSignalement: ViewStyle = {
   bottom: 0,
   left: "15%",
   zIndex: 1,
+}
+
+const $headerSignalement: ViewStyle = {
+  flexDirection: "row",
+  alignItems: "center",
+}
+
+const $lienSignalements: TextStyle = {
+  textDecorationLine: "underline",
+  color: colors.bouton,
+  fontSize: 12,
+  paddingStart: spacing.xs,
+}
+
+/* --------------------------------- ERREUR --------------------------------- */
+
+const $containerErreur: ViewStyle = {
+  justifyContent: "center",
+  alignItems: "center",
+  width: width,
+  height: height,
+  padding: spacing.lg,
+}
+
+const $texteErreur: TextStyle = {
+  marginTop: spacing.lg,
+  marginBottom: height / 2,
 }
