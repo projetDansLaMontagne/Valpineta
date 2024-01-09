@@ -1,15 +1,15 @@
 {
-  "name": "src",
-  "displayName": "src",
+  "name": "Valpineta",
+  "displayName": "Valpineta",
   "expo": {
-    "name": "src",
+    "name": "Valpineta",
     "slug": "src",
-    "scheme": "src",
-    "version": "1.0.0",
+    "scheme": "valpineta",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/app-icon-all.png",
+    "icon": "./assets/images/logo.jpg",
     "splash": {
-      "image": "./assets/images/splash-logo-all.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#191015"
     },
@@ -21,43 +21,41 @@
       "**/*"
     ],
     "android": {
-      "icon": "./assets/images/app-icon-android-legacy.png",
-      "package": "com.src",
+      "permissions": [
+        "INTERNET",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.valpineta.app",
+      "versionCode": 14,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
       },
-      "splash": {
-        "image": "./assets/images/splash-logo-android-universal.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#191015"
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAhbzEPoqamBm-RVtvrDXUSF_nJpHh_bjQ"
+        }
       }
     },
     "ios": {
-      "icon": "./assets/images/app-icon-ios.png",
       "supportsTablet": true,
-      "bundleIdentifier": "com.src",
-      "splash": {
-        "image": "./assets/images/splash-logo-ios-mobile.png",
-        "tabletImage": "./assets/images/splash-logo-ios-tablet.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#191015"
-      }
+      "bundleIdentifier": "com.valpineta.app"
     },
     "web": {
-      "favicon": "./assets/images/app-icon-web-favicon.png",
-      "splash": {
-        "image": "./assets/images/splash-logo-web.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#191015"
-      }
+      "favicon": "./assets/images/logo.jpg"
     },
     "packagerOpts": {
-      "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
+      "sourceExts": [
+        "js",
+        "json",
+        "ts",
+        "tsx",
+        "jsx, xml, gpx"
+      ]
     },
     "plugins": [
       "expo-localization"
     ]
-    
   }
 }

@@ -69,7 +69,7 @@ buck-out/
 .vscode
 
 # Expo
-.expo/*
+.expo
 bin/Exponent.app
 
 npm-debug.*
