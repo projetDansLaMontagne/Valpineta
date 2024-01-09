@@ -10,7 +10,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native"
-import { AppStackScreenProps } from "app/navigators"
+import { AppStackScreenProps, T_excursion, T_filtres, T_valeurs_filtres } from "app/navigators"
 import { Screen, CarteExcursion, Button } from "app/components"
 import { colors, spacing } from "app/theme"
 
@@ -20,16 +20,13 @@ import { colors, spacing } from "app/theme"
 
 /**@todo CSS : agrandir la zone de texte de recherche + la rendre fonctionnelle */
 /**@todo CSS : empecher le footer d etre au dessus de la derniere excursion */
-interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {
-  Filtres: Record<string, any>
-}
+
+interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
 
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(
   props: ExcursionsScreenProps,
 ) {
-  type excursionsType = Array<Record<string, any>>
-
-  var filtres: typeof props.Filtres
+  const filtres = props.route.params.filtres
 
   const [excursionsFiltrees1, setExcursionsFiltrees1] = useState(undefined) // Excursions triées par le 1e filtre (filtres en parametre)
   const [excursionsFiltrees2, setExcursionsFiltrees2] = useState(undefined) // Excursions triées par le 2e filtre (barre de recherche)
@@ -42,9 +39,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Cette fonction doit etre executee systematiquement lors de la synchro descendante
    * Recupere les valeurs max et les intervalles de chaque filtre (valeurs max, types de parcours, vallees)
    */
-  const calculValeursFiltres = (
-    excursions: excursionsType,
-  ): Record<string, number | Array<number>> => {
+  const calculValeursFiltres = (excursions: T_excursion[]): T_valeurs_filtres => {
     // Parcourt de chaque excursion pour connaitre les maximas
     var distanceMax = 0
     var dureeMax = 0
@@ -65,12 +60,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         dureeMax = duree
       }
       // Denivele
-      if (excursion.denivelePositif > deniveleMax) {
+      if (excursion.denivele > deniveleMax) {
         deniveleMax = excursion.denivele
       }
       // Types de parcours
-      if (!typesParcours.includes(excursion.typeParcours)) {
-        typesParcours.push(excursion.typeParcours)
+      if (!typesParcours.includes(excursion.fr.typeParcours)) {
+        typesParcours.push(excursion.fr.typeParcours)
       }
       // Vallee
       if (!vallees.includes(excursion.vallee)) {
@@ -100,7 +95,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Cette fonction doit etre executee systematiquement lors de la synchro descendante
    * Formate les fichiers de maniere a n avoir que le type necessaire (au lieu des strings)
    */
-  const formatageExcursions = (excursions: excursionsType) => {
+  const formatageExcursions = (excursions: T_excursion[]) => {
     var excursionsFormatees = []
 
     const formatDuree = /(\d{1,2})h(\d{0,2})/
@@ -156,38 +151,35 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * recuperation --> formatage --> application des filtres de parametres
    */
   const loadExcursions = async (): Promise<void> => {
-    try {
-      /* ----------------------- RECUPERATION DES EXCURSIONS ---------------------- */
-      var excursionsBRUT = require("../../assets/JSON/excursions.json")
+    /* ----------------------- RECUPERATION DES EXCURSIONS ---------------------- */
+    var excursionsBRUT = require("../../assets/JSON/excursions.json")
 
-      // ----> A SUPPRIMER AVEC LE CHANEGEMENT DE LANGUE
-      excursionsBRUT = excursionsBRUT.map((excursion) => {
-        return {
-          ...excursion,
-          nom: excursion.fr.nom,
-          description: excursion.fr.description,
-          typeParcours: excursion.fr.typeParcours,
-        }
-      })
-      // <---- FIN A SUPPRIMER
+    // ----> A SUPPRIMER AVEC LE CHANEGEMENT DE LANGUE
+    excursionsBRUT = excursionsBRUT.map((excursion) => {
+      return {
+        ...excursion,
+        nom: excursion.fr.nom,
+        description: excursion.fr.description,
+        typeParcours: excursion.fr.typeParcours,
+      }
+    })
+    // <---- FIN A SUPPRIMER
 
-      // -- FORMATAGE DES DONNEES RECUPEREES --
-      const excursionsFormatees = formatageExcursions(excursionsBRUT)
+    // -- FORMATAGE --
+    const excursionsFormatees = formatageExcursions(excursionsBRUT)
 
-      // -- TRI DES DONNEES RECUPEREES --
-      const excursionsFiltrees = filtrageParametres(excursionsFormatees, filtres) // Premier filtre
-      setExcursionsFiltrees1(excursionsFiltrees)
-      setExcursionsFiltrees2(excursionsFiltrees) // Copie car aucune recherche n a pu etre effectuee des le rendu
+    // -- FILTRE --
+    const excursionsFiltrees = filtres
+      ? filtrageParametres(excursionsFormatees, filtres)
+      : excursionsFormatees
+    setExcursionsFiltrees1(excursionsFiltrees)
+    setExcursionsFiltrees2(excursionsFiltrees) // Copie car aucune recherche n a pu etre effectuee des le rendu
 
-      // -- CALCUL DES VALEURS DE FILTRES --
-      /**@warning : ligne inutile */
-      /**@todo faire ceci automatiquement avec le formatage lors de la synchro descendante */
-      // const valeursFiltres = calculValeursFiltres(excursionsFormatees);
-      // console.log(valeursFiltres);
-
-    } catch (error) {
-      console.error("Erreur lors du chargement du fichier JSON :", error)
-    }
+    // -- CALCUL DES VALEURS DE FILTRES --
+    /**@warning : ligne inutile */
+    /**@todo faire ceci automatiquement avec le formatage lors de la synchro descendante */
+    // const valeursFiltres = calculValeursFiltres(excursionsFormatees);
+    // console.log(valeursFiltres);
   }
 
   // -- FONCTIONS DE TRI --
@@ -195,58 +187,55 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Tri et filtre des excursions avec les filtres
    * Doit etre effectué a chaque modification des filtres
    */
-  function filtrageParametres(excursionsAFiltrer: excursionsType, filtres: typeof props.Filtres) {
+  function filtrageParametres(excursionsAFiltrer: T_excursion[], filtres: T_filtres) {
     var excursionsFiltrees = excursionsAFiltrer
 
-    // Filtre de la page des filtres
-    if (filtres !== undefined) {
-      // Application des filtres en parametre
-      excursionsFiltrees = excursionsFiltrees.filter((excursion) => {
-        if (
-          excursion.distance < filtres.intervalleDistance.min ||
-          excursion.distance > filtres.intervalleDistance.max ||
-          (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
-          excursion.duree.h < filtres.intervalleDuree.min ||
-          excursion.duree.h > filtres.intervalleDuree.max ||
-          excursion.denivele < filtres.intervalleDenivele.min ||
-          excursion.denivele > filtres.intervalleDenivele.max ||
-          !filtres.typesParcours.includes(excursion.typeParcours) ||
-          !filtres.vallees.includes(excursion.vallee) ||
-          !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
-          !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
-        ) {
-          // On supprime de l excursion
-          return false
-        } else {
-          // On garde de l excursion
-          return true
-        }
-      })
+    // Application des filtres en parametre
+    excursionsFiltrees = excursionsFiltrees.filter((excursion) => {
+      if (
+        excursion.distance < filtres.intervalleDistance.min ||
+        excursion.distance > filtres.intervalleDistance.max ||
+        (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
+        excursion.duree.h < filtres.intervalleDuree.min ||
+        excursion.duree.h > filtres.intervalleDuree.max ||
+        excursion.denivele < filtres.intervalleDenivele.min ||
+        excursion.denivele > filtres.intervalleDenivele.max ||
+        !filtres.typesParcours.includes(excursion.fr.typeParcours) ||
+        !filtres.vallees.includes(excursion.vallee) ||
+        !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
+        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
+      ) {
+        // On supprime de l excursion
+        return false
+      } else {
+        // On garde de l excursion
+        return true
+      }
+    })
 
-      // Application du critere de tri
-      excursionsFiltrees = excursionsFiltrees.sort((a, b) => {
-        const critere = filtres.critereTri
+    // Application du critere de tri
+    excursionsFiltrees = excursionsFiltrees.sort((a, b) => {
+      const critere = filtres.critereTri
 
-        if (critere === "duree") {
-          // On tri par la duree (avec h et m)
-          const duree1 = a.duree.h + a.duree.m / 60
-          const duree2 = b.duree.h + b.duree.m / 60
-          return duree1 - duree2
-        }
-        return a[critere] - b[critere]
-      })
-    }
+      if (critere === "duree") {
+        // On tri par la duree (avec h et m)
+        const duree1 = a.duree.h + a.duree.m / 60
+        const duree2 = b.duree.h + b.duree.m / 60
+        return duree1 - duree2
+      }
+      return a[critere] - b[critere]
+    })
 
     return excursionsFiltrees
   }
   /**
    * Filtre les excursions contenant le texte de la barre de recherche
    */
-  function filtrageBarre(excursionsAFiltrer: excursionsType, recherche: String) {
+  function filtrageBarre(excursionsAFiltrer: T_excursion[], recherche: String) {
     // Filtre de la barre de recherche
     if (recherche !== undefined) {
       return excursionsAFiltrer.filter((excursion) =>
-        excursion.nom.toLowerCase().includes(recherche.toLowerCase()),
+        excursion.fr.nom.toLowerCase().includes(recherche.toLowerCase()),
       )
     } else {
       console.error("Impossible de filtrer : manque un parametre")
@@ -260,17 +249,11 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   }
 
   useEffect(() => {
-    // Initialisation du filtre
-    if (props.route.params) {
-      filtres = props.route.params.Filtres
-      console.log(filtres)
-    }
-
     // Chargement des excursions
     loadExcursions()
 
     // Changement apporté : Ajout de props.route.params en dependance pour que loadExcurison soit appelé a chaque changement de filtre
-  }, [props.route.params])
+  }, [filtres])
 
   return (
     <Screen style={$root} safeAreaEdges={["top", "bottom"]}>
