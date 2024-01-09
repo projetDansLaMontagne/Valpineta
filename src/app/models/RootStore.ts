@@ -1,12 +1,12 @@
-import { Instance, SnapshotOut, types } from "mobx-state-tree"
-import { ParametresModel } from "./Parametres"
+import { Instance, SnapshotOut, types } from "mobx-state-tree";
+import { ParametresModel } from "./Parametres";
 
 /**
  * A RootStore model.
  */
 export const RootStoreModel = types.model("RootStore").props({
-    parametres: types.optional(ParametresModel, {}),
-})
+  parametres: types.optional(ParametresModel, {}),
+});
 
 /**
  * The RootStore instance.

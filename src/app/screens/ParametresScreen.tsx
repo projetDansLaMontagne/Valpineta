@@ -1,22 +1,22 @@
-import React, { FC, useEffect } from "react"
-import { observer } from "mobx-react-lite"
-import { ViewStyle, TextStyle, Dimensions, View, TouchableOpacity } from "react-native"
-import { AppStackScreenProps } from "app/navigators"
-import { Screen, Text } from "app/components"
-import { colors, spacing } from "app/theme"
-import Icon from "react-native-vector-icons/FontAwesome"
-import { useStores } from "app/models"
-import I18n from "i18n-js"
+import React, { FC, useEffect } from "react";
+import { observer } from "mobx-react-lite";
+import { ViewStyle, TextStyle, Dimensions, View, TouchableOpacity } from "react-native";
+import { AppStackScreenProps } from "app/navigators";
+import { Screen, Text } from "app/components";
+import { colors, spacing } from "app/theme";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { useStores } from "app/models";
+import I18n from "i18n-js";
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
-  const { parametres } = useStores()
-  
+  const { parametres } = useStores();
+
   useEffect(() => {
-    parametres.setLangues(I18n.locale)
-  }, [])
+    parametres.setLangues(I18n.locale);
+  }, []);
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
@@ -29,19 +29,21 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           <Text style={$texteParametre} tx={"parametres.changerLangue.titre"} size="sm" />
         </View>
         <View style={$containerBoutons}>
-        <View style={[$souligneBouton, parametres.langues === "fr" ? {left:0}:{left:'50%'}]}></View>
+          <View
+            style={[$souligneBouton, parametres.langues === "fr" ? { left: 0 } : { left: "50%" }]}
+          ></View>
           <TouchableOpacity
             onPress={() => {
-              I18n.locale = "fr"
-              parametres.setLangues("fr")
+              I18n.locale = "fr";
+              parametres.setLangues("fr");
             }}
           >
             <Text style={$texteBouton} tx={"parametres.changerLangue.francais"} size="sm" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              I18n.locale = "es"
-              parametres.setLangues("es")
+              I18n.locale = "es";
+              parametres.setLangues("es");
             }}
           >
             <Text style={$texteBouton} tx={"parametres.changerLangue.espagnol"} size="sm" />
@@ -50,8 +52,8 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
       </View>
       <Text></Text>
     </Screen>
-  )
-})
+  );
+});
 
 const $titre: TextStyle = {
   marginTop: spacing.lg,
@@ -59,13 +61,13 @@ const $titre: TextStyle = {
   width: width,
   textAlign: "center",
   color: colors.text,
-}
+};
 
 const $souligne: ViewStyle = {
   borderBottomColor: colors.text,
   borderBottomWidth: 1,
   width: width,
-}
+};
 
 const $containerUnParametre: ViewStyle = {
   flexDirection: "row",
@@ -73,23 +75,22 @@ const $containerUnParametre: ViewStyle = {
   padding: spacing.xs,
   paddingTop: spacing.lg,
   width: width,
-}
+};
 
 const $containerIconTexte: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
-}
+};
 
 const $containerBoutons: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   marginHorizontal: spacing.sm,
-}
-
+};
 
 const $texteParametre: TextStyle = {
   marginHorizontal: spacing.sm,
-}
+};
 
 const $souligneBouton: ViewStyle = {
   backgroundColor: colors.bouton,
@@ -97,10 +98,10 @@ const $souligneBouton: ViewStyle = {
   width: "50%",
   bottom: 0,
   position: "absolute",
-}
+};
 
 const $texteBouton: TextStyle = {
   color: colors.text,
   paddingRight: spacing.xs,
   paddingLeft: spacing.xs,
-}
+};

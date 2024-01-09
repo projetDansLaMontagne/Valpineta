@@ -1,7 +1,7 @@
-import { FlexStyle } from "react-native"
-import { Edge, useSafeAreaInsets } from "react-native-safe-area-context"
+import { FlexStyle } from "react-native";
+import { Edge, useSafeAreaInsets } from "react-native-safe-area-context";
 
-export type ExtendedEdge = Edge | "start" | "end"
+export type ExtendedEdge = Edge | "start" | "end";
 
 const propertySuffixMap = {
   top: "Top",
@@ -10,12 +10,12 @@ const propertySuffixMap = {
   right: "End",
   start: "Start",
   end: "End",
-}
+};
 
 const edgeInsetMap = {
   start: "left",
   end: "right",
-}
+};
 
 /**
  * A hook that can be used to create a safe-area-aware style object that can be passed directly to a View.
@@ -36,9 +36,9 @@ export function useSafeAreaInsetsStyle(
   | "paddingStart"
   | "paddingTop"
 > {
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
 
   return safeAreaEdges.reduce((acc, e) => {
-    return { ...acc, [`${property}${propertySuffixMap[e]}`]: insets[edgeInsetMap[e] ?? e] }
-  }, {})
+    return { ...acc, [`${property}${propertySuffixMap[e]}`]: insets[edgeInsetMap[e] ?? e] };
+  }, {});
 }
