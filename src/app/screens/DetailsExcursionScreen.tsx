@@ -19,8 +19,7 @@ import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader, Screen, CarteSignale
 import { spacing, colors } from "app/theme"
 import SwipeUpDown from "react-native-swipe-up-down"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
-import { ca } from "date-fns/locale";
-
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
@@ -93,8 +92,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           itemMini={itemMini()}
           itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation, isLoading)}
           animation="easeInEaseOut"
-          extraMarginTop={125}
-          swipeHeight={100}
+          swipeHeight={30 + useBottomTabBarHeight()}
+          disableSwipeIcon={true}
         />
       </SafeAreaView>
     ) :
@@ -119,7 +118,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 )
 
 /**
- *
  * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas
  */
 function itemMini() {
@@ -243,36 +241,38 @@ function getUserLocation() {
  * @returns la liste des signalements
  */
 function listeSignalements(setIsAllSignalements, excursion, userLocation) {
+
+  const tabBarHeight = useBottomTabBarHeight();
+
   return (
     <View style={$containerGrand}>
-      <View style={$listeSignalements}>
-        <ScrollView>
-          <TouchableWithoutFeedback>
-            <View>
-              {excursion?.signalements?.map((signalement, index) => {
-                // Calcule de la distance pour chaque avertissement
-                const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
-                const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
-                const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
-                return (
-                  <View key={index}>
-                    <CarteSignalement
-                      type={carteType}
-                      details={true}
-                      nomSignalement={signalement.nom}
-                      distanceDuDepart={`${distanceSignalement}`}
-                      description={signalement.description}
-                      imageSignalement={signalement.image}
-                    />
-                  </View>
-                )
-              })}
-            </View>
-          </TouchableWithoutFeedback>
-        </ScrollView>
-        <View>
-          <Button style={$sortirDetailSignalement} tx="detailEscursion.bouttonRetourInformations" onPress={() => setIsAllSignalements(false)} />
-        </View>
+      <ScrollView >
+        <TouchableWithoutFeedback>
+          <View style={$containerSignalements}>
+            {excursion?.signalements?.map((signalement, index) => {
+              // Calcule de la distance pour chaque avertissement
+              const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
+              const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+              const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+              return (
+                <View key={index}>
+                  <CarteSignalement
+                    type={carteType}
+                    details={true}
+                    nomSignalement={signalement.nom}
+                    distanceDuDepart={`${distanceSignalement}`}
+                    description={signalement.description}
+                    imageSignalement={signalement.image}
+                  />
+                </View>
+              )
+            })}
+
+          </View>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+      <View>
+        <Button style={[$sortirDetailSignalement, { bottom: tabBarHeight }]} tx="detailEscursion.bouttonRetourInformations" onPress={() => setIsAllSignalements(false)} />
       </View>
     </View>
   );
@@ -352,7 +352,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
               }}
             >
               {description === "" ? null : (
-                <Text style={$lienDescription} text="Voir plus" size="xxs" />
+                <Text style={$lienDescription} text="Voir plus" size="xs" />
               )}
             </TouchableOpacity>
           </View>
@@ -366,7 +366,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
                   <View>
                     {signalements.length > 0 && (
                       <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                        <Text style={$lienSignalements} tx="detailEscursion.voirDetails" size="xxs" />
+                        <Text style={$lienSignalements} tx="detailEscursion.voirDetails" size="xs" />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -511,8 +511,8 @@ function recupDistance(coordonneeSignalement: Coordonnees) {
 /* -------------------------------------------------------------------------- */
 
 const $stylePage: ViewStyle = {
-  paddingRight: spacing.xl,
-  paddingLeft: spacing.xl,
+  paddingRight: spacing.lg,
+  paddingLeft: spacing.lg,
 }
 
 const $boutonRetour: ViewStyle = {
@@ -552,14 +552,12 @@ const $containerPetit: ViewStyle = {
 
 const $containerGrand: ViewStyle = {
   flex: 1,
-  alignItems: "center",
   width: width,
   backgroundColor: colors.fond,
   borderWidth: 1,
   borderColor: colors.bordure,
   borderRadius: 10,
-  padding: spacing.xs,
-  paddingBottom: 250,
+  marginTop: height / 4
 }
 
 //Style du container du titre et du bouton de téléchargement
@@ -636,35 +634,26 @@ const $containerDenivele: ViewStyle = {
   marginBottom: 100 //pour pouvoir afficher le graphique
 }
 
-
-const $listeSignalements: ViewStyle = {
-  marginTop: spacing.lg,
-  height: "115%", //Si je met a 100% il descend pas jusqu'en bas voir avec reio prod
-  width: "95%"
-}
-
 const $scrollLine: ViewStyle = {
   flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
   paddingBottom: spacing.xl
 }
 
+const $containerSignalements: ViewStyle = {
+  margin: spacing.xs,
+  paddingBottom: height / 2,
+}
 
 
 const $sortirDetailSignalement: ViewStyle = {
-  justifyContent: "center",
-  marginBottom: "5%",
   borderRadius: 15,
   borderWidth: 2,
-  padding: 0,
   backgroundColor: colors.fond,
   borderColor: colors.bordure,
-  width: "70%",
+  width: width / 1.5,
+  height: 50,
   position: "absolute",
-  bottom: 0,
-  left: "15%",
-  zIndex: 1,
+  alignSelf: "center",
 }
 
 const $headerSignalement: ViewStyle = {
@@ -675,7 +664,6 @@ const $headerSignalement: ViewStyle = {
 const $lienSignalements: TextStyle = {
   textDecorationLine: "underline",
   color: colors.bouton,
-  fontSize: 12,
   paddingStart: spacing.xs,
 }
 

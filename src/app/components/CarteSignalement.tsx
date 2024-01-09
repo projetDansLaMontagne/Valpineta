@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
     paddingStart: spacing.xs,
     paddingEnd: spacing.xs,
-    margin: 10,
+    margin: spacing.sm,
     shadowColor: colors.palette.noir,
     shadowOffset: {
       width: 0,
