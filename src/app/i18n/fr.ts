@@ -36,32 +36,34 @@ const fr = {
       follow: "Me suivre",
       stopFollowing: "Arrêter de me suivre",
       located: {
-          title: "Vous êtes ici !",
-          latitude: "Latitude : ",
-          longitude: "Longitude : ",
+        title: "Vous êtes ici !",
+        latitude: "Latitude : ",
+        longitude: "Longitude : ",
       },
       notLocated: {
-          title: "Impossible de vous localiser",
-          message: "Veuillez vérifier vos paramètres de localisation",
+        title: "Impossible de vous localiser",
+        message: "Veuillez vérifier vos paramètres de localisation",
       },
     }
   },
 
-  excursions:{
+  excursions: {
     titre: "Excursions",
     erreurChargement: "Aucune excursion ne répond aux critères selectionnés",
     erreurNom: "Aucune excursion ne porte ce nom.",
   },
-  detailsExcursion:{
-    titres:{
+  detailsExcursion: {
+    titres: {
       infos: "Infos",
       avis: "Avis",
       description: "Description",
-      signalement: "Signalement",
+      signalements: "Signalements",
       denivele: "Denivelé",
     },
-    boutons:{
+    boutons: {
       lireSuite: "Lire la suite",
+      voirDetails: "Voir détails",
+      retourInformations: "Revenir aux informations",
     },
     erreur: {
       titre: "Erreur",
@@ -69,7 +71,7 @@ const fr = {
     }
 
   },
-  parametres:{
+  parametres: {
     titre: "Paramètres",
     changerLangue: {
       titre: "Langue",
@@ -77,15 +79,15 @@ const fr = {
       espagnol: "Espagnol",
     }
   },
-  pageFiltres:{
-    tri:{
+  pageFiltres: {
+    tri: {
       titre: "Trier par",
       distance: "Distance",
       denivele: "Dénivelé",
       difficulteTech: "Difficulté technique",
       difficulteOrientation: "Difficulté d'orientation",
     },
-    filtres:{
+    filtres: {
       titre: "Filtrer par",
       distance: 'Distance (en km)',
       duree: 'Durée (en heures)',
@@ -100,7 +102,7 @@ const fr = {
       difficulteTech: 'Difficulté technique',
       difficulteOrientation: 'Difficulté d\'orientation',
     },
-    boutons:{
+    boutons: {
       valider: "Valider",
     }
   }

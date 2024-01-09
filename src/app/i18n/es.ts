@@ -45,31 +45,32 @@ const es = {
       },
     }
   },
-  
-  excursions:{
+
+  excursions: {
     titre: "Excursiones",
     erreurChargement: "Ninguna excursión encontrada",
     erreurNom: "Nombre de excursión no encontrado",
   },
-  detailsExcursion:{
-    titres:{
+  detailsExcursion: {
+    titres: {
       infos: "Infos",
       avis: "Aviso",
       description: "Descripción",
-      signalement: "Informes",
+      signalements: "Informes",
       denivele: "Desnivel",
     },
-    boutons:{
+    boutons: {
       lireSuite: "Leer más",
+      voirDetails: "Ver detalles",
+      retourInformations: "Volver a la información",
     },
     erreur: {
       titre: "Error",
       message: "Se produjo un error. Por favor, inténtalo de nuevo.",
-    }
-    
+    },
   },
 
-  parametres:{
+  parametres: {
     titre: "Ajustes",
     changerLangue: {
       titre: "Idioma",
@@ -77,7 +78,7 @@ const es = {
       espagnol: "Español",
     }
   },
-  pageFiltres:{
+  pageFiltres: {
     tri: {
       titre: "Ordenar por",
       distance: "Distancia",

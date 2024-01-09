@@ -18,19 +18,18 @@ import {
 } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import { Screen } from "app/components"
-import { spacing, colors } from "../theme"
+import { spacing, colors } from "../theme";
 
 // location
 import * as Location from "expo-location"
 import MapView, { UrlTile } from "react-native-maps"
-import MapButton from "../components/MapButton"
-import { Asset } from "expo-asset"
-
+import MapButton from "../components/MapButton";
+import { Asset } from "expo-asset";
 import * as fileSystem from "expo-file-system"
 import TilesRequire from "../services/importAssets/tilesRequire"
 
 // variables
-interface MapScreenProps extends AppStackScreenProps<"Map"> {}
+interface MapScreenProps extends AppStackScreenProps<"Map"> { }
 
 type T_animateToLocation = (passedLocation?: Location.LocationObject) => void
 

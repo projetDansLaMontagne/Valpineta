@@ -44,7 +44,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const dureeIcone = require("../../assets/icons/duree.png")
   const distanceIcone = require("../../assets/icons/distance.png")
   const deniveleIcone = require("../../assets/icons/denivele.png")
-  const difficulteTechniqueIcone = require("../../assets/icons/difficulteParcours.png")
+  const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png")
   const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png")
 
   const detailExcursion = () => {
@@ -162,9 +162,9 @@ export function CarteExcursion(props: CarteExcursionProps) {
             </View>
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={dureeIcone} resizeMode="contain" />
-              <Text text={duree.h} style={styles.content} />
+              <Text text={duree.h.toString()} style={styles.content} />
               <Text text={"h"} style={styles.content} />
-              <Text text={duree.m} style={styles.content} />
+              <Text text={duree.m.toString()} style={styles.content} />
             </View>
           </View>
           <View style={styles.ligneInf}>
@@ -178,7 +178,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={difficulteTechniqueIcone} resizeMode="contain" />
-              <Text text={difficulteTechnique} style={styles.content} />
+              <Text text={difficulteTechnique.toString()} style={styles.content} />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image
@@ -186,7 +186,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
                 source={difficulteOrientationIcone}
                 resizeMode="contain"
               />
-              <Text text={difficulteOrientation} style={styles.content} />
+              <Text text={difficulteOrientation.toString()} style={styles.content} />
             </View>
             <View>
               {track && <GraphiqueDenivele points={track} />}

@@ -4,9 +4,9 @@ import { I18nManager } from "react-native"
 import { useStores } from "app/models"
 // if English isn't your default language, move Translations to the appropriate language file.
 
-import  fr, { Translations } from './fr'
-import  es  from './es'
-import  en  from './en'
+import fr, { Translations } from './fr'
+import es from './es'
+import en from './en'
 
 i18n.fallbacks = true
 /**
@@ -18,7 +18,7 @@ i18n.translations = { fr, es, en }
 
 const preferredLanguage:
   | Localization.Locale
-  | { languageTag: string; textDirection: "ltr" | "rtl" } =  {
+  | { languageTag: string; textDirection: "ltr" | "rtl" } = {
   languageTag: "fr",
   textDirection: "ltr",
 }

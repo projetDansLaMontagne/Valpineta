@@ -118,7 +118,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         // MAUVAIS FORMAT DUREE
         console.log(
           "Format de duree d une excursion MAUVAIS, impossible de formater. Il faut que les durees soient de la forme : HHhMM et non : " +
-            excursion.duree,
+          excursion.duree,
         )
         malFormatee = true
       }
@@ -160,9 +160,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    */
   const loadExcursions = async (): Promise<void> => {
     try {
-      /* ----------------------- RECUPERATION DES EXCURSIONS ---------------------- */
-      var excursionsBRUT = require("../../assets/JSON/excursions.json")
-
+      // -- RECUPERATION DU FICHIER --
+      var excursionsBRUT = require('../../assets/JSON/excursions.json');
       excursionsBRUT = excursionsBRUT.map((excursion) => {
         return {
           ...excursion,
@@ -172,7 +171,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         }
       })
 
-      
+
       // -- FORMATAGE DES DONNEES RECUPEREES --
       const excursionsFormatees = formatageExcursions(excursionsBRUT)
 
@@ -276,10 +275,10 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   }, [props.route.params, parametres.langues])
 
   return (
-    <Screen style={$root} safeAreaEdges={["top", "bottom"]}>
+    <Screen style={$root} safeAreaEdges={["top"]}>
       <View style={styles.searchBox}>
         <TextInput
-          placeholder={ parametres.langues === "fr" ? "Rechercher une excursion" : "Buscar una excursión"}
+          placeholder={parametres.langues === "fr" ? "Rechercher une excursion" : "Buscar una excursión"}
           autoCorrect={false}
           onChangeText={(text) => clicRecherche(text)}
           placeholderTextColor={colors.palette.grisFonce}
@@ -293,32 +292,32 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         </TouchableOpacity>
       </View>
 
-    {
-      excursionsFiltrees1 && (
-        excursionsFiltrees1.length == 0 ?
-          <Text tx="excursions.erreurChargement"/>
-          :
-          (
-            excursionsFiltrees2 && (
-              excursionsFiltrees2.length == 0 ?
-                <Text tx="excursions.erreurNom"/>
-                :
-                <ScrollView style={styles.scrollContainer}>
-                  {
-                    excursionsFiltrees2.map((excursion, i) => (
-                      <CarteExcursion
-                        key={i}
-                        excursion={excursion}
-                        navigation={navigation}
-                      />
-                    ))
-                  }
-                </ScrollView>
+      {
+        excursionsFiltrees1 && (
+          excursionsFiltrees1.length == 0 ?
+            <Text tx="excursions.erreurChargement" />
+            :
+            (
+              excursionsFiltrees2 && (
+                excursionsFiltrees2.length == 0 ?
+                  <Text tx="excursions.erreurNom" />
+                  :
+                  <ScrollView style={styles.scrollContainer}>
+                    {
+                      excursionsFiltrees2.map((excursion, i) => (
+                        <CarteExcursion
+                          key={i}
+                          excursion={excursion}
+                          navigation={navigation}
+                        />
+                      ))
+                    }
+                  </ScrollView>
+              )
             )
-          )
-      )
-    }
-  </Screen>
+        )
+      }
+    </Screen>
   )
 
 })
