@@ -302,7 +302,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [menuIsOpen])
 
   useEffect(() => {
-    console.log(`[MapScreen] _props.startLocation: ${_props.startLocation}`);
+    console.log(`[MapScreen] _props.startLocation: ${JSON.stringify(_props.startLocation)}`);
     _props.startLocation && animateToLocation(_props.startLocation)
   }, [_props.startLocation]);
 

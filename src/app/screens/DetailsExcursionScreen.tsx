@@ -25,7 +25,6 @@ import {
 } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
-import HTML from "react-native-render-html";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import {LatLng, Marker, Polyline} from "react-native-maps";
@@ -214,27 +213,6 @@ const signalementsHandler = (signalements: T_Signalement[]) => {
   const binoculars: ImageSource = require("../../assets/icons/binoculars.png");
   const attention: ImageSource = require("../../assets/icons/attention.png");
 
-  /**
-   * ! TESTS
-   */
-  signalements = [
-    // ...signalements,
-    {
-      id: 1,
-      nom: "\"Couché de soleil\"",
-      type: "Avertissement",
-      description: "\"Meilleur endroit pour voir le couché de soleil\"",
-      image: "",
-      latitude: 42.714695,
-      longitude: 0.208302,
-      idExcursion: 2049
-
-      } as T_Signalement,
-  ]
-  /**
-   * ! FIN TESTS
-   */
-
   return (
     <>
       {
@@ -244,8 +222,6 @@ const signalementsHandler = (signalements: T_Signalement[]) => {
            */
           let iconColor: string;
           let image: ImageSource;
-
-          console.log(`[DetailsExcursionScreen] signalement: ${JSON.stringify(signalement)}`)
 
           switch (signalement.type) {
             case "PointInteret":
@@ -303,13 +279,39 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     if (route?.params !== undefined) {
       params = route?.params;
     }
-    params ? (excursion = params.excursion) : (excursion = null); //si params est défini, on récupère l'excursion, sinon on met excursion à null
+    params ? (excursion = params.excursion) : (excursion = null); // si params est défini, on récupère l'excursion, sinon on met excursion à null
 
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
+    const [startPoint, setStartPoint] = useState<LatLng>();
+
+    const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
+
     const footerHeight = useBottomTabBarHeight();
 
+    const allPoints = excursion.track.map((point: T_Point) => ({
+        latitude: point.lat,
+        longitude: point.lon,
+      } as LatLng))
+
+    const changeStartPoint = (point: LatLng) => {
+      console.log(`[DetailsExcursionScreen - changeStartPoint] point: ${JSON.stringify(point)}`)
+
+      setStartPoint(point);
+    }
+
+    // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
+    useEffect(() => {
+      setStartPoint({
+        latitude: excursion.track[0].lat,
+        longitude: excursion.track[0].lon,
+      } as LatLng);
+    }, [excursion]);
+
+    /**
+     * ! Pas nécessaire pour le moment
+     */
     useEffect(() => {
       const fetchLocation = async () => {
         const location = await getUserLocation();
@@ -318,18 +320,27 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
       fetchLocation();
     }, []);
+    /**
+     * ! FIN Pas nécessaire pour le moment
+     */
 
-    const startPoint = {
-      latitude: excursion.track[0].lat,
-      longitude: excursion.track[0].lon,
-    } as LatLng;
-    const allPoints = excursion.track.map((point: T_Point) => ({
-        latitude: point.lat,
-        longitude: point.lon,
-      } as LatLng))
-    const signalements: T_Signalement[] = excursion.signalements;
+    /**
+     * ! NON FONCTIONNEL
+     * J'aimerai que le swipeUpDown se baisse automatiquement
+     * lors du click sur un signalement
+     */
+      // if (swipeUpDownRef) {
+      //   console.log(`[DetailsExcursionScreen - useEffect] aled`);
+      //   swipeUpDownRef.current.showMini();
+      // } else {
+      //   console.error("swipeUpDownRef.current is null");
+      // }
+    /**
+     * ! FIN NON FONCTIONNEL
+     */
 
-    //si excursion est défini, on affiche les informations de l'excursion
+
+    // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <SafeAreaView style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
@@ -371,7 +382,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           )
         }
 
-
         <SwipeUpDown
           itemMini={itemMini()}
           itemFull={itemFull(
@@ -383,14 +393,19 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             setIsAllSignalements,
             userLocation,
             footerHeight,
+
+            changeStartPoint
           )}
           animation="easeInEaseOut"
           swipeHeight={30 + footerHeight}
           disableSwipeIcon={true}
+
+          ref={swipeUpDownRef}
+
         />
       </SafeAreaView>
     ) : (
-      //sinon on affiche une erreur
+      // sinon on affiche une erreur
       <Screen preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
@@ -431,13 +446,15 @@ function itemFull(
   setIsAllSignalements: React.Dispatch<any>,
   userLocation: Array<number>,
   footerHeight: number,
+
+  changeStartPoint?: (point: LatLng) => void,
 ) {
   var nomExcursion: string = "";
   if (excursion !== undefined) {
     nomExcursion = excursion.nom as string;
   }
   if (isAllSignalements) {
-    return listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight);
+    return listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight, changeStartPoint);
   } else {
     return (
       <View style={$containerGrand}>
@@ -531,7 +548,7 @@ function getUserLocation() {
  * @params setIsAllSignalements, excursion, userLocation
  * @returns la liste des signalements
  */
-function listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight) {
+function listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight, changeStartPoint?: (point: LatLng) => void) {
   return (
     <View style={$containerGrand}>
       <ScrollView>
@@ -557,6 +574,17 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
                     distanceDuDepart={`${distanceSignalement}`}
                     description={signalement.description}
                     imageSignalement={signalement.image}
+
+                    onPress={() => {
+                      console.log(`[DetailsExcursionScreen - listeSignalements] signalement: ${JSON.stringify(signalement)}`)
+                      // go to the signalement on the map
+                      // setIsAllSignalements(false);
+                      changeStartPoint && changeStartPoint({
+                        latitude: signalement.latitude,
+                        longitude: signalement.longitude,
+                      } as LatLng);
+
+                    }}
                   />
                 </View>
               );
