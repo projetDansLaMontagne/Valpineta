@@ -188,7 +188,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
               />
               <Text text={difficulteOrientation.toString()} style={styles.content} />
             </View>
-            <View>{track && <GraphiqueDenivele points={track} />}</View>
+            <View>{track && <GraphiqueDenivele points={track} detaille={false} />}</View>
           </View>
         </View>
       </View>

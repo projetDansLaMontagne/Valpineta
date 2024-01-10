@@ -423,7 +423,7 @@ function infos(
 
           <View style={$containerDenivele}>
             <Text tx="detailsExcursion.titres.denivele" size="xl" />
-            {excursion.track && <GraphiqueDenivele points={excursion.track} />}
+            {excursion.track && <GraphiqueDenivele points={excursion.track} detaille={true} />}
           </View>
         </View>
       </TouchableWithoutFeedback>
