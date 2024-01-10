@@ -12,7 +12,7 @@ type T_Point = {
 
 export interface GraphiqueDeniveleProps {
   style?: StyleProp<ViewStyle>;
-
+  detaille: boolean;
   points: T_Point[];
 }
 
@@ -20,7 +20,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
   props: GraphiqueDeniveleProps,
 ) {
   /* ---------------------- PROTECTION MAUVAIS PARAMETRES --------------------- */
-  if (!props.points) {
+  if (!props.points || props.detaille === undefined) {
     throw new Error("GraphiqueDenivele : Mauvais parametres");
   }
 
@@ -121,8 +121,8 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     labels: abscises,
     datasets: [
       {
-        data: points.map(point => point.alt),
-        strokeWidth: 3,
+        data: points.map(point => point.alt ?? 0),
+        strokeWidth: props.detaille ? 3 : 2,
       },
     ],
   };
@@ -131,8 +131,10 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     <LineChart
       data={donneesGraphique}
       width={width - spacing.xl * 2}
-      height={200}
-      withVerticalLabels={true}
+      height={props.detaille ? 200 : 100}
+      formatYLabel={valeur => Math.round(+valeur / 50) * 50 + " m"}
+      withVerticalLabels={props.detaille}
+      withHorizontalLabels={true}
       withInnerLines={false}
       withOuterLines={false}
       chartConfig={{
@@ -141,9 +143,6 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
         backgroundGradientTo: colors.fond,
         color: () => colors.boutonAttenue,
         labelColor: () => colors.bouton,
-        style: {
-          borderRadius: 16,
-        },
         propsForDots: {
           r: "0",
           strokeWidth: "0",
