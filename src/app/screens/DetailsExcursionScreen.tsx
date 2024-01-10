@@ -1,109 +1,70 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { View, SafeAreaView, ViewStyle, TouchableOpacity, Image, TextStyle, ImageStyle, ScrollView, TouchableWithoutFeedback, Dimensions, ActivityIndicator } from "react-native";
+import * as Location from "expo-location";
+import {
+  View,
+  SafeAreaView,
+  ViewStyle,
+  TouchableOpacity,
+  Image,
+  TextStyle,
+  ImageStyle,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Dimensions,
+} from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Text, CarteAvis, GraphiqueDenivele, GpxDownloader } from "app/components";
+import {
+  Text,
+  CarteAvis,
+  GraphiqueDenivele,
+  GpxDownloader,
+  Screen,
+  CarteSignalement,
+  Button,
+} from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
-import {MapScreen} from "./MapScreen";
-import {Marker, Polyline} from "react-native-maps";
-import * as Location from 'expo-location';
-// import { isLoading } from "expo-font"
-
+import HTML from "react-native-render-html";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  temps: Record<'h' | 'm', number>,
+  excursion: Record<string, unknown>;
+  temps: Record<"h" | "m", number>;
 }
 
-export type T_Point = {
-  lon: number,
-  lat: number,
-  alt: number | null,
-  dist: number,
+interface Coordonnees {
+  lat: number;
+  lon: number;
+  alt: number;
+  dist: number;
 }
 
-type T_Track = {
-  points: T_Point[],
-  typeParcours: "Ida y Vuelta" | "Circular" | "Ida"
-}
-/**
- * @function getExcursionTrack
- * @description Récupère le fichier gpx de l'excursion afin de l'afficher sur la carte.
- * @param nomExcursion
- * @returns le fichier gpx de l'excursion
- */
-const getExcursionTrack: (nomFichier) => Promise<T_Track> = async (nomExcursion: string) => {
-  // les fichiers sont stockés dans le dossier assets/tracks
-  // ! TO REMOVE BEFORE PRODUCTION - name is hardcoded
-  return {
-    points: await require(`../../assets/tracks/caminokique.json`),
-    typeParcours: "Ida y Vuelta"
-  } as T_Track;
-  // ! TO REMOVE BEFORE PRODUCTION - hardcoded
-}
-
-const startMiddleAndEndHandler = (track: T_Track) => {
-  console.log(JSON.stringify(track));
-
-  let points: T_Point[] = [];
-
-  let end = track.points[track.points.length - 1];
-
-  const middleDistance = Math.round(end.dist / 2);
-  const middle = track.points.find((point) => point.dist >= middleDistance);
-
-  points.push(track.points[0]);
-  points.push(middle);
-
-  if (track.typeParcours === "Ida") {
-    // Point d'arrivée
-    points.push(end);
-  }
-
-
-  return (
-    <>
-      {
-        points.map((point, index) => {
-          return (
-            <Marker
-              coordinate={{
-                latitude: point.lat,
-                longitude: point.lon
-              }}
-              key={point.dist}
-
-              pinColor={index === 1 ? colors.bouton : colors.text}
-
-              style={{
-                zIndex: 999,
-              }}
-            />
-          )
-        })
-      }
-    </>
-  )
+interface Signalement {
+  type: string;
+  nom: string;
+  description: string;
+  image: Image;
+  latitude: number;
+  longitude: number;
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { route, navigation } = props
-    const excursion = route.params?.excursion
-    const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true)
+    const { route, navigation } = props;
+    let excursion: Record<string, unknown>;
+    let params: any;
+    if (route?.params !== undefined) {
+      params = route?.params;
+    }
+    params ? (excursion = params.excursion) : (excursion = null); //si params est défini, on récupère l'excursion, sinon on met excursion à null
+
+    const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [startPoint, setStartPoint] = useState<T_Point | null>(null);
-    const [allPoints, setAllPoints] = useState<T_Point[] | null>(null);
-
-    const chrono = () => {
-      setTimeout(() => {
-        setIsLoading(false)
-      }
-        , 1000);
-    }
+    const footerHeight = useBottomTabBarHeight();
 
     useEffect(() => {
       const fetchLocation = async () => {
@@ -112,30 +73,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       };
 
       fetchLocation();
-    }, []);
-
-    useEffect(() => {
-      if (isLoading) {
-        chrono();
-      }
-    }, [isLoading]);
-
-    useEffect(() => {
-      console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion}`);
-
-      getExcursionTrack(nomExcursion)
-        .then((response) => {
-          console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion} - POINTS OK`);
-          setAllPoints(response.points);
-
-          setTimeout(() => {
-            console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion} - START POINT OK`);
-            setStartPoint(response.points[0]);
-          }, 5000)
-        })
-        .catch((error) => {
-          console.log(`[DetailsExcursionScreen] useEffect: ${nomExcursion} - error: ${error}`);
-        });
     }, []);
 
     //si excursion est défini, on affiche les informations de l'excursion
@@ -147,91 +84,42 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
-
-        <MapScreen
-          startLocation={startPoint}
-        >
-          {/*{*/}
-          {/*  allPoints &&*/}
-          {/*  allPoints.map((point, index) => {*/}
-          {/*    return (*/}
-          {/*      <Marker*/}
-          {/*        coordinate={{*/}
-          {/*          latitude: point.lat,*/}
-          {/*          longitude: point.lon*/}
-          {/*        }}*/}
-
-          {/*        tappable={false}*/}
-
-          {/*        key={index}*/}
-          {/*        style={{*/}
-          {/*          zIndex: 999,*/}
-          {/*        }}*/}
-          {/*      />*/}
-          {/*    )*/}
-          {/*  })*/}
-          {/*}*/}
-
-          {
-            allPoints &&
-            <>
-              <Polyline
-                coordinates={
-                  allPoints.map((point) => {
-                    return {
-                      latitude: point.lat,
-                      longitude: point.lon,
-                    }
-                  })
-                }
-                strokeColor={colors.bouton}
-                strokeWidth={10}
-              />
-
-              {
-                startMiddleAndEndHandler({
-                  points: allPoints,
-                  typeParcours: "Ida y Vuelta"
-                } as T_Track)
-              }
-            </>
-          }
-
-
-
-        </MapScreen>
-
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation, isLoading)}
+          itemFull={itemFull(
+            excursion,
+            navigation,
+            containerInfoAffiche,
+            setcontainerInfoAffiche,
+            isAllSignalements,
+            setIsAllSignalements,
+            userLocation,
+            footerHeight,
+          )}
           animation="easeInEaseOut"
-          extraMarginTop={125}
-          swipeHeight={100}
+          swipeHeight={30 + footerHeight}
+          disableSwipeIcon={true}
         />
       </SafeAreaView>
-    ) :
+    ) : (
       //sinon on affiche une erreur
-      (
-        <Screen preset="fixed">
-          <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
-            <Image
-              style={{ tintColor: colors.bouton }}
-              source={require("../../assets/icons/back.png")}
-            />
-          </TouchableOpacity>
-          <View style={$containerErreur}>
-            <Text size="xxl">Erreur</Text>
-            <Text style={$texteErreur} size="sm">
-              Une erreur est survenue, veuillez réessayer
-            </Text>
-          </View>
-        </Screen>
-      )
-  }
-)
+      <Screen preset="fixed">
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
+          <Image
+            style={{ tintColor: colors.bouton }}
+            source={require("../../assets/icons/back.png")}
+          />
+        </TouchableOpacity>
+        <View style={$containerErreur}>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
+          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
+        </View>
+      </Screen>
+    );
+  },
+);
 
 /**
- *
  * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas
  */
 function itemMini() {
@@ -239,31 +127,30 @@ function itemMini() {
     <View style={$containerPetit}>
       <Image source={require("../../assets/icons/swipe-up.png")} />
     </View>
-  )
+  );
 }
 
 /**
+ * @param excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation,
  * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
  */
 function itemFull(
   excursion: Record<string, unknown>,
-  navigation: any,
+  navigation: NativeStackNavigationProp<any>,
   containerInfoAffiche: boolean,
-  setcontainerInfoAffiche: any,
-  isAllSignalements: any,
-  setIsAllSignalements: any,
-  userLocation: any,
-  isLoading: any
+  setcontainerInfoAffiche: React.Dispatch<any>,
+  isAllSignalements: boolean,
+  setIsAllSignalements: React.Dispatch<any>,
+  userLocation: Array<number>,
+  footerHeight: number,
 ) {
-
-  var nomExcursion = ""
+  var nomExcursion: string = "";
   if (excursion !== undefined) {
-    nomExcursion = excursion.nom
+    nomExcursion = excursion.nom as string;
   }
   if (isAllSignalements) {
-    return listeSignalements(setIsAllSignalements, excursion, userLocation);
-  }
-  else {
+    return listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight);
+  } else {
     return (
       <View style={$containerGrand}>
         <View style={$containerTitre}>
@@ -274,24 +161,24 @@ function itemFull(
           <View style={$containerBouton}>
             <TouchableOpacity
               onPress={() => {
-                setcontainerInfoAffiche(true)
+                setcontainerInfoAffiche(true);
               }}
               style={$boutonInfoAvis}
             >
               <Text
-                text="Infos"
+                tx="detailsExcursion.titres.infos"
                 size="lg"
                 style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
               />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                setcontainerInfoAffiche(false)
+                setcontainerInfoAffiche(false);
               }}
               style={$boutonInfoAvis}
             >
               <Text
-                text="Avis"
+                tx="detailsExcursion.titres.avis"
                 size="lg"
                 style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
               />
@@ -305,37 +192,47 @@ function itemFull(
                 : { left: width - width / 2.5 - spacing.lg / 1.5 },
             ]}
           ></View>
-          {containerInfoAffiche ? infos(excursion, navigation, setIsAllSignalements, userLocation, isLoading) : avis()}
+          {containerInfoAffiche
+            ? infos(excursion, navigation, setIsAllSignalements, userLocation)
+            : avis()}
         </View>
       </View>
-    )
+    );
   }
 }
 
+/**
+ * @param description
+ * @returns la description courte
+ */
 function afficherDescriptionCourte(description: string) {
   if (description == null) {
-    return null
+    return null;
   } else {
-    const descriptionCoupe = description.slice(0, 100)
-    const descriptionFinale = descriptionCoupe + "..."
-    return descriptionFinale
+    const descriptionCoupe: string = description.slice(0, 100);
+    let descriptionFinale: string = descriptionCoupe + "...";
+    descriptionFinale = descriptionFinale.replace(/<[^>]*>?/gm, "");
+    return descriptionFinale;
   }
 }
-
-
+/**
+ *
+ * @returns les coordonnées de l'utilisateur
+ */
 function getUserLocation() {
   return new Promise(async (resolve, reject) => {
     try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Permission to access location was denied');
+      let { status } = await Location.requestForegroundPermissionsAsync(); // utiliser la fonction requestForegroundPermissionsAsync de Location pour demander la permission à l'utilisateur
+      if (status !== "granted") {
+        // Si l'utilisateur n'a pas accepté la permission
+        console.error("Permission to access location was denied"); // Afficher une erreur
         resolve(null);
       }
 
-      let location = await Location.getCurrentPositionAsync({}); // Use the getCurrentPositionAsync function from Location
-      resolve(location.coords);
+      let location = await Location.getCurrentPositionAsync({}); // utilise la fonction getCurrentPositionAsync de Location pour récupérer la position de l'utilisateur
+      resolve(location.coords); // Renvoie les coordonnées de l'utilisateur (latitude et longitude) pour pouvoir calculer la distance
     } catch (error) {
-      console.error('Error getting location', error);
+      console.error("Error getting location", error);
       reject(error);
     }
   });
@@ -343,44 +240,48 @@ function getUserLocation() {
 
 /**
  *
- * @param isLoading
- * @returns les informations de l'excursion
+ * @params setIsAllSignalements, excursion, userLocation
+ * @returns la liste des signalements
  */
-
-
-function listeSignalements(setIsAllSignalements, excursion, userLocation) {
+function listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight) {
   return (
     <View style={$containerGrand}>
-      <View style={$listeSignalements}>
-        <ScrollView>
-          <TouchableWithoutFeedback>
-            <View>
-              {excursion?.signalements?.map((signalement, index) => {
-                // Calcule de la distance pour chaque avertissement
-                const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
-                const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
-
-                if (signalement.type == "Avertissement")
-                  return (
-                    <View key={index}>
-                      <CarteSignalement type="avertissement" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} imageSignalement={signalement.image} />
-                    </View>
-                  );
-                else {
-                  return (
-                    <View key={index}>
-                      <CarteSignalement type="pointInteret" details={true} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} description={signalement.description} imageSignalement={signalement.image} />
-                    </View>
-                  );
-                }
-              })}
-
-            </View>
-          </TouchableWithoutFeedback>
-        </ScrollView>
-        <View>
-          <Button style={$sortirDetailSignalement} tx="detailEscursion.bouttonRetourInformations" onPress={() => setIsAllSignalements(false)} />
-        </View>
+      <ScrollView>
+        <TouchableWithoutFeedback>
+          <View style={$containerSignalements}>
+            {excursion?.signalements?.map((signalement, index) => {
+              // Calcule de la distance pour chaque avertissement
+              const coordSignalement = {
+                lat: signalement.latitude,
+                lon: signalement.longitude,
+                alt: null,
+                dist: null,
+              };
+              const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+              const carteType =
+                signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+              return (
+                <View key={index}>
+                  <CarteSignalement
+                    type={carteType}
+                    details={true}
+                    nomSignalement={signalement.nom}
+                    distanceDuDepart={`${distanceSignalement}`}
+                    description={signalement.description}
+                    imageSignalement={signalement.image}
+                  />
+                </View>
+              );
+            })}
+          </View>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+      <View>
+        <Button
+          style={[$sortirDetailSignalement, { bottom: footerHeight }]}
+          tx="detailsExcursion.boutons.retourInformations"
+          onPress={() => setIsAllSignalements(false)}
+        />
       </View>
     </View>
   );
@@ -388,19 +289,21 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation) {
 
 /**
  *
- * @param isLoading
+ * @params excursion, navigation, setIsAllSignalements, userLocation
  * @returns les informations de l'excursion
  */
-
-
-function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSignalements, userLocation, isLoading) {
-  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")));
-  var duree = ""
-  var distance = ""
-  var difficulteOrientation = 0
-  var difficulteTechnique = 0
-  var description = ""
-  var signalements = []
+function infos(
+  excursion: Record<string, unknown>,
+  navigation: any,
+  setIsAllSignalements,
+  userLocation,
+) {
+  var duree: string = "";
+  var distance: string = "";
+  var difficulteOrientation: number = 0;
+  var difficulteTechnique: number = 0;
+  var description: string = "";
+  var signalements: Signalement[] = [];
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -409,18 +312,17 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
     excursion.description !== undefined ||
     excursion.signalements != undefined
   ) {
-    duree = excursion.duree.h + "h"
-    if (excursion.duree.m !== 0) {
-      duree = duree + excursion.duree.m
+    duree = (excursion.duree as { h: number }).h + "h";
+    if ((excursion.duree as { m: number }).m !== 0) {
+      // Si la durée en minutes est différente de 0, on l'affiche en plus de la durée en heures
+      duree = duree + (excursion.duree as { m: number }).m;
     }
-    distance = excursion.distance
-    difficulteTechnique = excursion.difficulteTechnique
-    difficulteOrientation = excursion.difficulteOrientation
-    description = excursion.description
-    signalements = excursion.signalements
+    distance = excursion.distance as string;
+    difficulteTechnique = excursion.difficulteTechnique as number;
+    difficulteOrientation = excursion.difficulteOrientation as number;
+    description = excursion.description as string;
+    signalements = excursion.signalements as Signalement[];
   }
-
-
 
   return (
     <ScrollView>
@@ -428,25 +330,23 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
         <View style={$stylePage}>
           <View style={$containerInformations}>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
-                source={require("../../assets/icons/temps.png")}
-              />
+              <Image style={$iconInformation} source={require("../../assets/icons/temps.png")} />
               <Text text={duree} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
-                source={require("../../assets/icons/explorer.png")}
-              />
-              <Text text={distance + ' km'} size="xs" />
+              <Image style={$iconInformation} source={require("../../assets/icons/explorer.png")} />
+              <Text text={distance + " km"} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/difficulteTechnique.png")}
               />
               <Text text={difficulteTechnique.toString()} size="xs" />
             </View>
             <View style={$containerUneInformation}>
-              <Image style={$iconInformation}
+              <Image
+                style={$iconInformation}
                 source={require("../../assets/icons/difficulteOrientation.png")}
               />
               <Text text={difficulteOrientation.toString()} size="xs" />
@@ -454,75 +354,81 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
           </View>
           <View style={$containerDescriptionEtSignalements}>
             <Text text="Description" size="lg" />
-            <Text
-              text={afficherDescriptionCourte(description)}
-              size="xxs"
-            />
+            <Text text={afficherDescriptionCourte(description)} size="xxs" />
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("Description", { excursion: excursion })
+                navigation.navigate("Description", { excursion: excursion });
               }}
             >
               {description === "" ? null : (
-                <Text style={$lienDescription} text="Voir plus" size="xxs" />
+                <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
               )}
             </TouchableOpacity>
           </View>
-          <View style={$containerDescriptionEtSignalements}>
-            <View>
-              {signalements?.length > 0 && (
-                <Text tx="detailEscursion.signalements" size="lg" />
-              )}
-            </View>
-            <ScrollView horizontal>
-              <TouchableWithoutFeedback>
-                <View style={$scrollLine}>
-                  {signalements?.map((signalement, index) => {
-                    // Calcule de la distance pour chaque avertissement
-                    const coordSignalement = { latitude: signalement.latitude, longitude: signalement.longitude };
-                    const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
-
-                    if (signalement.type == "Avertissement")
-                      return (
-                        <View key={index}>
-                          <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                            <CarteSignalement type="avertissement" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
-                          </TouchableOpacity>
-                        </View>
-                      );
-                    else {
-                      return (
-                        <View key={index}>
-                          <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                            <CarteSignalement type="pointInteret" details={false} nomSignalement={signalement.nom} distanceDuDepart={`${distanceSignalement}`} />
-                          </TouchableOpacity>
-                        </View>
-                      );
-                    }
-                  })}
-                  {signalements?.length > 0 ? (
-                    <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                      <View style={$carteGlobale}>
-                        <Text tx="detailEscursion.voirDetails" style={$tousLesSignalements} />
-                      </View>
-                    </TouchableOpacity>
-                  ) : (
-                    <View></View>
-                  )}
+          <View>
+            {signalements?.length > 0 && (
+              <>
+                <View style={$headerSignalement}>
+                  <View>
+                    <Text tx="detailsExcursion.titres.signalements" size="lg" />
+                  </View>
+                  <View>
+                    {signalements.length > 0 && (
+                      <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                        <Text
+                          style={$lienSignalements}
+                          tx="detailsExcursion.boutons.voirDetails"
+                          size="xs"
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </View>
-              </TouchableWithoutFeedback>
-            </ScrollView>
+                <ScrollView horizontal>
+                  <TouchableWithoutFeedback>
+                    <View style={$scrollLine}>
+                      {signalements.map((signalement, index) => {
+                        // Calculate the distance for each warning
+                        const coordSignalement = {
+                          lat: signalement.latitude,
+                          lon: signalement.longitude,
+                          alt: null,
+                          dist: null,
+                        };
+                        const distanceSignalement = userLocation
+                          ? recupDistance(coordSignalement)
+                          : 0;
+                        const carteType =
+                          signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+
+                        return (
+                          <View key={index}>
+                            <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                              <CarteSignalement
+                                type={carteType}
+                                details={false}
+                                nomSignalement={signalement.nom}
+                                distanceDuDepart={`${distanceSignalement}`}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </TouchableWithoutFeedback>
+                </ScrollView>
+              </>
+            )}
           </View>
+
           <View style={$containerDenivele}>
-            <Text text="Dénivelé" size="lg" />
-            {
-              isLoading ? <ActivityIndicator size="large" color={colors.bouton} /> : <GraphiqueDenivele data={data} />
-            }
-          </View >
-        </View >
-      </TouchableWithoutFeedback >
-    </ScrollView >
-  )
+            <Text tx="detailsExcursion.titres.denivele" size="xl" />
+            {excursion.track && <GraphiqueDenivele points={excursion.track} detaille={true} />}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </ScrollView>
+  );
 }
 
 /**
@@ -530,13 +436,25 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
  */
 function avis() {
   return (
-    <ScrollView style={$containerAvis}>
+    <ScrollView>
       <TouchableWithoutFeedback>
-        <View>
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
-          <CarteAvis nombreEtoiles={3} texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️" />
+        <View style={$containerAvis}>
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
+          <CarteAvis
+            nombreEtoiles={3}
+            texteAvis="Ma randonnée a été gâchée par une marmotte agressive. J'ai dû renoncer à cause de cette petite terreur. Les montagnes ne sont plus ce qu'elles étaient. 😡🏔️"
+          />
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>
@@ -544,30 +462,38 @@ function avis() {
 }
 
 // Fonction de calcul de distance entre deux coordonnées
-function calculeDistanceEntreDeuxPoints(coord1, coord2) {
+function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees) {
   // Assurez-vous que coord1 et coord2 sont définis
-  if (!coord1 || typeof coord1.latitude === 'undefined' || typeof coord1.longitude === 'undefined' || !coord2 || typeof coord2.lat === 'undefined' || typeof coord2.lon === 'undefined') {
-    console.error('Coordonnées non valides');
-    return null;
+  if (
+    !coord1 ||
+    typeof coord1.lat === "undefined" ||
+    typeof coord1.lon === "undefined" ||
+    !coord2 ||
+    typeof coord2.lat === "undefined" ||
+    typeof coord2.lon === "undefined"
+  ) {
+    throw new Error("Coordonnées non valides");
   }
 
   // Rayon moyen de la Terre en kilomètres
   const R = 6371;
 
   // Convertir les degrés en radians
-  const toRadians = (degree) => degree * (Math.PI / 180);
+  const toRadians = degree => degree * (Math.PI / 180);
 
   // Calcul des distances
-  const dLat = toRadians(coord2.lat - coord1.latitude);
-  const dLon = toRadians(coord2.lon - coord1.longitude);
+  const dLat = toRadians(coord2.lat - coord1.lat);
+  const dLon = toRadians(coord2.lon - coord1.lon);
 
+  // Formule de Haversine pour calculer la distance entre deux points
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(coord1.latitude)) *
-    Math.cos(toRadians(coord2.lat)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+    Math.cos(toRadians(coord1.lat)) *
+      Math.cos(toRadians(coord2.lat)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
+  // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   // Distance en kilomètres
@@ -577,31 +503,33 @@ function calculeDistanceEntreDeuxPoints(coord1, coord2) {
 }
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-function recupDistance(coordonneeSignalement) {
+function recupDistance(coordonneeSignalement: Coordonnees) {
   // Charger le fichier JSON avec les coordonnées
-  const data = require('../../assets/JSON/exemple_cruz_del_guardia.json');
+  const data: Coordonnees[] = require("../../assets/JSON/exemple_cruz_del_guardia.json");
 
   // Assurez-vous que les coordonnées du signalement sont définies
-  if (!coordonneeSignalement || !coordonneeSignalement.latitude || !coordonneeSignalement.longitude) {
-    console.error('Coordonnées du signalement non valides');
-    return null;
+  if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
+    throw new Error("Coordonnées du signalement non valides");
   }
 
   // Initialiser la distance minimale avec une valeur élevée
-  let distanceMinimale = Number.MAX_VALUE;
+  let distanceMinimale: number = Number.MAX_VALUE;
 
-  var coordPointPlusProche;
+  let coordPointPlusProche: Coordonnees;
 
   // Parcourir toutes les coordonnées dans le fichier
   for (const coord of data) {
     // Assurez-vous que les coordonnées dans le fichier sont définies
     if (!coord.lat || !coord.lon) {
-      console.error('Coordonnées dans le fichier non valides');
+      console.error("Coordonnées dans le fichier non valides");
       continue;
     }
 
     // Calculer la distance entre le signalement et la coordonnée actuelle du fichier
-    const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(coordonneeSignalement, coord);
+    const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(
+      coordonneeSignalement,
+      coord,
+    );
 
     // Mettre à jour la distance minimale si la distance actuelle est plus petite
     if (distanceSignalementPointLePlusProche < distanceMinimale) {
@@ -612,8 +540,8 @@ function recupDistance(coordonneeSignalement) {
 
   const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
 
-  //Distance totale DANS UN MONDE PARFAIT
-  // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche;
+  //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
+  // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche; //c'est donc pas vraiment ce calcul qu'il faut faire
   // return distanceTotale;
   return distanceDepartPointLePlusProche;
 }
@@ -623,9 +551,9 @@ function recupDistance(coordonneeSignalement) {
 /* -------------------------------------------------------------------------- */
 
 const $stylePage: ViewStyle = {
-  paddingRight: spacing.xl,
-  paddingLeft: spacing.xl,
-}
+  paddingRight: spacing.lg,
+  paddingLeft: spacing.lg,
+};
 
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.fond,
@@ -637,16 +565,15 @@ const $boutonRetour: ViewStyle = {
   width: 50,
   position: "absolute",
   top: 15,
-
-  zIndex: 2,
-}
+  zIndex: 1,
+};
 
 const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
   backgroundColor: colors.erreur,
-}
+};
 
 //Style de itemMini
 
@@ -659,21 +586,19 @@ const $containerPetit: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.xxs,
-}
+};
 
 //Style de itemFull
 
 const $containerGrand: ViewStyle = {
   flex: 1,
-  alignItems: "center",
   width: width,
   backgroundColor: colors.fond,
   borderWidth: 1,
   borderColor: colors.bordure,
   borderRadius: 10,
-  padding: spacing.xs,
-  paddingBottom: 250,
-}
+  marginTop: height / 4,
+};
 
 //Style du container du titre et du bouton de téléchargement
 
@@ -683,12 +608,12 @@ const $containerTitre: ViewStyle = {
   alignItems: "center",
   width: width - width / 5,
   margin: spacing.lg,
-}
+};
 
 const $titre: ViewStyle = {
   marginTop: spacing.xs,
   paddingRight: spacing.xl,
-}
+};
 
 //Style du container des boutons infos et avis
 
@@ -696,19 +621,19 @@ const $containerBouton: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   width: width,
-}
+};
 
 const $boutonInfoAvis: ViewStyle = {
   paddingLeft: spacing.xxl,
   paddingRight: spacing.xxl,
-}
+};
 
 const $souligneInfosAvis: ViewStyle = {
   backgroundColor: colors.bouton,
   height: 2,
   width: width / 2.5,
   position: "relative",
-}
+};
 
 //Style des informations
 
@@ -716,38 +641,70 @@ const $containerInformations: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   paddingTop: spacing.xl,
-  paddingBottom: spacing.xl
-}
+  paddingBottom: spacing.xl,
+};
 
 const $containerUneInformation: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",
-}
+};
 
 const $iconInformation: ImageStyle = {
   width: spacing.lg,
   height: spacing.lg,
   marginRight: spacing.xs,
-}
+};
 
 //Style de la description et des signalements
 const $containerDescriptionEtSignalements: ViewStyle = {
-  paddingBottom: spacing.xl
-}
+  paddingBottom: spacing.xl,
+};
 
 const $lienDescription: TextStyle = {
   color: colors.bouton,
   paddingTop: spacing.xs,
   textDecorationLine: "underline",
-}
+};
 
 const $containerAvis: ViewStyle = {
-  height: 200,
-}
+  paddingBottom: height / 3, //pour pouvoir afficher les avis
+};
 
 const $containerDenivele: ViewStyle = {
-  marginBottom: 100 //pour pouvoir afficher le graphique
-}
+  marginBottom: height / 3, //pour pouvoir afficher le graphique
+};
+
+const $scrollLine: ViewStyle = {
+  flexDirection: "row",
+  paddingBottom: spacing.xl,
+};
+
+const $containerSignalements: ViewStyle = {
+  margin: spacing.xs,
+  paddingBottom: height / 2,
+};
+
+const $sortirDetailSignalement: ViewStyle = {
+  borderRadius: 15,
+  borderWidth: 2,
+  backgroundColor: colors.fond,
+  borderColor: colors.bordure,
+  width: width / 1.5,
+  height: 50,
+  position: "absolute",
+  alignSelf: "center",
+};
+
+const $headerSignalement: ViewStyle = {
+  flexDirection: "row",
+  alignItems: "center",
+};
+
+const $lienSignalements: TextStyle = {
+  textDecorationLine: "underline",
+  color: colors.bouton,
+  paddingStart: spacing.xs,
+};
 
 /* --------------------------------- ERREUR --------------------------------- */
 
@@ -757,56 +714,9 @@ const $containerErreur: ViewStyle = {
   width: width,
   height: height,
   padding: spacing.lg,
-}
+};
 
 const $texteErreur: TextStyle = {
   marginTop: spacing.lg,
   marginBottom: height / 2,
-}
-
-const $tousLesSignalements: TextStyle = {
-  fontSize: spacing.md,
-  justifyContent: "space-between",
-  color: colors.souligne,
-}
-const $listeSignalements: ViewStyle = {
-  marginTop: spacing.lg,
-  height: "115%", //Si je met a 100% il descend pas jusqu'en bas voir avec reio prod
-  width: "95%"
-}
-
-const $scrollLine: ViewStyle = {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-}
-
-const $carteGlobale: ViewStyle = {
-  padding: spacing.sm,
-  margin: 10,
-  shadowColor: colors.palette.noir,
-  shadowOffset: {
-    width: 0,
-    height: 3,
-  },
-  shadowOpacity: 0.27,
-  shadowRadius: 4.65,
-  elevation: 6,
-  borderRadius: 10,
-  backgroundColor: colors.palette.blanc,
-}
-
-const $sortirDetailSignalement: ViewStyle = {
-  justifyContent: "center",
-  marginBottom: "5%",
-  borderRadius: 15,
-  borderWidth: 2,
-  padding: 0,
-  backgroundColor: colors.fond,
-  borderColor: colors.bordure,
-  width: "70%",
-  position: "absolute",
-  bottom: 0,
-  left: "15%",
-  zIndex: 1,
-}
+};

@@ -19,7 +19,3 @@ Le [refuge de Pineta](https://www.valpineta.eu/fr/el-refugio/) et ses randonneur
 
 ## Pour installer les tuiles
 - Mettre le dossier `Tiles` dans `src/assets/` avec le fichier `tiles_struct.json` à l'intérieur.
-
-## Pour installer les tuiles
-
-- Mettre le dossier `Tiles` dans `src/assets/` avec le fichier `tiles_struct.json` à l'intérieur.

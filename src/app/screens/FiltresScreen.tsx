@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react"
+import React, { FC, useState, useEffect } from "react";
 import {
   Image,
   ImageStyle,
@@ -8,106 +8,123 @@ import {
   ViewStyle,
   TouchableOpacity,
   Switch,
-} from "react-native"
-import Slider from "react-native-a11y-slider"
-import { observer } from "mobx-react-lite"
+} from "react-native";
+import Slider from "react-native-a11y-slider";
+import { observer } from "mobx-react-lite";
 
-import { Text, Button, Screen } from "app/components"
-import { AppStackScreenProps } from "app/navigators"
-import { colors, spacing } from "../theme"
+import { Text, Button, Screen } from "app/components";
+import { AppStackScreenProps } from "app/navigators";
+import { colors, spacing } from "../theme";
+import { useStores } from "../models";
+import { types } from "mobx-state-tree";
 
 /**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
 
-interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> { }
+interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {}
 
 export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresScreen(
   props: FiltresScreenProps,
 ) {
-  const { navigation } = props
-  var valeursFiltres
+  const { navigation } = props;
+  const { parametres } = useStores();
+
+  var valeursFiltres;
 
   // Assets
-  const logoCheck = require("../../assets/icons/check_3x_vert.png")
+  const logoCheck = require("../../assets/icons/check_3x_vert.png");
 
-  const logoDistance = require("../../assets/icons/distance.png")
-  const logoDuree = require("../../assets/icons/time.png")
-  const logoDenivele = require("../../assets/icons/denivele.png")
-  const logoDiffTech = require("../../assets/icons/difficulte_technique.png")
-  const logoDiffOri = require("./../../assets/icons/difficulte_orientation.png")
+  const logoDistance = require("../../assets/icons/distance.png");
+  const logoDuree = require("../../assets/icons/time.png");
+  const logoDenivele = require("../../assets/icons/denivele.png");
+  const logoDiffTech = require("../../assets/icons/difficulte_technique.png");
+  const logoDiffOri = require("./../../assets/icons/difficulte_orientation.png");
 
   // -- CONSTANTES --
   // Recuperation des valeurs de filtres
   try {
     // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
-    valeursFiltres = require("../../assets/JSON/valeurs_filtres.json")
+    valeursFiltres =
+      parametres.langues == "fr"
+        ? require("../../assets/JSON/valeurs_filtresFR.json")
+        : require("../../assets/JSON/valeurs_filtresES.json");
   } catch (error) {
     // Erreur critique si on n a pas les valeurs de filtres
-    navigation.navigate("Excursions")
-    console.error("Page des filtres necessite les filtres appliques en parametres")
-    return <></>
+    navigation.navigate("Excursions");
+    console.error("Page des filtres necessite les filtres appliques en parametres");
+    return <></>;
   }
-  const incrementDenivele = 200
-  const criteresTri = [
-    { nom: "Distance", nomCle: "distance", logo: logoDistance },
-    { nom: "Durée", nomCle: "duree", logo: logoDuree },
-    { nom: "Dénivelé", nomCle: "denivele", logo: logoDenivele },
-    { nom: "Difficulté technique", nomCle: "difficulteTechnique", logo: logoDiffTech },
-    { nom: "Difficulté d'orientation", nomCle: "difficulteOrientation", logo: logoDiffOri },
-  ]
+
+  const incrementDenivele = 200;
+  const criteresTri =
+    parametres.langues == "fr"
+      ? [
+          { nom: "Distance", nomCle: "distance", logo: logoDistance },
+          { nom: "Durée", nomCle: "duree", logo: logoDuree },
+          { nom: "Dénivelé", nomCle: "denivele", logo: logoDenivele },
+          { nom: "Difficulté technique", nomCle: "difficulteTechnique", logo: logoDiffTech },
+          { nom: "Difficulté d'orientation", nomCle: "difficulteOrientation", logo: logoDiffOri },
+        ]
+      : [
+          { nom: "Distancia", nomCle: "distance", logo: logoDistance },
+          { nom: "Duración", nomCle: "duree", logo: logoDuree },
+          { nom: "Desnivel", nomCle: "denivele", logo: logoDenivele },
+          { nom: "Dificultad técnica", nomCle: "difficulteTechnique", logo: logoDiffTech },
+          { nom: "Dificultad de orientación", nomCle: "difficulteOrientation", logo: logoDiffOri },
+        ];
 
   // -- USE STATES --
   // Tri / Filtres selectionnes
-  const [critereTriSelectionne, setCritereTriSelectionne] = useState(0)
-  const [intervalleDistance, setIntervalleDistance] = useState([0, valeursFiltres.distanceMax])
-  const [intervalleDuree, setIntervalleDuree] = useState([0, valeursFiltres.dureeMax])
+  const [critereTriSelectionne, setCritereTriSelectionne] = useState(0);
+  const [intervalleDistance, setIntervalleDistance] = useState([0, valeursFiltres.distanceMax]);
+  const [intervalleDuree, setIntervalleDuree] = useState([0, valeursFiltres.dureeMax]);
   const [intervalleDenivele, setIntervalleDenivele] = useState([
     0,
     valeursFiltres.deniveleMax + incrementDenivele,
-  ])
+  ]);
   const [typesParcours, setTypesParcours] = useState(
-    valeursFiltres.nomTypesParcours.map((nomType) => ({ nom: nomType, selectionne: true })),
-  )
+    valeursFiltres.nomTypesParcours.map(nomType => ({ nom: nomType, selectionne: true })),
+  );
   const [vallees, setVallees] = useState(
-    valeursFiltres.nomVallees.map((nomVallee) => ({ nom: nomVallee, selectionne: true })),
-  )
+    valeursFiltres.nomVallees.map(nomVallee => ({ nom: nomVallee, selectionne: true })),
+  );
   const [difficultesTechniques, setDifficultesTechniques] = useState(
     [...Array(valeursFiltres.difficulteTechniqueMax)].map((trash, i) => ({
       niveau: i + 1,
       selectionne: true,
     })),
-  )
+  );
   const [difficultesOrientation, setDifficultesOrientation] = useState(
     [...Array(valeursFiltres.difficulteOrientationMax)].map((trash, i) => ({
       niveau: i + 1,
       selectionne: true,
     })),
-  )
+  );
 
   // Autres
-  const [slideVerticalBloque, setSlideVerticalBloque] = useState(false)
+  const [slideVerticalBloque, setSlideVerticalBloque] = useState(false);
 
   // -- CallBacks --
-  const clicType = (i) => {
+  const clicType = i => {
     // Modification de l'état du type
-    const updatedTypesParcours = [...typesParcours]
-    updatedTypesParcours[i].selectionne = !updatedTypesParcours[i].selectionne
-    setTypesParcours(updatedTypesParcours)
-  }
+    const updatedTypesParcours = [...typesParcours];
+    updatedTypesParcours[i].selectionne = !updatedTypesParcours[i].selectionne;
+    setTypesParcours(updatedTypesParcours);
+  };
   const clicVallee = (i: number) => {
-    let newVallees = [...vallees]
-    newVallees[i].selectionne = !newVallees[i].selectionne
-    setVallees(newVallees)
-  }
+    let newVallees = [...vallees];
+    newVallees[i].selectionne = !newVallees[i].selectionne;
+    setVallees(newVallees);
+  };
   const clicDifficulteTechnique = (i: number) => {
-    let newDifficulte = [...difficultesTechniques]
-    newDifficulte[i].selectionne = !newDifficulte[i].selectionne
-    setDifficultesTechniques(newDifficulte)
-  }
+    let newDifficulte = [...difficultesTechniques];
+    newDifficulte[i].selectionne = !newDifficulte[i].selectionne;
+    setDifficultesTechniques(newDifficulte);
+  };
   const clicDifficulteOrientation = (i: number) => {
-    let newDifficulte = [...difficultesOrientation]
-    newDifficulte[i].selectionne = !newDifficulte[i].selectionne
-    setDifficultesOrientation(newDifficulte)
-  }
+    let newDifficulte = [...difficultesOrientation];
+    newDifficulte[i].selectionne = !newDifficulte[i].selectionne;
+    setDifficultesOrientation(newDifficulte);
+  };
   const validerFiltres = () => {
     const filtres = {
       critereTri: criteresTri[critereTriSelectionne].nomCle,
@@ -116,39 +133,44 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
       // On retire les type de parcours non selectionnees
       typesParcours: typesParcours
-        .map((type) => (type.selectionne ? type.nom : null))
-        .filter((type) => type != null),
+        .map(type => (type.selectionne ? type.nom : null))
+        .filter(type => type != null),
       // On retire les vallees non selectionnees
       vallees: vallees
-        .map((vallee) => (vallee.selectionne ? vallee.nom : null))
-        .filter((type) => type != null),
+        .map(vallee => (vallee.selectionne ? vallee.nom : null))
+        .filter(type => type != null),
       // On retire les difficultes techniques non selectionnees
       difficultesTechniques: difficultesTechniques
-        .map((difficulteTechnique) =>
+        .map(difficulteTechnique =>
           difficulteTechnique.selectionne ? difficulteTechnique.niveau : null,
         )
-        .filter((type) => type != null),
+        .filter(type => type != null),
       // On retire les difficultes d orientation non selectionnes
       difficultesOrientation: difficultesOrientation
-        .map((difficultesOrientation) =>
+        .map(difficultesOrientation =>
           difficultesOrientation.selectionne ? difficultesOrientation.niveau : null,
         )
-        .filter((type) => type != null),
-    }
-    navigation.navigate("Excursions", { Filtres: filtres })
-  }
+        .filter(type => type != null),
+    };
+    navigation.navigate("Excursions", { Filtres: filtres });
+  };
+
+  // USE EFFECTS
+  useEffect(() => {
+    setTypesParcours(
+      valeursFiltres.nomTypesParcours.map(nomType => ({ nom: nomType, selectionne: true })),
+    );
+  }, [valeursFiltres.nomTypesParcours]);
 
   return (
-    <Screen
-      preset="fixed"
-      safeAreaEdges={["top"]}
-      style={$container}
-    >
-      <Button text="Valider filtres" style={$boutonValidation} onPress={() => validerFiltres()} />
-      <ScrollView
-        scrollEnabled={!slideVerticalBloque}
-      >
-        <Text style={$h1}>Trier par</Text>
+    <Screen preset="fixed" safeAreaEdges={["top"]} style={$container}>
+      <Button
+        tx="pageFiltres.boutons.valider"
+        style={$boutonValidation}
+        onPress={() => validerFiltres()}
+      />
+      <ScrollView scrollEnabled={!slideVerticalBloque}>
+        <Text tx="pageFiltres.tri.titre" style={$h1} />
         <View>
           {criteresTri.map((critere, i) => (
             <TouchableOpacity
@@ -165,8 +187,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
 
-        <Text style={$h1}>Filtrer par</Text>
-        <Text style={$h2}>Distance (en km)</Text>
+        <Text tx="pageFiltres.filtres.titre" style={$h1} />
+        <Text tx="pageFiltres.filtres.distance" style={$h2} />
         <Slider
           min={0}
           max={valeursFiltres.distanceMax}
@@ -175,12 +197,12 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           markerColor={colors.palette.vert}
           onSlidingStart={() => setSlideVerticalBloque(true)}
           onSlidingComplete={() => setSlideVerticalBloque(false)}
-          onChange={(value) => setIntervalleDistance(value)}
+          onChange={value => setIntervalleDistance(value)}
           style={$slider}
           labelStyle={{ backgroundColor: colors.fond }}
         />
 
-        <Text style={$h2}>Durée (en h)</Text>
+        <Text tx="pageFiltres.filtres.duree" style={$h2} />
         <Slider
           min={0}
           max={valeursFiltres.dureeMax}
@@ -189,12 +211,12 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           markerColor={colors.palette.vert}
           onSlidingStart={() => setSlideVerticalBloque(true)}
           onSlidingComplete={() => setSlideVerticalBloque(false)}
-          onChange={(value) => setIntervalleDuree(value)}
+          onChange={value => setIntervalleDuree(value)}
           style={$slider}
           labelStyle={{ backgroundColor: colors.fond }}
         />
 
-        <Text style={$h2}>Dénivelé (en m)</Text>
+        <Text tx="pageFiltres.filtres.denivele" style={$h2} />
         <Slider
           min={0}
           max={valeursFiltres.deniveleMax + incrementDenivele}
@@ -203,12 +225,12 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           markerColor={colors.palette.vert}
           onSlidingStart={() => setSlideVerticalBloque(true)}
           onSlidingComplete={() => setSlideVerticalBloque(false)}
-          onChange={(value) => setIntervalleDenivele(value)}
+          onChange={value => setIntervalleDenivele(value)}
           style={$slider}
           labelStyle={{ backgroundColor: colors.fond }}
         />
 
-        <Text style={$h2}>Type de parcours</Text>
+        <Text tx="pageFiltres.filtres.parcours" style={$h2} />
         <View>
           {typesParcours.map((typeParcours, i) => (
             <TouchableOpacity
@@ -229,7 +251,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
 
-        <Text style={$h2}>Vallées</Text>
+        <Text tx="pageFiltres.filtres.vallees" style={$h2} />
         <View style={$containerVallees}>
           {vallees.map((vallee, i) => (
             <TouchableOpacity
@@ -256,7 +278,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
 
-        <Text style={$h2}>Difficulté technique</Text>
+        <Text tx="pageFiltres.filtres.difficulteTech" style={$h2} />
         <View style={$containerDiff}>
           {difficultesTechniques.map((difficulte, i) => (
             <TouchableOpacity
@@ -275,7 +297,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
 
-        <Text style={$h2}>Difficulté d'orientation</Text>
+        <Text tx="pageFiltres.filtres.difficulteOrientation" style={$h2} />
         <View style={$containerDiffOrientation}>
           {difficultesOrientation.map((difficulte, i) => (
             <TouchableOpacity
@@ -294,9 +316,9 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
       </ScrollView>
-    </Screen >
-  )
-})
+    </Screen>
+  );
+});
 
 // ---- V I E W S ----
 const $container: ViewStyle = {
@@ -304,18 +326,18 @@ const $container: ViewStyle = {
   paddingRight: spacing.lg,
   paddingLeft: spacing.lg,
   height: "100%",
-}
+};
 const $critereTri: ViewStyle = {
   flexDirection: "row",
   width: "100%",
   alignItems: "center",
   justifyContent: "space-between",
-}
+};
 const $containerVallees: ViewStyle = {
   display: "flex",
   flexDirection: "row",
   flexWrap: "wrap",
-}
+};
 const $vallee: ViewStyle = {
   borderColor: colors.palette.vert,
   borderRadius: 15,
@@ -324,16 +346,16 @@ const $vallee: ViewStyle = {
   padding: spacing.sm,
   paddingBottom: spacing.xs,
   paddingTop: spacing.xs,
-}
+};
 const $containerDiff: ViewStyle = {
   flexDirection: "row",
   flexWrap: "wrap",
-}
+};
 const $containerDiffOrientation: ViewStyle = {
   ...$containerDiff,
   marginBottom: 100,
   /**@warning cette marge est a supprimer */
-}
+};
 const $difficulte: ViewStyle = {
   flexDirection: "row",
   borderRadius: 20,
@@ -342,11 +364,11 @@ const $difficulte: ViewStyle = {
   margin: spacing.xs,
   marginBottom: 0,
   padding: spacing.sm,
-}
+};
 const $difficulteSelectionnee: ViewStyle = {
   ...$difficulte,
   backgroundColor: colors.palette.vert,
-}
+};
 
 // ---- I M A G E S ----
 const $logoCritere: ImageStyle = {
@@ -357,34 +379,34 @@ const $logoCritere: ImageStyle = {
   marginRight: spacing.lg,
   marginTop: 7,
   marginBottom: 7,
-}
+};
 const $logoCheck: ImageStyle = {
   height: 40,
   resizeMode: "contain",
   marginRight: spacing.lg,
-}
+};
 const $imageDifficulte: ImageStyle = {
   width: 20,
   height: 20,
   resizeMode: "stretch",
   tintColor: colors.palette.noir,
   marginRight: 2,
-}
+};
 
 // ---- T E X T S ----
 const $h1: TextStyle = {
   fontSize: 30,
   marginTop: spacing.lg,
   paddingTop: spacing.lg,
-}
+};
 const $h2: TextStyle = {
   fontSize: 20,
   marginTop: spacing.lg,
   marginBottom: spacing.sm,
-}
+};
 const $filtres: TextStyle = {
   fontSize: 15,
-}
+};
 
 // ---- A U T R E S ----
 const $boutonValidation: ViewStyle = {
@@ -400,13 +422,13 @@ const $boutonValidation: ViewStyle = {
   bottom: 0,
   left: "15%",
   zIndex: 1,
-}
+};
 const $switch: ViewStyle = {
   backgroundColor: "transparent",
   borderColor: "transparent",
   margin: spacing.sm,
-}
+};
 const $slider: ViewStyle = {
   paddingLeft: spacing.lg,
   paddingRight: spacing.lg,
-}
+};

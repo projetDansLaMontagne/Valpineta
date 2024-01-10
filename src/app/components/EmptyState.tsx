@@ -1,104 +1,104 @@
-import React from "react"
-import { Image, ImageProps, ImageStyle, StyleProp, TextStyle, View, ViewStyle } from "react-native"
-import { translate } from "../i18n"
-import { spacing } from "../theme"
-import { Button, ButtonProps } from "./Button"
-import { Text, TextProps } from "./Text"
+import React from "react";
+import { Image, ImageProps, ImageStyle, StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { translate } from "../i18n";
+import { spacing } from "../theme";
+import { Button, ButtonProps } from "./Button";
+import { Text, TextProps } from "./Text";
 
-const sadFace = require("../../assets/images/sad-face.png")
+const sadFace = require("../../assets/images/sad-face.png");
 
 interface EmptyStateProps {
   /**
    * An optional prop that specifies the text/image set to use for the empty state.
    */
-  preset?: keyof typeof EmptyStatePresets
+  preset?: keyof typeof EmptyStatePresets;
   /**
    * Style override for the container.
    */
-  style?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>;
   /**
    * An Image source to be displayed above the heading.
    */
-  imageSource?: ImageProps["source"]
+  imageSource?: ImageProps["source"];
   /**
    * Style overrides for image.
    */
-  imageStyle?: StyleProp<ImageStyle>
+  imageStyle?: StyleProp<ImageStyle>;
   /**
    * Pass any additional props directly to the Image component.
    */
-  ImageProps?: Omit<ImageProps, "source">
+  ImageProps?: Omit<ImageProps, "source">;
   /**
    * The heading text to display if not using `headingTx`.
    */
-  heading?: TextProps["text"]
+  heading?: TextProps["text"];
   /**
    * Heading text which is looked up via i18n.
    */
-  headingTx?: TextProps["tx"]
+  headingTx?: TextProps["tx"];
   /**
    * Optional heading options to pass to i18n. Useful for interpolation
    * as well as explicitly setting locale or translation fallbacks.
    */
-  headingTxOptions?: TextProps["txOptions"]
+  headingTxOptions?: TextProps["txOptions"];
   /**
    * Style overrides for heading text.
    */
-  headingStyle?: StyleProp<TextStyle>
+  headingStyle?: StyleProp<TextStyle>;
   /**
    * Pass any additional props directly to the heading Text component.
    */
-  HeadingTextProps?: TextProps
+  HeadingTextProps?: TextProps;
   /**
    * The content text to display if not using `contentTx`.
    */
-  content?: TextProps["text"]
+  content?: TextProps["text"];
   /**
    * Content text which is looked up via i18n.
    */
-  contentTx?: TextProps["tx"]
+  contentTx?: TextProps["tx"];
   /**
    * Optional content options to pass to i18n. Useful for interpolation
    * as well as explicitly setting locale or translation fallbacks.
    */
-  contentTxOptions?: TextProps["txOptions"]
+  contentTxOptions?: TextProps["txOptions"];
   /**
    * Style overrides for content text.
    */
-  contentStyle?: StyleProp<TextStyle>
+  contentStyle?: StyleProp<TextStyle>;
   /**
    * Pass any additional props directly to the content Text component.
    */
-  ContentTextProps?: TextProps
+  ContentTextProps?: TextProps;
   /**
    * The button text to display if not using `buttonTx`.
    */
-  button?: TextProps["text"]
+  button?: TextProps["text"];
   /**
    * Button text which is looked up via i18n.
    */
-  buttonTx?: TextProps["tx"]
+  buttonTx?: TextProps["tx"];
   /**
    * Optional button options to pass to i18n. Useful for interpolation
    * as well as explicitly setting locale or translation fallbacks.
    */
-  buttonTxOptions?: TextProps["txOptions"]
+  buttonTxOptions?: TextProps["txOptions"];
   /**
    * Style overrides for button.
    */
-  buttonStyle?: ButtonProps["style"]
+  buttonStyle?: ButtonProps["style"];
   /**
    * Style overrides for button text.
    */
-  buttonTextStyle?: ButtonProps["textStyle"]
+  buttonTextStyle?: ButtonProps["textStyle"];
   /**
    * Called when the button is pressed.
    */
-  buttonOnPress?: ButtonProps["onPress"]
+  buttonOnPress?: ButtonProps["onPress"];
   /**
    * Pass any additional props directly to the Button component.
    */
-  ButtonProps?: ButtonProps
+  ButtonProps?: ButtonProps;
 }
 
 const EmptyStatePresets = {
@@ -108,7 +108,7 @@ const EmptyStatePresets = {
     content: translate("emptyStateComponent.generic.content"),
     button: translate("emptyStateComponent.generic.button"),
   },
-} as const
+} as const;
 
 /**
  * A component to use when there is no data to display. It can be utilized to direct the user what to do next.
@@ -116,7 +116,7 @@ const EmptyStatePresets = {
  * - [Documentation and Examples](https://github.com/infinitered/ignite/blob/master/docs/Components-EmptyState.md)
  */
 export function EmptyState(props: EmptyStateProps) {
-  const preset = EmptyStatePresets[props.preset] ? EmptyStatePresets[props.preset] : undefined
+  const preset = EmptyStatePresets[props.preset] ? EmptyStatePresets[props.preset] : undefined;
 
   const {
     button = preset?.button,
@@ -140,39 +140,39 @@ export function EmptyState(props: EmptyStateProps) {
     ContentTextProps,
     HeadingTextProps,
     ImageProps,
-  } = props
+  } = props;
 
-  const isImagePresent = !!imageSource
-  const isHeadingPresent = !!(heading || headingTx)
-  const isContentPresent = !!(content || contentTx)
-  const isButtonPresent = !!(button || buttonTx)
+  const isImagePresent = !!imageSource;
+  const isHeadingPresent = !!(heading || headingTx);
+  const isContentPresent = !!(content || contentTx);
+  const isButtonPresent = !!(button || buttonTx);
 
-  const $containerStyles = [$containerStyleOverride]
+  const $containerStyles = [$containerStyleOverride];
   const $imageStyles = [
     $image,
     (isHeadingPresent || isContentPresent || isButtonPresent) && { marginBottom: spacing.xxxs },
     $imageStyleOverride,
     ImageProps?.style,
-  ]
+  ];
   const $headingStyles = [
     $heading,
     isImagePresent && { marginTop: spacing.xxxs },
     (isContentPresent || isButtonPresent) && { marginBottom: spacing.xxxs },
     $headingStyleOverride,
     HeadingTextProps?.style,
-  ]
+  ];
   const $contentStyles = [
     $content,
     (isImagePresent || isHeadingPresent) && { marginTop: spacing.xxxs },
     isButtonPresent && { marginBottom: spacing.xxxs },
     $contentStyleOverride,
     ContentTextProps?.style,
-  ]
+  ];
   const $buttonStyles = [
     (isImagePresent || isHeadingPresent || isContentPresent) && { marginTop: spacing.xl },
     $buttonStyleOverride,
     ButtonProps?.style,
-  ]
+  ];
 
   return (
     <View style={$containerStyles}>
@@ -211,9 +211,9 @@ export function EmptyState(props: EmptyStateProps) {
         />
       )}
     </View>
-  )
+  );
 }
 
-const $image: ImageStyle = { alignSelf: "center" }
-const $heading: TextStyle = { textAlign: "center", paddingHorizontal: spacing.lg }
-const $content: TextStyle = { textAlign: "center", paddingHorizontal: spacing.lg }
+const $image: ImageStyle = { alignSelf: "center" };
+const $heading: TextStyle = { textAlign: "center", paddingHorizontal: spacing.lg };
+const $content: TextStyle = { textAlign: "center", paddingHorizontal: spacing.lg };

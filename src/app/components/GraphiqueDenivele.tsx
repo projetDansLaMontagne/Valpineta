@@ -1,93 +1,154 @@
-import React, { FC, useEffect, useState } from "react"
-import { StyleProp, View, ViewStyle, Dimensions, ActivityIndicator } from "react-native"
-import { observer } from "mobx-react-lite"
-import { colors, spacing } from "app/theme"
-import { LineChart } from "react-native-chart-kit"
+import { StyleProp, View, ViewStyle, Dimensions } from "react-native";
+import { observer } from "mobx-react-lite";
+import { colors, spacing } from "app/theme";
+import { LineChart } from "react-native-chart-kit";
+
+type T_Point = {
+  lat: number;
+  lon: number;
+  alt: number;
+  dist: number;
+};
 
 export interface GraphiqueDeniveleProps {
-  /**
-   * An optional style override useful for padding & margin.
-   */
-  style?: StyleProp<ViewStyle>
-
-  /**
-   * Données passées au graphique
-   */
-  data
+  style?: StyleProp<ViewStyle>;
+  detaille: boolean;
+  points: T_Point[];
 }
 
-/**
- * Describe your component here
- */
 export const GraphiqueDenivele = observer(function GraphiqueDenivele(
   props: GraphiqueDeniveleProps,
 ) {
-  //Chargement du graphique de dénivelé
-  const chrono = () => {
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
+  /* ---------------------- PROTECTION MAUVAIS PARAMETRES --------------------- */
+  if (!props.points || props.detaille === undefined) {
+    throw new Error("GraphiqueDenivele : Mauvais parametres");
   }
 
-  //Chargement du graphique de dénivelé
-  const [isLoading, setIsLoading] = useState(true)
+  /* -------------------------------- Variables ------------------------------- */
+  const { width } = Dimensions.get("window");
+  const precision = 40; // Precision de l altitude (nombre de points du graphique)
 
-  //Lance le chrono pour le chargement du graphique de dénivelé
-  useEffect(() => {
-    chrono()
-  }, [])
+  /* -------------------------------- Fonctions ------------------------------- */
+  /**
+   * Formate les points de l excursion pour qu ils soient utilisables par le graphique
+   * @param track Le track (points du track)
+   * @param nbFragments Le nombre de points souhaités sur le diagrame (doit etre inferieur au nombre de points de l excursion)
+   * @returns Les points formates
+   */
+  const trackReduit = (track: T_Point[], nbFragments: number): T_Point[] => {
+    /* ---------------------- Verifications des parametres ---------------------- */
+    if (nbFragments > track.length) {
+      // Si on demande trop de fragments par rapport au nombre de points du track
+      // On reduit le nombre de fragments au nombre de points du track
+      nbFragments = track.length;
+    }
 
-  //Lageur de l'écran
-  const { width } = Dimensions.get("window")
+    /* -------------------------- Selection des points -------------------------- */
+    // (c est cette etape qui va assurer une distance equivalente entre les points)
+    var pointsSelectionnes = [];
+    const distanceTotale = track[track.length - 1].dist; // Distance du dernier point
+    const incrementFragments = distanceTotale / (nbFragments - 1); // Increment (en m) entre chaque fragments
 
-  //Données du graphique
-  const data = props.data
+    // Variables de la boucle
+    var distanceIdeale = 0;
+    var indexPoint = 0;
+    var ecartPointPrecedent = Infinity;
 
-  //Récupération des altitudes
-  const coordonnees = data.features[0].geometry.coordinates[0]
-  //On ne garde que les altitudes tous les 50 points
-  const listeALtitude = coordonnees
-    .map((item, index) => (index % 50 === 0 ? item[2] : null))
-    .filter((altitude) => altitude !== null)
+    // Pour chaque fragment, on recherche le point le plus proche de sa distance ideale
+    // Le but est d encadrer la distance ideale entre deux points et de prendre le plus proche
+    while (true) {
+      // console.log("Point n°" + indexPoint + " à " + points[indexPoint].dist + "m")
+      // console.log("Distance ideale : " + distanceIdeale + "m")
 
-  //Données du graphique avec labels et les données
-  const line = {
-    labels: ["0", "200", "400", "600", "800", "1000"],
+      if (distanceIdeale > distanceTotale) {
+        // Dernier point atteint
+        break;
+      } else {
+        const distancePoint = track[indexPoint].dist;
+        if (distancePoint < distanceIdeale) {
+          // Le point est avant la distance ideale
+          // On passe au points suivant
+          ecartPointPrecedent = distanceIdeale - distancePoint;
+          indexPoint += 1;
+        } else {
+          // Le point est (à / apres) la distance ideale
+          var pointLePlusProche;
+          if (ecartPointPrecedent < distancePoint - distanceIdeale) {
+            // Le point precedent est plus proche
+            pointLePlusProche = track[indexPoint - 1];
+          } else {
+            // Le point est plus proche que le precedent
+            pointLePlusProche = track[indexPoint];
+          }
+
+          // Sauvegarde du point le plus proche
+          pointsSelectionnes.push(pointLePlusProche);
+
+          // On passe a la prochaine distance ideale
+          distanceIdeale += incrementFragments;
+          ecartPointPrecedent = Infinity;
+        }
+      }
+    }
+
+    return pointsSelectionnes;
+  };
+
+  /**
+   * Pour recupérer les 4 abscisses du graphique
+   */
+  const getAbscises = (points: T_Point[]): string[] => {
+    var abscisses = [];
+    for (let quart = 0; quart < 4; quart++) {
+      // Pour les 4 abscisses (les 4 premiers quarts)
+      const index = Math.round((points.length * quart) / 4);
+      const abscisse = Math.round(points[index].dist / 100) / 10; //Arrondies au 10e de km
+      abscisses.push("" + abscisse + " km");
+    }
+
+    return abscisses;
+  };
+
+  /* ------------------------ Calcul donnees graphiques ----------------------- */
+  // Reduction du nombre de points a la valeur souhaitee
+  const points = trackReduit(props.points, precision);
+
+  // Calcul des 4 absisses
+  const abscises = getAbscises(points);
+
+  // Creation des donnees pour le graphique
+  const donneesGraphique = {
+    labels: abscises,
     datasets: [
       {
-        data: listeALtitude,
+        data: points.map(point => point.alt ?? 0),
+        strokeWidth: props.detaille ? 3 : 2,
       },
     ],
-  }
+  };
 
-  return isLoading ? (
-    <ActivityIndicator size="large" color={colors.bouton} />
-    ) : (
-    <View>
-      <LineChart
-        data={line}
-        width={width - spacing.xl * 2}
-        height={200}
-        withInnerLines={false}
-        withOuterLines={false}
-        withShadow={false}
-        chartConfig={{
-          backgroundColor: colors.fond,
-          backgroundGradientFrom: colors.fond,
-          backgroundGradientTo: colors.fond,
-          color: () => colors.boutonAttenue,
-          labelColor: () => colors.bouton,
-          style: {
-            borderRadius: 16,
-          },
-          propsForDots: {
-            r: "0",
-            strokeWidth: "0",
-            stroke: colors.bouton,
-          },
-        }}
-        bezier
-      />
-    </View>
-  )
-})
+  return (
+    <LineChart
+      data={donneesGraphique}
+      width={width - spacing.xl * 2}
+      height={props.detaille ? 200 : 100}
+      formatYLabel={valeur => Math.round(+valeur / 50) * 50 + " m"}
+      withVerticalLabels={props.detaille}
+      withHorizontalLabels={true}
+      withInnerLines={false}
+      withOuterLines={false}
+      chartConfig={{
+        backgroundColor: colors.fond,
+        backgroundGradientFrom: colors.fond,
+        backgroundGradientTo: colors.fond,
+        color: () => colors.boutonAttenue,
+        labelColor: () => colors.bouton,
+        propsForDots: {
+          r: "0",
+          strokeWidth: "0",
+          stroke: colors.bouton,
+        },
+      }}
+    />
+  );
+});

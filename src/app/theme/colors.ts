@@ -1,20 +1,20 @@
 // TODO: write documentation for colors and palette in own markdown file and add links from here
 
 const palette = {
-  marron : "#333300",
-  vert : "#007C27",
-  vertAttenue : "#009944",
-  gris : "#D9D9D9",
-  grisClair : "#F9F9F9",
-  grisFonce : "#666666",
-  blanc : "#FFFFFF",
-  rouge : "#FF0000",
-  jaune : "#FFEE00",
-  noir : "#000000",
+  marron: "#333300",
+  vert: "#007C27",
+  vertAttenue: "#009944",
+  gris: "#D9D9D9",
+  grisClair: "#F9F9F9",
+  grisFonce: "#666666",
+  blanc: "#FFFFFF",
+  rouge: "#FF0000",
+  jaune: "#FFEE00",
+  noir: "#000000",
 
-  bleuLocActive : "#3478f6",
-  bleuLocInactive : "#3478f660",
-} as const
+  bleuLocActive: "#3478f6",
+  bleuLocInactive: "#3478f660",
+} as const;
 
 export const colors = {
   /**
@@ -59,7 +59,5 @@ export const colors = {
   valpinetaPalette: {
     transparentButton: palette.grisClair,
     green: palette.vert,
-  }
-
-
-}
+  },
+};
