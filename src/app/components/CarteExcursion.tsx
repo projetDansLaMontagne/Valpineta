@@ -15,14 +15,14 @@ interface CarteExcursionProps extends TouchableOpacityProps {
 
 export function CarteExcursion(props: CarteExcursionProps) {
   const navigation = props.navigation
-  var nomExcursion: string = ""
-  var vallee: string = ""
-  var typeParcours: string = ""
-  var duree: { h: number; m: number } = { h: 0, m: 0 }
-  var distance: number = 0
-  var denivele: number = 0
-  var difficulteTechnique: number = 0
-  var difficulteOrientation: number = 0
+  let nomExcursion: string = ""
+  let vallee: string = ""
+  let typeParcours: string = ""
+  let duree: { h: number; m: number } = { h: 0, m: 0 }
+  let distance: number = 0
+  let denivele: number = 0
+  let difficulteTechnique: number = 0
+  let difficulteOrientation: number = 0
 
   if (props.excursion) {
     nomExcursion = props.excursion.nom as string

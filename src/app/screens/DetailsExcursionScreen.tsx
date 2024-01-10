@@ -127,7 +127,7 @@ function itemFull(
   footerHeight: number
 ) {
 
-  var nomExcursion: string = ""
+  let nomExcursion: string = ""
   if (excursion !== undefined) {
     nomExcursion = excursion.nom as string;
   }
@@ -233,7 +233,7 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
             {excursion?.signalements?.map((signalement, index) => {
               // Calcule de la distance pour chaque avertissement
               const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
-              const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+              const distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track) : 0;
               const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
               return (
                 <View key={index}>
@@ -265,12 +265,12 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
  * @returns les informations de l'excursion
  */
 function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSignalements, userLocation) {
-  var duree: string = ""
-  var distance: string = ""
-  var difficulteOrientation: number = 0
-  var difficulteTechnique: number = 0
-  var description: string = ""
-  var signalements: Signalement[] = []
+  let duree: string = ""
+  let distance: string = ""
+  let difficulteOrientation: number = 0
+  let difficulteTechnique: number = 0
+  let description: string = ""
+  let signalements: Signalement[] = []
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -357,7 +357,7 @@ function infos(excursion: Record<string, unknown>, navigation: any, setIsAllSign
                       {signalements.map((signalement, index) => {
                         // Calculate the distance for each warning
                         const coordSignalement = { lat: signalement.latitude, lon: signalement.longitude, alt: null, dist: null };
-                        const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+                        const distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track) : 0;
                         const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
 
                         return (
@@ -443,10 +443,11 @@ function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees
 }
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-function recupDistance(coordonneeSignalement: Coordonnees) {
+function recupDistance(coordonneeSignalement: Coordonnees, track: any) {
   // Charger le fichier JSON avec les coordonnées
   const data: Coordonnees[] = require('../../assets/JSON/exemple_cruz_del_guardia.json');
-
+  // A modifier par le track de l'excursion
+  const data2: Coordonnees[] = track;
 
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
@@ -459,7 +460,7 @@ function recupDistance(coordonneeSignalement: Coordonnees) {
   let coordPointPlusProche: Coordonnees;
 
   // Parcourir toutes les coordonnées dans le fichier
-  for (const coord of data) {
+  for (const coord of data2) {
     // Assurez-vous que les coordonnées dans le fichier sont définies
     if (!coord.lat || !coord.lon) {
       console.error('Coordonnées dans le fichier non valides');
@@ -476,12 +477,11 @@ function recupDistance(coordonneeSignalement: Coordonnees) {
     }
   }
 
-  const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
-
   //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
   // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche; //c'est donc pas vraiment ce calcul qu'il faut faire
   // return distanceTotale;
-  return distanceDepartPointLePlusProche;
+
+  return distanceMinimale.toFixed(2);
 }
 
 /* -------------------------------------------------------------------------- */
