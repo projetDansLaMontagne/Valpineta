@@ -1,16 +1,18 @@
 // Librairies
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { TextStyle, TextInput, Image, View, Dimensions, ViewStyle } from "react-native";
+import { TextStyle, TextInput, Image, View, Dimensions, ViewStyle, Alert } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { Button, TextField } from "app/components";
 import * as ImagePicker from "expo-image-picker";
-import { useStores } from "app/models";
+import { RootStore, SynchroMontante, SynchroMontanteStore, useStores } from "app/models";
+import { synchroMontante } from "app/services/synchroMontante/synchroMontanteService"
+import NetInfo from '@react-native-community/netinfo';
+
 
 // Composants
 import { Screen, Text } from "app/components";
-import en from "app/i18n/en";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: "avertissement" | "pointInteret";
@@ -19,14 +21,13 @@ interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSign
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
     // Stores
-    const { parametres } = useStores();
+    const { parametres, synchroMontanteStore } = useStores(); 
 
     //type de signalement
     let type = "";
     if (props.route.params) {
       type = props.route.params.type;
-    }
-    else {
+    } else {
       throw new Error("Type de signalement non défini");
     }
 
@@ -43,6 +44,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [titreError, setTitreError] = useState(false);
     const [descriptionError, setDescriptionError] = useState(false);
     const [photoError, setPhotoError] = useState(false);
+
+    const [ status, setStatus ] = useState("");
 
     /**
      * Fonction pour prendre une photo avec la caméra
@@ -152,35 +155,81 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       }
     };
 
+    const AlerteStatus = (status: string) => {
+      if (status == "ajoute") { 
+      Alert.alert(
+
+        "Ajout réussi",
+        "Votre signalement a bien été ajouté",
+        [
+          { text: "Ajouter un autre" },
+          { text: "Retour", onPress: () => props.navigation.goBack() }
+        ],
+        { cancelable: false }
+      )
+      }
+      else if (status == "existe") {
+        Alert.alert(
+          "SIgnalement déjà existant",
+          "Votre signalement existe déjà dans la base de données",
+          [
+            { text: "OK" }
+          ],
+          { cancelable: false }
+        )
+      }
+      else if (status == "format") {
+        Alert.alert(
+          "Format incorrect",
+          "Veuillez vérifier les champs de votre signalement",
+          [
+            { text: "OK" }
+          ],
+          { cancelable: false }
+        )
+      }
+    }
+
     /**
      * Fonction pour envoyer le signalement en base de données
      * @returns {void}
      * @async
      * @function envoyerSignalement
      */
-    const envoyerSignalement = () => {
+    const envoyerSignalement = ( titreSignalement:string , descriptionSignalement:string, photoSignalement:string , synchroMontanteStore:SynchroMontanteStore): void => {
+      
+      let status = "En attente";
+
       // Vérification des champs
       verifSignalement();
 
       // Si les champs sont corrects
       if (!titreError && !descriptionError && !photoError) {
-        // On envoie le signalement en base de données
-        console.log("Signalement envoyé");
+
+        status = synchroMontante(titreSignalement, descriptionSignalement, photoSignalement, synchroMontanteStore);
+        
       } else {
-        console.log("Signalement non envoyé");
+        status = "format";
       }
+
+      AlerteStatus(status);
     };
 
-    // Utilisation d'effets secondaires pour déclencher la vérification des erreurs après chaque modification d'état
     useEffect(() => {
       verifSignalement();
     }, [titreSignalement, descriptionSignalement, photoSignalement]);
+
+    // Utilisation d'effets secondaires pour déclencher la vérification des erreurs après chaque modification d'état
 
     return (
       <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
         <Text
           style={$h1}
-          tx={type === "avertissement" ? "pageNouveauSignalement.titreAvertissement" : "pageNouveauSignalement.titrePointInteret"}
+          tx={
+            type === "avertissement"
+              ? "pageNouveauSignalement.titreAvertissement"
+              : "pageNouveauSignalement.titrePointInteret"
+          }
           size="xxl"
         />
         <Text text="Track : Col de la marmotte" size="lg" />
@@ -193,7 +242,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           />
         )}
         <TextInput
-          placeholder={ parametres.langues == "fr" ? "Insérez un titre" : "Insertar un título"}
+          placeholder={parametres.langues == "fr" ? "Insérez un titre" : "Insertar un título"}
           placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
           onChangeText={setTitreSignalement}
           value={titreSignalement}
@@ -212,7 +261,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           />
         )}
         <TextInput
-          placeholder={ parametres.langues == "fr" ? "Insérez une description" : "Insertar una descripción"}
+          placeholder={
+            parametres.langues == "fr" ? "Insérez une description" : "Insertar una descripción"
+          }
           placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
           onChangeText={setDescriptionSignalement}
           multiline={true}
@@ -226,11 +277,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         />
         <View>
           {photoError && !photoSignalement && (
-            <Text
-              tx="pageNouveauSignalement.erreur.photo"
-              size="xs"
-              style={$imageError}
-            />
+            <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
           )}
           {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}
           <View style={$boutonContainer}>
@@ -250,10 +297,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           <Button
             style={$bouton}
             tx="pageNouveauSignalement.boutons.valider"
-            onPress={envoyerSignalement}
+            onPress={() => 
+              envoyerSignalement(titreSignalement, descriptionSignalement, photoSignalement, synchroMontanteStore)
+            }
             textStyle={$textBouton}
           />
         </View>
+        <Text text={status} size="md" />
       </Screen>
     );
   },
