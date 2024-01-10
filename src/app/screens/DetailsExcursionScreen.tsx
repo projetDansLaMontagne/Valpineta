@@ -503,7 +503,7 @@ function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees
 }
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-function recupDistance(coordonneeSignalement: Coordonnees, data?: any) {
+function recupDistance(coordonneeSignalement: Coordonnees, data: any) {
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
     throw new Error("Coordonnées du signalement non valides");
