@@ -32,7 +32,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   const { parametres } = useStores();
 
-  var filtres: typeof props.Filtres;
+  let filtres: typeof props.Filtres;
   const [excursionsFiltrees1, setExcursionsFiltrees1] = useState(undefined); // Excursions triées par le 1e filtre (filtres en parametre)
   const [excursionsFiltrees2, setExcursionsFiltrees2] = useState(undefined); // Excursions triées par le 2e filtre (barre de recherche)
 
@@ -48,13 +48,13 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     excursions: excursionsType,
   ): Record<string, number | Array<number>> => {
     // Parcourt de chaque excursion pour connaitre les maximas
-    var distanceMax = 0;
-    var dureeMax = 0;
-    var deniveleMax = 0;
-    var typesParcours = [];
-    var vallees = [];
-    var difficulteTechniqueMax = 0;
-    var difficulteOrientationMax = 0;
+    let distanceMax = 0;
+    let dureeMax = 0;
+    let deniveleMax = 0;
+    let typesParcours = [];
+    let vallees = [];
+    let difficulteTechniqueMax = 0;
+    let difficulteOrientationMax = 0;
 
     excursions.forEach(excursion => {
       // Distance
@@ -103,12 +103,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Formate les fichiers de maniere a n avoir que le type necessaire (au lieu des strings)
    */
   const formatageExcursions = (excursions: excursionsType) => {
-    var excursionsFormatees = [];
+    let excursionsFormatees = [];
 
     const formatDuree = /(\d{1,2})h(\d{0,2})/;
 
     excursions.forEach(excursion => {
-      var malFormatee = false;
+      let malFormatee = false;
 
       // Duree
       const matchDuree: RegExpMatchArray | null = excursion.duree.match(formatDuree);
@@ -117,7 +117,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         // MAUVAIS FORMAT DUREE
         console.log(
           "Format de duree d une excursion MAUVAIS, impossible de formater. Il faut que les durees soient de la forme : HHhMM et non : " +
-            excursion.duree,
+          excursion.duree,
         );
         malFormatee = true;
       }
@@ -160,7 +160,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const loadExcursions = async (): Promise<void> => {
     try {
       // -- RECUPERATION DU FICHIER --
-      var excursionsBRUT = require("../../assets/JSON/excursions.json");
+      let excursionsBRUT = require("../../assets/JSON/excursions.json");
       excursionsBRUT = excursionsBRUT.map(excursion => {
         return {
           ...excursion,
@@ -196,7 +196,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Doit etre effectué a chaque modification des filtres
    */
   function filtrageParametres(excursionsAFiltrer: excursionsType, filtres: typeof props.Filtres) {
-    var excursionsFiltrees = excursionsAFiltrer;
+    let excursionsFiltrees = excursionsAFiltrer;
 
     // Filtre de la page des filtres
     if (filtres !== undefined) {
