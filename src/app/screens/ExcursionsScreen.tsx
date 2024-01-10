@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import {
   View,
@@ -28,10 +28,6 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 ) {
   const filtres = props.route.params?.filtres;
   const { parametres } = useStores();
-
-  const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
-  const [excursions, setExcursions] = useState<T_excursion[]>(undefined);
-  const [saisieBarre, setSaisieBarre] = useState<string>("");
 
   const { navigation } = props;
   const filtreIcone = require("../../assets/icons/filtre.png");
@@ -99,65 +95,60 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Tri et filtre des excursions avec les filtres
    * Doit etre effectué a chaque modification des filtres
    */
-  function applicationFiltres(excursions: T_excursion[], filtres: T_filtres) {
+  function filtrageParametre(excursions: T_excursion[], filtres: T_filtres) {
     const nomsTypesParcours =
       parametres.langues == "fr"
         ? ["Aller simple", "Aller/retour", "Circuit"]
         : ["Ida", "Ida y Vuelta", "Circular"];
 
     // Application des filtres en parametre
-    excursions = excursions.filter(excursion => {
-      const indexTypeParcours = nomsTypesParcours.indexOf(excursion.typeParcours);
+      excursions = excursions.filter(excursion => {
+        const indexTypeParcours = nomsTypesParcours.indexOf(excursion.typeParcours);
 
-      if (
-        excursion.distance < filtres.intervalleDistance.min ||
-        excursion.distance > filtres.intervalleDistance.max ||
-        (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
-        excursion.duree.h < filtres.intervalleDuree.min ||
-        excursion.duree.h > filtres.intervalleDuree.max ||
-        excursion.denivele < filtres.intervalleDenivele.min ||
-        excursion.denivele > filtres.intervalleDenivele.max ||
-        !filtres.indexTypesParcours.includes(indexTypeParcours) || // le type de l excursion est present dans les filtres
-        !filtres.vallees.includes(excursion.vallee) ||
-        !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
-        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
-      ) {
-        // On supprime de l excursion
-        return false;
-      } else {
-        // On garde de l excursion
-        return true;
-      }
-    });
+        if (
+          excursion.distance < filtres.intervalleDistance.min ||
+          excursion.distance > filtres.intervalleDistance.max ||
+          (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
+          excursion.duree.h < filtres.intervalleDuree.min ||
+          excursion.duree.h > filtres.intervalleDuree.max ||
+          excursion.denivele < filtres.intervalleDenivele.min ||
+          excursion.denivele > filtres.intervalleDenivele.max ||
+          !filtres.indexTypesParcours.includes(indexTypeParcours) || // le type de l excursion est present dans les filtres
+          !filtres.vallees.includes(excursion.vallee) ||
+          !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
+          !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
+        ) {
+          // On supprime de l excursion
+          return false;
+        } else {
+          // On garde de l excursion
+          return true;
+        }
+      });
 
-    // Application du critere de tri
-    excursions = excursions.sort((a, b) => {
-      const critere = filtres.critereTri;
+      // Application du critere de tri
+      excursions = excursions.sort((a, b) => {
+        const critere = filtres.critereTri;
 
-      if (critere === "duree") {
-        // On tri par la duree (avec h et m)
-        const duree1 = a.duree.h + a.duree.m / 60;
-        const duree2 = b.duree.h + b.duree.m / 60;
-        return duree1 - duree2;
-      }
-      return a[critere] - b[critere];
-    });
-    
-    return excursions;
+        if (critere === "duree") {
+          // On tri par la duree (avec h et m)
+          const duree1 = a.duree.h + a.duree.m / 60;
+          const duree2 = b.duree.h + b.duree.m / 60;
+          return duree1 - duree2;
+        }
+        return a[critere] - b[critere];
+      });
+
+      return excursions;
   }
   /**
    * Filtre les excursions contenant le texte de la barre de recherche
    */
   function filtrageBarre(excursionsAFiltrer: T_excursion[], recherche: String) {
     // Filtre de la barre de recherche
-    if (recherche !== undefined) {
-      return excursionsAFiltrer.filter(excursion =>
-        excursion.nom.toLowerCase().includes(recherche.toLowerCase()),
-      );
-    } else {
-      console.error("Impossible de filtrer : manque un parametre");
-      return excursionsAFiltrer;
-    }
+    return excursionsAFiltrer.filter(excursion =>
+      excursion.nom.toLowerCase().includes(recherche?.toLowerCase()),
+    );
   }
 
   // Applique la langue aux excursions
@@ -180,39 +171,44 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           typeParcours: excursion.es.typeParcours,
         };
       } else {
-        throw new Error("Langue inconnue : " + langue);
+        throw new Error("Langue non prise en charge : " + langue);
       }
     });
   }
 
-  // -- FONCTIONS CALL BACK --
-  const clicRecherche = val => {
- };
+  /* --------------------------------- STATES --------------------------------- */
+  const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
+  const [saisieBarre, setSaisieBarre] = useState<string>("");
+
+  const excursionsTraduites = useMemo<T_excursion[]>(
+    () => allExcursions && applicationLangue(allExcursions),
+    [allExcursions, parametres.langues],
+  );
+
+  const excursionsFiltreesParams = useMemo<T_excursion[]>(
+    () =>
+      excursionsTraduites && filtres
+        ? filtrageParametre(excursionsTraduites, filtres)
+        : excursionsTraduites,
+    [excursionsTraduites, filtres],
+  );
+
+  const excursionsFiltreesBarre = useMemo(
+    () =>
+      excursionsFiltreesParams && saisieBarre
+        ? filtrageBarre(excursionsFiltreesParams, saisieBarre)
+        : excursionsFiltreesParams,
+    [excursionsFiltreesParams, saisieBarre],
+  );
 
   // Initialisation des excursions
   useEffect(() => {
     try {
-      const excursionsBrutes = require("../../assets/JSON/excursions.json");
-      const excursionsTraduites = applicationLangue(excursionsBrutes);
-      setAllExcursions(excursionsTraduites);
+      setAllExcursions(require("../../assets/JSON/excursions.json"));
     } catch (error) {
       throw new Error("Erreur lors du chargement du fichier JSON : " + error);
     }
   }, []);
-
-  // Attribution des excursions
-  useEffect(() => {
-    if (allExcursions) {
-      setExcursions(filtres ? applicationFiltres(allExcursions, filtres) : allExcursions);
-    }
-  }, [allExcursions, filtres]);
-
-  // Application langue
-  useEffect(() => {
-    if (allExcursions) {
-      setAllExcursions(allExcursions => applicationLangue(allExcursions));
-    }
-  }, [parametres.langues]);
 
   return (
     <Screen style={$root} safeAreaEdges={["top"]}>
@@ -222,7 +218,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
             parametres.langues === "fr" ? "Rechercher une excursion" : "Buscar una excursión"
           }
           autoCorrect={false}
-          onChangeText={text => clicRecherche(text)}
+          onChangeText={text => setSaisieBarre(text)}
+          value={saisieBarre}
           placeholderTextColor={colors.palette.grisFonce}
           style={styles.barreRecherche}
         />
@@ -231,12 +228,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         </TouchableOpacity>
       </View>
 
-      {excursions &&
-        (excursions.length == 0 ? (
+      {excursionsFiltreesBarre &&
+        (excursionsFiltreesBarre.length == 0 ? (
           <Text tx="excursions.absenceResultats" />
         ) : (
           <ScrollView style={styles.scrollContainer}>
-            {excursions.map((excursion, i) => (
+            {excursionsFiltreesBarre.map((excursion, i) => (
               <CarteExcursion key={i} excursion={excursion} navigation={navigation} />
             ))}
           </ScrollView>
