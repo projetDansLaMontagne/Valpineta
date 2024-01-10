@@ -32,7 +32,7 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 import { MapScreen } from "./MapScreen";
 const { width, height } = Dimensions.get("window");
 
-interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
+interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> { }
 
 interface T_Point extends TPoint {
   title?: string;
@@ -234,10 +234,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     const allPoints = excursion.track.map(
       (point: T_Point) =>
-        ({
-          latitude: point.lat,
-          longitude: point.lon,
-        } as LatLng),
+      ({
+        latitude: point.lat,
+        longitude: point.lon,
+      } as LatLng),
     );
 
     const changeStartPoint = (point: LatLng) => {
@@ -738,9 +738,9 @@ function calculeDistanceEntreDeuxPoints(coord1: T_Point, coord2: T_Point) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-      Math.cos(toRadians(coord2.lat)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRadians(coord2.lat)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
