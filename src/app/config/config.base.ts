@@ -1,10 +1,10 @@
 export interface ConfigBaseProps {
-  persistNavigation: "always" | "dev" | "prod" | "never"
-  catchErrors: "always" | "dev" | "prod" | "never"
-  exitRoutes: string[]
+  persistNavigation: "always" | "dev" | "prod" | "never";
+  catchErrors: "always" | "dev" | "prod" | "never";
+  exitRoutes: string[];
 }
 
-export type PersistNavigationConfig = ConfigBaseProps["persistNavigation"]
+export type PersistNavigationConfig = ConfigBaseProps["persistNavigation"];
 
 const BaseConfig: ConfigBaseProps = {
   // This feature is particularly useful in development mode, but
@@ -21,6 +21,6 @@ const BaseConfig: ConfigBaseProps = {
    * is pressed while in that screen. Only affects Android.
    */
   exitRoutes: ["Accueil"],
-}
+};
 
-export default BaseConfig
+export default BaseConfig;

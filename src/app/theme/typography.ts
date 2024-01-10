@@ -1,23 +1,22 @@
 // TODO: write documentation about fonts and typography along with guides on how to add custom fonts in own
 // markdown file and add links from here
 
-import { Platform } from "react-native"
+import { Platform } from "react-native";
 import {
   SpaceGrotesk_300Light as spaceGroteskLight,
   SpaceGrotesk_400Regular as spaceGroteskRegular,
   SpaceGrotesk_500Medium as spaceGroteskMedium,
   SpaceGrotesk_600SemiBold as spaceGroteskSemiBold,
   SpaceGrotesk_700Bold as spaceGroteskBold,
-} from "@expo-google-fonts/space-grotesk"
+} from "@expo-google-fonts/space-grotesk";
 
-import { 
+import {
   WorkSans_300Light as workSansLight,
   WorkSans_400Regular as workSansRegular,
   WorkSans_500Medium as workSansMedium,
   WorkSans_600SemiBold as workSansSemiBold,
   WorkSans_700Bold as workSansBold,
-
-} from "@expo-google-fonts/work-sans"
+} from "@expo-google-fonts/work-sans";
 
 export const customFontsToLoad = {
   spaceGroteskLight,
@@ -30,7 +29,7 @@ export const customFontsToLoad = {
   workSansMedium,
   workSansSemiBold,
   workSansBold,
-}
+};
 
 const fonts = {
   spaceGrotesk: {
@@ -71,7 +70,7 @@ const fonts = {
     semiBold: "workSansSemiBold",
     bold: "workSansBold",
   },
-}
+};
 
 export const typography = {
   /**
@@ -90,4 +89,4 @@ export const typography = {
    * Lets get fancy with a monospace font!
    */
   code: Platform.select({ ios: fonts.courier, android: fonts.monospace }),
-}
+};

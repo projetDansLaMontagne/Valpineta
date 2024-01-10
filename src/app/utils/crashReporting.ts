@@ -29,7 +29,7 @@ export const initCrashReporting = () => {
   //   debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
   // })
   // Bugsnag.start("YOUR API KEY")
-}
+};
 
 /**
  * Error classifications used to sort errors on error reporting services.
@@ -52,10 +52,10 @@ export enum ErrorType {
 export const reportCrash = (error: Error, type: ErrorType = ErrorType.FATAL) => {
   if (__DEV__) {
     // Log to console and Reactotron in development
-    const message = error.message || "Unknown"
-    console.error(error)
-    console.log(message, type)
-    console.tron.log(error)
+    const message = error.message || "Unknown";
+    console.error(error);
+    console.log(message, type);
+    console.tron.log(error);
   } else {
     // In production, utilize crash reporting service of choice below:
     // RN
@@ -65,4 +65,4 @@ export const reportCrash = (error: Error, type: ErrorType = ErrorType.FATAL) => 
     // crashlytics().recordError(error)
     // Bugsnag.notify(error)
   }
-}
+};

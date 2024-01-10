@@ -11,10 +11,10 @@ import {
   PressableProps,
   StyleProp,
   TouchableOpacity,
-  ViewStyle
+  ViewStyle,
 } from "react-native";
-import {FontAwesome5} from "@expo/vector-icons";
-import {forwardRef, RefObject} from "react";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { forwardRef, RefObject } from "react";
 // END IMPORTS ==========================================================================================   END IMPORTS
 
 // VARIABLES ================================================================================================ VARIABLE
@@ -36,7 +36,7 @@ export interface MapButtonProps extends PressableProps {
   /**
    * An optional style override useful for padding & margin.
    */
-  style?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>;
 }
 // END VARIABLES ======================================================================================= END VARIABLES
 
@@ -58,7 +58,7 @@ const MapButton = forwardRef((props: MapButtonProps, ref) => {
     iconColor,
 
     style,
-  } = props
+  } = props;
 
   // Render
   return (
@@ -66,21 +66,15 @@ const MapButton = forwardRef((props: MapButtonProps, ref) => {
       <TouchableOpacity
         ref={ref as RefObject<any>}
         style={style}
-
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         onPress={onPress}
       >
-        <FontAwesome5
-          name={icon}
-          size={iconSize}
-          color={iconColor}
-        />
+        <FontAwesome5 name={icon} size={iconSize} color={iconColor} />
       </TouchableOpacity>
     </Animated.View>
-  )
+  );
 });
-
 
 // END COMPONENT =======================================================================================  END COMPONENT
 
