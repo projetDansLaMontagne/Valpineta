@@ -291,55 +291,68 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
+<<<<<<< HEAD
 
-        {allPoints && startPoint && (
-          <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
-            <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
+    {
+      allPoints && startPoint && (
+        <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
+          <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
 
-            {startMiddleAndEndHandler(
-              excursion.track,
-              excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
-            )}
-
-            {signalementsHandler(excursion.signalements)}
-          </MapScreen>
-        )}
-
-        <SwipeUpDown
-          itemMini={itemMini()}
-          itemFull={itemFull(
-            excursion,
-            navigation,
-            containerInfoAffiche,
-            setcontainerInfoAffiche,
-            isAllSignalements,
-            setIsAllSignalements,
-            userLocation,
-            footerHeight,
-
-            changeStartPoint,
+          {startMiddleAndEndHandler(
+            excursion.track,
+            excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
           )}
-          animation="easeInEaseOut"
-          swipeHeight={30 + footerHeight}
-          disableSwipeIcon={true}
-          ref={swipeUpDownRef}
-        />
-      </SafeAreaView>
-    ) : (
-      // sinon on affiche une erreur
-      <Screen preset="fixed">
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+
+          {signalementsHandler(excursion.signalements)}
+        </MapScreen>
+      )
+    }
+
+=======
+        <TouchableOpacity style={$boutonSuivi}
+          onPress={() => navigation.navigate("SuiviTrack", { excursion: excursion })}
+        >
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
-        <View style={$containerErreur}>
-          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
-          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
-        </View>
-      </Screen>
-    );
+>>>>>>> 483978b1 (Première version fonctionnelle sans signalements)
+    <SwipeUpDown
+      itemMini={itemMini()}
+      itemFull={itemFull(
+        excursion,
+        navigation,
+        containerInfoAffiche,
+        setcontainerInfoAffiche,
+        isAllSignalements,
+        setIsAllSignalements,
+        userLocation,
+        footerHeight,
+
+        changeStartPoint,
+      )}
+      animation="easeInEaseOut"
+      swipeHeight={30 + footerHeight}
+      disableSwipeIcon={true}
+      ref={swipeUpDownRef}
+    />
+      </SafeAreaView >
+    ) : (
+  // sinon on affiche une erreur
+  <Screen preset="fixed">
+    <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+      <Image
+        style={{ tintColor: colors.bouton }}
+        source={require("../../assets/icons/back.png")}
+      />
+    </TouchableOpacity>
+    <View style={$containerErreur}>
+      <Text tx="detailsExcursion.erreur.titre" size="xxl" />
+      <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
+    </View>
+  </Screen>
+);
   },
 );
 
@@ -784,12 +797,12 @@ function recupDistance(coordonneeSignalement: T_Point, data: any) {
       coordPointPlusProche = coord;
     }
   }
+
   const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
 
   //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
   // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche; //c'est donc pas vraiment ce calcul qu'il faut faire
   // return distanceTotale;
-
   return distanceDepartPointLePlusProche;
 }
 
@@ -813,6 +826,20 @@ const $boutonRetour: ViewStyle = {
   position: "absolute",
   top: 15,
   zIndex: 1,
+};
+
+const $boutonSuivi: ViewStyle = {
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
+  padding: spacing.sm,
+  margin: spacing.lg,
+  width: 50,
+  position: "absolute",
+  top: 15,
+  zIndex: 1,
+  left: 70,
 };
 
 const $container: ViewStyle = {

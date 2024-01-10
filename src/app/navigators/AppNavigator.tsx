@@ -139,7 +139,7 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 /* -------------------------------------------------------------------------- */
 
 export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
+  extends Partial<React.ComponentProps<typeof NavigationContainer>> { }
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme();
