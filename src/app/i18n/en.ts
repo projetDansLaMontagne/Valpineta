@@ -24,8 +24,8 @@ const en = {
       button: "Let's try this again",
     },
   },
-  testScreen: {
-    title: "Test Screen",
+  mapScreen: {
+    title: "Map",
     locate: {
       locate_btn: "Locate me !",
       dl_map_btn: "Download map",
@@ -44,12 +44,60 @@ const en = {
       },
     }
   },
-  footer: {
-    accueil: "Accueil",
-    carte: "Carte",
-    parametres: "Parametres",
+  excursions:{
+    titre: "Excursions",
+    erreurChargement: "No excursion found",
+    erreurNom: "No excursion found",
   },
+  detailsExcursion:{
+    titres:{
+      infos: "Infos",
+      avis: "Reviews",
+      description: "Description",
+      signalements: "Reports",
+    },
+    boutons:{
+      lireSuite: "Read more",
+    },
+    erreur:{
+      titre: "Error",
+      message : " An error has occured, please try again."
+    }
+  },parametres:{
+    titre: "Settings",
+    changerLangue: {
+      titre: "Language",
+      francais: "French",
+      espagnol: "Spanish",
+    }
+  },
+  pageFiltres:{
+    tri:{
+      titre: "Sort by",
+      distance: "Distance",
+      denivele: "Denivelation",
+      difficulteTech: "Technical difficulty",
+      difficulteOrientation: "Orientation difficulty",
+    },
+    filtres:{
+      titre: "Filters",
+      distance: 'Distance (en km)',
+      duree: 'Duration (en hours)',
+      denivele: 'Denivelation (en m)',
+      parcours: 'Type of course',
+      typeParcours: {
+        aller: 'One way',
+        allerRetour: 'Round trip',
+        boucle: 'Loop',
+      },
+      vallees: 'Valleys',
+      difficulteTech: 'Technical difficulty',
+      difficulteOrientation: 'Orientation difficulty',
+    },
+    boutons:{
+      valider: "Validate",
+    }
+  }
 }
 
 export default en
-export type Translations = typeof en

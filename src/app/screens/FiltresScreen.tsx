@@ -15,6 +15,8 @@ import { observer } from "mobx-react-lite"
 import { Text, Button, Screen } from "app/components"
 import { AppStackScreenProps } from "app/navigators"
 import { colors, spacing } from "../theme"
+import { useStores } from "../models"
+import { types } from "mobx-state-tree"
 
 /**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
 
@@ -24,6 +26,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   props: FiltresScreenProps,
 ) {
   const { navigation } = props
+  const { parametres } = useStores()
+
   var valeursFiltres
 
   // Assets
@@ -39,21 +43,34 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   // Recuperation des valeurs de filtres
   try {
     // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
-    valeursFiltres = require("../../assets/JSON/valeurs_filtres.json")
+    valeursFiltres = parametres.langues == "fr" ? 
+    require("../../assets/JSON/valeurs_filtresFR.json"):
+    require("../../assets/JSON/valeurs_filtresES.json")
   } catch (error) {
     // Erreur critique si on n a pas les valeurs de filtres
     navigation.navigate("Excursions")
     console.error("Page des filtres necessite les filtres appliques en parametres")
     return <></>
   }
+
   const incrementDenivele = 200
-  const criteresTri = [
+  const criteresTri = parametres.langues == "fr" ?
+  [
     { nom: "Distance", nomCle: "distance", logo: logoDistance },
     { nom: "Durée", nomCle: "duree", logo: logoDuree },
     { nom: "Dénivelé", nomCle: "denivele", logo: logoDenivele },
     { nom: "Difficulté technique", nomCle: "difficulteTechnique", logo: logoDiffTech },
     { nom: "Difficulté d'orientation", nomCle: "difficulteOrientation", logo: logoDiffOri },
   ]
+  :
+  [
+    { nom: "Distancia", nomCle: "distance", logo: logoDistance },
+    { nom: "Duración", nomCle: "duree", logo: logoDuree },
+    { nom: "Desnivel", nomCle: "denivele", logo: logoDenivele },
+    { nom: "Dificultad técnica", nomCle: "difficulteTechnique", logo: logoDiffTech },
+    { nom: "Dificultad de orientación", nomCle: "difficulteOrientation", logo: logoDiffOri },
+  ]
+
 
   // -- USE STATES --
   // Tri / Filtres selectionnes
@@ -138,17 +155,24 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     navigation.navigate("Excursions", { Filtres: filtres })
   }
 
+  // USE EFFECTS
+  useEffect(() => {
+    setTypesParcours(
+      valeursFiltres.nomTypesParcours.map((nomType) => ({ nom: nomType, selectionne: true })),
+    )
+  }, [valeursFiltres.nomTypesParcours])
+
   return (
     <Screen
       preset="fixed"
       safeAreaEdges={["top"]}
       style={$container}
     >
-      <Button text="Valider filtres" style={$boutonValidation} onPress={() => validerFiltres()} />
+      <Button tx="pageFiltres.boutons.valider" style={$boutonValidation} onPress={() => validerFiltres()} />
       <ScrollView
         scrollEnabled={!slideVerticalBloque}
       >
-        <Text style={$h1}>Trier par</Text>
+        <Text tx="pageFiltres.tri.titre" style={$h1}/>
         <View>
           {criteresTri.map((critere, i) => (
             <TouchableOpacity
@@ -165,8 +189,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
 
-        <Text style={$h1}>Filtrer par</Text>
-        <Text style={$h2}>Distance (en km)</Text>
+        <Text tx="pageFiltres.filtres.titre" style={$h1}/>
+        <Text tx="pageFiltres.filtres.distance" style={$h2}/>
         <Slider
           min={0}
           max={valeursFiltres.distanceMax}
@@ -180,7 +204,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           labelStyle={{ backgroundColor: colors.fond }}
         />
 
-        <Text style={$h2}>Durée (en h)</Text>
+        <Text tx="pageFiltres.filtres.duree" style={$h2} />
         <Slider
           min={0}
           max={valeursFiltres.dureeMax}
@@ -194,7 +218,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           labelStyle={{ backgroundColor: colors.fond }}
         />
 
-        <Text style={$h2}>Dénivelé (en m)</Text>
+        <Text tx="pageFiltres.filtres.denivele" style={$h2}/>
         <Slider
           min={0}
           max={valeursFiltres.deniveleMax + incrementDenivele}
@@ -208,7 +232,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           labelStyle={{ backgroundColor: colors.fond }}
         />
 
-        <Text style={$h2}>Type de parcours</Text>
+        <Text tx="pageFiltres.filtres.parcours" style={$h2} />
         <View>
           {typesParcours.map((typeParcours, i) => (
             <TouchableOpacity
@@ -229,7 +253,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
 
-        <Text style={$h2}>Vallées</Text>
+        <Text tx="pageFiltres.filtres.vallees" style={$h2}/>
         <View style={$containerVallees}>
           {vallees.map((vallee, i) => (
             <TouchableOpacity
@@ -256,7 +280,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
 
-        <Text style={$h2}>Difficulté technique</Text>
+        <Text tx="pageFiltres.filtres.difficulteTech" style={$h2} />
         <View style={$containerDiff}>
           {difficultesTechniques.map((difficulte, i) => (
             <TouchableOpacity
@@ -275,7 +299,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           ))}
         </View>
 
-        <Text style={$h2}>Difficulté d'orientation</Text>
+        <Text tx="pageFiltres.filtres.difficulteOrientation" style={$h2} />
         <View style={$containerDiffOrientation}>
           {difficultesOrientation.map((difficulte, i) => (
             <TouchableOpacity

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useState } from "react"
 import { observer } from "mobx-react-lite"
 import {
   View,
@@ -21,6 +21,7 @@ const { width, height } = Dimensions.get("window")
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
   excursion: Record<string, unknown>
+  temps: Record<"h" | "m", number>
 }
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
@@ -46,10 +47,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           swipeHeight={100}
         />
       </SafeAreaView>
-    ) : 
-    //sinon on affiche une erreur
-    (
-      <Screen  preset="fixed">
+    ) : (
+      //sinon on affiche une erreur
+      <Screen preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
             style={{ tintColor: colors.bouton }}
@@ -57,14 +57,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           />
         </TouchableOpacity>
         <View style={$containerErreur}>
-          <Text size="xxl">Erreur</Text>
-          <Text style={$texteErreur} size="sm">
-            Une erreur est survenue, veuillez réessayer
-          </Text>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl"/>
+          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message"/>
         </View>
       </Screen>
     )
-  }
+  },
 )
 
 /**
@@ -86,9 +84,8 @@ function itemFull(
   excursion: Record<string, unknown>,
   navigation: any,
   containerInfoAffiche: boolean,
-  setcontainerInfoAffiche: any
+  setcontainerInfoAffiche: any,
 ) {
-
   var nomExcursion = ""
   if (excursion !== undefined) {
     nomExcursion = excursion.nom
@@ -97,7 +94,7 @@ function itemFull(
   return (
     <View style={$containerGrand}>
       <View style={$containerTitre}>
-        <Text text={nomExcursion} size="xl" style={$titre} />
+        <Text text={excursion.nom} size="xl" style={$titre} />
         <GpxDownloader />
       </View>
       <View>
@@ -109,7 +106,7 @@ function itemFull(
             style={$boutonInfoAvis}
           >
             <Text
-              text="Infos"
+              tx="detailsExcursion.titres.infos"
               size="lg"
               style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
             />
@@ -121,7 +118,7 @@ function itemFull(
             style={$boutonInfoAvis}
           >
             <Text
-              text="Avis"
+              tx="detailsExcursion.titres.avis"
               size="lg"
               style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
             />
@@ -150,16 +147,13 @@ function afficherDescriptionCourte(description: string) {
     return descriptionFinale
   }
 }
-
 /**
  *
  * @param isLoading
  * @returns les informations de l'excursion
  */
-function infos( excursion: Record<string, unknown>, navigation: any) {
-  const data = JSON.parse(JSON.stringify(require("./../../assets/JSON/exemple.json")))
-
-  var duree = ""
+function infos(excursion: Record<string, any>, navigation: any) {
+  var duree = { h: 0, m: 0 }
   var distance = ""
   var difficulteOrientation = 0
   var difficulteTechnique = 0
@@ -171,10 +165,7 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
     excursion.difficulteTechnique !== undefined ||
     excursion.description !== undefined
   ) {
-    duree = excursion.duree.h + "h"
-    if (excursion.duree.m !== 0) {
-      duree = duree + excursion.duree.m
-    }
+    duree = excursion.duree
     distance = excursion.distance
     difficulteTechnique = excursion.difficulteTechnique
     difficulteOrientation = excursion.difficulteOrientation
@@ -191,7 +182,7 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
                 style={$iconInformation}
                 source={require("../../assets/icons/duree.png")}
               ></Image>
-              <Text text={duree} size="xs" />
+              <Text text={duree.h + "h" + (duree.m == 0 ? "" : duree.m)} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
@@ -217,7 +208,7 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
           </View>
           <View style={$containerDescriptionSignalements}>
             <View>
-              <Text text="Description" size="lg" />
+              <Text tx="detailsExcursion.titres.description" size="lg" />
               <Text
                 style={$textDescription}
                 text={afficherDescriptionCourte(description)}
@@ -229,18 +220,18 @@ function infos( excursion: Record<string, unknown>, navigation: any) {
                 }}
               >
                 {description === "" ? null : (
-                  <Text style={$lienDescription} text="Voir plus" size="xxs" />
+                  <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
                 )}
               </TouchableOpacity>
             </View>
             <View>
-              <Text text="Signalement" size="lg" />
+              <Text tx="detailsExcursion.titres.signalement" size="lg" />
               <Text text="signalement" size="xs" />
             </View>
           </View>
           <View style={$containerDenivele}>
-            <Text text="Dénivelé" size="xl" />
-              <GraphiqueDenivele data={data} />
+            <Text tx="detailsExcursion.titres.denivele" size="xl" />
+            {excursion.track && <GraphiqueDenivele points={excursion.track} />}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -326,7 +317,9 @@ const $containerGrand: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.xs,
-  paddingBottom: 250,
+  // A SUPPRIMER : si le footer est reconnnu, il n y a pas besoins de mettre de marge
+  // Là, la popup se cache derriere le footer
+  marginBottom: 170,
 }
 
 //Style du container du titre et du bouton de téléchargement
@@ -409,7 +402,7 @@ const $containerAvis: ViewStyle = {
 
 const $containerDenivele: ViewStyle = {
   padding: spacing.lg,
-  // marginBottom: 100, pour pouvoir afficher le graphique
+  // A SUPPRIMER : on devrait pas avoir ca
   marginBottom: 100,
 }
 

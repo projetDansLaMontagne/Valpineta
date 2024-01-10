@@ -32,10 +32,8 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
           />
         </TouchableOpacity>
         <ScrollView style={$containerDescription}>
-          <Text size="xxl">Erreur</Text>
-          <Text style={$texteDescription} size="sm">
-            Une erreur est survenue, veuillez réessayer
-          </Text>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl"/>
+          <Text tx="detailsExcursion.erreur.message" style={$texteDescription} size="sm"/>
         </ScrollView>
       </Screen>
     )
