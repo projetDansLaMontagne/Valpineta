@@ -27,6 +27,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [descriptionSignalement, setDescriptionSignalement] = useState("")
     const [photoSignalement, setPhotoSignalement] = useState(undefined)
 
+    //Variables de permissions
     const [cameraPermission, setCameraPermission] = useState(false)
     const [LibrairiesPermission, setLibrairiesPermission] = useState(null)
 
@@ -35,18 +36,29 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [descriptionError, setDescriptionError] = useState(false)
     const [photoError, setPhotoError] = useState(false)
 
-    //Fonction pour prendre une photo
+    /**
+     * Fonction pour prendre une photo avec la caméra
+     * @returns {void}
+     * @async
+     * @function prendrePhoto
+     */
     const prendrePhoto = async () => {
+      // On vétifie si l'application a accès à la caméra
       if (cameraPermission) {
         let photo = await ImagePicker.launchCameraAsync()
+        // On vérifie si l'utilisateur a annulé la prise de photo
         if (!photo.canceled) {
           setPhotoSignalement(photo.assets[0].uri)
         }
       } else {
+        // On demande l'accès à la caméra
         const cameraStatus = await ImagePicker.requestCameraPermissionsAsync()
         if (cameraStatus.granted) {
+          // Si l'accès est accordé, on met la variable à true
           setCameraPermission(true)
+          // On ouvre la caméra
           let photo = await ImagePicker.launchCameraAsync()
+          // On vérifie si l'utilisateur a annulé la prise de photo
           if (!photo.canceled) {
             setPhotoSignalement(photo.assets[0].uri)
           }
@@ -54,18 +66,29 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       }
     }
 
-    //Fonction pour choisir une photo
+    /**
+     * Fonction pour choisir une photo dans la librairie
+     * @returns {void}
+     * @async
+     * @function choisirPhoto
+     */
     const choisirPhoto = async () => {
+      // On vérifie si l'application a accès à la librairie
       if (LibrairiesPermission) {
         let photo = await ImagePicker.launchImageLibraryAsync()
+        // On vérifie si l'utilisateur a annulé la prise de photo
         if (!photo.canceled) {
           setPhotoSignalement(photo.assets[0].uri)
         }
       } else {
+        // On demande l'accès à la librairie
         const LibrairiesStatus = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        // Si l'accès est accordé, on met la variable à true
         if (LibrairiesStatus.granted) {
           setLibrairiesPermission(true)
+          // On ouvre la librairie
           let photo = await ImagePicker.launchImageLibraryAsync()
+          // On vérifie si l'utilisateur a annulé la prise de photo
           if (!photo.canceled) {
             setPhotoSignalement(photo.assets[0].uri)
           }
@@ -73,11 +96,16 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       }
     }
 
+    /**
+     * Fonction pour envoyer le signalement en base de données et vérification des champs
+     * @returns {void}
+     * @function envoyerSignalement
+     */
     const envoyerSignalement = () => {
-
+      // Regex pour vérifier si les champs sont corrects et contiennent uniquement des caractères autorisés
       const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*-+,.:;"]+$/;
 
-
+      // Vérification du titre
       if (
         titreSignalement === "" ||
         !regex.test(titreSignalement) ||
@@ -89,6 +117,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         setTitreError(false)
       }
 
+      // Vérification de la description
       if (
         descriptionSignalement === "" ||
         !regex.test(descriptionSignalement) ||
@@ -100,6 +129,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         setDescriptionError(false)
       }
 
+      // Vérification de la photo
       if (photoSignalement === undefined || photoSignalement === null) {
         setPhotoError(true)
       } else {
@@ -113,6 +143,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         }
       }
 
+      // Si tout est correct, on envoie le signalement en base de données
       if (photoError === false && descriptionError === false && titreError === false) {
         console.log("envoyer")
       }
