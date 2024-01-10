@@ -28,11 +28,34 @@ import SwipeUpDown from "react-native-swipe-up-down";
 import HTML from "react-native-render-html";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import {LatLng, Marker, Polyline} from "react-native-maps";
+import {ImageSource} from "react-native-vector-icons/Icon";
+import {MapScreen} from "./MapScreen";
 const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  excursion: Record<string, unknown>;
-  temps: Record<"h" | "m", number>;
+  excursion: Record<string, unknown>
+  temps: Record<"h" | "m", number>
+}
+
+export type T_Point = {
+  lon: number,
+  lat: number,
+  alt: number | null,
+  dist: number,
+  pos: number,
+  title?: string,
+}
+
+type T_Signalement = {
+  id: number,
+  nom: string,
+  type: string,
+  description: string,
+  image: string,
+  latitude: number,
+  longitude: number,
+  idExcursion: number,
 }
 
 interface Coordonnees {
@@ -51,10 +74,231 @@ interface Signalement {
   longitude: number;
 }
 
+type T_Language = "fr" | "es" | "en" | 'ar';
+type T_LanguageContent = {
+  nom: string,
+  description: string,
+  typeParcours: "Ida" | "Ida y Vuelta" | "Circular",
+}
+
+type T_Excursion = {
+  [key in T_Language]: T_LanguageContent;
+} & {
+  denivele: string;
+  difficulteOrientation: string;
+  difficulteTechnique: string;
+  distance: string;
+  duree: string;
+  vallee: string;
+  postId: number;
+  signalements: T_Signalement[];
+  nomTrackGpx: string;
+  track: T_Point[];
+};
+
+
+/**
+ * @function startMiddleAndEndHandler
+ * @description Affiche les points de départ, milieu et fin de l'excursion en fonction du type de parcours.
+ * Un parcours en boucle n'a pas de point d'arrivée.
+ * Un parcours en aller-retour a un point d'arrivée.
+ * Tous les parcours ont un point de départ et un point de milieu.
+ *
+ * @param track {T_Point[]} - le fichier gpx de l'excursion
+ * @param typeParcours {"Ida" | "Ida y Vuelta" | "Circular"} - le type de parcours
+ *
+ * @returns les points de départ, milieu et fin de l'excursion
+ */
+const startMiddleAndEndHandler = (
+  track: T_Point[],
+  typeParcours: "Ida" | "Ida y Vuelta" | "Circular",
+) => {
+
+  // Point d'arrivée
+  const start = {
+    ...track[0],
+    title: "Départ"
+  };
+  const end = {
+    ...track[track.length - 1],
+    title: "Arrivée"
+  }
+  let points: T_Point[];
+
+
+  // Calcul du point du milieu
+  // Si c'est un aller-retour, le parcours étant symétrique,
+  // on prend le point à la moitié de la distance totale
+  const middleDistance = end.dist / (typeParcours === "Ida y Vuelta" ? 1 : 2);
+
+  const middle = {
+      ...track
+      .sort((a, b) => {
+        return a.dist - b.dist
+      })
+      .find((point) => point.dist >= middleDistance),
+    title: "Milieu"
+  };
+    // find prend le premier élément qui correspond à la condition, vu que c'est sorted, on a le bon point
+
+  // À ce stade, on a les points d'arrivée et du milieu.
+  switch (typeParcours) {
+    case "Ida": // aller simple
+      // Point de départ si c'est un aller simple
+      points = [start, middle, end];
+      break;
+    case "Ida y Vuelta":
+    case "Circular":
+      // Point d'arrivée si c'est un aller-retour
+      start.title = "Départ / Arrivée";
+
+      points = [start, middle];
+      break;
+  }
+
+  if (typeParcours === "Ida") {
+    // Point d'arrivée si c'est un aller simple
+    points.push(end);
+  }
+
+  const image: ImageSource = require("../../assets/icons/location.png");
+
+  return (
+    <>
+      {
+        points.map((point, index) => {
+          return (
+            <Marker
+              coordinate={{
+                latitude: point.lat,
+                longitude: point.lon
+              }}
+              // key={point.dist}
+              key={index}
+              // Si l'array de points ne contient que 2 points,
+              // on est sur un aller simple, le deuxième point est donc l'arrivée
+              title={point.title}
+
+              pinColor={index === 1 ? colors.bouton : colors.text}
+              style={{
+                zIndex: 999,
+              }}
+
+              centerOffset={{ x: 0, y: -15 }}
+            >
+              <Image
+                source={image}
+                style={{
+                  width: 30,
+                  height: 30,
+                  tintColor: index === 1 ? colors.bouton : colors.text,
+                }}
+              />
+            </Marker>
+          )
+        })
+      }
+    </>
+  )
+}
+
+/**
+ * @function signalementsHandler
+ * @description Affiche les signalements sur la carte.
+ *
+ * @param signalements {T_Signalement[]} - les signalements de l'excursion
+ *
+ * @returns les signalements à afficher sur la carte.
+ */
+const signalementsHandler = (signalements: T_Signalement[]) => {
+  const binoculars: ImageSource = require("../../assets/icons/binoculars.png");
+  const attention: ImageSource = require("../../assets/icons/attention.png");
+
+  /**
+   * ! TESTS
+   */
+  signalements = [
+    // ...signalements,
+    {
+      id: 1,
+      nom: "\"Couché de soleil\"",
+      type: "Avertissement",
+      description: "\"Meilleur endroit pour voir le couché de soleil\"",
+      image: "",
+      latitude: 42.714695,
+      longitude: 0.208302,
+      idExcursion: 2049
+
+      } as T_Signalement,
+  ]
+  /**
+   * ! FIN TESTS
+   */
+
+  return (
+    <>
+      {
+        signalements.map((signalement, index) => {
+          /**
+           * ! ATTENDRE PR DE NICO QUI A TYPÉ LES SIGNALEMENTS
+           */
+          let iconColor: string;
+          let image: ImageSource;
+
+          console.log(`[DetailsExcursionScreen] signalement: ${JSON.stringify(signalement)}`)
+
+          switch (signalement.type) {
+            case "PointInteret":
+              image = binoculars;
+              break;
+            case "Avertissement":
+              image = attention;
+              break;
+            default:
+              iconColor = "black";
+              image = binoculars;
+              break;
+          }
+
+          return (
+            <Marker
+              coordinate={{
+                latitude: signalement.latitude,
+                longitude: signalement.longitude
+              }}
+              // key={point.dist}
+              key={index}
+              // Si l'array de points ne contient que 2 points,
+              // on est sur un aller simple, le deuxième point est donc l'arrivée
+              title={signalement.nom}
+
+              // pinColor={iconColor}
+              style={{
+                zIndex: 999,
+              }}
+
+              centerOffset={{ x: 0, y: signalement.type === "PointInteret" ? 0 : -15 }}
+            >
+              <Image
+                source={image}
+                style={{
+                  width: 30,
+                  height: 30,
+                  tintColor: iconColor,
+                }}
+              />
+            </Marker>
+          )
+        })
+      }
+    </>
+  )
+}
+
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props;
-    let excursion: Record<string, unknown>;
+    let excursion: T_Excursion;
     let params: any;
     if (route?.params !== undefined) {
       params = route?.params;
@@ -75,6 +319,16 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       fetchLocation();
     }, []);
 
+    const startPoint = {
+      latitude: excursion.track[0].lat,
+      longitude: excursion.track[0].lon,
+    } as LatLng;
+    const allPoints = excursion.track.map((point: T_Point) => ({
+        latitude: point.lat,
+        longitude: point.lon,
+      } as LatLng))
+    const signalements: T_Signalement[] = excursion.signalements;
+
     //si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <SafeAreaView style={$container}>
@@ -84,6 +338,40 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
+
+        {
+          allPoints && startPoint && (
+            <MapScreen
+              startLocation={startPoint}
+            >
+              {
+                allPoints &&
+                <>
+                  <Polyline
+                    coordinates={allPoints}
+
+                    strokeColor={colors.bouton}
+                    strokeWidth={8}
+
+                  />
+
+                  {
+                    startMiddleAndEndHandler(
+                      excursion.track,
+                      excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular"
+                    )
+                  }
+
+                  {
+                    signalementsHandler(excursion.signalements)
+                  }
+                </>
+              }
+            </MapScreen>
+          )
+        }
+
+
         <SwipeUpDown
           itemMini={itemMini()}
           itemFull={itemFull(
