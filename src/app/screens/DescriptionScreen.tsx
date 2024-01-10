@@ -5,13 +5,10 @@ import {
   ViewStyle,
   TouchableOpacity,
   Image,
-  useWindowDimensions,
   Dimensions,
   ScrollView,
   TextStyle,
-  View,
 } from "react-native";
-import HTML from "react-native-render-html";
 // import { AppStackScreenProps } from "app/navigators"
 
 // Composants
@@ -65,11 +62,11 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
-        <ScrollView style={$scrollDescription}>
-          <View style={$containerDescription}>
-            <Text size="xxl">{nomExcursion}</Text>
-            <HTML source={{ html: description }} />
-          </View>
+        <ScrollView style={$containerDescription}>
+          <Text size="xxl">{nomExcursion}</Text>
+          <Text style={$texteDescription} size="sm">
+            {description}
+          </Text>
         </ScrollView>
       </Screen>
     );
@@ -96,16 +93,13 @@ const $container: ViewStyle = {
   position: "absolute",
 };
 
-const $scrollDescription: ViewStyle = {
+const $containerDescription: ViewStyle = {
   width: width,
   padding: spacing.lg,
 };
 
-const $containerDescription: ViewStyle = {
-  marginBottom: 500,
-};
-
 const $texteDescription: TextStyle = {
   marginTop: spacing.lg,
+  marginBottom: height / 2,
   textAlign: "justify",
 };

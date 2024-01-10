@@ -25,7 +25,6 @@ import {
 } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
-import HTML from "react-native-render-html";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 const { width, height } = Dimensions.get("window");
@@ -209,9 +208,8 @@ function afficherDescriptionCourte(description: string) {
   if (description == null) {
     return null;
   } else {
-    const descriptionCoupe: string = description.slice(0, 100);
-    let descriptionFinale: string = descriptionCoupe + "...";
-    descriptionFinale = descriptionFinale.replace(/<[^>]*>?/gm, "");
+    const descriptionCoupe = description.slice(0, 100);
+    const descriptionFinale = descriptionCoupe + "...";
     return descriptionFinale;
   }
 }
@@ -423,7 +421,7 @@ function infos(
 
           <View style={$containerDenivele}>
             <Text tx="detailsExcursion.titres.denivele" size="xl" />
-            {excursion.track && <GraphiqueDenivele points={excursion.track} detaille={true} />}
+            {excursion.track && <GraphiqueDenivele points={excursion.track} />}
           </View>
         </View>
       </TouchableWithoutFeedback>

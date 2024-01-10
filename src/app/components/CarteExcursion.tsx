@@ -5,7 +5,6 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import { colors, spacing } from "../theme";
 import { Text } from "./Text";
-import { GraphiqueDenivele } from "./GraphiqueDenivele";
 
 /**@warning L absence de parametre n est pas geree */
 
@@ -16,27 +15,24 @@ interface CarteExcursionProps extends TouchableOpacityProps {
 
 export function CarteExcursion(props: CarteExcursionProps) {
   const navigation = props.navigation;
-
-  var nomExcursion = "";
-  var vallee = "";
-  var typeParcours = "";
-  var duree = { h: 0, m: 0 };
-  var distance = 0;
-  var denivele = 0;
-  var difficulteTechnique = 0;
-  var difficulteOrientation = 0;
-  var track: any[] = [];
+  var nomExcursion: string = "";
+  var vallee: string = "";
+  var typeParcours: string = "";
+  var duree: { h: number; m: number } = { h: 0, m: 0 };
+  var distance: number = 0;
+  var denivele: number = 0;
+  var difficulteTechnique: number = 0;
+  var difficulteOrientation: number = 0;
 
   if (props.excursion) {
-    nomExcursion = props.excursion.nom;
-    vallee = props.excursion.vallee;
-    typeParcours = props.excursion.typeParcours;
-    duree = props.excursion.duree;
-    distance = props.excursion.distance;
-    denivele = props.excursion.denivele;
-    difficulteTechnique = props.excursion.difficulteTechnique;
-    difficulteOrientation = props.excursion.difficulteOrientation;
-    track = props.excursion.track;
+    nomExcursion = props.excursion.nom as string;
+    vallee = props.excursion.vallee as string;
+    typeParcours = props.excursion.typeParcours as string;
+    duree = props.excursion.duree as { h: number; m: number };
+    distance = props.excursion.distance as number;
+    denivele = props.excursion.denivele as number;
+    difficulteTechnique = props.excursion.difficulteTechnique as number;
+    difficulteOrientation = props.excursion.difficulteOrientation as number;
   }
 
   const valleeIcone = require("../../assets/icons/zone.png");
@@ -46,6 +42,18 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const deniveleIcone = require("../../assets/icons/denivele.png");
   const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png");
   const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png");
+
+  const imageRandonnee = require("../../assets/images/randonnee.png");
+
+  const [coeurTouche, setCoeurTouche] = useState(false);
+
+  const excursionFavorite = () => {
+    if (coeurTouche) {
+      setCoeurTouche(false);
+    } else {
+      setCoeurTouche(true);
+    }
+  };
 
   const detailExcursion = () => {
     navigation.navigate("Stack", {
@@ -70,7 +78,8 @@ export function CarteExcursion(props: CarteExcursionProps) {
       backgroundColor: colors.palette.blanc,
     },
     heading: {
-      maxWidth: "100%",
+      maxWidth: "50%",
+      marginEnd: spacing.xl,
       fontSize: 16,
     },
     content: {
@@ -129,10 +138,17 @@ export function CarteExcursion(props: CarteExcursionProps) {
       justifyContent: "center",
     },
     entete: {
+      flexDirection: "row",
       alignItems: "center",
+      justifyContent: "space-between",
       paddingStart: spacing.xs,
       paddingEnd: spacing.xs,
       marginBottom: spacing.xxs,
+    },
+    imageRando: {
+      width: 80,
+      height: 50,
+      borderRadius: spacing.xs,
     },
     icone: {
       width: spacing.lg,
@@ -148,7 +164,16 @@ export function CarteExcursion(props: CarteExcursionProps) {
     <TouchableOpacity onPress={detailExcursion}>
       <View style={styles.carteGlobale}>
         <View style={styles.entete}>
+          <Image style={styles.imageRando} source={imageRandonnee} resizeMode="contain" />
           <Text weight="bold" text={nomExcursion} style={styles.heading} />
+          <TouchableOpacity onPress={excursionFavorite}>
+            <Icon
+              name="heart-o"
+              size={spacing.lg}
+              style={styles.icone}
+              color={coeurTouche ? colors.palette.rouge : colors.palette.noir}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.tableauInfos}>
           <View style={styles.ligneSup}>
@@ -188,7 +213,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
               />
               <Text text={difficulteOrientation.toString()} style={styles.content} />
             </View>
-            <View>{track && <GraphiqueDenivele points={track} detaille={false} />}</View>
           </View>
         </View>
       </View>
