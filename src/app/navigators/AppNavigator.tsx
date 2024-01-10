@@ -58,7 +58,7 @@ export type T_filtres = {
   intervalleDistance: { min: number; max: number };
   intervalleDuree: { min: number; max: number };
   intervalleDenivele: { min: number; max: number };
-  typesParcours: string[];
+  indexTypesParcours: number[];
   vallees: string[];
   difficultesTechniques: number[];
   difficultesOrientation: number[];

@@ -30,7 +30,6 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
 
   // Assets
   const logoCheck = require("../../assets/icons/check_3x_vert.png");
-
   const logoDistance = require("../../assets/icons/distance.png");
   const logoDuree = require("../../assets/icons/time.png");
   const logoDenivele = require("../../assets/icons/denivele.png");
@@ -42,10 +41,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   var valeursFiltres: T_valeurs_filtres;
   try {
     // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
-    valeursFiltres =
-      parametres.langues == "fr"
-        ? require("../../assets/JSON/valeurs_filtresFR.json")
-        : require("../../assets/JSON/valeurs_filtresES.json");
+    valeursFiltres = require("../../assets/JSON/valeurs_filtres.json");
   } catch (error) {
     // Erreur critique si on n a pas les valeurs de filtres
     console.error("Page des filtres necessite les filtres appliques en parametres");
@@ -70,6 +66,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           { nom: "Dificultad técnica", nomCle: "difficulteTechnique", logo: logoDiffTech },
           { nom: "Dificultad de orientación", nomCle: "difficulteOrientation", logo: logoDiffOri },
         ];
+  const nomsTypesParcours =
+    parametres.langues == "fr"
+      ? ["Aller simple", "Aller/retour", "Circuit"]
+      : ["Ida", "Ida y Vuelta", "Circular"];
 
   // -- USE STATES --
   // Tri / Filtres selectionnes
@@ -81,8 +81,9 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     valeursFiltres.deniveleMax + incrementDenivele,
   ]);
   const [typesParcours, setTypesParcours] = useState(
-    valeursFiltres.typesParcours.map(type => ({ nom: type, selectionne: true })),
+    nomsTypesParcours.map((nom, index) => ({ nom: nom, id: index, selectionne: true })),
   );
+
   const [vallees, setVallees] = useState(
     valeursFiltres.vallees.map(vallee => ({ nom: vallee, selectionne: true })),
   );
@@ -131,8 +132,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       intervalleDuree: { min: intervalleDuree[0], max: intervalleDuree[1] },
       intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
       // On retire les type de parcours non selectionnees
-      typesParcours: typesParcours
-        .map(type => (type.selectionne ? type.nom : null))
+      indexTypesParcours: typesParcours
+        .map(type => (type.selectionne ? type.id : null))
         .filter(type => type != null),
       // On retire les vallees non selectionnees
       vallees: vallees

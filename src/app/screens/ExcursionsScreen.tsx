@@ -4,14 +4,13 @@ import {
   View,
   ViewStyle,
   ScrollView,
-  Text,
   TextInput,
   StyleSheet,
   Image,
   TouchableOpacity,
 } from "react-native";
 import { AppStackScreenProps, T_excursion, T_filtres, T_valeurs_filtres } from "app/navigators";
-import { Screen, CarteExcursion, Button } from "app/components";
+import { Screen, CarteExcursion, Text } from "app/components";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
 
@@ -30,8 +29,9 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   const filtres = props.route.params?.filtres;
   const { parametres } = useStores();
 
-  const [excursionsFiltrees1, setExcursionsFiltrees1] = useState(undefined); // Excursions triées par le 1e filtre (filtres en parametre)
-  const [excursionsFiltrees2, setExcursionsFiltrees2] = useState(undefined); // Excursions triées par le 2e filtre (barre de recherche)
+  const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
+  const [excursions, setExcursions] = useState<T_excursion[]>(undefined);
+  const [saisieBarre, setSaisieBarre] = useState<string>("");
 
   const { navigation } = props;
   const filtreIcone = require("../../assets/icons/filtre.png");
@@ -93,77 +93,78 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       difficulteOrientationMax: difficulteOrientationMax,
     };
   };
+
+  // -- FONCTIONS --
   /**
-   * Cette fonction doit etre executee systematiquement lors de la synchro descendante
-   * Formate les fichiers de maniere a n avoir que le type necessaire (au lieu des strings)
+   * Tri et filtre des excursions avec les filtres
+   * Doit etre effectué a chaque modification des filtres
    */
-  const formatageExcursions = (excursions: T_excursion[]) => {
-    var excursionsFormatees = [];
+  function applicationFiltres(excursions: T_excursion[], filtres: T_filtres) {
+    const nomsTypesParcours =
+      parametres.langues == "fr"
+        ? ["Aller simple", "Aller/retour", "Circuit"]
+        : ["Ida", "Ida y Vuelta", "Circular"];
 
-    const formatDuree = /(\d{1,2})h(\d{0,2})/;
+    // Application des filtres en parametre
+    excursions = excursions.filter(excursion => {
+      const indexTypeParcours = nomsTypesParcours.indexOf(excursion.typeParcours);
 
-    excursions.forEach(excursion => {
-      var malFormatee = false;
-
-      // Duree
-      const matchDuree: RegExpMatchArray | null = excursion.duree.match(formatDuree);
-
-      if (matchDuree == null) {
-        // MAUVAIS FORMAT DUREE
-        console.log(
-          "Format de duree d une excursion MAUVAIS, impossible de formater. Il faut que les durees soient de la forme : HHhMM et non : " +
-            excursion.duree,
-        );
-        malFormatee = true;
-      }
-
-      if (!malFormatee) {
-        // Conversions string --> number
-        excursion.duree = { h: +matchDuree[1], m: +matchDuree[2] };
-        excursion.distance = +excursion.distance;
-        excursion.denivele = +excursion.denivele;
-        excursion.difficulteTechnique = +excursion.difficulteTechnique;
-        excursion.difficulteOrientation = +excursion.difficulteOrientation;
-
-        // Verification de la validite des conversions
-        if (
-          isNaN(excursion.duree.h) ||
-          isNaN(excursion.duree.m) ||
-          isNaN(excursion.distance) ||
-          isNaN(excursion.denivele) ||
-          isNaN(excursion.difficulteTechnique) ||
-          isNaN(excursion.difficulteOrientation)
-        ) {
-          // L excursion est mal formatee, on la retire
-          console.log("Format d un attribut de l excursion MAUVAIS, impossible de formater.");
-          malFormatee = true;
-        }
-      }
-
-      if (!malFormatee) {
-        // L excursion est bien formatee, on l ajoute
-        excursionsFormatees.push(excursion);
+      if (
+        excursion.distance < filtres.intervalleDistance.min ||
+        excursion.distance > filtres.intervalleDistance.max ||
+        (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
+        excursion.duree.h < filtres.intervalleDuree.min ||
+        excursion.duree.h > filtres.intervalleDuree.max ||
+        excursion.denivele < filtres.intervalleDenivele.min ||
+        excursion.denivele > filtres.intervalleDenivele.max ||
+        !filtres.indexTypesParcours.includes(indexTypeParcours) || // le type de l excursion est present dans les filtres
+        !filtres.vallees.includes(excursion.vallee) ||
+        !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
+        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
+      ) {
+        // On supprime de l excursion
+        return false;
+      } else {
+        // On garde de l excursion
+        return true;
       }
     });
 
-    return excursionsFormatees;
-  };
+    // Application du critere de tri
+    excursions = excursions.sort((a, b) => {
+      const critere = filtres.critereTri;
+
+      if (critere === "duree") {
+        // On tri par la duree (avec h et m)
+        const duree1 = a.duree.h + a.duree.m / 60;
+        const duree2 = b.duree.h + b.duree.m / 60;
+        return duree1 - duree2;
+      }
+      return a[critere] - b[critere];
+    });
+    
+    return excursions;
+  }
   /**
-   * Initialise les excursions
-   * recuperation --> formatage --> application des filtres de parametres
+   * Filtre les excursions contenant le texte de la barre de recherche
    */
-  const loadExcursions = async (): Promise<void> => {
-    /* ----------------------- RECUPERATION DES EXCURSIONS ---------------------- */
-    var excursionsBRUT: T_excursion[];
-
-    try {
-      excursionsBRUT = require("../../assets/JSON/excursions.json");
-    } catch (error) {
-      throw new Error("Erreur lors du chargement du fichier JSON : " + error);
+  function filtrageBarre(excursionsAFiltrer: T_excursion[], recherche: String) {
+    // Filtre de la barre de recherche
+    if (recherche !== undefined) {
+      return excursionsAFiltrer.filter(excursion =>
+        excursion.nom.toLowerCase().includes(recherche.toLowerCase()),
+      );
+    } else {
+      console.error("Impossible de filtrer : manque un parametre");
+      return excursionsAFiltrer;
     }
+  }
 
+  // Applique la langue aux excursions
+  function applicationLangue(excursions: T_excursion[]) {
     const langue = parametres.langues;
-    excursionsBRUT = excursionsBRUT.map(excursion => {
+
+    return excursions.map(excursion => {
       if (langue === "fr") {
         return {
           ...excursion,
@@ -182,99 +183,36 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         throw new Error("Langue inconnue : " + langue);
       }
     });
-
-    console.log(excursionsBRUT[0]);
-    // -- FORMATAGE --
-    const excursionsFormatees = formatageExcursions(excursionsBRUT);
-
-    // -- FILTRE --
-    const excursionsFiltrees = filtres
-      ? filtrageParametres(excursionsFormatees, filtres)
-      : excursionsFormatees;
-    setExcursionsFiltrees1(excursionsFiltrees);
-    setExcursionsFiltrees2(excursionsFiltrees); // Copie car aucune recherche n a pu etre effectuee des le rendu
-
-    // -- CALCUL DES VALEURS DE FILTRES --
-    /**@warning : ligne inutile */
-    /**@todo faire ceci automatiquement avec le formatage lors de la synchro descendante */
-    // const valeursFiltres = calculValeursFiltres(excursionsFormatees);
-    // console.log(valeursFiltres);
-  };
-
-  // -- FONCTIONS DE TRI --
-  /**
-   * Tri et filtre des excursions avec les filtres
-   * Doit etre effectué a chaque modification des filtres
-   */
-  function filtrageParametres(excursionsAFiltrer: T_excursion[], filtres: T_filtres) {
-    var excursionsFiltrees = excursionsAFiltrer;
-
-    // Application des filtres en parametre
-    excursionsFiltrees = excursionsFiltrees.filter(excursion => {
-      if (
-        excursion.distance < filtres.intervalleDistance.min ||
-        excursion.distance > filtres.intervalleDistance.max ||
-        (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
-        excursion.duree.h < filtres.intervalleDuree.min ||
-        excursion.duree.h > filtres.intervalleDuree.max ||
-        excursion.denivele < filtres.intervalleDenivele.min ||
-        excursion.denivele > filtres.intervalleDenivele.max ||
-        !filtres.typesParcours.includes(excursion.typeParcours) ||
-        !filtres.vallees.includes(excursion.vallee) ||
-        !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
-        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
-      ) {
-        // On supprime de l excursion
-        return false;
-      } else {
-        // On garde de l excursion
-        return true;
-      }
-    });
-
-    // Application du critere de tri
-    excursionsFiltrees = excursionsFiltrees.sort((a, b) => {
-      const critere = filtres.critereTri;
-
-      if (critere === "duree") {
-        // On tri par la duree (avec h et m)
-        const duree1 = a.duree.h + a.duree.m / 60;
-        const duree2 = b.duree.h + b.duree.m / 60;
-        return duree1 - duree2;
-      }
-      return a[critere] - b[critere];
-    });
-
-    return excursionsFiltrees;
-  }
-  /**
-   * Filtre les excursions contenant le texte de la barre de recherche
-   */
-  function filtrageBarre(excursionsAFiltrer: T_excursion[], recherche: String) {
-    // Filtre de la barre de recherche
-    if (recherche !== undefined) {
-      return excursionsAFiltrer.filter(excursion =>
-        excursion.nom.toLowerCase().includes(recherche.toLowerCase()),
-      );
-    } else {
-      console.error("Impossible de filtrer : manque un parametre");
-      return excursionsAFiltrer;
-    }
   }
 
   // -- FONCTIONS CALL BACK --
-  const clicRecherche = saisie => {
-    setExcursionsFiltrees2(filtrageBarre(excursionsFiltrees1, saisie));
-  };
+  const clicRecherche = val => {
+ };
 
+  // Initialisation des excursions
   useEffect(() => {
-    // Chargement des excursions
-    loadExcursions();
+    try {
+      const excursionsBrutes = require("../../assets/JSON/excursions.json");
+      const excursionsTraduites = applicationLangue(excursionsBrutes);
+      setAllExcursions(excursionsTraduites);
+    } catch (error) {
+      throw new Error("Erreur lors du chargement du fichier JSON : " + error);
+    }
+  }, []);
 
-    console.log("RELOAD page excursions");
+  // Attribution des excursions
+  useEffect(() => {
+    if (allExcursions) {
+      setExcursions(filtres ? applicationFiltres(allExcursions, filtres) : allExcursions);
+    }
+  }, [allExcursions, filtres]);
 
-    // Changement apporté : Ajout de props.route.params en dependance pour que loadExcurison soit appelé a chaque changement de filtre
-  }, [filtres, parametres.langues]);
+  // Application langue
+  useEffect(() => {
+    if (allExcursions) {
+      setAllExcursions(allExcursions => applicationLangue(allExcursions));
+    }
+  }, [parametres.langues]);
 
   return (
     <Screen style={$root} safeAreaEdges={["top"]}>
@@ -293,20 +231,15 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         </TouchableOpacity>
       </View>
 
-      {excursionsFiltrees1 &&
-        (excursionsFiltrees1.length == 0 ? (
-          <Text tx="excursions.erreurChargement" />
+      {excursions &&
+        (excursions.length == 0 ? (
+          <Text tx="excursions.absenceResultats" />
         ) : (
-          excursionsFiltrees2 &&
-          (excursionsFiltrees2.length == 0 ? (
-            <Text tx="excursions.erreurNom" />
-          ) : (
-            <ScrollView style={styles.scrollContainer}>
-              {excursionsFiltrees2.map((excursion, i) => (
-                <CarteExcursion key={i} excursion={excursion} navigation={navigation} />
-              ))}
-            </ScrollView>
-          ))
+          <ScrollView style={styles.scrollContainer}>
+            {excursions.map((excursion, i) => (
+              <CarteExcursion key={i} excursion={excursion} navigation={navigation} />
+            ))}
+          </ScrollView>
         ))}
     </Screen>
   );

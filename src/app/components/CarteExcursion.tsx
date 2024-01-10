@@ -162,9 +162,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
             </View>
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={dureeIcone} resizeMode="contain" />
-              <Text text={duree.h.toString()} style={styles.content} />
-              <Text text={"h"} style={styles.content} />
-              <Text text={duree.m.toString()} style={styles.content} />
+              <Text text={duree.h + "h" + (duree.m !== 0 ? duree.m : "")} style={styles.content} />
             </View>
           </View>
           <View style={styles.ligneInf}>
