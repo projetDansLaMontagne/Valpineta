@@ -1,30 +1,40 @@
 // Librairies
 import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
-import { ViewStyle, TouchableOpacity, Image, Dimensions, ScrollView, TextStyle } from "react-native"
-// import { AppStackScreenProps } from "app/navigators"
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  TextStyle,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  ViewStyle,
+} from "react-native"
+import HTML from "react-native-render-html"
+import { AppStackScreenProps } from "app/navigators"
 
 // Composants
-import { Screen } from "app/components"
-import { spacing, colors } from "app/theme"
-import { Text } from "app/components"
+import { Screen, Text } from "app/components"
+import { colors, spacing } from "app/theme"
 // import { goBack } from "app/navigators"
 
 const { width, height } = Dimensions.get("window")
 
 interface DescriptionScreenProps extends AppStackScreenProps<"Description"> {
-  excursion: Record<string, unknown>
+  excursion: Record<string, unknown>;
 }
 
 export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function DescriptionScreen(
   props: DescriptionScreenProps,
 ) {
   const { route, navigation } = props
+  const { width: windowWidth } = useWindowDimensions()
 
   // Vérifier si "excursion" est défini
   if (props?.route?.params?.excursion === undefined) {
     return (
-      <Screen style={$container} preset="fixed" >
+      <Screen style={$container} preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
@@ -32,13 +42,12 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
           />
         </TouchableOpacity>
         <ScrollView style={$containerDescription}>
-          <Text tx="detailsExcursion.erreur.titre" size="xxl"/>
-          <Text tx="detailsExcursion.erreur.message" style={$texteDescription} size="sm"/>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
+          <Text tx="detailsExcursion.erreur.message" style={$texteDescription} size="sm" />
         </ScrollView>
       </Screen>
     )
-  }
-  else {
+  } else {
     const { excursion } = route.params
     var nomExcursion = ""
     var description = ""
@@ -49,24 +58,23 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
     }
 
     return (
-      <Screen style={$container} preset="fixed" >
+      <Screen style={$container} preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
-        <ScrollView style={$containerDescription}>
-          <Text size="xxl">{nomExcursion}</Text>
-          <Text style={$texteDescription} size="sm">
-            {description}
-          </Text>
+        <ScrollView style={$scrollDescription}>
+          <View style={$containerDescription}>
+            <Text size="xxl">{nomExcursion}</Text>
+            <HTML source={{ html: description }} contentWidth={windowWidth} />
+          </View>
         </ScrollView>
       </Screen>
     )
   }
 })
-
 
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.fond,
@@ -88,13 +96,16 @@ const $container: ViewStyle = {
   position: "absolute",
 }
 
-const $containerDescription: ViewStyle = {
+const $scrollDescription: ViewStyle = {
   width: width,
   padding: spacing.lg,
 }
 
+const $containerDescription: ViewStyle = {
+  marginBottom: 500,
+}
+
 const $texteDescription: TextStyle = {
   marginTop: spacing.lg,
-  marginBottom: height / 2,
   textAlign: "justify",
 }

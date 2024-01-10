@@ -4,26 +4,26 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
-import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
-import { observer } from "mobx-react-lite"
-import React, { useEffect, useState } from "react"
-import { useColorScheme } from "react-native"
-import * as Screens from "app/screens"
-import Config from "../config"
-import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
-import { colors } from "app/theme"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { Image, ImageStyle } from "react-native"
-import { useStores } from "app/models"
-import { Text } from "app/components"
-import I18n from "i18n-js"
-import { getActiveRouteName } from "./navigationUtilities"
-import { set } from "date-fns"
+import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack";
+import { observer } from "mobx-react-lite";
+import React, { useEffect, useState } from "react";
+import { useColorScheme } from "react-native";
+import * as Screens from "app/screens";
+import Config from "../config";
+import { navigationRef, useBackButtonHandler } from "./navigationUtilities";
+import { colors } from "app/theme";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Image, ImageStyle } from "react-native";
+import { useStores } from "app/models";
+import { Text } from "app/components";
+import I18n from "i18n-js";
+import { getActiveRouteName } from "./navigationUtilities";
+import { set } from "date-fns";
 
-const explorerLogo = require("./../../assets/icons/explorer.png")
-const carteLogo = require("./../../assets/icons/carte.png")
-const parametresLogo = require("./../../assets/icons/parametres.png")
+const explorerLogo = require("./../../assets/icons/explorer.png");
+const carteLogo = require("./../../assets/icons/carte.png");
+const parametresLogo = require("./../../assets/icons/parametres.png");
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -46,21 +46,20 @@ export type AppStackParamList = {
   DetailsExcursion: undefined
   Parametres: undefined
   NouveauSignalement: undefined
-	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
   Description: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
-}
+};
 
 /**
  * This is a list of all the route names that will exit the app if the back button
  * is pressed while in that screen. Only affects Android.
  */
-const exitRoutes = Config.exitRoutes
+const exitRoutes = Config.exitRoutes;
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStackScreenProps<
   AppStackParamList,
   T
->
+>;
 
 /* -------------------------------------------------------------------------- */
 /*                                APP NAVIGATOR                               */
@@ -70,21 +69,21 @@ export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
-  const colorScheme = useColorScheme()
-  const Tab = createBottomTabNavigator()
+  const colorScheme = useColorScheme();
+  const Tab = createBottomTabNavigator();
 
-  useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
+  useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
-  const { parametres } = useStores()
+  const { parametres } = useStores();
 
   useEffect(() => {
     if (parametres.langues === "fr") {
-      I18n.locale = "fr"
+      I18n.locale = "fr";
     }
     if (parametres.langues === "es") {
-      I18n.locale = "es"
+      I18n.locale = "es";
     }
-  }, [parametres.langues])
+  }, [parametres.langues]);
 
   return (
     <NavigationContainer
@@ -93,7 +92,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        initialRouteName="Carte"
+        initialRouteName={"Carte"}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
@@ -112,15 +111,13 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           name="Excursions"
           component={Screens.ExcursionsScreen}
           options={{
-            tabBarIcon: (props) => (
+            tabBarIcon: props => (
               <Image
                 source={explorerLogo}
                 style={[
                   $icon,
                   {
-                    tintColor: props.focused
-                      ? colors.palette.marron
-                      : colors.palette.vert 
+                    tintColor: props.focused ? colors.palette.marron : colors.palette.vert,
                   },
                 ]}
               />
@@ -140,7 +137,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           name="Carte"
           component={Screens.MapScreen}
           options={{
-            tabBarIcon: (props) => (
+            tabBarIcon: props => (
               <Image
                 source={carteLogo}
                 style={[
@@ -164,7 +161,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
           name="Parametres"
           component={Screens.ParametresScreen}
           options={{
-            tabBarIcon: (props) => (
+            tabBarIcon: props => (
               <Image
                 source={parametresLogo}
                 style={[
@@ -186,20 +183,20 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
         />
       </Tab.Navigator>
     </NavigationContainer>
-  )
-})
+  );
+});
 
 const $icon: ImageStyle = {
   width: 25,
   height: 25,
-}
+};
 
 /* -------------------------------------------------------------------------- */
 /*                                   FOOTER                                   */
 /* -------------------------------------------------------------------------- */
 
 function StackNavigator() {
-  const Stack = createNativeStackNavigator()
+  const Stack = createNativeStackNavigator();
 
   return (
     <Stack.Navigator
@@ -213,5 +210,5 @@ function StackNavigator() {
       <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
       <Stack.Screen name="NouveauSignalement" component={Screens.NouveauSignalementScreen} />
     </Stack.Navigator>
-  )
+  );
 }

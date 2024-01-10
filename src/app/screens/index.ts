@@ -1,4 +1,4 @@
-export * from "./ErrorScreen/ErrorBoundary"
+export * from "./ErrorScreen/ErrorBoundary";
 // export other screens here
 export * from "./MapScreen"
 export * from "./FiltresScreen"

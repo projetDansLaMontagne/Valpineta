@@ -43,41 +43,42 @@ const es = {
         title: "No es posible localizarte",
         message: "Por favor, verifica tu configuración de ubicación",
       },
-    }
+    },
   },
-  
-  excursions:{
+
+  excursions: {
     titre: "Excursiones",
     erreurChargement: "Ninguna excursión encontrada",
     erreurNom: "Nombre de excursión no encontrado",
   },
-  detailsExcursion:{
-    titres:{
+  detailsExcursion: {
+    titres: {
       infos: "Infos",
       avis: "Aviso",
       description: "Descripción",
-      signalement: "Informes",
+      signalements: "Informes",
       denivele: "Desnivel",
     },
-    boutons:{
+    boutons: {
       lireSuite: "Leer más",
+      voirDetails: "Ver detalles",
+      retourInformations: "Volver a la información",
     },
     erreur: {
       titre: "Error",
       message: "Se produjo un error. Por favor, inténtalo de nuevo.",
-    }
-    
+    },
   },
 
-  parametres:{
+  parametres: {
     titre: "Ajustes",
     changerLangue: {
       titre: "Idioma",
       francais: "Francés",
       espagnol: "Español",
-    }
+    },
   },
-  pageFiltres:{
+  pageFiltres: {
     tri: {
       titre: "Ordenar por",
       distance: "Distancia",
@@ -87,23 +88,23 @@ const es = {
     },
     filtres: {
       titre: "Filtrar por",
-      distance: 'Distancia (en km)',
-      duree: 'Duración (en horas)',
-      denivele: 'Desnivel (en m)',
-      parcours: 'Tipo de recorrido',
+      distance: "Distancia (en km)",
+      duree: "Duración (en horas)",
+      denivele: "Desnivel (en m)",
+      parcours: "Tipo de recorrido",
       typeParcours: {
-        aller: 'Ida simple',
-        allerRetour: 'Ida y vuelta',
-        boucle: 'Bucle',
+        aller: "Ida simple",
+        allerRetour: "Ida y vuelta",
+        boucle: "Bucle",
       },
-      vallees: 'Valles',
-      difficulteTech: 'Dificultad técnica',
-      difficulteOrientation: 'Dificultad de orientación',
+      vallees: "Valles",
+      difficulteTech: "Dificultad técnica",
+      difficulteOrientation: "Dificultad de orientación",
     },
     boutons: {
       valider: "Validar",
-    }
-  }
-}
+    },
+  },
+};
 
-export default es
+export default es;
