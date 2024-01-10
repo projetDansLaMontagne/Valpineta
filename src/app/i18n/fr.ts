@@ -1,3 +1,5 @@
+import { placeholder } from "i18n-js";
+
 const fr = {
   common: {
     ok: "OK !",
@@ -103,6 +105,21 @@ const fr = {
     },
     boutons: {
       valider: "Valider",
+    },
+  },
+  pageNouveauSignalement: {
+    titreAvertissement: "Nouvel avertissement",
+    titrePointInteret: "Nouveau point d'intérêt",
+    consigne: "Insérez un titre et une description",
+    boutons: {
+      photo: "Prendre une photo",
+      librairie: "Ajouter une photo",
+      valider: "Valider",
+    },
+    erreur: {
+      titre: "Le titre doit contenir entre 3 et 50 caractères et ne doit pas contenir de caractères spéciaux",
+      description: "La description doit contenir entre 10 et 1000 caractères et ne doit pas contenir de caractères spéciaux",
+      photo: "Veuillez ajouter une photo dans un des formats : jpg, jpeg, png, gif avec une taille maximum de 5 mo",
     },
   },
 };

@@ -4,23 +4,30 @@ import { observer } from "mobx-react-lite";
 import { TextStyle, TextInput, Image, View, Dimensions, ViewStyle } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
-import { Button } from "app/components";
+import { Button, TextField } from "app/components";
 import * as ImagePicker from "expo-image-picker";
+import { useStores } from "app/models";
 
 // Composants
 import { Screen, Text } from "app/components";
 import en from "app/i18n/en";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
-  type: string;
+  type: "avertissement" | "pointInteret";
 }
 
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
+    // Stores
+    const { parametres } = useStores();
+
     //type de signalement
-    let type = "signalement";
+    let type = "";
     if (props.route.params) {
       type = props.route.params.type;
+    }
+    else {
+      throw new Error("Type de signalement non défini");
     }
 
     // Variables
@@ -173,20 +180,20 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
         <Text
           style={$h1}
-          text={type === "signalement" ? "Nouveau signalement" : "Nouveau Point d'interet"}
+          tx={type === "avertissement" ? "pageNouveauSignalement.titreAvertissement" : "pageNouveauSignalement.titrePointInteret"}
           size="xxl"
         />
         <Text text="Track : Col de la marmotte" size="lg" />
-        <Text text="Insérez un titre et une description" size="sm" />
+        <Text tx="pageNouveauSignalement.consigne" size="sm" />
         {titreError && (
           <Text
-            text="Le titre doit contenir entre 3 et 50 caractères et ne doit pas contenir de caractères spéciaux"
-            size="sm"
+            tx="pageNouveauSignalement.erreur.titre"
+            size="xs"
             style={{ color: colors.palette.rouge }}
           />
         )}
         <TextInput
-          placeholder="Insérez un titre"
+          placeholder={ parametres.langues == "fr" ? "Insérez un titre" : "Insertar un título"}
           placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
           onChangeText={setTitreSignalement}
           value={titreSignalement}
@@ -199,13 +206,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         />
         {descriptionError && (
           <Text
-            text="La description doit contenir entre 10 et 1000 caractères et ne doit pas contenir de caractères spéciaux"
-            size="sm"
+            tx="pageNouveauSignalement.erreur.description"
+            size="xs"
             style={{ color: colors.palette.rouge }}
           />
         )}
         <TextInput
-          placeholder="Insérez une description"
+          placeholder={ parametres.langues == "fr" ? "Insérez une description" : "Insertar una descripción"}
           placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
           onChangeText={setDescriptionSignalement}
           multiline={true}
@@ -220,8 +227,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         <View>
           {photoError && !photoSignalement && (
             <Text
-              text="Veuillez ajouter une photo dans un des formats : jpg, jpeg, png, gif avec une taille maximum de 5 mo"
-              size="sm"
+              tx="pageNouveauSignalement.erreur.photo"
+              size="xs"
               style={$imageError}
             />
           )}
@@ -229,20 +236,20 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           <View style={$boutonContainer}>
             <Button
               style={$bouton}
-              text="Prendre une photo"
+              tx="pageNouveauSignalement.boutons.photo"
               onPress={prendrePhoto}
               textStyle={$textBouton}
             />
             <Button
               style={$bouton}
-              text="Choisir une photo"
+              tx="pageNouveauSignalement.boutons.librairie"
               onPress={choisirPhoto}
               textStyle={$textBouton}
             />
           </View>
           <Button
             style={$bouton}
-            text="Envoyer"
+            tx="pageNouveauSignalement.boutons.valider"
             onPress={envoyerSignalement}
             textStyle={$textBouton}
           />

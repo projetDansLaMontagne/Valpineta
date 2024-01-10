@@ -105,6 +105,24 @@ const es = {
       valider: "Validar",
     },
   },
+  pageNouveauSignalement: {
+    titreAvertissement: "Nueva advertencia",
+    titrePointInteret: "Nuevo punto de interés",
+    consigne: "Inserte un título y una descripción",
+    boutons: {
+      photo: "Tomar una foto",
+      librairie: "Añadir una foto",
+      valider: "Validar",
+    },
+    erreur: {
+      titre:
+        "El título debe contener entre 5 y 50 caracteres y no debe contener caracteres especiales",
+      description:
+        "La descripción debe contener entre 5 y 500 caracteres y no debe contener caracteres especiales",
+      photo:
+        "La foto debe tener un tamaño inferior a 5 MB y debe estar en formato JPG, JPEG o PNG",
+    },
+  },
 };
 
 export default es;
