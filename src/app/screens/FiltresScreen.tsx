@@ -45,7 +45,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   } catch (error) {
     // Erreur critique si on n a pas les valeurs de filtres
     console.error("Page des filtres necessite les filtres appliques en parametres");
-    navigation.navigate("Excursions");
+    navigation.goBack();
     return <></>;
   }
 
@@ -279,13 +279,16 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
               style={difficulte.selectionne ? $difficulteSelectionnee : $difficulte}
               key={difficulte.niveau}
             >
-              {[...Array(difficulte.niveau)].map((_, i) => (
-                <Image
-                  source={logoDiffTech}
-                  style={$imageDifficulte}
-                  key={(i + 1) * difficulte.niveau}
-                />
-              ))}
+              {
+                // On affiche le logo de difficulte autant de fois que le niveau de difficulte
+                [...Array(difficulte.niveau)].map((_, i) => (
+                  <Image
+                    source={logoDiffTech}
+                    style={$imageDifficulte}
+                    key={(i + 1) * difficulte.niveau}
+                  />
+                ))
+              }
             </TouchableOpacity>
           ))}
         </View>

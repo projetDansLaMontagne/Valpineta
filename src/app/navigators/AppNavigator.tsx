@@ -98,7 +98,7 @@ export type AppStackParamList = {
   Filtres: undefined;
   Excursions: undefined | { filtres?: T_filtres };
   Carte: undefined;
-  DetailsExcursion: { excursion: T_excursion };
+  DetailsExcursion: undefined | { excursion: T_excursion };
   Parametres: undefined;
   Description: { excursion: T_excursion };
 };
