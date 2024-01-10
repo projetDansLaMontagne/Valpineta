@@ -2,11 +2,12 @@ import React, { FC, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { ViewStyle, TextStyle, Dimensions, View, TouchableOpacity } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Screen, Text } from "app/components";
+import { Screen, Text, Button } from "app/components";
 import { colors, spacing } from "app/theme";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useStores } from "app/models";
 import I18n from "i18n-js";
+import { navigate } from "app/navigators";
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window");
@@ -50,7 +51,13 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           </TouchableOpacity>
         </View>
       </View>
-      <Text></Text>
+      <Button  text="Navigation vers nouveau signalement" onPress={() => {
+        navigate("Stack", {
+          screen: "NouveauSignalement",
+          params: { type : "Signalement" },
+        });
+      }
+      }/>
     </Screen>
   );
 });
