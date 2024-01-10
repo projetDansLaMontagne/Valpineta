@@ -15,7 +15,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs"
-import { Image, ImageStyle } from "react-native"
+import { Image } from "react-native"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator

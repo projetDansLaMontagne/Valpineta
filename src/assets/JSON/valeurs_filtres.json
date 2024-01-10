@@ -2,8 +2,8 @@
   "distanceMax": 41,
   "dureeMax": 18,
   "deniveleMax": 3300,
-  "nomTypesParcours": ["Aller simple", "Aller/retour", "Circuit", null],
-  "nomVallees": [
+  "typesParcours": ["Aller simple", "Aller/retour", "Circuit"],
+  "vallees": [
     "Pineta/Refugio",
     "Pineta/Pradera",
     "Salcorz",

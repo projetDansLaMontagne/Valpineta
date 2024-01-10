@@ -8,7 +8,6 @@ import { AppStackScreenProps } from "app/navigators"
 import { Screen } from "app/components"
 import { spacing, colors } from "app/theme"
 import { Text } from "app/components"
-// import { goBack } from "app/navigators"
 
 const { width, height } = Dimensions.get("window")
 

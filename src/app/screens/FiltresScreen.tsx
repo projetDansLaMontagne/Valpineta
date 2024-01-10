@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react"
+import React, { FC, useState } from "react"
 import {
   Image,
   ImageStyle,
@@ -13,18 +13,17 @@ import Slider from "react-native-a11y-slider"
 import { observer } from "mobx-react-lite"
 
 import { Text, Button, Screen } from "app/components"
-import { AppStackScreenProps } from "app/navigators"
+import { AppStackScreenProps, T_valeurs_filtres } from "app/navigators"
 import { colors, spacing } from "../theme"
 
 /**@bug onSlidingComplete du slide ne s active pas toujours, ce qui parfois garde la navigation verticale */
 
-interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> { }
+interface FiltresScreenProps extends AppStackScreenProps<"Filtres"> {}
 
 export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresScreen(
   props: FiltresScreenProps,
 ) {
   const { navigation } = props
-  var valeursFiltres
 
   // Assets
   const logoCheck = require("../../assets/icons/check_3x_vert.png")
@@ -37,13 +36,14 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
 
   // -- CONSTANTES --
   // Recuperation des valeurs de filtres
+  var valeursFiltres: T_valeurs_filtres
   try {
     // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
     valeursFiltres = require("../../assets/JSON/valeurs_filtres.json")
   } catch (error) {
     // Erreur critique si on n a pas les valeurs de filtres
-    navigation.navigate("Excursions")
     console.error("Page des filtres necessite les filtres appliques en parametres")
+    navigation.navigate("Excursions")
     return <></>
   }
   const incrementDenivele = 200
@@ -65,10 +65,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     valeursFiltres.deniveleMax + incrementDenivele,
   ])
   const [typesParcours, setTypesParcours] = useState(
-    valeursFiltres.nomTypesParcours.map((nomType) => ({ nom: nomType, selectionne: true })),
+    valeursFiltres.typesParcours.map((nomType) => ({ nom: nomType, selectionne: true })),
   )
   const [vallees, setVallees] = useState(
-    valeursFiltres.nomVallees.map((nomVallee) => ({ nom: nomVallee, selectionne: true })),
+    valeursFiltres.vallees.map((nomVallee) => ({ nom: nomVallee, selectionne: true })),
   )
   const [difficultesTechniques, setDifficultesTechniques] = useState(
     [...Array(valeursFiltres.difficulteTechniqueMax)].map((trash, i) => ({
@@ -135,7 +135,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
         )
         .filter((type) => type != null),
     }
-    navigation.navigate("Excursions", { filtres: filtres })
+    navigation.navigate("Excursions", { filtres })
   }
 
   return (
@@ -264,7 +264,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
               style={difficulte.selectionne ? $difficulteSelectionnee : $difficulte}
               key={difficulte.niveau}
             >
-              {[...Array(difficulte.niveau)].map((trash, i) => (
+              {[...Array(difficulte.niveau)].map((_, i) => (
                 <Image
                   source={logoDiffTech}
                   style={$imageDifficulte}

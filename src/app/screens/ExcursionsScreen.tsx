@@ -152,7 +152,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    */
   const loadExcursions = async (): Promise<void> => {
     /* ----------------------- RECUPERATION DES EXCURSIONS ---------------------- */
-    var excursionsBRUT = require("../../assets/JSON/excursions.json")
+    var excursionsBRUT: T_excursion[] = require("../../assets/JSON/excursions.json")
 
     // ----> A SUPPRIMER AVEC LE CHANEGEMENT DE LANGUE
     excursionsBRUT = excursionsBRUT.map((excursion) => {
