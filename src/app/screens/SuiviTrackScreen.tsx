@@ -19,6 +19,7 @@ import { Text, Screen, CarteSignalement, GraphiqueDenivele } from "app/component
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { number } from "mobx-state-tree/dist/internal";
 const { width, height } = Dimensions.get("window");
 
 // Composants
@@ -35,8 +36,6 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
     }
     params ? (excursion = params.excursion) : (excursion = null);
 
-    // console.log(excursion.distance);
-
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [userLocation, setUserLocation] = useState(null);
     const footerHeight = useBottomTabBarHeight();
@@ -47,11 +46,9 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
 
     function toggleChrono() {
       setChronoRunning(!chronoRunning);
-      console.log("Timer démarré");
     };
 
     function resetChrono() {
-      console.log("Timer arrêté");
       setChronoRunning(false);
       setChronoTime(0);
     };
@@ -304,7 +301,7 @@ function itemFull(excursion: Record<string, unknown>, navigation: any, progress:
           ]}
         ></View>
         {containerInfoAffiche
-          ? descritpion(excursion)
+          ? descritpion(excursion, userLocation)
           : listeSignalements(excursion, userLocation)}
       </View>
     </View >
@@ -329,7 +326,7 @@ function getUserLocation() {
   });
 }
 
-function descritpion(excursion) {
+function descritpion(excursion, userLocation) {
   let track = excursion.track;
   //on recuprere l'altitude max
   let altitudeMax = 0;
@@ -345,6 +342,10 @@ function descritpion(excursion) {
         altitudeMin = element.alt;
       }
     });
+  }
+
+  if (userLocation !== null) {
+    altitudeActuelle = userLocation.altitude;
   }
 
   return (
@@ -396,7 +397,7 @@ function descritpion(excursion) {
         <View style={$listeAltitudes}>
           <View style={$blocAltitude}>
             <Text tx="suiviTrack.description.altitudeActuelle" style={$texteDescription} />
-            <Text style={$texteDescription}>{altitudeActuelle} m</Text>
+            <Text style={$texteDescription}>{altitudeActuelle.toFixed()} m</Text>
           </View>
           <View style={$blocAltitude}>
             <Text tx="suiviTrack.description.altitudeMax" style={$texteDescription} />
@@ -426,7 +427,12 @@ function listeSignalements(excursion, userLocation) {
                 alt: null,
                 dist: null,
               };
-              const distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track) : 0;
+
+              let distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track, userLocation) : 0;
+              if (Number(distanceSignalement) < 0) {
+                distanceSignalement = "depassé                                    "
+              }
+
               const carteType =
                 signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
               return (
@@ -449,8 +455,14 @@ function listeSignalements(excursion, userLocation) {
   );
 }
 
-function recupDistance(coordonneeSignalement, data: any) {
-  // Charger le fichier JSON avec les coordonnées
+function recupDistance(coordonneeSignalement, data: any, userLocation) {
+  //on va devoir trouver le point le plus proche de nos coordonnées, puis on calcule la distance entre ce point et le signalement
+  const cooredonneesUtilsateur = {
+    lat: userLocation.latitude,
+    lon: userLocation.longitude,
+    alt: null,
+    dist: null,
+  };
 
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
@@ -458,9 +470,11 @@ function recupDistance(coordonneeSignalement, data: any) {
   }
 
   // Initialiser la distance minimale avec une valeur élevée
-  let distanceMinimale: number = Number.MAX_VALUE;
+  let distanceMinimaleSignalement: number = Number.MAX_VALUE;
+  let distanceMinimaleUtilisateur: number = Number.MAX_VALUE;
 
-  let coordPointPlusProche;
+  let coordPointPlusProcheSignalement;
+  let coordPointPlusProcheUtilisateur;
 
   // Parcourir toutes les coordonnées dans le fichier
   for (const coord of data) {
@@ -474,21 +488,39 @@ function recupDistance(coordonneeSignalement, data: any) {
     const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(
       coordonneeSignalement,
       coord,
-    );
+    );  //on ignore pour l'instant 
 
     // Mettre à jour la distance minimale si la distance actuelle est plus petite
-    if (distanceSignalementPointLePlusProche < distanceMinimale) {
-      distanceMinimale = distanceSignalementPointLePlusProche;
-      coordPointPlusProche = coord;
+    if (distanceSignalementPointLePlusProche < distanceMinimaleSignalement) {
+      distanceMinimaleSignalement = distanceSignalementPointLePlusProche;
+      coordPointPlusProcheSignalement = coord;
+    }
+
+    //on fait la même chpse pour trouver le point le plus proche de l'utilisateur
+    // on trouve le point le plus proche de l'utilisateur
+    // on calcule la distance entre ce point et le point de départ en faisant coordPointPlusProche.dist
+
+    const distanceUtilisateurPointLePlusProche = calculeDistanceEntreDeuxPoints(
+      cooredonneesUtilsateur,
+      coord,
+    );
+
+    if (distanceUtilisateurPointLePlusProche < distanceMinimaleUtilisateur) {
+      distanceMinimaleUtilisateur = distanceUtilisateurPointLePlusProche;
+      coordPointPlusProcheUtilisateur = coord;
     }
   }
 
-  const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
+  const distanceDepartPointLePlusProcheSignalement: number = (coordPointPlusProcheSignalement.dist / 1000); //distance entre le point de départ et le point le plus proche du signalement
+
+  const distanceDepartPointLePlusProcheUtilisateur: number = (coordPointPlusProcheUtilisateur.dist / 1000); //distance entre le point de départ et le point le plus proche de l'utilisateur
+
+  const distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement = (distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
 
   //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
-  // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche; //c'est donc pas vraiment ce calcul qu'il faut faire
+  // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProcheSignalement; //c'est donc pas vraiment ce calcul qu'il faut faire
   // return distanceTotale;
-  return distanceDepartPointLePlusProche;
+  return distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement;
 }
 
 // Fonction de calcul de distance entre deux coordonnées
@@ -601,7 +633,7 @@ const $containerBoutonChrono: ViewStyle = {
 };
 
 const $containerBouton: ViewStyle = {
-  marginTop: spacing.xs,
+  marginTop: spacing.md,
   flexDirection: "row",
   justifyContent: "space-around",
   alignItems: "center",
@@ -617,7 +649,7 @@ const $listeDescription: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   alignItems: "center",
-  padding: spacing.xs,
+  padding: spacing.xxs,
 };
 
 const $icone: ImageStyle = {
@@ -668,8 +700,6 @@ const $buttonIncreaseProgress: ViewStyle = {
   alignItems: "center",
 };
 
-
-
 /* -------------------------------- La fleche ------------------------------- */
 
 /* Styles pour la flèche d'avancement */
@@ -689,19 +719,6 @@ const $iconeFleche: ImageStyle = {
 
 /* ------------------------------ Signalements ------------------------------ */
 
-const $titreSignalement: TextStyle = {
-  zIndex: 1,
-  fontSize: spacing.lg,
-  textAlign: "center",
-  marginTop: spacing.xs,
-  position: "absolute",
-  alignSelf: "center",
-};
-
-const $listeSignalements: ViewStyle = {
-  marginTop: spacing.xl,
-};
-
 const $containerSignalements: ViewStyle = {
   margin: spacing.xs,
   paddingBottom: height / 2,
@@ -709,8 +726,6 @@ const $containerSignalements: ViewStyle = {
 
 /* ------------------------------ Description/Signalements ------------------------------ */
 const $boutonDescriptionignalements: ViewStyle = {
-  // paddingLeft: spacing.xl,
-  // paddingRight: spacing.xl,
   justifyContent: "center",
 };
 
@@ -723,7 +738,7 @@ const $souligneDescriptionAvis: ViewStyle = {
 
 /* ------------------------------- Description ------------------------------ */
 const $nomExcursion: TextStyle = {
-  fontSize: 20,
+  fontSize: 18,
   textAlign: "center",
   alignSelf: "center",
   paddingBottom: spacing.xxs,
@@ -735,7 +750,7 @@ const $containerDescription: ViewStyle = {
 
 const $typeParcours: ViewStyle = {
   flexDirection: "row",
-  paddingStart: spacing.sm,
+  alignSelf: "center",
 };
 
 const $iconDescription: ImageStyle = {
@@ -752,41 +767,32 @@ const $listeInfos: ViewStyle = {
 }
 
 const $blocInfo: ViewStyle = {
-  // justifyContent: "space-between",
-  // flexBasis: '50%',
   flexDirection: "row",
   alignItems: "center",
-  height: 45,
-  width: 150,
-  // justifyContent: "space-between",
-  // marginTop: spacing.sm,
-  // padding: spacing.sm,
+  height: 42,
+  width: 150, // A modifier en fonction du nombre de mot / ligne que je veux
 };
 
 const $blocInterieurTexte: ViewStyle = {
   flexDirection: "column",
-  // alignItems: "center",
-  // justifyContent: "space-between",
-  // marginTop: spacing.sm,
-  // padding: spacing.sm,
 };
 
 const $texteDescription: TextStyle = {
-  // fontWeight: "bold",
   fontSize: 12,
-  lineHeight: 18,
+  lineHeight: 14,
 };
 
 const $containerDenivele: ViewStyle = {
   width: width * 0.5,
-  flexDirection: "row"
+  flexDirection: "row",
+  paddingTop: spacing.md,
 };
 
 const $texteDenivele: TextStyle = {
   fontSize: spacing.md,
   lineHeight: 16,
   textAlign: "center",
-  paddingTop: spacing.xs,
+  paddingStart: spacing.xxl
 };
 
 const $listeAltitudes: ViewStyle = {
@@ -796,7 +802,7 @@ const $listeAltitudes: ViewStyle = {
 
 const $blocAltitude: ViewStyle = {
   flexDirection: "row",
-  paddingBottom: spacing.sm,
+  paddingBottom: spacing.md,
 };
 
 /* ------------------------------ Style Erreur ------------------------------ */
