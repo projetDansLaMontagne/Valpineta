@@ -6,17 +6,16 @@ import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import { colors, spacing } from "../theme";
 import { Text } from "./Text";
 import { GraphiqueDenivele } from "./GraphiqueDenivele";
+import { T_excursion } from "app/navigators";
 
 /**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-  excursion: Record<string, unknown>;
-  navigation: any;
+  excursion: T_excursion;
+  onPress?: () => void;
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
-  const navigation = props.navigation;
-
   var nomExcursion = "";
   var vallee = "";
   var typeParcours = "";
@@ -46,13 +45,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const deniveleIcone = require("../../assets/icons/denivele.png");
   const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png");
   const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png");
-
-  const detailExcursion = () => {
-    navigation.navigate("CarteStack", {
-      screen: "DetailsExcursion",
-      params: { excursion: props.excursion },
-    });
-  };
 
   const styles = StyleSheet.create({
     carteGlobale: {
@@ -145,7 +137,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   });
 
   return (
-    <TouchableOpacity onPress={detailExcursion}>
+    <TouchableOpacity onPress={props.onPress}>
       <View style={styles.carteGlobale}>
         <View style={styles.entete}>
           <Text weight="bold" text={nomExcursion} style={styles.heading} />

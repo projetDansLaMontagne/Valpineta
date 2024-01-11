@@ -102,44 +102,44 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         : ["Ida", "Ida y Vuelta", "Circular"];
 
     // Application des filtres en parametre
-      excursions = excursions.filter(excursion => {
-        const indexTypeParcours = nomsTypesParcours.indexOf(excursion.typeParcours);
+    excursions = excursions.filter(excursion => {
+      const indexTypeParcours = nomsTypesParcours.indexOf(excursion.typeParcours);
 
-        if (
-          excursion.distance < filtres.intervalleDistance.min ||
-          excursion.distance > filtres.intervalleDistance.max ||
-          (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
-          excursion.duree.h < filtres.intervalleDuree.min ||
-          excursion.duree.h > filtres.intervalleDuree.max ||
-          excursion.denivele < filtres.intervalleDenivele.min ||
-          excursion.denivele > filtres.intervalleDenivele.max ||
-          !filtres.indexTypesParcours.includes(indexTypeParcours) || // le type de l excursion est present dans les filtres
-          !filtres.vallees.includes(excursion.vallee) ||
-          !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
-          !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
-        ) {
-          // On supprime de l excursion
-          return false;
-        } else {
-          // On garde de l excursion
-          return true;
-        }
-      });
+      if (
+        excursion.distance < filtres.intervalleDistance.min ||
+        excursion.distance > filtres.intervalleDistance.max ||
+        (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
+        excursion.duree.h < filtres.intervalleDuree.min ||
+        excursion.duree.h > filtres.intervalleDuree.max ||
+        excursion.denivele < filtres.intervalleDenivele.min ||
+        excursion.denivele > filtres.intervalleDenivele.max ||
+        !filtres.indexTypesParcours.includes(indexTypeParcours) || // le type de l excursion est present dans les filtres
+        !filtres.vallees.includes(excursion.vallee) ||
+        !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
+        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
+      ) {
+        // On supprime de l excursion
+        return false;
+      } else {
+        // On garde de l excursion
+        return true;
+      }
+    });
 
-      // Application du critere de tri
-      excursions = excursions.sort((a, b) => {
-        const critere = filtres.critereTri;
+    // Application du critere de tri
+    excursions = excursions.sort((a, b) => {
+      const critere = filtres.critereTri;
 
-        if (critere === "duree") {
-          // On tri par la duree (avec h et m)
-          const duree1 = a.duree.h + a.duree.m / 60;
-          const duree2 = b.duree.h + b.duree.m / 60;
-          return duree1 - duree2;
-        }
-        return a[critere] - b[critere];
-      });
+      if (critere === "duree") {
+        // On tri par la duree (avec h et m)
+        const duree1 = a.duree.h + a.duree.m / 60;
+        const duree2 = b.duree.h + b.duree.m / 60;
+        return duree1 - duree2;
+      }
+      return a[critere] - b[critere];
+    });
 
-      return excursions;
+    return excursions;
   }
   /**
    * Filtre les excursions contenant le texte de la barre de recherche
@@ -210,6 +210,11 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     }
   }, []);
 
+  /* ------------------------------- CALL BACKS ------------------------------- */
+  const clicExcursion = (excursion: T_excursion) => {
+    navigation.navigate("DetailsExcursion", { excursion });
+  };
+
   return (
     <Screen style={$root} safeAreaEdges={["top"]}>
       <View style={styles.searchBox}>
@@ -234,7 +239,11 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         ) : (
           <ScrollView style={styles.scrollContainer}>
             {excursionsFiltreesBarre.map((excursion, i) => (
-              <CarteExcursion key={i} excursion={excursion} navigation={navigation} />
+              <CarteExcursion
+                key={i}
+                excursion={excursion}
+                onPress={() => clicExcursion(excursion)}
+              />
             ))}
           </ScrollView>
         ))}
