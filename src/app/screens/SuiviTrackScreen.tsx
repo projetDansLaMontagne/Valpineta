@@ -166,7 +166,7 @@ function itemMini(excursion: Record<string, unknown>, navigation: any, progress:
             style={$icone}
             source={require("../../assets/icons/denivelePositifV2.png")}
           />
-          <Text style={$texteInfo}> 147 m</Text>
+          <Text style={$texteInfo}> 0 m</Text>
         </View>
         <View style={$containerInfo}>
           <Image style={$icone} source={require("../../assets/icons/deniveleNegatif.png")} />
@@ -238,7 +238,7 @@ function itemFull(excursion: Record<string, unknown>, navigation: any, progress:
             style={$icone}
             source={require("../../assets/icons/denivelePositifV2.png")}
           />
-          <Text style={$texteInfo}> 147 m</Text>
+          <Text style={$texteInfo}> 0 m</Text>
         </View>
         <View style={$containerInfo}>
           <Image style={$icone} source={require("../../assets/icons/deniveleNegatif.png")} />
@@ -268,10 +268,7 @@ function itemFull(excursion: Record<string, unknown>, navigation: any, progress:
         </View>
       </View>
       <View>
-        <Text weight="bold" style={$titreSignalement}> Signalements </Text>
-      </View>
-      <View>
-
+        {listeSignalements(excursion, userLocation)}
       </View>
     </View >
   );
@@ -295,9 +292,10 @@ function getUserLocation() {
   });
 }
 
-function listeSignalements(excursion, userLocation, footerHeight) {
+function listeSignalements(excursion, userLocation) {
   return (
-    <View style={$containerGrand}>
+    <View>
+      <Text weight="bold" style={$titreSignalement}> Signalements </Text>
       <ScrollView>
         <TouchableWithoutFeedback>
           <View style={$containerSignalements}>
@@ -309,7 +307,7 @@ function listeSignalements(excursion, userLocation, footerHeight) {
                 alt: null,
                 dist: null,
               };
-              const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+              const distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track) : 0;
               const carteType =
                 signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
               return (
@@ -328,15 +326,94 @@ function listeSignalements(excursion, userLocation, footerHeight) {
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
-    </View>
+    </View >
   );
 }
 
-/* --------------------------------- Styles --------------------------------- */
+function recupDistance(coordonneeSignalement, data: any) {
+  // Charger le fichier JSON avec les coordonnées
 
-const $root: ViewStyle = {
-  flex: 1,
-};
+  // Assurez-vous que les coordonnées du signalement sont définies
+  if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
+    throw new Error("Coordonnées du signalement non valides");
+  }
+
+  // Initialiser la distance minimale avec une valeur élevée
+  let distanceMinimale: number = Number.MAX_VALUE;
+
+  let coordPointPlusProche;
+
+  // Parcourir toutes les coordonnées dans le fichier
+  for (const coord of data) {
+    // Assurez-vous que les coordonnées dans le fichier sont définies
+    if (!coord.lat || !coord.lon) {
+      console.error("Coordonnées dans le fichier non valides");
+      continue;
+    }
+
+    // Calculer la distance entre le signalement et la coordonnée actuelle du fichier
+    const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(
+      coordonneeSignalement,
+      coord,
+    );
+
+    // Mettre à jour la distance minimale si la distance actuelle est plus petite
+    if (distanceSignalementPointLePlusProche < distanceMinimale) {
+      distanceMinimale = distanceSignalementPointLePlusProche;
+      coordPointPlusProche = coord;
+    }
+  }
+
+  const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
+
+  //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
+  // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche; //c'est donc pas vraiment ce calcul qu'il faut faire
+  // return distanceTotale;
+  return distanceDepartPointLePlusProche;
+}
+
+// Fonction de calcul de distance entre deux coordonnées
+function calculeDistanceEntreDeuxPoints(coord1, coord2) {
+  // Assurez-vous que coord1 et coord2 sont définis
+  if (
+    !coord1 ||
+    typeof coord1.lat === "undefined" ||
+    typeof coord1.lon === "undefined" ||
+    !coord2 ||
+    typeof coord2.lat === "undefined" ||
+    typeof coord2.lon === "undefined"
+  ) {
+    throw new Error("Coordonnées non valides");
+  }
+
+  // Rayon moyen de la Terre en kilomètres
+  const R = 6371;
+
+  // Convertir les degrés en radians
+  const toRadians = degree => degree * (Math.PI / 180);
+
+  // Calcul des distances
+  const dLat = toRadians(coord2.lat - coord1.lat);
+  const dLon = toRadians(coord2.lon - coord1.lon);
+
+  // Formule de Haversine pour calculer la distance entre deux points
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(coord1.lat)) *
+    Math.cos(toRadians(coord2.lat)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
+
+  // Distance en radians
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  // Distance en kilomètres
+  const distance = R * c;
+
+  return distance;
+}
+
+/* --------------------------------- Styles --------------------------------- */
 
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.fond,
@@ -358,17 +435,6 @@ const $container: ViewStyle = {
   backgroundColor: colors.erreur,
 };
 
-// const $containerPetit: ViewStyle = {
-//   flex: 1,
-//   width: width,
-//   backgroundColor: colors.fond,
-//   alignItems: "center",
-//   borderWidth: 1,
-//   borderColor: colors.bordure,
-//   borderRadius: 10,
-//   padding: spacing.xxs,
-// };
-
 const $containerPetit: ViewStyle = {
   flex: 1,
   width: width,
@@ -376,7 +442,6 @@ const $containerPetit: ViewStyle = {
   borderWidth: 1,
   borderColor: colors.bordure,
   borderRadius: 10,
-  // marginTop: height / 1.6,
   paddingTop: spacing.md,
 };
 
@@ -390,6 +455,7 @@ const $containerGrand: ViewStyle = {
   borderRadius: 10,
   marginTop: height / 4,
   paddingTop: spacing.md,
+  height: height
 };
 
 const $containerInfo: ViewStyle = {
@@ -473,11 +539,7 @@ const $buttonIncreaseProgress: ViewStyle = {
   alignItems: "center",
 };
 
-const $textButton: TextStyle = {
-  color: colors.palette.gris, // Couleur du texte du bouton
-  fontSize: 16, // Taille de la police du texte du bouton
-  fontWeight: "bold",
-};
+
 
 /* -------------------------------- La fleche ------------------------------- */
 
@@ -499,13 +561,21 @@ const $iconeFleche: ImageStyle = {
 /* ------------------------------ Signalements ------------------------------ */
 
 const $titreSignalement: TextStyle = {
-  fontSize: 20,
+  zIndex: 1,
+  fontSize: spacing.lg,
   textAlign: "center",
-  marginTop: spacing.md,
+  marginTop: spacing.xs,
+  position: "absolute",
+  alignSelf: "center",
+};
+
+const $listeSignalements: ViewStyle = {
+  marginTop: spacing.xl,
 };
 
 const $containerSignalements: ViewStyle = {
   margin: spacing.xs,
+  marginTop: spacing.xl,
   paddingBottom: height / 2,
 };
 
