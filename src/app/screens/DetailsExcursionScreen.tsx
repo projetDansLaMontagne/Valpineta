@@ -37,7 +37,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const { route, navigation } = props;
 
     let excursion = route.params?.excursion;
-    
+
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
@@ -55,7 +55,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     //si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <SafeAreaView style={$container}>
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
