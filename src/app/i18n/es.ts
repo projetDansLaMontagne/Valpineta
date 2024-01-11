@@ -68,7 +68,23 @@ const es = {
       message: "Se produjo un error. Por favor, inténtalo de nuevo.",
     },
   },
-
+  suiviTrack: {
+    titres: {
+      signalements: "Informes",
+      description: "Descripción",
+    },
+    description: {
+      typeParcours: "Tipo de recorrido : ",
+      duree: "Duración :",
+      distance: "Distancia :",
+      difficulteTech: "Dificultad técnica :",
+      difficulteOrientation: "Dificultad de orientación :",
+    },
+    barreAvancement: {
+      parcouru: "Viajó :",
+      total: "Total :",
+    },
+  },
   parametres: {
     titre: "Ajustes",
     changerLangue: {

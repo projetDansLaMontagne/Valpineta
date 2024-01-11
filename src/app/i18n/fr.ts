@@ -69,6 +69,23 @@ const fr = {
       message: "Une erreur est survenue, veuillez réessayer",
     },
   },
+  suiviTrack: {
+    titres: {
+      signalements: "Signalements",
+      description: "Description",
+    },
+    description: {
+      typeParcours: "Type de parcours : ",
+      duree: "Durée:",
+      distance: "Distance:",
+      difficulteTech: "Difficulté technique:",
+      difficulteOrientation: "Difficulté d'orientation:",
+    },
+    barreAvancement: {
+      parcouru: "Parcouru :",
+      total: "Total :",
+    },
+  },
   parametres: {
     titre: "Paramètres",
     changerLangue: {

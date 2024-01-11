@@ -37,7 +37,7 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
 
     // console.log(excursion.distance);
 
-
+    const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [userLocation, setUserLocation] = useState(null);
     const footerHeight = useBottomTabBarHeight();
     const [progress, setProgress] = useState(0);
@@ -99,7 +99,7 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={itemMini(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning)}
-          itemFull={itemFull(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, userLocation)}
+          itemFull={itemFull(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, userLocation, containerInfoAffiche, setcontainerInfoAffiche)}
           animation="easeInEaseOut"
           swipeHeight={height / 4.5 + footerHeight}
           disableSwipeIcon={true}
@@ -141,7 +141,7 @@ function itemMini(excursion: Record<string, unknown>, navigation: any, progress:
 
   return (
     <View style={$containerPetit}>
-      <View style={$containerBouton}>
+      <View style={$containerBoutonChrono}>
         <TouchableOpacity onPress={() => { toggleChrono() }}>
           <Image
             style={$boutonPauseArret}
@@ -156,9 +156,9 @@ function itemMini(excursion: Record<string, unknown>, navigation: any, progress:
           <Image style={$boutonPauseArret} source={require("../../assets/icons/arret.png")} />
         </TouchableOpacity>
       </View>
-      <View style={$listeInfos}>
+      <View style={$listeDescription}>
         <View style={$containerInfo}>
-          <Image style={$icone} source={require("../../assets/icons/temps.png")} />
+          <Image style={$icone} source={require("../../assets/icons/duree.png")} />
           <Text style={$texteInfo}>{formatTime(chronoTime)}</Text>
         </View>
         <View style={$containerInfo}>
@@ -199,7 +199,7 @@ function itemMini(excursion: Record<string, unknown>, navigation: any, progress:
   );
 }
 
-function itemFull(excursion: Record<string, unknown>, navigation: any, progress: number, setProgress: any, chronoTime: number, toggleChrono: () => void, resetChrono: () => void, formatTime: (timeInSeconds: number) => string, chronoRunning: boolean, userLocation: any) {
+function itemFull(excursion: Record<string, unknown>, navigation: any, progress: number, setProgress: any, chronoTime: number, toggleChrono: () => void, resetChrono: () => void, formatTime: (timeInSeconds: number) => string, chronoRunning: boolean, userLocation: any, containerInfoAffiche: boolean, setcontainerInfoAffiche) {
   const increaseProgress = () => {
     if (progress < 100) { // 100 a remplacer par la valeur max de la barre de progression ( la distance totale de l'excursion)
       setProgress(progress + 2); // Augmente la valeur de progression de 2 (à ajuster en fonction de la distance parcourue) 
@@ -213,7 +213,7 @@ function itemFull(excursion: Record<string, unknown>, navigation: any, progress:
 
   return (
     <View style={$containerGrand}>
-      <View style={$containerBouton}>
+      <View style={$containerBoutonChrono}>
         <TouchableOpacity onPress={() => { toggleChrono() }}>
           <Image
             style={$boutonPauseArret}
@@ -228,9 +228,9 @@ function itemFull(excursion: Record<string, unknown>, navigation: any, progress:
           <Image style={$boutonPauseArret} source={require("../../assets/icons/arret.png")} />
         </TouchableOpacity>
       </View>
-      <View style={$listeInfos}>
+      <View style={$listeDescription}>
         <View style={$containerInfo}>
-          <Image style={$icone} source={require("../../assets/icons/temps.png")} />
+          <Image style={$icone} source={require("../../assets/icons/duree.png")} />
           <Text style={$texteInfo}>{formatTime(chronoTime)}</Text>
         </View>
         <View style={$containerInfo}>
@@ -259,16 +259,53 @@ function itemFull(excursion: Record<string, unknown>, navigation: any, progress:
       </View>
       <View style={$listeDistances}>
         <View style={$containerTextVariable}>
-          <Text size="xs">Parcourus : </Text>
+          <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
           <Text size="xs" weight="bold"> 0 km</Text>
         </View>
         <View style={$containerTextVariable}>
-          <Text size="xs">Total : </Text>
+          <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
           <Text size="xs" weight="bold">{distance} km</Text>
         </View>
       </View>
       <View>
-        {listeSignalements(excursion, userLocation)}
+        <View style={$containerBouton}>
+          <TouchableOpacity
+            onPress={() => {
+              setcontainerInfoAffiche(true);
+            }}
+            style={$boutonDescriptionignalements}
+          >
+            <Text
+              tx="suiviTrack.titres.description"
+              size="lg"
+              style={[containerInfoAffiche ? { color: colors.bouton, paddingLeft: spacing.lg } : { color: colors.text, paddingLeft: spacing.lg }]}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setcontainerInfoAffiche(false);
+            }}
+            style={$boutonDescriptionignalements}
+          >
+            <Text
+              tx="suiviTrack.titres.signalements"
+              size="lg"
+              style={[containerInfoAffiche ? { color: colors.text, paddingEnd: spacing.lg } : { color: colors.bouton, paddingEnd: spacing.lg }]}
+            />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={[
+            $souligneDescriptionAvis,
+            containerInfoAffiche
+              ? { left: spacing.lg }
+              // : { left: width - width / 2.5 - spacing.lg / 1.5 },
+              : { left: width / 2 },
+          ]}
+        ></View>
+        {containerInfoAffiche
+          ? descritpion(excursion)
+          : listeSignalements(excursion, userLocation)}
       </View>
     </View >
   );
@@ -292,10 +329,57 @@ function getUserLocation() {
   });
 }
 
+function descritpion(excursion) {
+  return (
+    <View style={$containerDescription}>
+      {/* <Text weight="bold" style={$nomExcursion}>{excursion.nom}</Text> */}
+      <View style={$typeParcours}>
+        <Text tx="suiviTrack.description.typeParcours" />
+        <Text>{excursion.typeParcours}</Text>
+      </View>
+      <View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: "space-around" }}>
+          <View style={$blocInfo}>
+            <Image style={$iconDescription} source={require("../../assets/icons/distance.png")} />
+            <View style={$blocInterieurTexte}>
+              <Text style={$texteDescription} tx="suiviTrack.description.distance" />
+              <Text style={$texteDescription} >{excursion.distance} km</Text>
+            </View>
+          </View>
+          <View style={$blocInfo}>
+            <Image style={$iconDescription} source={require("../../assets/icons/duree.png")} />
+            <View style={$blocInterieurTexte}>
+              <Text style={$texteDescription} tx="suiviTrack.description.duree" />
+              <Text style={$texteDescription} >{excursion.duree.h}h{excursion.duree.m}</Text>
+            </View>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: "space-around" }}>
+          <View style={$blocInfo}>
+            <Image style={$iconDescription} source={require("../../assets/icons/difficulteTechnique.png")} />
+            <View style={$blocInterieurTexte}>
+              <Text style={$texteDescription} tx="suiviTrack.description.difficulteTech" />
+              <Text style={$texteDescription} >{excursion.difficulteTechnique}/3</Text>
+            </View>
+          </View>
+          <View style={$blocInfo}>
+            <Image style={$iconDescription} source={require("../../assets/icons/difficulteOrientation.png")} />
+            <View style={$blocInterieurTexte}>
+              <Text style={$texteDescription} tx="suiviTrack.description.difficulteOrientation" />
+              <Text style={$texteDescription} >{excursion.difficulteOrientation}/3</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+    </View >
+  )
+}
+
 function listeSignalements(excursion, userLocation) {
   return (
     <View>
-      <Text weight="bold" style={$titreSignalement}> Signalements </Text>
+      {/* <Text weight="bold" style={$titreSignalement}> Signalements </Text> */}
       <ScrollView>
         <TouchableWithoutFeedback>
           <View style={$containerSignalements}>
@@ -464,26 +548,36 @@ const $containerInfo: ViewStyle = {
   justifyContent: "space-around",
   backgroundColor: "#F5F5F5",
   borderRadius: 20,
-  padding: spacing.xs,
+  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.sm,
 };
 
 const $texteInfo: TextStyle = {
-  fontSize: 20,
+  fontSize: spacing.md,
   fontWeight: "bold",
+  paddingStart: spacing.xxs,
+};
+
+const $containerBoutonChrono: ViewStyle = {
+  flexDirection: "row",
+  justifyContent: "space-around",
+  alignItems: "center",
 };
 
 const $containerBouton: ViewStyle = {
+  marginTop: spacing.xs,
   flexDirection: "row",
   justifyContent: "space-around",
   alignItems: "center",
 };
 
 const $boutonPauseArret: ImageStyle = {
-  width: 60,
-  height: 60,
+  tintColor: colors.palette.rouge,
+  width: 55,
+  height: 55,
 };
 
-const $listeInfos: ViewStyle = {
+const $listeDescription: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   alignItems: "center",
@@ -492,8 +586,8 @@ const $listeInfos: ViewStyle = {
 };
 
 const $icone: ImageStyle = {
-  width: 22,
-  height: 22,
+  width: 20,
+  height: 20,
 };
 
 const $listeDistances: ViewStyle = {
@@ -575,10 +669,75 @@ const $listeSignalements: ViewStyle = {
 
 const $containerSignalements: ViewStyle = {
   margin: spacing.xs,
-  marginTop: spacing.xl,
   paddingBottom: height / 2,
 };
 
+/* ------------------------------ Description/Signalements ------------------------------ */
+const $boutonDescriptionignalements: ViewStyle = {
+  // paddingLeft: spacing.xl,
+  // paddingRight: spacing.xl,
+  justifyContent: "center",
+};
+
+const $souligneDescriptionAvis: ViewStyle = {
+  backgroundColor: colors.bouton,
+  height: 2,
+  width: width / 2.5,
+  position: "relative",
+};
+
+/* ------------------------------- Description ------------------------------ */
+const $nomExcursion: TextStyle = {
+  fontSize: 24,
+  textAlign: "center",
+  marginTop: spacing.sm,
+  alignSelf: "center",
+};
+
+const $containerDescription: ViewStyle = {
+  padding: spacing.md,
+};
+
+const $typeParcours: ViewStyle = {
+  flexDirection: "row",
+  paddingBottom: spacing.sm,
+  paddingStart: spacing.sm,
+};
+
+const $iconDescription: ImageStyle = {
+  width: 25,
+  height: 25,
+  // tintColor: colors.palette.vert,
+  marginEnd: spacing.xs
+};
+
+const $blocInfo: ViewStyle = {
+  // justifyContent: "space-between",
+  // flexBasis: '50%',
+  flexDirection: "row",
+  alignItems: "center",
+  height: 50,
+  width: 150,
+  // justifyContent: "space-between",
+  // marginTop: spacing.sm,
+  // padding: spacing.sm,
+};
+
+const $blocInterieurTexte: ViewStyle = {
+  flexDirection: "column",
+  // alignItems: "center",
+  // justifyContent: "space-between",
+  // marginTop: spacing.sm,
+  // padding: spacing.sm,
+};
+
+const $texteDescription: TextStyle = {
+  // fontWeight: "bold",
+  fontSize: 12,
+  lineHeight: 18,
+};
+
+const $containerBlocs: ViewStyle = {};
 /* ------------------------------ Style Erreur ------------------------------ */
 
 const $containerErreur: ViewStyle = {
