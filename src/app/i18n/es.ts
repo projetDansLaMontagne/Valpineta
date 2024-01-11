@@ -79,6 +79,10 @@ const es = {
       distance: "Distancia :",
       difficulteTech: "Dificultad técnica :",
       difficulteOrientation: "Dificultad de orientación :",
+      denivele: "Desnivel",
+      altitudeActuelle: "Altitud actual : ",
+      altitudeMax: "Altitud máxima : ",
+      altitudeMin: "Altitud mínima : ",
     },
     barreAvancement: {
       parcouru: "Viajó :",

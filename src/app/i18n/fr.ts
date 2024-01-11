@@ -80,10 +80,14 @@ const fr = {
       distance: "Distance:",
       difficulteTech: "Difficulté technique:",
       difficulteOrientation: "Difficulté d'orientation:",
+      denivele: "Dénivelé",
+      altitudeActuelle: "Altitude actuelle : ",
+      altitudeMax: "Altitude max : ",
+      altitudeMin: "Altitude min : ",
     },
     barreAvancement: {
-      parcouru: "Parcouru :",
-      total: "Total :",
+      parcouru: "Parcouru : ",
+      total: "Total : ",
     },
   },
   parametres: {

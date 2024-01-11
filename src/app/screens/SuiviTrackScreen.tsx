@@ -15,7 +15,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Text, Screen, CarteSignalement } from "app/components";
+import { Text, Screen, CarteSignalement, GraphiqueDenivele } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -101,7 +101,7 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
           itemMini={itemMini(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning)}
           itemFull={itemFull(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, userLocation, containerInfoAffiche, setcontainerInfoAffiche)}
           animation="easeInEaseOut"
-          swipeHeight={height / 4.5 + footerHeight}
+          swipeHeight={height / 5 + footerHeight}
           disableSwipeIcon={true}
         />
       </SafeAreaView>
@@ -187,11 +187,11 @@ function itemMini(excursion: Record<string, unknown>, navigation: any, progress:
       </View>
       <View style={$listeDistances}>
         <View style={$containerTextVariable}>
-          <Text size="xs">Parcourus : </Text>
+          <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
           <Text size="xs" weight="bold"> 0 km</Text>
         </View>
         <View style={$containerTextVariable}>
-          <Text size="xs">Total : </Text>
+          <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
           <Text size="xs" weight="bold">{distance} km</Text>
         </View>
       </View>
@@ -330,15 +330,32 @@ function getUserLocation() {
 }
 
 function descritpion(excursion) {
+  let track = excursion.track;
+  //on recuprere l'altitude max
+  let altitudeMax = 0;
+  let altitudeMin = Infinity;
+  let altitudeActuelle = 0;
+
+  if (track !== undefined) {
+    track.forEach((element) => {
+      if (element.alt > altitudeMax) {
+        altitudeMax = element.alt;
+      }
+      if (element.alt < altitudeMin) {
+        altitudeMin = element.alt;
+      }
+    });
+  }
+
   return (
     <View style={$containerDescription}>
-      {/* <Text weight="bold" style={$nomExcursion}>{excursion.nom}</Text> */}
+      <Text weight="bold" style={$nomExcursion}>{excursion.nom}</Text>
       <View style={$typeParcours}>
-        <Text tx="suiviTrack.description.typeParcours" />
-        <Text>{excursion.typeParcours}</Text>
+        <Text size="xs" tx="suiviTrack.description.typeParcours" />
+        <Text size="xs">{excursion.typeParcours}</Text>
       </View>
       <View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: "space-around" }}>
+        <View style={$listeInfos}>
           <View style={$blocInfo}>
             <Image style={$iconDescription} source={require("../../assets/icons/distance.png")} />
             <View style={$blocInterieurTexte}>
@@ -371,7 +388,26 @@ function descritpion(excursion) {
           </View>
         </View>
       </View>
-
+      <View style={$containerDenivele}>
+        <View>
+          <Text style={$texteDenivele} weight="bold" tx="suiviTrack.description.denivele" />
+          {excursion.track && <GraphiqueDenivele points={excursion.track} detaille={false} largeur={width / 1.5} />}
+        </View>
+        <View style={$listeAltitudes}>
+          <View style={$blocAltitude}>
+            <Text tx="suiviTrack.description.altitudeActuelle" style={$texteDescription} />
+            <Text style={$texteDescription}>{altitudeActuelle} m</Text>
+          </View>
+          <View style={$blocAltitude}>
+            <Text tx="suiviTrack.description.altitudeMax" style={$texteDescription} />
+            <Text style={$texteDescription}>{altitudeMax.toFixed()} m</Text>
+          </View>
+          <View style={$blocAltitude}>
+            <Text tx="suiviTrack.description.altitudeMin" style={$texteDescription} />
+            <Text style={$texteDescription}>{altitudeMin.toFixed()} m</Text>
+          </View>
+        </View>
+      </View>
     </View >
   )
 }
@@ -379,7 +415,6 @@ function descritpion(excursion) {
 function listeSignalements(excursion, userLocation) {
   return (
     <View>
-      {/* <Text weight="bold" style={$titreSignalement}> Signalements </Text> */}
       <ScrollView>
         <TouchableWithoutFeedback>
           <View style={$containerSignalements}>
@@ -537,7 +572,7 @@ const $containerGrand: ViewStyle = {
   borderWidth: 1,
   borderColor: colors.bordure,
   borderRadius: 10,
-  marginTop: height / 4,
+  marginTop: height / 4.5,
   paddingTop: spacing.md,
   height: height
 };
@@ -548,7 +583,7 @@ const $containerInfo: ViewStyle = {
   justifyContent: "space-around",
   backgroundColor: "#F5F5F5",
   borderRadius: 20,
-  paddingVertical: spacing.xs,
+  paddingVertical: spacing.xxs,
   paddingHorizontal: spacing.sm,
 };
 
@@ -562,6 +597,7 @@ const $containerBoutonChrono: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   alignItems: "center",
+  marginBottom: spacing.xs,
 };
 
 const $containerBouton: ViewStyle = {
@@ -581,7 +617,6 @@ const $listeDescription: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   alignItems: "center",
-  marginTop: spacing.sm,
   padding: spacing.xs,
 };
 
@@ -688,10 +723,10 @@ const $souligneDescriptionAvis: ViewStyle = {
 
 /* ------------------------------- Description ------------------------------ */
 const $nomExcursion: TextStyle = {
-  fontSize: 24,
+  fontSize: 20,
   textAlign: "center",
-  marginTop: spacing.sm,
   alignSelf: "center",
+  paddingBottom: spacing.xxs,
 };
 
 const $containerDescription: ViewStyle = {
@@ -700,7 +735,6 @@ const $containerDescription: ViewStyle = {
 
 const $typeParcours: ViewStyle = {
   flexDirection: "row",
-  paddingBottom: spacing.sm,
   paddingStart: spacing.sm,
 };
 
@@ -711,12 +745,18 @@ const $iconDescription: ImageStyle = {
   marginEnd: spacing.xs
 };
 
+const $listeInfos: ViewStyle = {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: "space-around"
+}
+
 const $blocInfo: ViewStyle = {
   // justifyContent: "space-between",
   // flexBasis: '50%',
   flexDirection: "row",
   alignItems: "center",
-  height: 50,
+  height: 45,
   width: 150,
   // justifyContent: "space-between",
   // marginTop: spacing.sm,
@@ -737,7 +777,28 @@ const $texteDescription: TextStyle = {
   lineHeight: 18,
 };
 
-const $containerBlocs: ViewStyle = {};
+const $containerDenivele: ViewStyle = {
+  width: width * 0.5,
+  flexDirection: "row"
+};
+
+const $texteDenivele: TextStyle = {
+  fontSize: spacing.md,
+  lineHeight: 16,
+  textAlign: "center",
+  paddingTop: spacing.xs,
+};
+
+const $listeAltitudes: ViewStyle = {
+  paddingStart: spacing.sm,
+  marginTop: spacing.xl,
+};
+
+const $blocAltitude: ViewStyle = {
+  flexDirection: "row",
+  paddingBottom: spacing.sm,
+};
+
 /* ------------------------------ Style Erreur ------------------------------ */
 
 const $containerErreur: ViewStyle = {
