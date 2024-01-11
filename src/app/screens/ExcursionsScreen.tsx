@@ -14,22 +14,15 @@ import { Screen, CarteExcursion, Text } from "app/components";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
 
-/**@warning La navigation vers filtres est dans le mauvais sens (l'écran slide vers la gauche au lieu de la droite) */
-
-/**@warning Cliquer sur excursions dans le footer redirige vers la page en retirant les parametre "Filtres" mais donne un parametre buggé "filtres" */
-
-/**@todo CSS : agrandir la zone de texte de recherche + la rendre fonctionnelle */
-/**@todo CSS : empecher le footer d etre au dessus de la derniere excursion */
-
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
 
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(
   props: ExcursionsScreenProps,
 ) {
-  const filtres = props.route.params?.filtres;
   const { parametres } = useStores();
 
-  const { navigation } = props;
+  const filtres = props.route.params?.filtres;
+
   const filtreIcone = require("../../assets/icons/filtre.png");
 
   // -- FONCTIONS D INITIALISATION --
@@ -212,7 +205,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   /* ------------------------------- CALL BACKS ------------------------------- */
   const clicExcursion = (excursion: T_excursion) => {
-    navigation.navigate("DetailsExcursion", { excursion });
+    props.navigation.navigate("DetailsExcursion", { excursion });
   };
 
   return (
@@ -228,7 +221,10 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           placeholderTextColor={colors.palette.grisFonce}
           style={styles.barreRecherche}
         />
-        <TouchableOpacity onPress={() => navigation.navigate("Filtres")} style={styles.valleeIcone}>
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate("Filtres")}
+          style={styles.valleeIcone}
+        >
           <Image style={styles.iconeFiltre} source={filtreIcone} />
         </TouchableOpacity>
       </View>
