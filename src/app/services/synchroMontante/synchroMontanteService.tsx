@@ -1,3 +1,5 @@
+import NetInfo from "@react-native-community/netinfo";
+
 export function synchroMontante(
     titreSignalement,
     descriptionSignalement,
@@ -6,6 +8,8 @@ export function synchroMontante(
 ) {
     return new Promise(async (resolve) => {
         let status = "attente";
+        const connexion = await NetInfo.fetch();
+        console.log(synchroMontanteStore.signalements);
 
         if (
             !rechercheMemeSignalement(
@@ -34,7 +38,14 @@ export function synchroMontante(
                     photoURL: photoSignalement,
                 };
                 synchroMontanteStore.addSignalement(unSignalement);
-                status = "ajoute";
+                if (connexion.isConnected){
+                    envoieBaseDeDonnées();
+                    synchroMontanteStore.removeAllSignalements();
+                    status = "envoye";
+                }
+                else{
+                    status = "ajoute";
+                }
             } catch (error) {
                 console.error("Erreur lors de la conversion de l'image :", error);
                 status = "erreur";
@@ -47,7 +58,6 @@ export function synchroMontante(
         resolve(status);
     });
 }
-
 
 function rechercheMemeSignalement(
     titreSignalement: string,
@@ -68,4 +78,8 @@ function rechercheMemeSignalement(
     });
 
     return memeSignalement;
+}
+
+async function envoieBaseDeDonnées(){
+    console.log("Envoie de la base de données");
 }

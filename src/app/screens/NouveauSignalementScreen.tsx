@@ -160,7 +160,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       Alert.alert(
 
         "Ajout réussi",
-        "Votre signalement a bien été ajouté",
+        "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
         [
           { text: "Ajouter un autre" },
           { text: "Retour", onPress: () => props.navigation.goBack() }
@@ -184,6 +184,17 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           "Veuillez vérifier les champs de votre signalement",
           [
             { text: "OK" }
+          ],
+          { cancelable: false }
+        )
+      }
+      else if (status == "envoye") {
+        Alert.alert(
+          "Envoi réussi",
+          "Votre signalement a bien été envoyé en base de données",
+          [
+            { text: "Ajouter un autre" },
+            { text: "Retour", onPress: () => props.navigation.goBack() }
           ],
           { cancelable: false }
         )
