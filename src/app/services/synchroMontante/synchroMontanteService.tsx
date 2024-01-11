@@ -1,28 +1,11 @@
-import { SynchroMontanteStore } from "app/models";
-
-export async function synchroMontante(
+export function synchroMontante(
     titreSignalement,
     descriptionSignalement,
     photoSignalement,
     synchroMontanteStore,
 ) {
-    let status = "attente";
-
-    // Convertir le chemin de l'image en blob
-    const blob = await fetch(photoSignalement).then(response => response.blob());
-
-    // Convertir le blob en base64
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-
-    reader.onloadend = function () {
-        const base64data = reader.result;
-
-        const unSignalement = {
-            titre: titreSignalement,
-            description: descriptionSignalement,
-            photo: base64data,
-        };
+    return new Promise(async (resolve) => {
+        let status = "attente";
 
         if (
             !rechercheMemeSignalement(
@@ -32,17 +15,39 @@ export async function synchroMontante(
                 synchroMontanteStore,
             )
         ) {
-            synchroMontanteStore.addSignalement(unSignalement);
-            status = "ajoute";
+            try {
+                // Convertir le chemin de l'image en blob
+                const blob = await fetch(photoSignalement).then(response => response.blob());
+
+                // Convertir le blob en base64
+                const base64data = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+
+                const unSignalement = {
+                    titre: titreSignalement,
+                    description: descriptionSignalement,
+                    photoBlob: base64data,
+                    photoURL: photoSignalement,
+                };
+                synchroMontanteStore.addSignalement(unSignalement);
+                status = "ajoute";
+            } catch (error) {
+                console.error("Erreur lors de la conversion de l'image :", error);
+                status = "erreur";
+            }
         } else {
             status = "existe";
         }
 
         console.log(synchroMontanteStore.signalements);
-    };
-
-    return status;
+        resolve(status);
+    });
 }
+
 
 function rechercheMemeSignalement(
     titreSignalement: string,
@@ -56,7 +61,7 @@ function rechercheMemeSignalement(
         if (
             signalement.titre === titreSignalement &&
             signalement.description === descriptionSignalement &&
-            signalement.photo === photoSignalement
+            signalement.photoURL === photoSignalement
         ) {
             memeSignalement = true;
         }

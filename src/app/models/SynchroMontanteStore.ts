@@ -1,9 +1,11 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
+import { remove } from "app/utils/storage";
 
 // Modèle pour représenter un signalement individuel
 const signalement = types.model({
-  photo: types.string,
+  photoURL: types.string,
+  photoBlob: types.string,
   titre: types.string,
   description: types.string,
 });
@@ -35,9 +37,12 @@ export const SynchroMontanteModel = types
     removeSignalement: (index: number) => {
       self.signalements.splice(index, 1);
     },
+    removeAllSignalements: () => {
+      self.signalements.clear();
+    },
   })) // eslint-disable-line @typescript-eslint/no-unused-vars
 
-export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> {}
-export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> {}
-export interface SynchroMontanteSnapshotIn extends SnapshotIn<typeof SynchroMontanteModel> {}
+export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> { }
+export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> { }
+export interface SynchroMontanteSnapshotIn extends SnapshotIn<typeof SynchroMontanteModel> { }
 export const createSynchroMontanteDefaultModel = () => types.optional(SynchroMontanteModel, {})

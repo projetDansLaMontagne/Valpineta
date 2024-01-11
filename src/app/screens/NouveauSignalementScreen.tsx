@@ -1,15 +1,14 @@
 // Librairies
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { TextStyle, TextInput, Image, View, Dimensions, ViewStyle, Alert } from "react-native";
+import { TextStyle, TextInput, Image, View, Dimensions, ViewStyle, Alert, ActivityIndicator } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { Button, TextField } from "app/components";
 import * as ImagePicker from "expo-image-picker";
-import { RootStore, SynchroMontante, SynchroMontanteStore, useStores } from "app/models";
+import { RootStore, SynchroMontanteStore, useStores } from "app/models";
 import { synchroMontante } from "app/services/synchroMontante/synchroMontanteService"
 import NetInfo from '@react-native-community/netinfo';
-
 
 // Composants
 import { Screen, Text } from "app/components";
@@ -46,6 +45,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [photoError, setPhotoError] = useState(false);
 
     const [ status, setStatus ] = useState("");
+    const [ isLoading, setIsLoading ] = useState(false);
 
     /**
      * Fonction pour prendre une photo avec la caméra
@@ -196,9 +196,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @async
      * @function envoyerSignalement
      */
-    const envoyerSignalement = ( titreSignalement:string , descriptionSignalement:string, photoSignalement:string , synchroMontanteStore:SynchroMontanteStore): void => {
+    const envoyerSignalement = async ( titreSignalement:string , descriptionSignalement:string, photoSignalement:string , synchroMontanteStore:SynchroMontanteStore): Promise<void> => {
       
-      let status = "En attente";
+      let status: string = "En attente";
 
       // Vérification des champs
       verifSignalement();
@@ -206,10 +206,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       // Si les champs sont corrects
       if (!titreError && !descriptionError && !photoError) {
 
-        status = synchroMontante(titreSignalement, descriptionSignalement, photoSignalement, synchroMontanteStore);
-        
+        setIsLoading(true);
+        status = await synchroMontante(titreSignalement, descriptionSignalement, photoSignalement, synchroMontanteStore) as string;
+        setIsLoading(false);
+
       } else {
         status = "format";
+        AlerteStatus(status);
       }
 
       AlerteStatus(status);
@@ -222,6 +225,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     // Utilisation d'effets secondaires pour déclencher la vérification des erreurs après chaque modification d'état
 
     return (
+      isLoading ?
+      <Screen style={$containerLoader} preset="fixed" safeAreaEdges={["top", "bottom"]}>
+        <ActivityIndicator size="large" color={colors.palette.vert} />
+      </Screen>
+      :
       <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
         <Text
           style={$h1}
@@ -316,6 +324,12 @@ const { width } = Dimensions.get("window");
 const $container: ViewStyle = {
   paddingRight: spacing.sm,
   paddingLeft: spacing.sm,
+};
+
+const $containerLoader: ViewStyle = {
+  ...$container,
+  justifyContent: "center",
+  alignItems: "center",
 };
 
 const $h1: TextStyle = {
