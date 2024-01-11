@@ -39,13 +39,13 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    */
   const calculValeursFiltres = (excursions: T_excursion[]): T_valeurs_filtres => {
     // Parcourt de chaque excursion pour connaitre les maximas
-    var distanceMax = 0;
-    var dureeMax = 0;
-    var deniveleMax = 0;
-    var typesParcours = [];
-    var vallees = [];
-    var difficulteTechniqueMax = 0;
-    var difficulteOrientationMax = 0;
+    let distanceMax = 0;
+    let dureeMax = 0;
+    let deniveleMax = 0;
+    let typesParcours = [];
+    let vallees = [];
+    let difficulteTechniqueMax = 0;
+    let difficulteOrientationMax = 0;
 
     excursions.forEach(excursion => {
       // Distance

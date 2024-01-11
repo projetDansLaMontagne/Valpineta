@@ -121,7 +121,7 @@ function itemFull(
   userLocation: Array<number>,
   footerHeight: number,
 ) {
-  var nomExcursion: string = "";
+  let nomExcursion: string = "";
   if (excursion !== undefined) {
     nomExcursion = excursion.nom as string;
   }
@@ -234,7 +234,7 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
                 alt: null,
                 dist: null,
               };
-              const distanceSignalement = userLocation ? recupDistance(coordSignalement) : 0;
+              const distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track) : 0;
               const carteType =
                 signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
               return (
@@ -275,12 +275,12 @@ function infos(
   setIsAllSignalements,
   userLocation,
 ) {
-  var duree: string = "";
-  var distance: string = "";
-  var difficulteOrientation: number = 0;
-  var difficulteTechnique: number = 0;
-  var description: string = "";
-  var signalements: T_signalement[] = [];
+  let duree: string = "";
+  let distance: string = "";
+  let difficulteOrientation: number = 0;
+  let difficulteTechnique: number = 0;
+  let description: string = "";
+  let signalements: T_signalement[] = [];
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -373,7 +373,7 @@ function infos(
                           dist: null,
                         };
                         const distanceSignalement = userLocation
-                          ? recupDistance(coordSignalement)
+                          ? recupDistance(coordSignalement, excursion.track)
                           : 0;
                         const carteType =
                           signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
@@ -466,9 +466,9 @@ function calculeDistanceEntreDeuxPoints(coord1: T_point, coord2: T_point) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-      Math.cos(toRadians(coord2.lat)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRadians(coord2.lat)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -480,10 +480,7 @@ function calculeDistanceEntreDeuxPoints(coord1: T_point, coord2: T_point) {
 }
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-function recupDistance(coordonneeSignalement: T_point) {
-  // Charger le fichier JSON avec les coordonnées
-  const data: T_point[] = require("../../assets/JSON/exemple_cruz_del_guardia.json");
-
+function recupDistance(coordonneeSignalement: T_point, data: any) {
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
     throw new Error("Coordonnées du signalement non valides");
@@ -514,12 +511,12 @@ function recupDistance(coordonneeSignalement: T_point) {
       coordPointPlusProche = coord;
     }
   }
-
   const distanceDepartPointLePlusProche = (coordPointPlusProche.dist / 1000).toFixed(2);
 
   //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
   // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProche; //c'est donc pas vraiment ce calcul qu'il faut faire
   // return distanceTotale;
+
   return distanceDepartPointLePlusProche;
 }
 
