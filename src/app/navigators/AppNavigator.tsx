@@ -121,9 +121,6 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
-
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme();
   /* --------------------------------- Assets --------------------------------- */
@@ -150,6 +147,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     tabBarLabel: ({ color }) => <Text tx={tx} style={{ color: color, fontSize: 10 }} />,
   });
 
+  const Tab = createBottomTabNavigator();
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -171,17 +169,17 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       >
         <Tab.Screen
           name="ExcursionsStack"
-          component={ExcursionStack}
+          component={ExcursionStackScreen}
           options={optionsBoutons("excursions.titre", excursionLogo)}
         />
         <Tab.Screen
           name="CarteStack"
-          component={CarteStack}
+          component={CarteStackScreen}
           options={optionsBoutons("mapScreen.title", carteLogo)}
         />
         <Tab.Screen
           name="ParametresStack"
-          component={ParametresStack}
+          component={ParametresStackScreen}
           options={optionsBoutons("parametres.titre", parametresLogo)}
         />
       </Tab.Navigator>
@@ -192,38 +190,41 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 /* -------------------------------------------------------------------------- */
 /*                                   STACKS                                   */
 /* -------------------------------------------------------------------------- */
-const ExcursionStack = () => (
-  <Stack.Navigator
+const ExcursionStack = createNativeStackNavigator();
+const ExcursionStackScreen = () => (
+  <ExcursionStack.Navigator
     initialRouteName={"Excursions"}
     screenOptions={{
       headerShown: false,
     }}
   >
-    <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
-    <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
-  </Stack.Navigator>
+    <ExcursionStack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
+    <ExcursionStack.Screen name="Filtres" component={Screens.FiltresScreen} />
+  </ExcursionStack.Navigator>
 );
 
-const CarteStack = () => (
-  <Stack.Navigator
+const CarteStack = createNativeStackNavigator();
+const CarteStackScreen = () => (
+  <CarteStack.Navigator
     initialRouteName={"Carte"}
     screenOptions={{
       headerShown: false,
     }}
   >
-    <Stack.Screen name="Carte" component={Screens.MapScreen} />
-    <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
-    <Stack.Screen name="Description" component={Screens.DescriptionScreen} />
-  </Stack.Navigator>
+    <CarteStack.Screen name="Carte" component={Screens.MapScreen} />
+    <CarteStack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
+    <CarteStack.Screen name="Description" component={Screens.DescriptionScreen} />
+  </CarteStack.Navigator>
 );
 
-const ParametresStack = () => (
-  <Stack.Navigator
+const ParametresStack = createNativeStackNavigator();
+const ParametresStackScreen = () => (
+  <ParametresStack.Navigator
     initialRouteName={"Parametres"}
     screenOptions={{
       headerShown: false,
     }}
   >
-    <Stack.Screen name="Parametres" component={Screens.ParametresScreen} />
-  </Stack.Navigator>
+    <ParametresStack.Screen name="Parametres" component={Screens.ParametresScreen} />
+  </ParametresStack.Navigator>
 );
