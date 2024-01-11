@@ -131,15 +131,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 
   const { parametres } = useStores();
 
-  useEffect(() => {
-    if (parametres.langues === "fr") {
-      I18n.locale = "fr";
-    }
-    if (parametres.langues === "es") {
-      I18n.locale = "es";
-    }
-  }, [parametres.langues]);
-
   const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
     tabBarIcon: ({ color }) => (
       <Image source={logo} style={{ width: 30, height: 30, tintColor: color }} />

@@ -39,15 +39,9 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   // -- CONSTANTES --
   // Recuperation des valeurs de filtres
   var valeursFiltres: T_valeurs_filtres;
-  try {
-    // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
-    valeursFiltres = require("../../assets/JSON/valeurs_filtres.json");
-  } catch (error) {
-    // Erreur critique si on n a pas les valeurs de filtres
-    console.error("Page des filtres necessite les filtres appliques en parametres");
-    navigation.goBack();
-    return <></>;
-  }
+
+  // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
+  valeursFiltres = require("../../assets/JSON/valeurs_filtres.json");
 
   const incrementDenivele = 200;
   const criteresTri =
