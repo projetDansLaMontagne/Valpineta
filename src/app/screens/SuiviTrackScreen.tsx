@@ -19,7 +19,6 @@ import { Text, Screen, CarteSignalement, GraphiqueDenivele } from "app/component
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { number } from "mobx-state-tree/dist/internal";
 const { width, height } = Dimensions.get("window");
 
 // Composants
@@ -38,10 +37,16 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
 
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [userLocation, setUserLocation] = useState(null);
+    const [altitudeActuelle, setAltitudeActuelle] = useState(0);
+    const [altitudePrecedente, setAltitudePrecedente] = useState(0);
+    const [deniveleMonte, setDeniveleMonte] = useState(0);
+    const [deniveleDescendu, setDeniveleDescendu] = useState(0);
+
     const footerHeight = useBottomTabBarHeight();
     const [progress, setProgress] = useState(0);
     const [chronoRunning, setChronoRunning] = useState(false);
     const [chronoTime, setChronoTime] = useState(0);
+
 
     function toggleChrono() {
       setChronoRunning(!chronoRunning);
@@ -75,7 +80,7 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
 
     useEffect(() => {
       const fetchLocation = async () => {
-        const location = await getUserLocation();
+        const location = await getUserLocation(setAltitudeActuelle, altitudePrecedente, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu, setAltitudePrecedente,);
         setUserLocation(location);
       };
 
@@ -95,7 +100,7 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
         </TouchableOpacity>
         <SwipeUpDown
           itemMini={item(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, true)}
-          itemFull={item(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, false, userLocation, containerInfoAffiche, setcontainerInfoAffiche)}
+          itemFull={item(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, false, altitudeActuelle, userLocation, containerInfoAffiche, setcontainerInfoAffiche, setDeniveleMonte, deniveleMonte)}
           animation="easeInEaseOut"
           swipeHeight={height / 5 + footerHeight}
           disableSwipeIcon={true}
@@ -123,11 +128,14 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
 
 /* --------------------------------- Fonctions --------------------------------- */
 
-function item(excursion: Record<string, unknown>, navigation: any, progress: number, setProgress: any, chronoTime: number, toggleChrono: () => void, resetChrono: () => void, formatTime: (timeInSeconds: number) => string, chronoRunning: boolean, isMini: boolean, userLocation?: any, containerInfoAffiche?: boolean, setcontainerInfoAffiche?: any) {
+function item(excursion: Record<string, unknown>, navigation: any, progress: number, setProgress: any, chronoTime: number, toggleChrono: () => void, resetChrono: () => void, formatTime: (timeInSeconds: number) => string, chronoRunning: boolean, isMini: boolean, altitudeActuelle?, userLocation?: any, containerInfoAffiche?: boolean, setcontainerInfoAffiche?: any, setDeniveleMonte?, deniveleMonte?: number, deniveleDescendu?: number) {
   const increaseProgress = () => {
     if (progress < 100) { // 100 a remplacer par la valeur max de la barre de progression ( la distance totale de l'excursion)
       setProgress(progress + 2); // Augmente la valeur de progression de 2 (à ajuster en fonction de la distance parcourue) 
     }
+
+    // // Augmenter deniveleMonte en fonction de l'altitude actuelle
+    // setDeniveleMonte(deniveleMonte + altitudeActuelle);
   };
 
   let distance = 0;
@@ -162,11 +170,11 @@ function item(excursion: Record<string, unknown>, navigation: any, progress: num
             style={$icone}
             source={require("../../assets/icons/denivelePositifV2.png")}
           />
-          <Text style={$texteInfo}> 0 m</Text>
+          <Text style={$texteInfo}> {deniveleMonte} m</Text>
         </View>
         <View style={$containerInfo}>
           <Image style={$icone} source={require("../../assets/icons/deniveleNegatif.png")} />
-          <Text style={$texteInfo}> 0 m</Text>
+          <Text style={$texteInfo}> {deniveleDescendu} m</Text>
         </View>
       </View>
       {/* Barre de progression */}
@@ -228,7 +236,7 @@ function item(excursion: Record<string, unknown>, navigation: any, progress: num
             ]}
           ></View>
           {containerInfoAffiche
-            ? descritpion(excursion, userLocation)
+            ? descritpion(excursion, altitudeActuelle)
             : listeSignalements(excursion, userLocation)}
         </View>
       }
@@ -236,30 +244,59 @@ function item(excursion: Record<string, unknown>, navigation: any, progress: num
   );
 }
 
-function getUserLocation() {
+function getUserLocation(setAltitudeActuelle, altitudePrecedente, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu, setAltitudePrecedente) {
   return new Promise(async (resolve, reject) => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        console.error("Permission to access location was denied");
+        console.error("Permission d'accès à la localisation refusée");
         resolve(null);
       }
 
+      // Obtention de la position initiale
       let location = await Location.getCurrentPositionAsync({});
+      setAltitudeActuelle(location.coords.altitude); // Mettre à jour l'état
+
       resolve(location.coords);
+
+      // Mise à jour de la position à intervalles réguliers
+      const updateInterval = 10000;
+      setInterval(async () => {
+        try {
+          location = await Location.getCurrentPositionAsync({});
+          const nouvelleAltitude = location.coords.altitude;
+          setAltitudeActuelle(nouvelleAltitude);
+
+          // Mettre à jour deniveleMonte et deniveleDescendu en fonction de l'altitude
+          if (nouvelleAltitude > altitudePrecedente) {
+            setDeniveleMonte(deniveleMonte + (nouvelleAltitude - altitudePrecedente));
+          } else if (nouvelleAltitude < altitudePrecedente) {
+            setDeniveleDescendu(deniveleDescendu + (altitudePrecedente - nouvelleAltitude));
+          }
+
+          // Mettre à jour l'altitude précédente
+          setAltitudePrecedente(nouvelleAltitude);
+
+          console.log("Altitude mise à jour:", nouvelleAltitude);
+          resolve(location.coords);
+        } catch (error) {
+          console.error("Erreur lors de la récupération de la position", error);
+          reject(error);
+        }
+      }, updateInterval);
     } catch (error) {
-      console.error("Error getting location", error);
+      console.error("Erreur lors de la récupération de la position", error);
       reject(error);
     }
   });
 }
 
-function descritpion(excursion, userLocation) {
+function descritpion(excursion, altitudeActuelle) {
   let track = excursion.track;
   //on recuprere l'altitude max
   let altitudeMax = 0;
   let altitudeMin = Infinity;
-  let altitudeActuelle = 0; // a voir comment faire pour la mettre a jour
+  // let altitudeActuelle = 0; // a voir comment faire pour la mettre a jour
 
   if (track !== undefined) {
     track.forEach((element) => {
@@ -271,11 +308,6 @@ function descritpion(excursion, userLocation) {
       }
     });
   }
-
-  if (userLocation !== null) {
-    altitudeActuelle = userLocation.altitude;
-  }
-
   return (
     <View style={$containerDescription}>
       <Text weight="bold" style={$nomExcursion}>{excursion.nom}</Text>
