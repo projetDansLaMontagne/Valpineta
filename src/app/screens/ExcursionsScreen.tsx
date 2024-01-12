@@ -99,8 +99,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     excursions = excursions.filter(excursion => {
       const indexTypeParcours = nomsTypesParcours.indexOf(excursion.typeParcours);
 
-      if (
-        excursion.distance < filtres.intervalleDistance.min ||
+      return !(excursion.distance < filtres.intervalleDistance.min ||
         excursion.distance > filtres.intervalleDistance.max ||
         (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
         excursion.duree.h < filtres.intervalleDuree.min ||
@@ -110,14 +109,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         !filtres.indexTypesParcours.includes(indexTypeParcours) || // le type de l excursion est present dans les filtres
         !filtres.vallees.includes(excursion.vallee) ||
         !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
-        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
-      ) {
-        // On supprime de l excursion
-        return false;
-      } else {
-        // On garde de l excursion
-        return true;
-      }
+        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation));
     });
 
     // Application du critere de tri
@@ -138,7 +130,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   /**
    * Filtre les excursions contenant le texte de la barre de recherche
    */
-  function filtrageBarre(excursionsAFiltrer: T_excursion[], recherche: String) {
+  function filtrageBarre(excursionsAFiltrer: T_excursion[], recherche: string) {
     // Filtre de la barre de recherche
     return excursionsAFiltrer.filter(excursion =>
       excursion.nom.toLowerCase().includes(recherche?.toLowerCase()),
