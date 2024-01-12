@@ -426,7 +426,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               showsUserLocation={true}
               zoomControlEnabled={false}
               zoomEnabled={true}
-              minZoomLevel={12} // Niveau de zoom minimum
+              minZoomLevel={10} // Niveau de zoom minimum
               maxZoomLevel={15} // Niveau de zoom maximum
             >
               <UrlTile urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"} tileSize={256} />

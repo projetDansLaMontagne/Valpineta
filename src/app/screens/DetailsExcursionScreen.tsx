@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
 } from "react-native";
-import { AppStackScreenProps, T_point, T_signalement } from "app/navigators";
+import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
 import {
   Text,
   CarteAvis,
@@ -25,7 +25,6 @@ import {
 } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
-import HTML from "react-native-render-html";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import {LatLng, Marker, Polyline} from "react-native-maps";
@@ -35,51 +34,22 @@ const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
 
-export type T_Point = {
-  lon: number,
-  lat: number,
-  alt: number | null,
-  dist: number,
-  pos: number,
+interface T_Point extends TPoint {
   title?: string,
 }
 
-type T_Signalement = {
-  id: number,
-  nom: string,
-  type: string,
-  description: string,
-  image: string,
-  latitude: number,
-  longitude: number,
-  idExcursion: number,
-}
 
-interface Coordonnees {
-  lat: number;
-  lon: number;
-  alt: number;
-  dist: number;
-}
-
-interface Signalement {
-  type: string;
-  nom: string;
-  description: string;
-  image: Image;
-  latitude: number;
-  longitude: number;
-}
-
-type T_Language = "fr" | "es" | "en" | 'ar';
-type T_LanguageContent = {
+type T_Language = "fr" | "es";
+type T_TypeParcoursEs = "Ida" | "Ida y Vuelta" | "Circular";
+type T_TypeParcoursFr = "Aller simple" | "Aller-retour" | "Boucle";
+type T_LanguageContent<T extends T_Language> = {
   nom: string,
   description: string,
-  typeParcours: "Ida" | "Ida y Vuelta" | "Circular",
+  typeParcours: T extends "fr" ? T_TypeParcoursFr : T_TypeParcoursEs,
 }
 
 export type TExcursion = {
-  [key in T_Language]: T_LanguageContent;
+  [key in T_Language]: T_LanguageContent<key>
 } & {
   denivele: string;
   difficulteOrientation: string;
@@ -88,11 +58,10 @@ export type TExcursion = {
   duree: string;
   vallee: string;
   postId: number;
-  signalements: T_Signalement[];
+  signalements: TSignalement[];
   nomTrackGpx: string;
   track: T_Point[];
 };
-
 
 /**
  * @function startMiddleAndEndHandler
@@ -153,11 +122,6 @@ const startMiddleAndEndHandler = (
       break;
   }
 
-  if (typeParcours === "Ida") {
-    // Point d'arrivée si c'est un aller simple
-    points.push(end);
-  }
-
   const image: ImageSource = require("../../assets/icons/location.png");
 
   return (
@@ -170,7 +134,6 @@ const startMiddleAndEndHandler = (
                 latitude: point.lat,
                 longitude: point.lon
               }}
-              // key={point.dist}
               key={index}
               // Si l'array de points ne contient que 2 points,
               // on est sur un aller simple, le deuxième point est donc l'arrivée
@@ -203,11 +166,11 @@ const startMiddleAndEndHandler = (
  * @function signalementsHandler
  * @description Affiche les signalements sur la carte.
  *
- * @param signalements {T_Signalement[]} - les signalements de l'excursion
+ * @param signalements {TSignalement[]} - les signalements de l'excursion
  *
  * @returns les signalements à afficher sur la carte.
  */
-const signalementsHandler = (signalements: T_Signalement[]) => {
+const signalementsHandler = (signalements: TSignalement[]) => {
   const binoculars: ImageSource = require("../../assets/icons/binoculars.png");
   const attention: ImageSource = require("../../assets/icons/attention.png");
 
@@ -273,7 +236,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props;
 
-    let excursion = route.params?.excursion;
+    const excursion = route.params?.excursion;
 
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
@@ -349,29 +312,26 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
               isInDetailExcursion={true}
               hideOverlay={false}
             >
-              {
-                allPoints &&
-                <>
-                  <Polyline
-                    coordinates={allPoints}
+              <>
+                <Polyline
+                  coordinates={allPoints}
 
-                    strokeColor={colors.bouton}
-                    strokeWidth={5}
+                  strokeColor={colors.bouton}
+                  strokeWidth={5}
 
-                  />
+                />
 
-                  {
-                    startMiddleAndEndHandler(
-                      excursion.track,
-                      excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular"
-                    )
-                  }
+                {
+                  startMiddleAndEndHandler(
+                    excursion.track,
+                    excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular"
+                  )
+                }
 
-                  {
-                    signalementsHandler(excursion.signalements)
-                  }
-                </>
-              }
+                {
+                  signalementsHandler(excursion.signalements)
+                }
+              </>
             </MapScreen>
           )
         }
@@ -443,7 +403,7 @@ function itemFull(
 
   changeStartPoint?: (point: LatLng) => void,
 ) {
-  let nomExcursion: string = "";
+  let nomExcursion = "";
   if (excursion !== undefined) {
     nomExcursion = excursion.nom as string;
   }
@@ -467,7 +427,7 @@ function itemFull(
               <Text
                 tx="detailsExcursion.titres.infos"
                 size="lg"
-                style={[containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }]}
+                style={containerInfoAffiche ? { color: colors.bouton } : { color: colors.text }}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -479,7 +439,7 @@ function itemFull(
               <Text
                 tx="detailsExcursion.titres.avis"
                 size="lg"
-                style={[containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }]}
+                style={containerInfoAffiche ? { color: colors.text } : { color: colors.bouton }}
               />
             </TouchableOpacity>
           </View>
@@ -519,16 +479,16 @@ function afficherDescriptionCourte(description: string) {
  * @returns les coordonnées de l'utilisateur
  */
 function getUserLocation() {
-  return new Promise(async (resolve, reject) => {
+  return new Promise( async (resolve, reject) => {
     try {
-      let { status } = await Location.requestForegroundPermissionsAsync(); // utiliser la fonction requestForegroundPermissionsAsync de Location pour demander la permission à l'utilisateur
+      const { status } = await Location.requestForegroundPermissionsAsync(); // utiliser la fonction requestForegroundPermissionsAsync de Location pour demander la permission à l'utilisateur
       if (status !== "granted") {
         // Si l'utilisateur n'a pas accepté la permission
         console.error("Permission to access location was denied"); // Afficher une erreur
         resolve(null);
       }
 
-      let location = await Location.getCurrentPositionAsync({}); // utilise la fonction getCurrentPositionAsync de Location pour récupérer la position de l'utilisateur
+      const location = await Location.getCurrentPositionAsync({}); // utilise la fonction getCurrentPositionAsync de Location pour récupérer la position de l'utilisateur
       resolve(location.coords); // Renvoie les coordonnées de l'utilisateur (latitude et longitude) pour pouvoir calculer la distance
     } catch (error) {
       console.error("Error getting location", error);
@@ -610,12 +570,12 @@ function infos(
   setIsAllSignalements,
   userLocation,
 ) {
-  let duree: string = "";
-  let distance: string = "";
-  let difficulteOrientation: number = 0;
-  let difficulteTechnique: number = 0;
-  let description: string = "";
-  let signalements: T_signalement[] = [];
+  let duree = "";
+  let distance = "";
+  let difficulteOrientation = 0;
+  let difficulteTechnique = 0;
+  let description = "";
+  let signalements: TSignalement[] = [];
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -633,7 +593,7 @@ function infos(
     difficulteTechnique = excursion.difficulteTechnique as number;
     difficulteOrientation = excursion.difficulteOrientation as number;
     description = excursion.description as string;
-    signalements = excursion.signalements as T_signalement[];
+    signalements = excursion.signalements as TSignalement[];
   }
 
   return (
@@ -774,7 +734,7 @@ function avis() {
 }
 
 // Fonction de calcul de distance entre deux coordonnées
-function calculeDistanceEntreDeuxPoints(coord1: T_point, coord2: T_point) {
+function calculeDistanceEntreDeuxPoints(coord1: T_Point, coord2: T_Point) {
   // Assurez-vous que coord1 et coord2 sont définis
   if (
     !coord1 ||
@@ -815,7 +775,7 @@ function calculeDistanceEntreDeuxPoints(coord1: T_point, coord2: T_point) {
 }
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-function recupDistance(coordonneeSignalement: T_point, data: any) {
+function recupDistance(coordonneeSignalement: T_Point, data: any) {
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
     console.error("Coordonnées du signalement non valides");
@@ -825,7 +785,7 @@ function recupDistance(coordonneeSignalement: T_point, data: any) {
   // Initialiser la distance minimale avec une valeur élevée
   let distanceMinimale: number = Number.MAX_VALUE;
 
-  let coordPointPlusProche: T_point;
+  let coordPointPlusProche: T_Point;
 
   // Parcourir toutes les coordonnées dans le fichier
   for (const coord of data) {

@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   Keyboard,
 } from "react-native";
-import { AppStackScreenProps, T_excursion, T_filtres, T_valeurs_filtres } from "app/navigators";
+import { AppStackScreenProps, T_excursion, TFiltres, T_valeurs_filtres } from "app/navigators";
 import { Screen, CarteExcursion, Text } from "app/components";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
@@ -89,7 +89,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Tri et filtre des excursions avec les filtres
    * Doit etre effectué a chaque modification des filtres
    */
-  function filtrageParametre(excursions: T_excursion[], filtres: T_filtres) {
+  function filtrageParametre(excursions: T_excursion[], filtres: TFiltres) {
     const nomsTypesParcours =
       parametres.langues == "fr"
         ? ["Aller simple", "Aller/retour", "Circuit"]

@@ -12,20 +12,17 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack";
 import { observer } from "mobx-react-lite";
-import { ImageSourcePropType, useColorScheme } from "react-native";
+import { ImageSourcePropType, useColorScheme, Image } from "react-native";
 import * as Screens from "app/screens";
 import Config from "../config";
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities";
 import { colors } from "app/theme";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
-import { set } from "date-fns";
+import { createBottomTabNavigator, BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 import I18n from "i18n-js";
 import { Text } from "app/components";
 
 import { useStores } from "app/models";
-import { Image, ImageStyle } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -51,14 +48,14 @@ export type T_valeurs_filtres = {
   difficulteTechniqueMax: number;
   difficulteOrientationMax: number;
 };
-export type T_point = {
+export interface TPoint {
   alt: number; // Altitude
   dist: number; // Distance par rapport au point de départ
   lat: number; // Latitude
   lon: number; // Longitude
   pos: number; // Denivele positif
-};
-export type T_filtres = {
+}
+export type TFiltres = {
   critereTri: string;
   intervalleDistance: { min: number; max: number };
   intervalleDuree: { min: number; max: number };
@@ -68,7 +65,7 @@ export type T_filtres = {
   difficultesTechniques: number[];
   difficultesOrientation: number[];
 };
-export type T_signalement = {
+export type TSignalement = {
   description: string;
   image: string;
   latitude: number;
@@ -95,14 +92,14 @@ export type T_excursion = {
   es?: T_infoLangue;
   fr?: T_infoLangue;
 
-  signalements: T_signalement[];
-  track: T_point[];
+  signalements: TSignalement[];
+  track: TPoint[];
 } & Partial<T_infoLangue>;
 
 // TYPES STACKS
 type ExcursionStackParamList = {
   Filtres: undefined;
-  Excursions: undefined | { filtres?: T_filtres };
+  Excursions: undefined | { filtres?: TFiltres };
 };
 
 type CarteStackParamList = {
@@ -163,7 +160,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     tabBarIcon: ({ color }) => (
       <Image source={logo} style={{ width: 30, height: 30, tintColor: color }} />
     ),
-    tabBarLabel: ({ color }) => <Text tx={tx} style={{ color: color, fontSize: 10 }} />,
+    tabBarLabel: ({ color }) => <Text tx={tx} style={{ color, fontSize: 10 }} />,
   });
 
   const Tab = createBottomTabNavigator();
