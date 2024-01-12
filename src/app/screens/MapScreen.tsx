@@ -29,7 +29,7 @@ import * as fileSystem from "expo-file-system";
 // import TilesRequire from "../services/importAssets/tilesRequire"
 
 // variables
-interface MapScreenProps extends AppStackScreenProps<"Map"> {}
+interface MapScreenProps extends AppStackScreenProps<"Carte"> {}
 
 type T_animateToLocation = (passedLocation?: Location.LocationObject) => void;
 
@@ -323,8 +323,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   };
 
   return (
-    <Screen style={$container}>
-      <SafeAreaView style={styles.container}>
+    <Screen style={$container} safeAreaEdges={["bottom"]}>
+      <View style={styles.container}>
         <View style={styles.mapContainer}>
           <>
             <MapView
@@ -413,7 +413,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             </View>
           </>
         </View>
-      </SafeAreaView>
+      </View>
     </Screen>
   );
 });

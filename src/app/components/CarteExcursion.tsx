@@ -6,17 +6,16 @@ import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import { colors, spacing } from "../theme";
 import { Text } from "./Text";
 import { GraphiqueDenivele } from "./GraphiqueDenivele";
+import { T_excursion } from "app/navigators";
 
 /**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-  excursion: Record<string, unknown>;
-  navigation: any;
+  excursion: T_excursion;
+  onPress?: () => void;
 }
 
 export function CarteExcursion(props: CarteExcursionProps) {
-  const navigation = props.navigation;
-
   let nomExcursion = "";
   let vallee = "";
   let typeParcours = "";
@@ -46,13 +45,6 @@ export function CarteExcursion(props: CarteExcursionProps) {
   const deniveleIcone = require("../../assets/icons/denivele.png");
   const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png");
   const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png");
-
-  const detailExcursion = () => {
-    navigation.navigate("Stack", {
-      screen: "DetailsExcursion",
-      params: { excursion: props.excursion },
-    });
-  };
 
   const styles = StyleSheet.create({
     carteGlobale: {
@@ -145,7 +137,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
   });
 
   return (
-    <TouchableOpacity onPress={detailExcursion}>
+    <TouchableOpacity onPress={props.onPress}>
       <View style={styles.carteGlobale}>
         <View style={styles.entete}>
           <Text weight="bold" text={nomExcursion} style={styles.heading} />
@@ -162,9 +154,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
             </View>
             <View style={styles.groupeTexteIconeLigneSup}>
               <Image style={styles.icone} source={dureeIcone} resizeMode="contain" />
-              <Text text={duree.h.toString()} style={styles.content} />
-              <Text text={"h"} style={styles.content} />
-              <Text text={duree.m.toString()} style={styles.content} />
+              <Text text={duree.h + "h" + (duree.m !== 0 ? duree.m : "")} style={styles.content} />
             </View>
           </View>
           <View style={styles.ligneInf}>
