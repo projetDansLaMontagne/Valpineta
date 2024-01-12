@@ -129,7 +129,20 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   const parametresLogo = require("./../../assets/icons/parametres.png");
   useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
+  /**
+   * @warning CODE REDONDANT : parametres.langues est forcement modifié en meme temps que I18n
+   * (dans la page des parametres) donc ça sert à rien de faire dépendre l'un de l'autre
+   * MAIS sans cette partie le footer ne change pas de langue... raison inconnue
+  */
   const { parametres } = useStores();
+  useEffect(() => {
+    if (parametres.langues === "fr") {
+      I18n.locale = "fr";
+    }
+    if (parametres.langues === "es") {
+      I18n.locale = "es";
+    }
+  }, [parametres.langues]);
 
   const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
     tabBarIcon: ({ color }) => (
@@ -146,7 +159,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        initialRouteName={"Excursions"}
+        initialRouteName={"ExcursionsStack"}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
