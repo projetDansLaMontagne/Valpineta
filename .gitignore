@@ -88,3 +88,5 @@ package-lock.json
 # ASSETS
 src/assets/Tiles
 src/assets/tracks
+.commitignore
+commit_message.md
