@@ -294,16 +294,14 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
         {allPoints && startPoint && (
           <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
-            <>
-              <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
+            <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
 
-              {startMiddleAndEndHandler(
-                excursion.track,
-                excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
-              )}
+            {startMiddleAndEndHandler(
+              excursion.track,
+              excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
+            )}
 
-              {signalementsHandler(excursion.signalements)}
-            </>
+            {signalementsHandler(excursion.signalements)}
           </MapScreen>
         )}
 
@@ -464,7 +462,7 @@ function getUserLocation() {
       }
 
       const location = await Location.getCurrentPositionAsync({}); // utilise la fonction getCurrentPositionAsync de Location pour récupérer la position de l'utilisateur
-      resolve(location.coords); // Renvoie les coordonnées de l'utilisateur (latitude et longitude) pour pouvoir calculer la distance
+      resolve(location.coords); // Renvoie les coordonnées de l'utilisateur (latitude et lontude) pour pouvoir calculer la distance
     } catch (error) {
       console.error("Error getting location", error);
       reject(error);

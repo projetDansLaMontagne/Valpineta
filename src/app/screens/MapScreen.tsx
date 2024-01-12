@@ -378,166 +378,164 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     <Screen style={$container} safeAreaEdges={["bottom"]}>
       <View style={styles.container}>
         <View style={styles.mapContainer}>
-          <>
-            <MapView
-              mapType={Platform.OS === "android" ? "none" : "standard"}
-              ref={mapRef}
-              style={{
-                height,
-                width,
+          <MapView
+            mapType={Platform.OS === "android" ? "none" : "standard"}
+            ref={mapRef}
+            style={{
+              height,
+              width,
 
-                ...styles.map,
-              }}
-              initialRegion={{
+              ...styles.map,
+            }}
+            initialRegion={{
+              latitude: _props.startLocation?.latitude ?? LATITUDE,
+              longitude: _props.startLocation?.longitude ?? LONGITUDE,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
+            }}
+            initialCamera={{
+              center: {
                 latitude: _props.startLocation?.latitude ?? LATITUDE,
                 longitude: _props.startLocation?.longitude ?? LONGITUDE,
-                latitudeDelta: LATITUDE_DELTA,
-                longitudeDelta: LONGITUDE_DELTA,
-              }}
-              initialCamera={{
-                center: {
-                  latitude: _props.startLocation?.latitude ?? LATITUDE,
-                  longitude: _props.startLocation?.longitude ?? LONGITUDE,
-                },
-                pitch: 0,
-                heading: 0,
-                altitude: 6000,
-                zoom: 5,
-              }}
-              onMoveShouldSetResponder={handleMapMoves}
-              showsBuildings={true}
-              showsCompass={true}
-              showsMyLocationButton={false} // only for Android
-              shouldRasterizeIOS={true} // only for iOS
-              showsScale={true} // only for iOS
-              showsUserLocation={true}
-              zoomControlEnabled={false}
-              zoomEnabled={true}
-              minZoomLevel={10} // Niveau de zoom minimum
-              maxZoomLevel={15} // Niveau de zoom maximum
-            >
-              <UrlTile urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"} tileSize={256} />
+              },
+              pitch: 0,
+              heading: 0,
+              altitude: 6000,
+              zoom: 5,
+            }}
+            onMoveShouldSetResponder={handleMapMoves}
+            showsBuildings={true}
+            showsCompass={true}
+            showsMyLocationButton={false} // only for Android
+            shouldRasterizeIOS={true} // only for iOS
+            showsScale={true} // only for iOS
+            showsUserLocation={true}
+            zoomControlEnabled={false}
+            zoomEnabled={true}
+            minZoomLevel={10} // Niveau de zoom minimum
+            maxZoomLevel={15} // Niveau de zoom maximum
+          >
+            <UrlTile urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"} tileSize={256} />
 
-              {_props.children}
-              {
-                // Oier voulait toutes les excursions sur la carte
-                // si on était pas dans la page détail excursion.
-                !_props.isInDetailExcursion &&
-                  excursions !== undefined &&
-                  excursions.length > 0 &&
-                  excursions.map((excursion, index) => {
-                    if (excursion.track) {
-                      return (
-                        <>
-                          <Polyline
-                            key={index}
-                            coordinates={excursion.track.map(point => {
-                              return {
-                                latitude: point.lat,
-                                longitude: point.lon,
-                              } as LatLng;
-                            })}
-                            strokeColor={colors.palette.vert}
-                            strokeWidth={5}
+            {_props.children}
+            {
+              // Oier voulait toutes les excursions sur la carte
+              // si on était pas dans la page détail excursion.
+              !_props.isInDetailExcursion &&
+                excursions !== undefined &&
+                excursions.length > 0 &&
+                excursions.map((excursion, index) => {
+                  if (excursion.track) {
+                    return (
+                      <>
+                        <Polyline
+                          key={index}
+                          coordinates={excursion.track.map(point => {
+                            return {
+                              latitude: point.lat,
+                              longitude: point.lon,
+                            } as LatLng;
+                          })}
+                          strokeColor={colors.palette.vert}
+                          strokeWidth={5}
+                        />
+
+                        <Marker
+                          coordinate={
+                            {
+                              latitude: excursion.track[0].lat,
+                              longitude: excursion.track[0].lon,
+                            } as LatLng
+                          }
+                          title={excursion.fr.nom}
+                          key={index}
+                          centerOffset={{ x: 0, y: -15 }}
+                        >
+                          <Image
+                            source={image}
+                            style={{
+                              width: 30,
+                              height: 30,
+                              tintColor: colors.palette.marron,
+                            }}
                           />
+                        </Marker>
+                      </>
+                    );
+                  } else {
+                    return null;
+                  }
+                })
+            }
+          </MapView>
 
-                          <Marker
-                            coordinate={
-                              {
-                                latitude: excursion.track[0].lat,
-                                longitude: excursion.track[0].lon,
-                              } as LatLng
-                            }
-                            title={excursion.fr.nom}
-                            key={index}
-                            centerOffset={{ x: 0, y: -15 }}
-                          >
-                            <Image
-                              source={image}
-                              style={{
-                                width: 30,
-                                height: 30,
-                                tintColor: colors.palette.marron,
-                              }}
-                            />
-                          </Marker>
-                        </>
-                      );
-                    } else {
-                      return null;
-                    }
-                  })
-              }
-            </MapView>
-
-            {!_props.hideOverlay && (
-              <>
-                <View
+          {!_props.hideOverlay && (
+            <>
+              <View
+                style={{
+                  ...styles.mapOverlay,
+                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
+                  bottom: _props.isInDetailExcursion ? 20 : 0,
+                }}
+              >
+                {menuIsOpen && (
+                  <>
+                    <MapButton
+                      ref={addPOIBtnRef}
+                      style={{
+                        ...styles.actionsButtonContainer,
+                      }}
+                      onPress={poiButtonOnPress}
+                      icon={"eye"}
+                      iconSize={spacing.lg}
+                      iconColor={colors.palette.blanc}
+                    />
+                    <MapButton
+                      ref={addWarningBtnRef}
+                      style={{
+                        ...styles.actionsButtonContainer,
+                      }}
+                      icon="exclamation-circle"
+                      iconSize={spacing.lg}
+                      iconColor={colors.palette.blanc}
+                    />
+                  </>
+                )}
+                <MapButton
+                  ref={toggleBtnMenuRef}
                   style={{
-                    ...styles.mapOverlay,
-                    ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                    bottom: _props.isInDetailExcursion ? 20 : 0,
+                    ...styles.actionsButtonContainer,
                   }}
-                >
-                  {menuIsOpen && (
-                    <>
-                      <MapButton
-                        ref={addPOIBtnRef}
-                        style={{
-                          ...styles.actionsButtonContainer,
-                        }}
-                        onPress={poiButtonOnPress}
-                        icon={"eye"}
-                        iconSize={spacing.lg}
-                        iconColor={colors.palette.blanc}
-                      />
-                      <MapButton
-                        ref={addWarningBtnRef}
-                        style={{
-                          ...styles.actionsButtonContainer,
-                        }}
-                        icon="exclamation-circle"
-                        iconSize={spacing.lg}
-                        iconColor={colors.palette.blanc}
-                      />
-                    </>
-                  )}
-                  <MapButton
-                    ref={toggleBtnMenuRef}
-                    style={{
-                      ...styles.actionsButtonContainer,
-                    }}
-                    onPress={toggleMenu}
-                    icon={menuIsOpen ? "times" : "map-marker-alt"}
-                    iconSize={spacing.lg}
-                    iconColor={colors.palette.blanc}
-                  />
-                </View>
-                <View
+                  onPress={toggleMenu}
+                  icon={menuIsOpen ? "times" : "map-marker-alt"}
+                  iconSize={spacing.lg}
+                  iconColor={colors.palette.blanc}
+                />
+              </View>
+              <View
+                style={{
+                  ...styles.mapOverlayLeft,
+                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
+                  bottom: _props.isInDetailExcursion ? 20 : 0,
+                }}
+              >
+                <MapButton
+                  ref={followLocationButtonRef}
                   style={{
-                    ...styles.mapOverlayLeft,
-                    ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                    bottom: _props.isInDetailExcursion ? 20 : 0,
+                    ...styles.locateButtonContainer,
                   }}
-                >
-                  <MapButton
-                    ref={followLocationButtonRef}
-                    style={{
-                      ...styles.locateButtonContainer,
-                    }}
-                    onPress={toggleFollowUserLocation}
-                    icon="location-arrow"
-                    iconSize={spacing.lg}
-                    iconColor={
-                      followUserLocation
-                        ? colors.palette.bleuLocActive
-                        : colors.palette.bleuLocInactive
-                    }
-                  />
-                </View>
-              </>
-            )}
-          </>
+                  onPress={toggleFollowUserLocation}
+                  icon="location-arrow"
+                  iconSize={spacing.lg}
+                  iconColor={
+                    followUserLocation
+                      ? colors.palette.bleuLocActive
+                      : colors.palette.bleuLocInactive
+                  }
+                />
+              </View>
+            </>
+          )}
         </View>
       </View>
     </Screen>
