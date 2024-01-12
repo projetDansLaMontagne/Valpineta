@@ -4,26 +4,28 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+  NavigatorScreenParams,
+} from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack";
 import { observer } from "mobx-react-lite";
-import React, { useEffect, useState } from "react";
-import { useColorScheme } from "react-native";
+import { ImageSourcePropType, useColorScheme } from "react-native";
 import * as Screens from "app/screens";
 import Config from "../config";
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities";
 import { colors } from "app/theme";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image, ImageStyle } from "react-native";
-import { useStores } from "app/models";
-import { Text } from "app/components";
-import I18n from "i18n-js";
-import { getActiveRouteName } from "./navigationUtilities";
+import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 import { set } from "date-fns";
+import I18n from "i18n-js";
+import { Text } from "app/components";
 
-const explorerLogo = require("./../../assets/icons/explorer.png");
-const carteLogo = require("./../../assets/icons/carte.png");
-const parametresLogo = require("./../../assets/icons/parametres.png");
+import { useStores } from "app/models";
+import { Image, ImageStyle } from "react-native";
+import React, { useEffect, useState } from "react";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -38,16 +40,88 @@ const parametresLogo = require("./../../assets/icons/parametres.png");
  *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
-export type AppStackParamList = {
-  // 🔥 Your screens go here
-  Filtres: undefined;
-  Excursions: undefined;
-  Map: undefined;
-  DetailsExcursion: undefined;
-  Parametres: undefined;
-  Description: undefined;
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+
+/* ---------------------------------- Types --------------------------------- */
+export type T_valeurs_filtres = {
+  distanceMax: number;
+  dureeMax: number;
+  deniveleMax: number;
+  typesParcours: string[];
+  vallees: string[];
+  difficulteTechniqueMax: number;
+  difficulteOrientationMax: number;
 };
+export type T_point = {
+  alt: number; // Altitude
+  dist: number; // Distance par rapport au point de départ
+  lat: number; // Latitude
+  lon: number; // Longitude
+  pos: number; // Denivele positif
+};
+export type T_filtres = {
+  critereTri: string;
+  intervalleDistance: { min: number; max: number };
+  intervalleDuree: { min: number; max: number };
+  intervalleDenivele: { min: number; max: number };
+  indexTypesParcours: number[];
+  vallees: string[];
+  difficultesTechniques: number[];
+  difficultesOrientation: number[];
+};
+export type T_signalement = {
+  description: string;
+  image: string;
+  latitude: number;
+  longitude: number;
+  nom: string;
+  type: "PointInteret" | "Avertissement";
+};
+export type T_infoLangue = {
+  nom: string;
+  description: string;
+  typeParcours: string;
+};
+
+export type T_excursion = {
+  denivele: number;
+  description: string;
+  difficulteOrientation: number;
+  difficulteTechnique: number;
+  distance: number;
+  duree: { h: number; m: number };
+  nomTrackGpx: string;
+  vallee: string;
+
+  es?: T_infoLangue;
+  fr?: T_infoLangue;
+
+  signalements: T_signalement[];
+  track: T_point[];
+} & Partial<T_infoLangue>;
+
+// TYPES STACKS
+type ExcursionStackParamList = {
+  Filtres: undefined;
+  Excursions: undefined | { filtres?: T_filtres };
+};
+
+type CarteStackParamList = {
+  Carte: undefined;
+  DetailsExcursion: undefined | { excursion: T_excursion };
+  Description: { excursion: T_excursion };
+};
+
+type ParametresStackParamList = {
+  Parametres: undefined;
+};
+
+export type AppStackParamList = {
+  ExcursionsStack: NavigatorScreenParams<ExcursionStackParamList> | undefined;
+  CarteStack: NavigatorScreenParams<CarteStackParamList> | undefined;
+  ParametresStack: NavigatorScreenParams<ParametresStackParamList> | undefined;
+} & ExcursionStackParamList &
+  CarteStackParamList &
+  ParametresStackParamList;
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -69,21 +143,30 @@ export interface NavigationProps
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme();
-  const Tab = createBottomTabNavigator();
-
+  /* --------------------------------- Assets --------------------------------- */
+  const excursionLogo = require("./../../assets/icons/explorer.png");
+  const carteLogo = require("./../../assets/icons/carte.png");
+  const parametresLogo = require("./../../assets/icons/parametres.png");
   useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
+  /**
+   * @warning CODE REDONDANT : parametres.langues est forcement modifié en meme temps que I18n
+   * (dans la page des parametres) donc ça sert à rien de faire dépendre l'un de l'autre
+   * MAIS sans cette partie le footer ne change pas de langue... raison inconnue
+   */
   const { parametres } = useStores();
-
   useEffect(() => {
-    if (parametres.langues === "fr") {
-      I18n.locale = "fr";
-    }
-    if (parametres.langues === "es") {
-      I18n.locale = "es";
-    }
+    I18n.locale = parametres.langues;
   }, [parametres.langues]);
 
+  const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
+    tabBarIcon: ({ color }) => (
+      <Image source={logo} style={{ width: 30, height: 30, tintColor: color }} />
+    ),
+    tabBarLabel: ({ color }) => <Text tx={tx} style={{ color: color, fontSize: 10 }} />,
+  });
+
+  const Tab = createBottomTabNavigator();
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -91,7 +174,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        initialRouteName={"Carte"}
+        initialRouteName={"CarteStack"}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
@@ -99,114 +182,68 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
             backgroundColor: colors.fond,
             borderTopColor: colors.palette.vert,
           },
+          tabBarActiveTintColor: colors.palette.noir, // Couleur de l'onglet actif
+          tabBarInactiveTintColor: colors.palette.vert, // Couleur de l'onglet inactif
         }}
       >
         <Tab.Screen
-          name="Stack"
-          component={StackNavigator}
-          options={{ tabBarButton: () => null }}
+          name="ExcursionsStack"
+          component={ExcursionStackScreen}
+          options={optionsBoutons("excursions.titre", excursionLogo)}
         />
         <Tab.Screen
-          name="Excursions"
-          component={Screens.ExcursionsScreen}
-          options={{
-            tabBarIcon: props => (
-              <Image
-                source={explorerLogo}
-                style={[
-                  $icon,
-                  {
-                    tintColor: props.focused ? colors.palette.marron : colors.palette.vert,
-                  },
-                ]}
-              />
-            ),
-            tabBarLabel: ({ focused }) => (
-              <Text
-                style={{
-                  color: focused ? colors.palette.marron : colors.palette.vert,
-                  fontSize: 10,
-                }}
-                tx={"excursions.titre"}
-              />
-            ),
-          }}
+          name="CarteStack"
+          component={CarteStackScreen}
+          options={optionsBoutons("mapScreen.title", carteLogo)}
         />
         <Tab.Screen
-          name="Carte"
-          component={Screens.MapScreen}
-          options={{
-            tabBarIcon: props => (
-              <Image
-                source={carteLogo}
-                style={[
-                  $icon,
-                  { tintColor: props.focused ? colors.palette.marron : colors.palette.vert },
-                ]}
-              />
-            ),
-            tabBarLabel: ({ focused }) => (
-              <Text
-                style={{
-                  color: focused ? colors.palette.marron : colors.palette.vert,
-                  fontSize: 10,
-                }}
-                tx={"mapScreen.title"}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Parametres"
-          component={Screens.ParametresScreen}
-          options={{
-            tabBarIcon: props => (
-              <Image
-                source={parametresLogo}
-                style={[
-                  $icon,
-                  { tintColor: props.focused ? colors.palette.marron : colors.palette.vert },
-                ]}
-              />
-            ),
-            tabBarLabel: ({ focused }) => (
-              <Text
-                style={{
-                  color: focused ? colors.palette.marron : colors.palette.vert,
-                  fontSize: 10,
-                }}
-                tx={"parametres.titre"}
-              />
-            ),
-          }}
+          name="ParametresStack"
+          component={ParametresStackScreen}
+          options={optionsBoutons("parametres.titre", parametresLogo)}
         />
       </Tab.Navigator>
     </NavigationContainer>
   );
 });
 
-const $icon: ImageStyle = {
-  width: 25,
-  height: 25,
-};
-
 /* -------------------------------------------------------------------------- */
-/*                                   FOOTER                                   */
+/*                                   STACKS                                   */
 /* -------------------------------------------------------------------------- */
+const ExcursionStack = createNativeStackNavigator<ExcursionStackParamList>();
+const ExcursionStackScreen = () => (
+  <ExcursionStack.Navigator
+    initialRouteName={"Excursions"}
+    screenOptions={{
+      headerShown: false,
+    }}
+  >
+    <ExcursionStack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
+    <ExcursionStack.Screen name="Filtres" component={Screens.FiltresScreen} />
+  </ExcursionStack.Navigator>
+);
 
-function StackNavigator() {
-  const Stack = createNativeStackNavigator();
+const CarteStack = createNativeStackNavigator<CarteStackParamList>();
+const CarteStackScreen = () => (
+  <CarteStack.Navigator
+    initialRouteName={"Carte"}
+    screenOptions={{
+      headerShown: false,
+    }}
+  >
+    <CarteStack.Screen name="Carte" component={Screens.MapScreen} />
+    <CarteStack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
+    <CarteStack.Screen name="Description" component={Screens.DescriptionScreen} />
+  </CarteStack.Navigator>
+);
 
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="Description" component={Screens.DescriptionScreen} />
-      <Stack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
-      <Stack.Screen name="Excursions" component={Screens.ExcursionsScreen} />
-      <Stack.Screen name="Filtres" component={Screens.FiltresScreen} />
-    </Stack.Navigator>
-  );
-}
+const ParametresStack = createNativeStackNavigator<ParametresStackParamList>();
+const ParametresStackScreen = () => (
+  <ParametresStack.Navigator
+    initialRouteName={"Parametres"}
+    screenOptions={{
+      headerShown: false,
+    }}
+  >
+    <ParametresStack.Screen name="Parametres" component={Screens.ParametresScreen} />
+  </ParametresStack.Navigator>
+);

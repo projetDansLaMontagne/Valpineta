@@ -49,8 +49,7 @@ const fr = {
 
   excursions: {
     titre: "Excursions",
-    erreurChargement: "Aucune excursion ne répond aux critères selectionnés",
-    erreurNom: "Aucune excursion ne porte ce nom.",
+    absenceResultats: "Aucune excursion trouvée",
   },
   detailsExcursion: {
     titres: {
