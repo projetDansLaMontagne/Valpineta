@@ -48,8 +48,7 @@ const es = {
 
   excursions: {
     titre: "Excursiones",
-    erreurChargement: "Ninguna excursión encontrada",
-    erreurNom: "Nombre de excursión no encontrado",
+    absenceResultats: "Ninguna excursión encontrada",
   },
   detailsExcursion: {
     titres: {
