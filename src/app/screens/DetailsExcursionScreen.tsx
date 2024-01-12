@@ -27,29 +27,28 @@ import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import {LatLng, Marker, Polyline} from "react-native-maps";
-import {ImageSource} from "react-native-vector-icons/Icon";
-import {MapScreen} from "./MapScreen";
+import { LatLng, Marker, Polyline } from "react-native-maps";
+import { ImageSource } from "react-native-vector-icons/Icon";
+import { MapScreen } from "./MapScreen";
 const { width, height } = Dimensions.get("window");
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
 
 interface T_Point extends TPoint {
-  title?: string,
+  title?: string;
 }
-
 
 type T_Language = "fr" | "es";
 type T_TypeParcoursEs = "Ida" | "Ida y Vuelta" | "Circular";
 type T_TypeParcoursFr = "Aller simple" | "Aller-retour" | "Boucle";
 type T_LanguageContent<T extends T_Language> = {
-  nom: string,
-  description: string,
-  typeParcours: T extends "fr" ? T_TypeParcoursFr : T_TypeParcoursEs,
-}
+  nom: string;
+  description: string;
+  typeParcours: T extends "fr" ? T_TypeParcoursFr : T_TypeParcoursEs;
+};
 
 export type TExcursion = {
-  [key in T_Language]: T_LanguageContent<key>
+  [key in T_Language]: T_LanguageContent<key>;
 } & {
   denivele: string;
   difficulteOrientation: string;
@@ -79,18 +78,16 @@ const startMiddleAndEndHandler = (
   track: T_Point[],
   typeParcours: "Ida" | "Ida y Vuelta" | "Circular",
 ) => {
-
   // Point d'arrivée
   const start = {
     ...track[0],
-    title: "Départ"
+    title: "Départ",
   };
   const end = {
     ...track[track.length - 1],
-    title: "Arrivée"
-  }
+    title: "Arrivée",
+  };
   let points: T_Point[];
-
 
   // Calcul du point du milieu
   // Si c'est un aller-retour, le parcours étant symétrique,
@@ -98,14 +95,14 @@ const startMiddleAndEndHandler = (
   const middleDistance = end.dist / (typeParcours === "Ida y Vuelta" ? 1 : 2);
 
   const middle = {
-      ...track
+    ...track
       .sort((a, b) => {
-        return a.dist - b.dist
+        return a.dist - b.dist;
       })
-      .find((point) => point.dist >= middleDistance),
-    title: "Milieu"
+      .find(point => point.dist >= middleDistance),
+    title: "Milieu",
   };
-    // find prend le premier élément qui correspond à la condition, vu que c'est sorted, on a le bon point
+  // find prend le premier élément qui correspond à la condition, vu que c'est sorted, on a le bon point
 
   // À ce stade, on a les points d'arrivée et du milieu.
   switch (typeParcours) {
@@ -124,43 +121,35 @@ const startMiddleAndEndHandler = (
 
   const image: ImageSource = require("../../assets/icons/location.png");
 
-  return (
-    <>
-      {
-        points.map((point, index) => {
-          return (
-            <Marker
-              coordinate={{
-                latitude: point.lat,
-                longitude: point.lon
-              }}
-              key={index}
-              // Si l'array de points ne contient que 2 points,
-              // on est sur un aller simple, le deuxième point est donc l'arrivée
-              title={point.title}
-
-              pinColor={index === 1 ? colors.bouton : colors.text}
-              style={{
-                zIndex: 999,
-              }}
-
-              centerOffset={{ x: 0, y: -15 }}
-            >
-              <Image
-                source={image}
-                style={{
-                  width: 30,
-                  height: 30,
-                  tintColor: index === 1 ? colors.bouton : colors.text,
-                }}
-              />
-            </Marker>
-          )
-        })
-      }
-    </>
-  )
-}
+  return points.map((point, index) => {
+    return (
+      <Marker
+        coordinate={{
+          latitude: point.lat,
+          longitude: point.lon,
+        }}
+        key={index}
+        // Si l'array de points ne contient que 2 points,
+        // on est sur un aller simple, le deuxième point est donc l'arrivée
+        title={point.title}
+        pinColor={index === 1 ? colors.bouton : colors.text}
+        style={{
+          zIndex: 999,
+        }}
+        centerOffset={{ x: 0, y: -15 }}
+      >
+        <Image
+          source={image}
+          style={{
+            width: 30,
+            height: 30,
+            tintColor: index === 1 ? colors.bouton : colors.text,
+          }}
+        />
+      </Marker>
+    );
+  });
+};
 
 /**
  * @function signalementsHandler
@@ -176,61 +165,57 @@ const signalementsHandler = (signalements: TSignalement[]) => {
 
   return (
     <>
-      {
-        signalements.map((signalement, index) => {
-          /**
-           * ! ATTENDRE PR DE NICO QUI A TYPÉ LES SIGNALEMENTS
-           */
-          let iconColor: string;
-          let image: ImageSource;
+      {signalements.map((signalement, index) => {
+        /**
+         * ! ATTENDRE PR DE NICO QUI A TYPÉ LES SIGNALEMENTS
+         */
+        let iconColor: string;
+        let image: ImageSource;
 
-          switch (signalement.type) {
-            case "PointInteret":
-              image = binoculars;
-              break;
-            case "Avertissement":
-              image = attention;
-              break;
-            default:
-              iconColor = "black";
-              image = binoculars;
-              break;
-          }
+        switch (signalement.type) {
+          case "PointInteret":
+            image = binoculars;
+            break;
+          case "Avertissement":
+            image = attention;
+            break;
+          default:
+            iconColor = "black";
+            image = binoculars;
+            break;
+        }
 
-          return (
-            <Marker
-              coordinate={{
-                latitude: signalement.latitude,
-                longitude: signalement.longitude
-              }}
-              // key={point.dist}
-              key={index}
-              // Si l'array de points ne contient que 2 points,
-              // on est sur un aller simple, le deuxième point est donc l'arrivée
-              title={signalement.nom}
-
-              // pinColor={iconColor}
+        return (
+          <Marker
+            coordinate={{
+              latitude: signalement.latitude,
+              longitude: signalement.longitude,
+            }}
+            // key={point.dist}
+            key={index}
+            // Si l'array de points ne contient que 2 points,
+            // on est sur un aller simple, le deuxième point est donc l'arrivée
+            title={signalement.nom}
+            // pinColor={iconColor}
+            style={{
+              zIndex: 999,
+            }}
+            centerOffset={{ x: 0, y: signalement.type === "PointInteret" ? 0 : -15 }}
+          >
+            <Image
+              source={image}
               style={{
-                zIndex: 999,
+                width: 30,
+                height: 30,
+                tintColor: iconColor,
               }}
-
-              centerOffset={{ x: 0, y: signalement.type === "PointInteret" ? 0 : -15 }}
-            >
-              <Image
-                source={image}
-                style={{
-                  width: 30,
-                  height: 30,
-                  tintColor: iconColor,
-                }}
-              />
-            </Marker>
-          )
-        })
-      }
+            />
+          </Marker>
+        );
+      })}
     </>
-  )
-}
+  );
+};
 
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
@@ -247,14 +232,17 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     const footerHeight = useBottomTabBarHeight();
 
-    const allPoints = excursion.track.map((point: T_Point) => ({
-        latitude: point.lat,
-        longitude: point.lon,
-      } as LatLng))
+    const allPoints = excursion.track.map(
+      (point: T_Point) =>
+        ({
+          latitude: point.lat,
+          longitude: point.lon,
+        } as LatLng),
+    );
 
     const changeStartPoint = (point: LatLng) => {
       setStartPoint(point);
-    }
+    };
 
     // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
     useEffect(() => {
@@ -284,16 +272,15 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * J'aimerai que le swipeUpDown se baisse automatiquement
      * lors du click sur un signalement
      */
-      // if (swipeUpDownRef) {
-      //   r(`[DetailsExcursionScreen - useEffect] aled`);
-      //   swipeUpDownRef.current.showMini();
-      // } else {
-      //   console.error("swipeUpDownRef.current is null");
-      // }
+    // if (swipeUpDownRef) {
+    //   r(`[DetailsExcursionScreen - useEffect] aled`);
+    //   swipeUpDownRef.current.showMini();
+    // } else {
+    //   console.error("swipeUpDownRef.current is null");
+    // }
     /**
      * ! FIN NON FONCTIONNEL
      */
-
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
@@ -305,36 +292,20 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           />
         </TouchableOpacity>
 
-        {
-          allPoints && startPoint && (
-            <MapScreen
-              startLocation={startPoint}
-              isInDetailExcursion={true}
-              hideOverlay={false}
-            >
-              <>
-                <Polyline
-                  coordinates={allPoints}
+        {allPoints && startPoint && (
+          <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
+            <>
+              <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
 
-                  strokeColor={colors.bouton}
-                  strokeWidth={5}
+              {startMiddleAndEndHandler(
+                excursion.track,
+                excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
+              )}
 
-                />
-
-                {
-                  startMiddleAndEndHandler(
-                    excursion.track,
-                    excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular"
-                  )
-                }
-
-                {
-                  signalementsHandler(excursion.signalements)
-                }
-              </>
-            </MapScreen>
-          )
-        }
+              {signalementsHandler(excursion.signalements)}
+            </>
+          </MapScreen>
+        )}
 
         <SwipeUpDown
           itemMini={itemMini()}
@@ -348,14 +319,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             userLocation,
             footerHeight,
 
-            changeStartPoint
+            changeStartPoint,
           )}
           animation="easeInEaseOut"
           swipeHeight={30 + footerHeight}
           disableSwipeIcon={true}
-
           ref={swipeUpDownRef}
-
         />
       </SafeAreaView>
     ) : (
@@ -408,7 +377,13 @@ function itemFull(
     nomExcursion = excursion.nom as string;
   }
   if (isAllSignalements) {
-    return listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight, changeStartPoint);
+    return listeSignalements(
+      setIsAllSignalements,
+      excursion,
+      userLocation,
+      footerHeight,
+      changeStartPoint,
+    );
   } else {
     return (
       <View style={$containerGrand}>
@@ -479,7 +454,7 @@ function afficherDescriptionCourte(description: string) {
  * @returns les coordonnées de l'utilisateur
  */
 function getUserLocation() {
-  return new Promise( async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync(); // utiliser la fonction requestForegroundPermissionsAsync de Location pour demander la permission à l'utilisateur
       if (status !== "granted") {
@@ -502,7 +477,13 @@ function getUserLocation() {
  * @params setIsAllSignalements, excursion, userLocation
  * @returns la liste des signalements
  */
-function listeSignalements(setIsAllSignalements, excursion, userLocation, footerHeight, changeStartPoint?: (point: LatLng) => void) {
+function listeSignalements(
+  setIsAllSignalements,
+  excursion,
+  userLocation,
+  footerHeight,
+  changeStartPoint?: (point: LatLng) => void,
+) {
   return (
     <View style={$containerGrand}>
       <ScrollView>
@@ -530,16 +511,14 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
                     distanceDuDepart={`${distanceSignalement}`}
                     description={signalement.description}
                     imageSignalement={signalement.image}
-
-
                     onPress={() => {
                       // go to the signalement on the map
                       // setIsAllSignalements(false);
-                      changeStartPoint && changeStartPoint({
-                        latitude: signalement.latitude,
-                        longitude: signalement.longitude,
-                      } as LatLng);
-
+                      changeStartPoint &&
+                        changeStartPoint({
+                          latitude: signalement.latitude,
+                          longitude: signalement.longitude,
+                        } as LatLng);
                     }}
                   />
                 </View>

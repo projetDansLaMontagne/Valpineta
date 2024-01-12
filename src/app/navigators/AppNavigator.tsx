@@ -17,7 +17,10 @@ import * as Screens from "app/screens";
 import Config from "../config";
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities";
 import { colors } from "app/theme";
-import { createBottomTabNavigator, BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
+import {
+  createBottomTabNavigator,
+  BottomTabNavigationOptions,
+} from "@react-navigation/bottom-tabs";
 import I18n from "i18n-js";
 import { Text } from "app/components";
 

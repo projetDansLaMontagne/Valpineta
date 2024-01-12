@@ -10,13 +10,13 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
   Animated,
-  SafeAreaView,
   View,
   StyleSheet,
   GestureResponderEvent,
   Platform,
   ViewStyle,
   Dimensions,
+  Image,
 } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { Screen } from "app/components";
@@ -28,11 +28,8 @@ import MapView, { LatLng, Marker, Polyline, UrlTile } from "react-native-maps";
 import MapButton from "../components/MapButton";
 import { Asset } from "expo-asset";
 
-import { Image } from "react-native";
-
 import * as fileSystem from "expo-file-system";
 import TilesRequire from "../services/importAssets/tilesRequire";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 import fichierJson from "../../assets/Tiles/tiles_struct.json";
 import { TExcursion } from "./DetailsExcursionScreen";
@@ -165,7 +162,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const buttonOpacity = useRef(new Animated.Value(0)).current;
 
   // Var(s)
-  const bottomTabBarHeight = useBottomTabBarHeight();
 
   // Method(s)
   /**
@@ -378,13 +374,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   const image: ImageSource = require("../../assets/icons/location.png");
 
-  const region = {
-    latitude: LATITUDE,
-    longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
-  };
-
   return (
     <Screen style={$container} safeAreaEdges={["bottom"]}>
       <View style={styles.container}>
@@ -399,14 +388,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
                 ...styles.map,
               }}
-              initialRegion={
-                {
-                  latitude: _props.startLocation?.latitude ?? LATITUDE,
-                  longitude: _props.startLocation?.longitude ?? LONGITUDE,
-                  latitudeDelta: LATITUDE_DELTA,
-                  longitudeDelta: LONGITUDE_DELTA,
-                } ?? region
-              }
+              initialRegion={{
+                latitude: _props.startLocation?.latitude ?? LATITUDE,
+                longitude: _props.startLocation?.longitude ?? LONGITUDE,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+              }}
               initialCamera={{
                 center: {
                   latitude: _props.startLocation?.latitude ?? LATITUDE,

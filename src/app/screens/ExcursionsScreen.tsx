@@ -99,7 +99,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     excursions = excursions.filter(excursion => {
       const indexTypeParcours = nomsTypesParcours.indexOf(excursion.typeParcours);
 
-      return !(excursion.distance < filtres.intervalleDistance.min ||
+      return !(
+        excursion.distance < filtres.intervalleDistance.min ||
         excursion.distance > filtres.intervalleDistance.max ||
         (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
         excursion.duree.h < filtres.intervalleDuree.min ||
@@ -109,7 +110,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
         !filtres.indexTypesParcours.includes(indexTypeParcours) || // le type de l excursion est present dans les filtres
         !filtres.vallees.includes(excursion.vallee) ||
         !filtres.difficultesTechniques.includes(excursion.difficulteTechnique) ||
-        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation));
+        !filtres.difficultesOrientation.includes(excursion.difficulteOrientation)
+      );
     });
 
     // Application du critere de tri

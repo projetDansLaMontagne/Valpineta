@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
-import {View, StyleSheet, Image, TouchableOpacity} from "react-native";
+import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
 import { Text } from "app/components/Text";
