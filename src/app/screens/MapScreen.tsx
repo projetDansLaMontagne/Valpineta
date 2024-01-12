@@ -464,7 +464,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                           } as LatLng}
 
                           title={excursion.fr.nom}
-                          pinColor={colors.bouton}
                           key={index}
 
 
@@ -476,6 +475,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                             style={{
                               width: 30,
                               height: 30,
+                              tintColor: colors.palette.marron,
                             }}
 
                           />
