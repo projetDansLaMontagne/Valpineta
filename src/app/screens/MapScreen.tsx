@@ -24,9 +24,13 @@ import { spacing, colors } from "../theme"
 
 // location
 import * as Location from "expo-location"
-import MapView, {LatLng, Polyline, UrlTile} from "react-native-maps"
+import MapView, {LatLng, Marker, Polyline, UrlTile} from "react-native-maps"
 import MapButton from "../components/MapButton"
 import { Asset } from "expo-asset"
+
+import {
+  Image
+} from "react-native"
 
 import * as fileSystem from "expo-file-system"
 import TilesRequire from "../services/importAssets/tilesRequire"
@@ -34,6 +38,7 @@ import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
 
 import fichierJson from "../../assets/Tiles/tiles_struct.json"
 import {TExcursion} from "./DetailsExcursionScreen";
+import {ImageSource} from "react-native-vector-icons/Icon";
 // variables
 type MapScreenProps = AppStackScreenProps<"Map"> & {
   startLocation?: LatLng,
@@ -371,6 +376,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const LATITUDE_DELTA = 0.0922
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
 
+
+  const image: ImageSource = require("../../assets/icons/location.png");
+
   const region = {
     latitude: LATITUDE,
     longitude: LONGITUDE,
@@ -433,20 +441,46 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 excursions.map((excursion, index) => {
                   if (excursion.track) {
                     return (
-                      <Polyline
-                        key={index}
-                        coordinates={
-                          excursion.track.map((point) => {
-                            return {
-                              latitude: point.lat,
-                              longitude: point.lon,
-                            } as LatLng
-                          })
-                        }
-                        strokeColor={colors.palette.vert}
-                        strokeWidth={5}
+                      <>
+                        <Polyline
+                          key={index}
+                          coordinates={
+                            excursion.track.map((point) => {
+                              return {
+                                latitude: point.lat,
+                                longitude: point.lon,
+                              } as LatLng
+                            })
+                          }
+                          strokeColor={colors.palette.vert}
+                          strokeWidth={5}
 
-                      />
+                        />
+
+                        <Marker
+                          coordinate={{
+                            latitude: excursion.track[0].lat,
+                            longitude: excursion.track[0].lon,
+                          } as LatLng}
+
+                          title={excursion.fr.nom}
+                          pinColor={colors.bouton}
+                          key={index}
+
+
+                          centerOffset={{ x: 0, y: -15 }}
+
+                        >
+                          <Image
+                            source={image}
+                            style={{
+                              width: 30,
+                              height: 30,
+                            }}
+
+                          />
+                        </Marker>
+                      </>
                     )
                   } else {
                     return null
