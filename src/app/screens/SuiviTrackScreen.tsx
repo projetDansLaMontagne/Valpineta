@@ -19,6 +19,7 @@ import { Text, Screen, CarteSignalement, GraphiqueDenivele } from "app/component
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { set } from "date-fns";
 const { width, height } = Dimensions.get("window");
 
 // Composants
@@ -38,7 +39,6 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [userLocation, setUserLocation] = useState(null);
     const [altitudeActuelle, setAltitudeActuelle] = useState(0);
-    const [altitudePrecedente, setAltitudePrecedente] = useState(0);
     const [deniveleMonte, setDeniveleMonte] = useState(0);
     const [deniveleDescendu, setDeniveleDescendu] = useState(0);
 
@@ -80,7 +80,7 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
 
     useEffect(() => {
       const fetchLocation = async () => {
-        const location = await getUserLocation(setAltitudeActuelle, altitudePrecedente, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu, setAltitudePrecedente,);
+        const location = await getUserLocation(setAltitudeActuelle, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu);
         setUserLocation(location);
       };
 
@@ -99,8 +99,8 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
           />
         </TouchableOpacity>
         <SwipeUpDown
-          itemMini={item(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, true)}
-          itemFull={item(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, false, altitudeActuelle, userLocation, containerInfoAffiche, setcontainerInfoAffiche, setDeniveleMonte, deniveleMonte)}
+          itemMini={item(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, deniveleMonte, deniveleDescendu, true)}
+          itemFull={item(excursion, navigation, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, deniveleMonte, deniveleDescendu, false, altitudeActuelle, userLocation, containerInfoAffiche, setcontainerInfoAffiche, setDeniveleMonte)}
           animation="easeInEaseOut"
           swipeHeight={height / 5 + footerHeight}
           disableSwipeIcon={true}
@@ -128,20 +128,21 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
 
 /* --------------------------------- Fonctions --------------------------------- */
 
-function item(excursion: Record<string, unknown>, navigation: any, progress: number, setProgress: any, chronoTime: number, toggleChrono: () => void, resetChrono: () => void, formatTime: (timeInSeconds: number) => string, chronoRunning: boolean, isMini: boolean, altitudeActuelle?, userLocation?: any, containerInfoAffiche?: boolean, setcontainerInfoAffiche?: any, setDeniveleMonte?, deniveleMonte?: number, deniveleDescendu?: number) {
+function item(excursion: Record<string, unknown>, navigation: any, progress: number, setProgress: any, chronoTime: number, toggleChrono: () => void, resetChrono: () => void, formatTime: (timeInSeconds: number) => string, chronoRunning: boolean, deniveleMonte?: number, deniveleDescendu?: number, isMini: boolean, altitudeActuelle?, userLocation?: any, containerInfoAffiche?: boolean, setcontainerInfoAffiche?: any, setDeniveleMonte?) {
   const increaseProgress = () => {
     if (progress < 100) { // 100 a remplacer par la valeur max de la barre de progression ( la distance totale de l'excursion)
       setProgress(progress + 2); // Augmente la valeur de progression de 2 (à ajuster en fonction de la distance parcourue) 
     }
-
-    // // Augmenter deniveleMonte en fonction de l'altitude actuelle
-    // setDeniveleMonte(deniveleMonte + altitudeActuelle);
   };
 
   let distance = 0;
   if (excursion !== undefined) {
     distance = excursion.distance as number;
   }
+
+  // console.log("altitude actuelle affiché", altitudeActuelle)
+  // console.log("denivele monte affiché", deniveleMonte)
+  // console.log("denivele descendu affiché", deniveleDescendu)
 
   return (
     <View style={isMini ? $containerPetit : $containerGrand}>
@@ -170,11 +171,11 @@ function item(excursion: Record<string, unknown>, navigation: any, progress: num
             style={$icone}
             source={require("../../assets/icons/denivelePositifV2.png")}
           />
-          <Text style={$texteInfo}> {deniveleMonte} m</Text>
+          <Text style={$texteInfo}> {deniveleMonte.toFixed()} m</Text>
         </View>
         <View style={$containerInfo}>
           <Image style={$icone} source={require("../../assets/icons/deniveleNegatif.png")} />
-          <Text style={$texteInfo}> {deniveleDescendu} m</Text>
+          <Text style={$texteInfo}> {deniveleDescendu.toFixed()} m</Text>
         </View>
       </View>
       {/* Barre de progression */}
@@ -244,7 +245,7 @@ function item(excursion: Record<string, unknown>, navigation: any, progress: num
   );
 }
 
-function getUserLocation(setAltitudeActuelle, altitudePrecedente, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu, setAltitudePrecedente) {
+function getUserLocation(setAltitudeActuelle, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu) {
   return new Promise(async (resolve, reject) => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -253,6 +254,8 @@ function getUserLocation(setAltitudeActuelle, altitudePrecedente, setDeniveleMon
         resolve(null);
       }
 
+      let altitudePrecedente = 0;
+
       // Obtention de la position initiale
       let location = await Location.getCurrentPositionAsync({});
       setAltitudeActuelle(location.coords.altitude); // Mettre à jour l'état
@@ -260,7 +263,7 @@ function getUserLocation(setAltitudeActuelle, altitudePrecedente, setDeniveleMon
       resolve(location.coords);
 
       // Mise à jour de la position à intervalles réguliers
-      const updateInterval = 10000;
+      const updateInterval = 1000;
       setInterval(async () => {
         try {
           location = await Location.getCurrentPositionAsync({});
@@ -268,16 +271,24 @@ function getUserLocation(setAltitudeActuelle, altitudePrecedente, setDeniveleMon
           setAltitudeActuelle(nouvelleAltitude);
 
           // Mettre à jour deniveleMonte et deniveleDescendu en fonction de l'altitude
-          if (nouvelleAltitude > altitudePrecedente) {
-            setDeniveleMonte(deniveleMonte + (nouvelleAltitude - altitudePrecedente));
-          } else if (nouvelleAltitude < altitudePrecedente) {
-            setDeniveleDescendu(deniveleDescendu + (altitudePrecedente - nouvelleAltitude));
+          if (altitudePrecedente != 0) {
+            if (nouvelleAltitude > altitudePrecedente) {
+              deniveleMonte = deniveleMonte + (nouvelleAltitude - altitudePrecedente);
+            } else if (nouvelleAltitude < altitudePrecedente) {
+              deniveleDescendu = deniveleDescendu + (altitudePrecedente - nouvelleAltitude);
+            }
+          }
+          else {
+            altitudePrecedente = nouvelleAltitude;
           }
 
           // Mettre à jour l'altitude précédente
-          setAltitudePrecedente(nouvelleAltitude);
+          // setAltitudePrecedente(nouvelleAltitude);
+          altitudePrecedente = nouvelleAltitude;
 
-          console.log("Altitude mise à jour:", nouvelleAltitude);
+          setDeniveleMonte(deniveleMonte);
+          setDeniveleDescendu(deniveleDescendu);
+
           resolve(location.coords);
         } catch (error) {
           console.error("Erreur lors de la récupération de la position", error);
@@ -293,10 +304,8 @@ function getUserLocation(setAltitudeActuelle, altitudePrecedente, setDeniveleMon
 
 function descritpion(excursion, altitudeActuelle) {
   let track = excursion.track;
-  //on recuprere l'altitude max
   let altitudeMax = 0;
   let altitudeMin = Infinity;
-  // let altitudeActuelle = 0; // a voir comment faire pour la mettre a jour
 
   if (track !== undefined) {
     track.forEach((element) => {
