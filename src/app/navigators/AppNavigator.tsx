@@ -4,7 +4,12 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+  NavigatorScreenParams,
+} from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack";
 import { observer } from "mobx-react-lite";
 import { ImageSourcePropType, useColorScheme } from "react-native";
@@ -94,14 +99,29 @@ export type T_excursion = {
   track: T_point[];
 } & Partial<T_infoLangue>;
 
-export type AppStackParamList = {
+// TYPES STACKS
+type ExcursionStackParamList = {
   Filtres: undefined;
   Excursions: undefined | { filtres?: T_filtres };
+};
+
+type CarteStackParamList = {
   Carte: undefined;
   DetailsExcursion: undefined | { excursion: T_excursion };
-  Parametres: undefined;
   Description: { excursion: T_excursion };
 };
+
+type ParametresStackParamList = {
+  Parametres: undefined;
+};
+
+export type AppStackParamList = {
+  ExcursionsStack: NavigatorScreenParams<ExcursionStackParamList> | undefined;
+  CarteStack: NavigatorScreenParams<CarteStackParamList> | undefined;
+  ParametresStack: NavigatorScreenParams<ParametresStackParamList> | undefined;
+} & ExcursionStackParamList &
+  CarteStackParamList &
+  ParametresStackParamList;
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -133,15 +153,10 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
    * @warning CODE REDONDANT : parametres.langues est forcement modifié en meme temps que I18n
    * (dans la page des parametres) donc ça sert à rien de faire dépendre l'un de l'autre
    * MAIS sans cette partie le footer ne change pas de langue... raison inconnue
-  */
+   */
   const { parametres } = useStores();
   useEffect(() => {
-    if (parametres.langues === "fr") {
-      I18n.locale = "fr";
-    }
-    if (parametres.langues === "es") {
-      I18n.locale = "es";
-    }
+    I18n.locale = parametres.langues;
   }, [parametres.langues]);
 
   const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
@@ -194,7 +209,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 /* -------------------------------------------------------------------------- */
 /*                                   STACKS                                   */
 /* -------------------------------------------------------------------------- */
-const ExcursionStack = createNativeStackNavigator();
+const ExcursionStack = createNativeStackNavigator<ExcursionStackParamList>();
 const ExcursionStackScreen = () => (
   <ExcursionStack.Navigator
     initialRouteName={"Excursions"}
@@ -207,7 +222,7 @@ const ExcursionStackScreen = () => (
   </ExcursionStack.Navigator>
 );
 
-const CarteStack = createNativeStackNavigator();
+const CarteStack = createNativeStackNavigator<CarteStackParamList>();
 const CarteStackScreen = () => (
   <CarteStack.Navigator
     initialRouteName={"Carte"}
@@ -221,7 +236,7 @@ const CarteStackScreen = () => (
   </CarteStack.Navigator>
 );
 
-const ParametresStack = createNativeStackNavigator();
+const ParametresStack = createNativeStackNavigator<ParametresStackParamList>();
 const ParametresStackScreen = () => (
   <ParametresStack.Navigator
     initialRouteName={"Parametres"}

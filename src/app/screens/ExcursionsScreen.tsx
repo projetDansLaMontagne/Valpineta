@@ -206,6 +206,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   /* ------------------------------- CALL BACKS ------------------------------- */
   const clicExcursion = (excursion: T_excursion) => {
     props.navigation.navigate("DetailsExcursion", { excursion });
+
+    // REMPLACER PAR CA si la navigation ne fonctionne pas (dire a Nicolas)
+    // props.navigation.navigate("CarteStack", {
+    //   screen: "DetailsExcursion",
+    //   params: { excursion },
+    // });
   };
 
   return (
