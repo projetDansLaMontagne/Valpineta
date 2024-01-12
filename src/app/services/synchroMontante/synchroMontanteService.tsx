@@ -1,4 +1,8 @@
 import NetInfo from "@react-native-community/netinfo";
+import { SynchroMontanteStore } from "app/models";
+import { tr } from "date-fns/locale";
+import { Alert } from "react-native";
+import { useToast } from "react-native-toast-notifications";
 
 export function synchroMontante(
     titreSignalement,
@@ -6,7 +10,7 @@ export function synchroMontante(
     photoSignalement,
     synchroMontanteStore,
 ) {
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
         let status = "attente";
         const connexion = await NetInfo.fetch();
         console.log(synchroMontanteStore.signalements);
@@ -38,12 +42,11 @@ export function synchroMontante(
                     photoURL: photoSignalement,
                 };
                 synchroMontanteStore.addSignalement(unSignalement);
-                if (connexion.isConnected){
-                    envoieBaseDeDonnées();
+                if (connexion.isConnected) {
+                    envoieBaseDeDonnées(synchroMontanteStore);
                     synchroMontanteStore.removeAllSignalements();
                     status = "envoye";
-                }
-                else{
+                } else {
                     status = "ajoute";
                 }
             } catch (error) {
@@ -80,6 +83,13 @@ function rechercheMemeSignalement(
     return memeSignalement;
 }
 
-async function envoieBaseDeDonnées(){
-    console.log("Envoie de la base de données");
+export async function envoieBaseDeDonnées(synchroMontanteStore: SynchroMontanteStore) : Promise<boolean> {
+    let status = false;
+
+    if (synchroMontanteStore.getSignalementsCount() > 0) {
+        console.log("Envoi des données");
+        status =  true;
+    }
+    synchroMontanteStore.removeAllSignalements();
+    return status;
 }

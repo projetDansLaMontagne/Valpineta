@@ -18,8 +18,12 @@ import { Image, ImageStyle } from "react-native";
 import { useStores } from "app/models";
 import { Text } from "app/components";
 import I18n from "i18n-js";
-import { getActiveRouteName } from "./navigationUtilities";
-import { set } from "date-fns";
+
+//Import pour la synchro
+import NetInfo from "@react-native-community/netinfo";
+import { envoieBaseDeDonnées } from "app/services/synchroMontante/synchroMontanteService";
+import { useToast } from "react-native-toast-notifications";
+import { tr } from "date-fns/locale";
 
 const explorerLogo = require("./../../assets/icons/explorer.png");
 const carteLogo = require("./../../assets/icons/carte.png");
@@ -40,13 +44,13 @@ const parametresLogo = require("./../../assets/icons/parametres.png");
  */
 export type AppStackParamList = {
   // 🔥 Your screens go here
-  Filtres: undefined
-  Excursions: undefined
-  Map: undefined
-  DetailsExcursion: undefined
-  Parametres: undefined
-  NouveauSignalement: undefined
-  Description: undefined
+  Filtres: undefined;
+  Excursions: undefined;
+  Map: undefined;
+  DetailsExcursion: undefined;
+  Parametres: undefined;
+  NouveauSignalement: undefined;
+  Description: undefined;
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 };
 
@@ -74,7 +78,9 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 
   useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
-  const { parametres } = useStores();
+  const { parametres, synchroMontanteStore } = useStores();
+  const [connected, setConnected] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     if (parametres.langues === "fr") {
@@ -84,6 +90,34 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       I18n.locale = "es";
     }
   }, [parametres.langues]);
+
+  // Utilise useEffect pour vérifier la connexion toutes les 3 secondes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      NetInfo.fetch().then(state => {
+        setConnected(state.isConnected);
+      });
+    }, 3000);
+
+    return () => {
+      clearInterval(interval); // Nettoie l'intervalle lorsqu'un composant est démonté
+    };
+  }, []);
+
+  // Utilise useEffect pour déclencher l'alerte en cas de changement de connexion
+  useEffect(() => {
+    if (connected !== null && connected) {
+      const envoieStatus = envoieBaseDeDonnées(synchroMontanteStore);
+      envoieStatus.then(status => {
+        if (status === true) {
+          parametres.langues === "fr"
+            ? toast.show("Les signalements ont bien été envoyés", { type: "success" })
+            : parametres.langues === "es"
+            toast.show("Las denuncias fueron enviadas correctamente", { type: "success" })
+        }
+      });
+    }
+  }, [connected]);
 
   return (
     <NavigationContainer

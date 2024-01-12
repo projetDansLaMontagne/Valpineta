@@ -1,14 +1,23 @@
 // Librairies
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { TextStyle, TextInput, Image, View, Dimensions, ViewStyle, Alert, ActivityIndicator } from "react-native";
+import {
+  TextStyle,
+  TextInput,
+  Image,
+  View,
+  Dimensions,
+  ViewStyle,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { Button, TextField } from "app/components";
 import * as ImagePicker from "expo-image-picker";
 import { RootStore, SynchroMontanteStore, useStores } from "app/models";
-import { synchroMontante } from "app/services/synchroMontante/synchroMontanteService"
-import NetInfo from '@react-native-community/netinfo';
+import { synchroMontante } from "app/services/synchroMontante/synchroMontanteService";
+import NetInfo from "@react-native-community/netinfo";
 
 // Composants
 import { Screen, Text } from "app/components";
@@ -20,7 +29,7 @@ interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSign
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
     // Stores
-    const { parametres, synchroMontanteStore } = useStores(); 
+    const { parametres, synchroMontanteStore } = useStores();
 
     //type de signalement
     let type = "";
@@ -44,8 +53,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [descriptionError, setDescriptionError] = useState(false);
     const [photoError, setPhotoError] = useState(false);
 
-    const [ status, setStatus ] = useState("");
-    const [ isLoading, setIsLoading ] = useState(false);
+    const [status, setStatus] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     /**
      * Fonction pour prendre une photo avec la caméra
@@ -156,50 +165,78 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     };
 
     const AlerteStatus = (status: string) => {
-      if (status == "ajoute") { 
-      Alert.alert(
-
-        "Ajout réussi",
-        "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
-        [
-          { text: "Ajouter un autre" },
-          { text: "Retour", onPress: () => props.navigation.goBack() }
-        ],
-        { cancelable: false }
-      )
+      if (status == "ajoute") {
+        if (parametres.langues == "fr") {
+          Alert.alert(
+            "Ajout réussi",
+            "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
+            [
+              { text: "Ajouter un autre" },
+              { text: "Retour", onPress: () => props.navigation.goBack() },
+            ],
+            { cancelable: false },
+          );
+        } else {
+          Alert.alert(
+            "Añadido con éxito",
+            "Su informe ha sido agregado a la memoria, se enviará cuando esté conectado a Internet",
+            [{ text: "Añadir otro" }, { text: "Volver", onPress: () => props.navigation.goBack() }],
+            { cancelable: false },
+          );
+        }
+      } else if (status == "existe") {
+        if (parametres.langues == "fr") {
+          Alert.alert(
+            "Signalement déjà existant",
+            "Ce signalement existe déjà en base de données, veuillez en choisir un autre",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+        else {
+          Alert.alert(
+            "Informe ya existente",
+            "Este informe ya existe en la base de datos, elija otro",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+      } else if (status == "format") {
+        if (parametres.langues == "fr") {
+          Alert.alert(
+            "Format incorrect",
+            "Veuillez vérifier que les champs sont correctement remplis",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+        else {
+          Alert.alert(
+            "Formato incorrecto",
+            "Verifique que los campos estén completados correctamente",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+      } else if (status == "envoye") {
+        if (parametres.langues == "fr") {
+          Alert.alert(
+            "Signalement envoyé",
+            "Votre signalement a bien été envoyé en base de données",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+        else {
+          Alert.alert(
+            "Informe enviado",
+            "Su informe ha sido enviado a la base de datos",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
       }
-      else if (status == "existe") {
-        Alert.alert(
-          "SIgnalement déjà existant",
-          "Votre signalement existe déjà dans la base de données",
-          [
-            { text: "OK" }
-          ],
-          { cancelable: false }
-        )
-      }
-      else if (status == "format") {
-        Alert.alert(
-          "Format incorrect",
-          "Veuillez vérifier les champs de votre signalement",
-          [
-            { text: "OK" }
-          ],
-          { cancelable: false }
-        )
-      }
-      else if (status == "envoye") {
-        Alert.alert(
-          "Envoi réussi",
-          "Votre signalement a bien été envoyé en base de données",
-          [
-            { text: "Ajouter un autre" },
-            { text: "Retour", onPress: () => props.navigation.goBack() }
-          ],
-          { cancelable: false }
-        )
-      }
-    }
+    };
 
     /**
      * Fonction pour envoyer le signalement en base de données
@@ -207,8 +244,12 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @async
      * @function envoyerSignalement
      */
-    const envoyerSignalement = async ( titreSignalement:string , descriptionSignalement:string, photoSignalement:string , synchroMontanteStore:SynchroMontanteStore): Promise<void> => {
-      
+    const envoyerSignalement = async (
+      titreSignalement: string,
+      descriptionSignalement: string,
+      photoSignalement: string,
+      synchroMontanteStore: SynchroMontanteStore,
+    ): Promise<void> => {
       let status: string = "En attente";
 
       // Vérification des champs
@@ -216,11 +257,14 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 
       // Si les champs sont corrects
       if (!titreError && !descriptionError && !photoError) {
-
         setIsLoading(true);
-        status = await synchroMontante(titreSignalement, descriptionSignalement, photoSignalement, synchroMontanteStore) as string;
+        status = (await synchroMontante(
+          titreSignalement,
+          descriptionSignalement,
+          photoSignalement,
+          synchroMontanteStore,
+        )) as string;
         setIsLoading(false);
-
       } else {
         status = "format";
         AlerteStatus(status);
@@ -235,12 +279,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 
     // Utilisation d'effets secondaires pour déclencher la vérification des erreurs après chaque modification d'état
 
-    return (
-      isLoading ?
+    return isLoading ? (
       <Screen style={$containerLoader} preset="fixed" safeAreaEdges={["top", "bottom"]}>
         <ActivityIndicator size="large" color={colors.palette.vert} />
       </Screen>
-      :
+    ) : (
       <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
         <Text
           style={$h1}
@@ -316,8 +359,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           <Button
             style={$bouton}
             tx="pageNouveauSignalement.boutons.valider"
-            onPress={() => 
-              envoyerSignalement(titreSignalement, descriptionSignalement, photoSignalement, synchroMontanteStore)
+            onPress={() =>
+              envoyerSignalement(
+                titreSignalement,
+                descriptionSignalement,
+                photoSignalement,
+                synchroMontanteStore,
+              )
             }
             textStyle={$textBouton}
           />

@@ -78,6 +78,7 @@
     "react-native-screens": "~3.22.0",
     "react-native-svg": "13.9.0",
     "react-native-swipe-up-down": "^1.2.0",
+    "react-native-toast-notifications": "^3.4.0",
     "react-native-vector-icons": "^10.0.1",
     "reactotron-mst": "3.1.4",
     "reactotron-react-js": "^3.3.7",
