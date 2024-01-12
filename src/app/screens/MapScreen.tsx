@@ -6,8 +6,8 @@
  * - hideOverlay: boolean, si on veut afficher les boutons de la carte.®
  */
 
-import React, { FC, useEffect, useRef, useState } from "react"
-import { observer } from "mobx-react-lite"
+import React, { FC, useEffect, useRef, useState } from "react";
+import { observer } from "mobx-react-lite";
 import {
   Animated,
   SafeAreaView,
@@ -17,64 +17,65 @@ import {
   Platform,
   ViewStyle,
   Dimensions,
-} from "react-native"
-import { AppStackScreenProps } from "app/navigators"
-import { Screen } from "app/components"
-import { spacing, colors } from "../theme"
+} from "react-native";
+import { AppStackScreenProps } from "app/navigators";
+import { Screen } from "app/components";
+import { spacing, colors } from "../theme";
 
 // location
-import * as Location from "expo-location"
-import MapView, {LatLng, Marker, Polyline, UrlTile} from "react-native-maps"
-import MapButton from "../components/MapButton"
-import { Asset } from "expo-asset"
+import * as Location from "expo-location";
+import MapView, { LatLng, Marker, Polyline, UrlTile } from "react-native-maps";
+import MapButton from "../components/MapButton";
+import { Asset } from "expo-asset";
 
-import {
-  Image
-} from "react-native"
+import { Image } from "react-native";
 
-import * as fileSystem from "expo-file-system"
-import TilesRequire from "../services/importAssets/tilesRequire"
-import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
+import * as fileSystem from "expo-file-system";
+import TilesRequire from "../services/importAssets/tilesRequire";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
-import fichierJson from "../../assets/Tiles/tiles_struct.json"
-import {TExcursion} from "./DetailsExcursionScreen";
-import {ImageSource} from "react-native-vector-icons/Icon";
+import fichierJson from "../../assets/Tiles/tiles_struct.json";
+import { TExcursion } from "./DetailsExcursionScreen";
+import { ImageSource } from "react-native-vector-icons/Icon";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
-  startLocation?: LatLng,
+  startLocation?: LatLng;
 
-  isInDetailExcursion?: boolean,
-  children?: React.ReactNode
-} & ({
-  hideOverlay: true
-} | {
-  hideOverlay: false
-  overlayDebugMode?: boolean
-})
+  isInDetailExcursion?: boolean;
+  children?: React.ReactNode;
+} & (
+    | {
+        hideOverlay: true;
+      }
+    | {
+        hideOverlay: false;
+        overlayDebugMode?: boolean;
+      }
+  );
 
-type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) => void
+type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) => void;
 
-let COMPTEUR = 0
-const folderDest = `${fileSystem.documentDirectory}cartes/OSM`
+let COMPTEUR = 0;
+const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
 const copyFilesInBatch = async (filesToCopy, batchCount) => {
   for (let i = 0; i < filesToCopy.length; i += batchCount) {
-    const batchFiles = filesToCopy.slice(i, i + batchCount)
+    const batchFiles = filesToCopy.slice(i, i + batchCount);
 
     // Copie des fichiers dans ce lot
     await Promise.all(
-      batchFiles.map(async (file) => {
+      batchFiles.map(async file => {
         // Effectuer la copie du fichier ici avec FileSystem.copyAsync
         // (Exemple: À adapter selon votre structure de fichier)
         await fileSystem.copyAsync({
           from: file.source,
           to: file.destination,
-        })
+        });
       }),
-    )
+    );
   }
-}
+};
 
 /**
  * Create the folder structure (recursively)
@@ -91,16 +92,16 @@ const createFolderStruct = async (
   for (const folder in folderStruct) {
     if (folderStruct.hasOwnProperty(folder)) {
       if (typeof folderStruct[folder] === "string") {
-        const fileName = folderStruct[folder].split("/").pop()
+        const fileName = folderStruct[folder].split("/").pop();
         // remove 'folderDest' from 'folderPath'
-        const fileFolder = folderPath.replace(folderDest, "")
+        const fileFolder = folderPath.replace(folderDest, "");
 
         await fileSystem.makeDirectoryAsync(`${folderDest}${fileFolder}`, {
           intermediates: true,
-        })
+        });
 
-        const assetsListUri = assetsList[COMPTEUR].localUri
-        COMPTEUR++
+        const assetsListUri = assetsList[COMPTEUR].localUri;
+        COMPTEUR++;
         // console.log(`downloaded ${COMPTEUR} files`)
 
         // Copier les fichiers en lot en utilisant copyFilesInBatch
@@ -111,18 +112,18 @@ const createFolderStruct = async (
             destination: `${folderDest}${fileFolder}/${fileName}`,
           },
           // ... autres fichiers à copier pour ce dossier
-        ]
+        ];
 
         // Copie par lot des fichiers
-        const batchCount = 10 // Nombre de fichiers par lot
-        await copyFilesInBatch(filesToCopy, batchCount)
+        const batchCount = 10; // Nombre de fichiers par lot
+        await copyFilesInBatch(filesToCopy, batchCount);
       } else {
         // Récursivement créer la structure des dossiers pour les sous-dossiers
-        await createFolderStruct(folderStruct[folder], `${folderPath}/${folder}`, assetsList)
+        await createFolderStruct(folderStruct[folder], `${folderPath}/${folder}`, assetsList);
       }
     }
   }
-}
+};
 
 /**
  * Get all the tracks of the `src/assets/JSON/excursions.json` file.
@@ -130,42 +131,41 @@ const createFolderStruct = async (
  * @returns {Promise<TExcursion[]>} The list of all the tracks
  */
 const getAllTracks = (): TExcursion[] => {
-  return require("../../assets/JSON/excursions.json") as TExcursion[]
-}
+  return require("../../assets/JSON/excursions.json") as TExcursion[];
+};
 
 // Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
   // Variables
-  const userLocationIntervalMs = 1000 // ! mabye change this value
+  const userLocationIntervalMs = 1000; // ! mabye change this value
 
   // State(s)
-  const [gavePermission, setGavePermission] = useState(false)
-  const [location, setLocation] = useState(null)
+  const [gavePermission, setGavePermission] = useState(false);
+  const [location, setLocation] = useState(null);
 
-  const [followUserLocation, setFollowUserLocation] = useState(false)
+  const [followUserLocation, setFollowUserLocation] = useState(false);
 
-  const [menuIsOpen, setMenuIsOpen] = useState(false)
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
 
-  const [excursions, setExcursions] = useState<TExcursion[]>(undefined)
+  const [excursions, setExcursions] = useState<TExcursion[]>(undefined);
 
   // Ref(s)
-  const intervalRef = useRef(null)
+  const intervalRef = useRef(null);
 
-  const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null)
-  const mapRef = useRef<MapView>(null)
+  const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
+  const mapRef = useRef<MapView>(null);
 
   // buttons
-  const followLocationButtonRef = useRef(null)
-  const toggleBtnMenuRef = useRef(null)
-  const addPOIBtnRef = useRef(null)
-  const addWarningBtnRef = useRef(null)
+  const followLocationButtonRef = useRef(null);
+  const toggleBtnMenuRef = useRef(null);
+  const addPOIBtnRef = useRef(null);
+  const addWarningBtnRef = useRef(null);
 
   // Animation(s)
-  const buttonOpacity = useRef(new Animated.Value(0)).current
+  const buttonOpacity = useRef(new Animated.Value(0)).current;
 
   // Var(s)
-  const bottomTabBarHeight = useBottomTabBarHeight()
-
+  const bottomTabBarHeight = useBottomTabBarHeight();
 
   // Method(s)
   /**
@@ -178,57 +178,59 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   ): void => {
     if (mapRef.current) {
       if (!location && !passedLocation) {
-        console.log("[MapScreen] location is null")
-        return
+        console.log("[MapScreen] location is null");
+        return;
       }
 
-      const finalLocation = passedLocation ?? location
+      const finalLocation = passedLocation ?? location;
 
       mapRef.current.animateCamera({
         center: {
           latitude: finalLocation.coords ? finalLocation.coords.latitude : finalLocation.latitude,
-          longitude: finalLocation.coords ? finalLocation.coords.longitude : finalLocation.longitude,
+          longitude: finalLocation.coords
+            ? finalLocation.coords.longitude
+            : finalLocation.longitude,
         },
-      })
+      });
     } else {
-      console.log("[MapScreen] mapRef.current is null")
+      console.log("[MapScreen] mapRef.current is null");
     }
-  }
+  };
 
   const downloadTiles = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync()
+    const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied")
+      console.log("[MapScreen] Permission to access location was denied");
     } else {
-      console.log("[MapScreen] Permission ok")
+      console.log("[MapScreen] Permission ok");
       // Vérifier si les tuiles sont déjà dl cartes/OSM/17/65682/48390.jpg
-      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/")
+      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/");
       if (folderInfo.exists && folderInfo.isDirectory) {
-        console.log("[MapScreen] Tuiles déjà DL")
+        console.log("[MapScreen] Tuiles déjà DL");
       } else {
         // Supprimer le dossier
         console.log("[MapScreen] Suppression du dossier");
-        await fileSystem.deleteAsync(folderDest, { idempotent: true })
+        await fileSystem.deleteAsync(folderDest, { idempotent: true });
 
-        const assets = await TilesRequire()
+        const assets = await TilesRequire();
 
-        await createFolderStruct(fichierJson, folderDest, assets)
+        await createFolderStruct(fichierJson, folderDest, assets);
       }
     }
-  }
+  };
 
   /**
    * Remove the location subscription
    */
   const removeLocationSubscription = () => {
     if (watchPositionSubscriptionRef.current) {
-      console.log("[MapScreen] watchPositionSubscriptionRef.current.remove() ")
-      watchPositionSubscriptionRef.current.remove()
+      console.log("[MapScreen] watchPositionSubscriptionRef.current.remove() ");
+      watchPositionSubscriptionRef.current.remove();
 
-      setLocation(null)
+      setLocation(null);
     }
-  }
+  };
 
   /**
    * Get the user location (authorization is asked if not already given).
@@ -237,16 +239,16 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
    */
   const getLocationAsync = async (debug?: boolean): Promise<void> => {
     if (debug) {
-      console.log(`[[MapScreen]] getLocationAsync()`)
+      console.log(`[[MapScreen]] getLocationAsync()`);
       console.log(
         `[[MapScreen]] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`,
-      )
+      );
     }
 
-    const { status } = await Location.requestForegroundPermissionsAsync()
+    const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied")
+      console.log("[MapScreen] Permission to access location was denied");
     }
 
     // write code for the app to handle GPS changes
@@ -256,16 +258,16 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
         timeInterval: userLocationIntervalMs,
         distanceInterval: 1,
       },
-      (location) => {
+      location => {
         if (debug) {
-          console.log(`[[MapScreen]] watchPositionAsync()`)
-          console.log(`[[MapScreen]] location.coords.latitude: ${location.coords.latitude}`)
-          console.log(`[[MapScreen]] location.coords.longitude: ${location.coords.longitude}`)
+          console.log(`[[MapScreen]] watchPositionAsync()`);
+          console.log(`[[MapScreen]] location.coords.latitude: ${location.coords.latitude}`);
+          console.log(`[[MapScreen]] location.coords.longitude: ${location.coords.longitude}`);
         }
-        setLocation(location)
+        setLocation(location);
       },
-    )
-  }
+    );
+  };
 
   /**
    * Handle the map moves
@@ -276,47 +278,47 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
    * @param _ {GestureResponderEvent} The gesture event
    */
   const handleMapMoves = (_: GestureResponderEvent) => {
-    setFollowUserLocation(false)
+    setFollowUserLocation(false);
 
-    return false
-  }
+    return false;
+  };
 
   const toggleFollowUserLocation = () => {
     if (!gavePermission) {
-      askUserLocation().then(() => console.log("[MapScreen] aled"))
+      askUserLocation().then(() => console.log("[MapScreen] aled"));
     }
 
-    setFollowUserLocation(!followUserLocation)
-  }
+    setFollowUserLocation(!followUserLocation);
+  };
 
   const askUserLocation = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync()
+    const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied")
-      setGavePermission(false)
-      return
+      console.log("[MapScreen] Permission to access location was denied");
+      setGavePermission(false);
+      return;
     }
-    setGavePermission(true)
-  }
+    setGavePermission(true);
+  };
 
   const poiButtonOnPress = async () => {
-    console.log("[MapScreen] poiButtonOnPress()")
-  }
+    console.log("[MapScreen] poiButtonOnPress()");
+  };
 
   const toggleMenu = () => {
-    setMenuIsOpen(!menuIsOpen)
-  }
+    setMenuIsOpen(!menuIsOpen);
+  };
 
   // Effect(s)
   useEffect(() => {
     return () => {
-      clearInterval(intervalRef.current)
-    }
-  }, [gavePermission])
+      clearInterval(intervalRef.current);
+    };
+  }, [gavePermission]);
 
   useEffect(() => {
-    followUserLocation && animateToLocation(location)
-  }, [location])
+    followUserLocation && animateToLocation(location);
+  }, [location]);
 
   useEffect(() => {
     if (menuIsOpen) {
@@ -327,13 +329,13 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
           duration: 1000,
           useNativeDriver: true,
         }),
-      ]).start()
+      ]).start();
     }
-  }, [menuIsOpen])
+  }, [menuIsOpen]);
 
   useEffect(() => {
     console.log(`[MapScreen] _props.startLocation: ${JSON.stringify(_props.startLocation)}`);
-    _props.startLocation && animateToLocation(_props.startLocation)
+    _props.startLocation && animateToLocation(_props.startLocation);
   }, [_props.startLocation]);
 
   useEffect(() => {
@@ -342,11 +344,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     if (followUserLocation) {
       getLocationAsync(true)
         .then(() => console.log("[MapScreen] getLocationAsync() ok"))
-        .catch((e) => console.log("[MapScreen] getLocationAsync() error: ", e))
+        .catch(e => console.log("[MapScreen] getLocationAsync() error: ", e));
     } else {
-      removeLocationSubscription()
+      removeLocationSubscription();
     }
-  }, [followUserLocation])
+  }, [followUserLocation]);
 
   useEffect(() => {
     if (excursions !== undefined && excursions.length > 0) {
@@ -355,25 +357,24 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [excursions]);
 
   useEffect(() => {
-    downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"))
+    downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
 
     if (!_props.isInDetailExcursion) {
-      setExcursions(getAllTracks())
+      setExcursions(getAllTracks());
     }
 
     return () => {
-      removeLocationSubscription()
-    }
-  }, [])
+      removeLocationSubscription();
+    };
+  }, []);
 
-  const { width, height } = Dimensions.get("window")
+  const { width, height } = Dimensions.get("window");
 
-  const ASPECT_RATIO = width / height
-  const LATITUDE = 42.63099943470989
-  const LONGITUDE = 0.21949934093707602
-  const LATITUDE_DELTA = 0.0922
-  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
-
+  const ASPECT_RATIO = width / height;
+  const LATITUDE = 42.63099943470989;
+  const LONGITUDE = 0.21949934093707602;
+  const LATITUDE_DELTA = 0.0922;
+  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
   const image: ImageSource = require("../../assets/icons/location.png");
 
@@ -382,7 +383,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     longitude: LONGITUDE,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
-  }
+  };
 
   return (
     <Screen style={$container} safeAreaEdges={["bottom"]}>
@@ -398,12 +399,14 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
                 ...styles.map,
               }}
-              initialRegion={{
-                latitude: _props.startLocation?.latitude ?? LATITUDE,
-                longitude: _props.startLocation?.longitude ?? LONGITUDE,
-                latitudeDelta: LATITUDE_DELTA,
-                longitudeDelta: LONGITUDE_DELTA,
-              } ?? region}
+              initialRegion={
+                {
+                  latitude: _props.startLocation?.latitude ?? LATITUDE,
+                  longitude: _props.startLocation?.longitude ?? LONGITUDE,
+                  latitudeDelta: LATITUDE_DELTA,
+                  longitudeDelta: LONGITUDE_DELTA,
+                } ?? region
+              }
               initialCamera={{
                 center: {
                   latitude: _props.startLocation?.latitude ?? LATITUDE,
@@ -428,73 +431,67 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             >
               <UrlTile urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"} tileSize={256} />
 
-              {
-                _props.children
-              }
+              {_props.children}
               {
                 // Oier voulait toutes les excursions sur la carte
                 // si on était pas dans la page détail excursion.
                 !_props.isInDetailExcursion &&
-                excursions !== undefined && excursions.length > 0 &&
-                excursions.map((excursion, index) => {
-                  if (excursion.track) {
-                    return (
-                      <>
-                        <Polyline
-                          key={index}
-                          coordinates={
-                            excursion.track.map((point) => {
+                  excursions !== undefined &&
+                  excursions.length > 0 &&
+                  excursions.map((excursion, index) => {
+                    if (excursion.track) {
+                      return (
+                        <>
+                          <Polyline
+                            key={index}
+                            coordinates={excursion.track.map(point => {
                               return {
                                 latitude: point.lat,
                                 longitude: point.lon,
-                              } as LatLng
-                            })
-                          }
-                          strokeColor={colors.palette.vert}
-                          strokeWidth={5}
-
-                        />
-
-                        <Marker
-                          coordinate={{
-                            latitude: excursion.track[0].lat,
-                            longitude: excursion.track[0].lon,
-                          } as LatLng}
-
-                          title={excursion.fr.nom}
-                          key={index}
-
-
-                          centerOffset={{ x: 0, y: -15 }}
-
-                        >
-                          <Image
-                            source={image}
-                            style={{
-                              width: 30,
-                              height: 30,
-                              tintColor: colors.palette.marron,
-                            }}
-
+                              } as LatLng;
+                            })}
+                            strokeColor={colors.palette.vert}
+                            strokeWidth={5}
                           />
-                        </Marker>
-                      </>
-                    )
-                  } else {
-                    return null
-                  }
-                })
+
+                          <Marker
+                            coordinate={
+                              {
+                                latitude: excursion.track[0].lat,
+                                longitude: excursion.track[0].lon,
+                              } as LatLng
+                            }
+                            title={excursion.fr.nom}
+                            key={index}
+                            centerOffset={{ x: 0, y: -15 }}
+                          >
+                            <Image
+                              source={image}
+                              style={{
+                                width: 30,
+                                height: 30,
+                                tintColor: colors.palette.marron,
+                              }}
+                            />
+                          </Marker>
+                        </>
+                      );
+                    } else {
+                      return null;
+                    }
+                  })
               }
             </MapView>
 
-            {
-              !_props.hideOverlay &&
+            {!_props.hideOverlay && (
               <>
-                <View style={{
-                  ...styles.mapOverlay,
-                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                  bottom: _props.isInDetailExcursion ? 20 : 0,
-                }}>
+                <View
+                  style={{
+                    ...styles.mapOverlay,
+                    ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
+                    bottom: _props.isInDetailExcursion ? 20 : 0,
+                  }}
+                >
                   {menuIsOpen && (
                     <>
                       <MapButton
@@ -529,11 +526,13 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                     iconColor={colors.palette.blanc}
                   />
                 </View>
-                <View style={{
-                  ...styles.mapOverlayLeft,
-                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                  bottom: _props.isInDetailExcursion ? 20 : 0,
-                }}>
+                <View
+                  style={{
+                    ...styles.mapOverlayLeft,
+                    ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
+                    bottom: _props.isInDetailExcursion ? 20 : 0,
+                  }}
+                >
                   <MapButton
                     ref={followLocationButtonRef}
                     style={{
@@ -543,26 +542,28 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                     icon="location-arrow"
                     iconSize={spacing.lg}
                     iconColor={
-                      followUserLocation ? colors.palette.bleuLocActive : colors.palette.bleuLocInactive
+                      followUserLocation
+                        ? colors.palette.bleuLocActive
+                        : colors.palette.bleuLocInactive
                     }
                   />
                 </View>
-                </>
-            }
+              </>
+            )}
           </>
         </View>
       </View>
     </Screen>
-  )
-})
+  );
+});
 
 const values = {
   locateBtnContainerSize: 50,
-}
+};
 
 const $container: ViewStyle = {
   display: "flex",
-}
+};
 
 const mapOverlayStyle: ViewStyle = {
   position: "absolute",
@@ -579,13 +580,13 @@ const mapOverlayStyle: ViewStyle = {
   padding: spacing.sm,
 
   zIndex: 1000,
-}
+};
 
 const mapOverlayStyleDebug: ViewStyle = {
   borderColor: colors.palette.vert,
   borderWidth: 4,
   borderRadius: 10,
-}
+};
 
 const buttonContainer = {
   height: values.locateBtnContainerSize,
@@ -599,7 +600,7 @@ const buttonContainer = {
   justifyContent: "center",
 
   pointerEvents: "auto",
-}
+};
 
 const styles = StyleSheet.create({
   actionsButtonContainer: {
@@ -648,4 +649,4 @@ const styles = StyleSheet.create({
     ...mapOverlayStyle,
     left: 0,
   },
-})
+});
