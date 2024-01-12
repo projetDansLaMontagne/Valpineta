@@ -80,7 +80,7 @@ type T_LanguageContent = {
   typeParcours: "Ida" | "Ida y Vuelta" | "Circular",
 }
 
-type T_Excursion = {
+export type TExcursion = {
   [key in T_Language]: T_LanguageContent;
 } & {
   denivele: string;
@@ -274,7 +274,7 @@ const signalementsHandler = (signalements: T_Signalement[]) => {
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props;
-    let excursion: T_Excursion;
+    let excursion: TExcursion;
     let params: any;
     if (route?.params !== undefined) {
       params = route?.params;
@@ -354,6 +354,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           allPoints && startPoint && (
             <MapScreen
               startLocation={startPoint}
+              isInDetailExcursion={true}
+              hideOverlay={false}
             >
               {
                 allPoints &&
@@ -362,7 +364,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                     coordinates={allPoints}
 
                     strokeColor={colors.bouton}
-                    strokeWidth={8}
+                    strokeWidth={5}
 
                   />
 
@@ -575,8 +577,8 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
                     description={signalement.description}
                     imageSignalement={signalement.image}
 
+
                     onPress={() => {
-                      console.log(`[DetailsExcursionScreen - listeSignalements] signalement: ${JSON.stringify(signalement)}`)
                       // go to the signalement on the map
                       // setIsAllSignalements(false);
                       changeStartPoint && changeStartPoint({
@@ -885,7 +887,7 @@ const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
-  backgroundColor: colors.erreur,
+  backgroundColor: colors.fond,
 };
 
 //Style de itemMini

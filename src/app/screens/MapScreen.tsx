@@ -3,7 +3,7 @@
  *
  * - startLocation: LatLng, si on veut centrer la carte sur une position au chargement,
  * si on met un state et que l'on change la valeur, la carte se recentre
- * - showOverlay: boolean, si on veut afficher les boutons de la carte.
+ * - hideOverlay: boolean, si on veut afficher les boutons de la carte.®
  */
 
 import React, { FC, useEffect, useRef, useState } from "react"
@@ -24,7 +24,7 @@ import { spacing, colors } from "../theme"
 
 // location
 import * as Location from "expo-location"
-import MapView, {LatLng, UrlTile} from "react-native-maps"
+import MapView, {LatLng, Polyline, UrlTile} from "react-native-maps"
 import MapButton from "../components/MapButton"
 import { Asset } from "expo-asset"
 
@@ -33,13 +33,19 @@ import TilesRequire from "../services/importAssets/tilesRequire"
 import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
 
 import fichierJson from "../../assets/Tiles/tiles_struct.json"
+import {TExcursion} from "./DetailsExcursionScreen";
 // variables
-interface MapScreenProps extends AppStackScreenProps<"Map"> {
+type MapScreenProps = AppStackScreenProps<"Map"> & {
   startLocation?: LatLng,
-  showOverlay?: boolean,
 
+  isInDetailExcursion?: boolean,
   children?: React.ReactNode
-}
+} & ({
+  hideOverlay: true
+} | {
+  hideOverlay: false
+  overlayDebugMode?: boolean
+})
 
 type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) => void
 
@@ -113,6 +119,15 @@ const createFolderStruct = async (
   }
 }
 
+/**
+ * Get all the tracks of the `src/assets/JSON/excursions.json` file.
+ *
+ * @returns {Promise<TExcursion[]>} The list of all the tracks
+ */
+const getAllTracks = (): TExcursion[] => {
+  return require("../../assets/JSON/excursions.json") as TExcursion[]
+}
+
 // Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
   // Variables
@@ -125,6 +140,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const [followUserLocation, setFollowUserLocation] = useState(false)
 
   const [menuIsOpen, setMenuIsOpen] = useState(false)
+
+  const [excursions, setExcursions] = useState<TExcursion[]>(undefined)
 
   // Ref(s)
   const intervalRef = useRef(null)
@@ -140,6 +157,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   // Animation(s)
   const buttonOpacity = useRef(new Animated.Value(0)).current
+
+  // Var(s)
+  const bottomTabBarHeight = useBottomTabBarHeight()
+
 
   // Method(s)
   /**
@@ -283,6 +304,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   // Effect(s)
   useEffect(() => {
+    console.log(bottomTabBarHeight);
+
     return () => {
       clearInterval(intervalRef.current)
     }
@@ -323,7 +346,20 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [followUserLocation])
 
   useEffect(() => {
+    if (excursions !== undefined && excursions.length > 0) {
+      console.log(`[MapScreen] excursions[]: ${JSON.stringify(excursions[0].track[0])}`);
+    }
+  }, [excursions]);
+
+  useEffect(() => {
     downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"))
+
+    if (!_props.isInDetailExcursion) {
+      getAllTracks()
+        .then((excursions) => {
+          setExcursions(excursions)
+        });
+    }
 
     return () => {
       removeLocationSubscription()
@@ -392,14 +428,43 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               {
                 _props.children
               }
+              {
+                // Oier voulait toutes les excursions sur la carte
+                // si on était pas dans la page détail excursion.
+                !_props.isInDetailExcursion &&
+                excursions !== undefined && excursions.length > 0 &&
+                excursions.map((excursion, index) => {
+                  if (excursion.track) {
+                    return (
+                      <Polyline
+                        key={index}
+                        coordinates={
+                          excursion.track.map((point) => {
+                            return {
+                              latitude: point.lat,
+                              longitude: point.lon,
+                            } as LatLng
+                          })
+                        }
+                        strokeColor={colors.palette.vert}
+                        strokeWidth={5}
+
+                      />
+                    )
+                  } else {
+                    return null
+                  }
+                })
+              }
             </MapView>
 
             {
-              _props.showOverlay &&
+              !_props.hideOverlay &&
               <>
                 <View style={{
                   ...styles.mapOverlay,
-                  bottom:useBottomTabBarHeight()
+                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
+                  bottom: _props.isInDetailExcursion ? bottomTabBarHeight : 0,
                 }}>
                   {menuIsOpen && (
                     <>
@@ -437,7 +502,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 </View>
                 <View style={{
                   ...styles.mapOverlayLeft,
-                  bottom: useBottomTabBarHeight()
+                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
+                  bottom: _props.isInDetailExcursion ? bottomTabBarHeight : 0,
                 }}>
                   <MapButton
                     ref={followLocationButtonRef}
@@ -475,11 +541,6 @@ const mapOverlayStyle: ViewStyle = {
 
   // height: "max-content",
   width: "20%",
-
-  borderColor: colors.palette.vert,
-  borderWidth: 4,
-  borderRadius: 10,
-
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -489,6 +550,12 @@ const mapOverlayStyle: ViewStyle = {
   padding: spacing.sm,
 
   zIndex: 1000,
+}
+
+const mapOverlayStyleDebug: ViewStyle = {
+  borderColor: colors.palette.vert,
+  borderWidth: 4,
+  borderRadius: 10,
 }
 
 const buttonContainer = {
