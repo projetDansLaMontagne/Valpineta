@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import { AppStackScreenProps, T_excursion, T_filtres, T_valeurs_filtres } from "app/navigators";
 import { Screen, CarteExcursion, Text } from "app/components";
@@ -222,10 +223,13 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
             parametres.langues === "fr" ? "Rechercher une excursion" : "Buscar una excursión"
           }
           autoCorrect={false}
-          onChangeText={text => setSaisieBarre(text)}
-          value={saisieBarre}
           placeholderTextColor={colors.palette.grisFonce}
           style={styles.barreRecherche}
+          onSubmitEditing={e => {
+            // Le timeout permet de laiser le temps au clavier de se fermer
+            const texteSaisi = e.nativeEvent.text;
+            setTimeout(() => setSaisieBarre(texteSaisi), 100);
+          }}
         />
         <TouchableOpacity
           onPress={() => props.navigation.navigate("Filtres")}
@@ -261,6 +265,7 @@ const $root: ViewStyle = {
 const styles = StyleSheet.create({
   scrollContainer: {
     marginBottom: 30,
+    height: "100%",
   },
   searchBox: {
     display: "flex",
