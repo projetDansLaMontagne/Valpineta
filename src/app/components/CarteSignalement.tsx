@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
 import { Text } from "app/components/Text";
@@ -17,6 +17,8 @@ export interface CarteSignalementProps {
   distanceDuDepart: string;
 
   imageSignalement?: Image;
+
+  onPress?: () => void;
 }
 
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
@@ -92,10 +94,10 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
   };
 
   return details ? ( // Si on veut les détails, on affiche l'image et la description
-    <View style={styles.carteGlobale}>
+    <TouchableOpacity style={styles.carteGlobale} onPress={props.onPress}>
       {entete(type, nomSignalement, distanceDuDepart)}
       <View style={styles.contenu}>{renderImageEtDescription()}</View>
-    </View>
+    </TouchableOpacity>
   ) : (
     <View style={styles.carteGlobale}>{entete(type, nomSignalement, distanceDuDepart)}</View>
   );
