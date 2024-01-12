@@ -234,7 +234,9 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
                 alt: null,
                 dist: null,
               };
-              const distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track) : 0;
+              const distanceSignalement = userLocation
+                ? recupDistance(coordSignalement, excursion.track)
+                : 0;
               const carteType =
                 signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
               return (
@@ -466,9 +468,9 @@ function calculeDistanceEntreDeuxPoints(coord1: T_point, coord2: T_point) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-    Math.cos(toRadians(coord2.lat)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos(toRadians(coord2.lat)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -483,7 +485,8 @@ function calculeDistanceEntreDeuxPoints(coord1: T_point, coord2: T_point) {
 function recupDistance(coordonneeSignalement: T_point, data: any) {
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
-    throw new Error("Coordonnées du signalement non valides");
+    console.error("Coordonnées du signalement non valides");
+    return 0;
   }
 
   // Initialiser la distance minimale avec une valeur élevée
