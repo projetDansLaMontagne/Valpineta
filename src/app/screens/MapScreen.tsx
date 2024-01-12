@@ -40,7 +40,7 @@ import fichierJson from "../../assets/Tiles/tiles_struct.json"
 import {TExcursion} from "./DetailsExcursionScreen";
 import {ImageSource} from "react-native-vector-icons/Icon";
 // variables
-type MapScreenProps = AppStackScreenProps<"Map"> & {
+type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng,
 
   isInDetailExcursion?: boolean,
@@ -309,8 +309,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   // Effect(s)
   useEffect(() => {
-    console.log(bottomTabBarHeight);
-
     return () => {
       clearInterval(intervalRef.current)
     }
@@ -387,8 +385,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }
 
   return (
-    <Screen style={$container}>
-      <SafeAreaView style={styles.container}>
+    <Screen style={$container} safeAreaEdges={["bottom"]}>
+      <View style={styles.container}>
         <View style={styles.mapContainer}>
           <>
             <MapView
@@ -495,7 +493,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 <View style={{
                   ...styles.mapOverlay,
                   ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                  bottom: _props.isInDetailExcursion ? bottomTabBarHeight : 0,
+                  bottom: _props.isInDetailExcursion ? 20 : 0,
                 }}>
                   {menuIsOpen && (
                     <>
@@ -534,7 +532,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 <View style={{
                   ...styles.mapOverlayLeft,
                   ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                  bottom: _props.isInDetailExcursion ? bottomTabBarHeight : 0,
+                  bottom: _props.isInDetailExcursion ? 20 : 0,
                 }}>
                   <MapButton
                     ref={followLocationButtonRef}
@@ -553,7 +551,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             }
           </>
         </View>
-      </SafeAreaView>
+      </View>
     </Screen>
   )
 })

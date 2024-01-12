@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
 } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps, T_point, T_signalement } from "app/navigators";
 import {
   Text,
   CarteAvis,
@@ -25,6 +25,7 @@ import {
 } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
+import HTML from "react-native-render-html";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import {LatLng, Marker, Polyline} from "react-native-maps";
@@ -32,10 +33,7 @@ import {ImageSource} from "react-native-vector-icons/Icon";
 import {MapScreen} from "./MapScreen";
 const { width, height } = Dimensions.get("window");
 
-interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {
-  excursion: Record<string, unknown>
-  temps: Record<"h" | "m", number>
-}
+interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
 
 export type T_Point = {
   lon: number,
@@ -274,12 +272,8 @@ const signalementsHandler = (signalements: T_Signalement[]) => {
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props;
-    let excursion: TExcursion;
-    let params: any;
-    if (route?.params !== undefined) {
-      params = route?.params;
-    }
-    params ? (excursion = params.excursion) : (excursion = null); // si params est défini, on récupère l'excursion, sinon on met excursion à null
+
+    let excursion = route.params?.excursion;
 
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
@@ -296,8 +290,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       } as LatLng))
 
     const changeStartPoint = (point: LatLng) => {
-      console.log(`[DetailsExcursionScreen - changeStartPoint] point: ${JSON.stringify(point)}`)
-
       setStartPoint(point);
     }
 
@@ -330,7 +322,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * lors du click sur un signalement
      */
       // if (swipeUpDownRef) {
-      //   console.log(`[DetailsExcursionScreen - useEffect] aled`);
+      //   r(`[DetailsExcursionScreen - useEffect] aled`);
       //   swipeUpDownRef.current.showMini();
       // } else {
       //   console.error("swipeUpDownRef.current is null");
@@ -409,7 +401,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     ) : (
       // sinon on affiche une erreur
       <Screen preset="fixed">
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.navigate("Excursions")}>
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
@@ -564,7 +556,9 @@ function listeSignalements(setIsAllSignalements, excursion, userLocation, footer
                 alt: null,
                 dist: null,
               };
-              const distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track) : 0;
+              const distanceSignalement = userLocation
+                ? recupDistance(coordSignalement, excursion.track)
+                : 0;
               const carteType =
                 signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
               return (
@@ -621,7 +615,7 @@ function infos(
   let difficulteOrientation: number = 0;
   let difficulteTechnique: number = 0;
   let description: string = "";
-  let signalements: Signalement[] = [];
+  let signalements: T_signalement[] = [];
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -639,7 +633,7 @@ function infos(
     difficulteTechnique = excursion.difficulteTechnique as number;
     difficulteOrientation = excursion.difficulteOrientation as number;
     description = excursion.description as string;
-    signalements = excursion.signalements as Signalement[];
+    signalements = excursion.signalements as T_signalement[];
   }
 
   return (
@@ -780,7 +774,7 @@ function avis() {
 }
 
 // Fonction de calcul de distance entre deux coordonnées
-function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees) {
+function calculeDistanceEntreDeuxPoints(coord1: T_point, coord2: T_point) {
   // Assurez-vous que coord1 et coord2 sont définis
   if (
     !coord1 ||
@@ -807,9 +801,9 @@ function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-    Math.cos(toRadians(coord2.lat)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos(toRadians(coord2.lat)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -821,16 +815,17 @@ function calculeDistanceEntreDeuxPoints(coord1: Coordonnees, coord2: Coordonnees
 }
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-function recupDistance(coordonneeSignalement: Coordonnees, data: any) {
+function recupDistance(coordonneeSignalement: T_point, data: any) {
   // Assurez-vous que les coordonnées du signalement sont définies
   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
-    throw new Error("Coordonnées du signalement non valides");
+    console.error("Coordonnées du signalement non valides");
+    return 0;
   }
 
   // Initialiser la distance minimale avec une valeur élevée
   let distanceMinimale: number = Number.MAX_VALUE;
 
-  let coordPointPlusProche: Coordonnees;
+  let coordPointPlusProche: T_point;
 
   // Parcourir toutes les coordonnées dans le fichier
   for (const coord of data) {
@@ -887,7 +882,7 @@ const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
-  backgroundColor: colors.fond,
+  backgroundColor: colors.erreur,
 };
 
 //Style de itemMini

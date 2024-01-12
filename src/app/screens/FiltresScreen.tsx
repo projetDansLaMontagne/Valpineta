@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState } from "react";
 import {
   Image,
   ImageStyle,
@@ -13,7 +13,7 @@ import Slider from "react-native-a11y-slider";
 import { observer } from "mobx-react-lite";
 
 import { Text, Button, Screen } from "app/components";
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps, T_valeurs_filtres } from "app/navigators";
 import { colors, spacing } from "../theme";
 import { useStores } from "../models";
 import { types } from "mobx-state-tree";
@@ -28,11 +28,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
   const { navigation } = props;
   const { parametres } = useStores();
 
-  var valeursFiltres;
-
   // Assets
   const logoCheck = require("../../assets/icons/check_3x_vert.png");
-
   const logoDistance = require("../../assets/icons/distance.png");
   const logoDuree = require("../../assets/icons/time.png");
   const logoDenivele = require("../../assets/icons/denivele.png");
@@ -41,18 +38,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
 
   // -- CONSTANTES --
   // Recuperation des valeurs de filtres
-  try {
-    // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
-    valeursFiltres =
-      parametres.langues == "fr"
-        ? require("../../assets/JSON/valeurs_filtresFR.json")
-        : require("../../assets/JSON/valeurs_filtresES.json");
-  } catch (error) {
-    // Erreur critique si on n a pas les valeurs de filtres
-    navigation.navigate("Excursions");
-    console.error("Page des filtres necessite les filtres appliques en parametres");
-    return <></>;
-  }
+  var valeursFiltres: T_valeurs_filtres;
+
+  // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
+  valeursFiltres = require("../../assets/JSON/valeurs_filtres.json");
 
   const incrementDenivele = 200;
   const criteresTri =
@@ -71,6 +60,10 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           { nom: "Dificultad técnica", nomCle: "difficulteTechnique", logo: logoDiffTech },
           { nom: "Dificultad de orientación", nomCle: "difficulteOrientation", logo: logoDiffOri },
         ];
+  const nomsTypesParcours =
+    parametres.langues == "fr"
+      ? ["Aller simple", "Aller/retour", "Circuit"]
+      : ["Ida", "Ida y Vuelta", "Circular"];
 
   // -- USE STATES --
   // Tri / Filtres selectionnes
@@ -82,10 +75,11 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
     valeursFiltres.deniveleMax + incrementDenivele,
   ]);
   const [typesParcours, setTypesParcours] = useState(
-    valeursFiltres.nomTypesParcours.map(nomType => ({ nom: nomType, selectionne: true })),
+    nomsTypesParcours.map((nom, index) => ({ nom: nom, id: index, selectionne: true })),
   );
+
   const [vallees, setVallees] = useState(
-    valeursFiltres.nomVallees.map(nomVallee => ({ nom: nomVallee, selectionne: true })),
+    valeursFiltres.vallees.map(vallee => ({ nom: vallee, selectionne: true })),
   );
   const [difficultesTechniques, setDifficultesTechniques] = useState(
     [...Array(valeursFiltres.difficulteTechniqueMax)].map((trash, i) => ({
@@ -132,8 +126,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
       intervalleDuree: { min: intervalleDuree[0], max: intervalleDuree[1] },
       intervalleDenivele: { min: intervalleDenivele[0], max: intervalleDenivele[1] },
       // On retire les type de parcours non selectionnees
-      typesParcours: typesParcours
-        .map(type => (type.selectionne ? type.nom : null))
+      indexTypesParcours: typesParcours
+        .map(type => (type.selectionne ? type.id : null))
         .filter(type => type != null),
       // On retire les vallees non selectionnees
       vallees: vallees
@@ -152,15 +146,8 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
         )
         .filter(type => type != null),
     };
-    navigation.navigate("Excursions", { Filtres: filtres });
+    navigation.navigate("Excursions", { filtres });
   };
-
-  // USE EFFECTS
-  useEffect(() => {
-    setTypesParcours(
-      valeursFiltres.nomTypesParcours.map(nomType => ({ nom: nomType, selectionne: true })),
-    );
-  }, [valeursFiltres.nomTypesParcours]);
 
   return (
     <Screen preset="fixed" safeAreaEdges={["top"]} style={$container}>
@@ -286,13 +273,16 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
               style={difficulte.selectionne ? $difficulteSelectionnee : $difficulte}
               key={difficulte.niveau}
             >
-              {[...Array(difficulte.niveau)].map((trash, i) => (
-                <Image
-                  source={logoDiffTech}
-                  style={$imageDifficulte}
-                  key={(i + 1) * difficulte.niveau}
-                />
-              ))}
+              {
+                // On affiche le logo de difficulte autant de fois que le niveau de difficulte
+                [...Array(difficulte.niveau)].map((_, i) => (
+                  <Image
+                    source={logoDiffTech}
+                    style={$imageDifficulte}
+                    key={(i + 1) * difficulte.niveau}
+                  />
+                ))
+              }
             </TouchableOpacity>
           ))}
         </View>
