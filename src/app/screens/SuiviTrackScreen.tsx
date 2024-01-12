@@ -87,7 +87,7 @@ export const SuiviTrackScreen: FC<SuiviTrackScreenProps> = observer(
       fetchLocation();
     }, []);
 
-    return true ? (
+    return excursion ? (
       <SafeAreaView style={$container}>
         <TouchableOpacity
           style={$boutonRetour}
