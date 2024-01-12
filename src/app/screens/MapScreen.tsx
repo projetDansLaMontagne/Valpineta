@@ -355,10 +355,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"))
 
     if (!_props.isInDetailExcursion) {
-      getAllTracks()
-        .then((excursions) => {
-          setExcursions(excursions)
-        });
+      setExcursions(getAllTracks())
     }
 
     return () => {
