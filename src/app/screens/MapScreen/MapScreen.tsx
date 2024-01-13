@@ -20,19 +20,19 @@ import {
 } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { Screen } from "app/components";
-import { spacing, colors } from "../theme";
+import { spacing, colors } from "app/theme";
 
 // location
 import * as Location from "expo-location";
 import MapView, { LatLng, Marker, Polyline, UrlTile } from "react-native-maps";
-import MapButton from "../components/MapButton";
+import MapButton from "./MapButton";
 import { Asset } from "expo-asset";
 
 import * as fileSystem from "expo-file-system";
-import TilesRequire from "../services/importAssets/tilesRequire";
+import TilesRequire from "app/services/importAssets/tilesRequire";
 
-import fichierJson from "../../assets/Tiles/tiles_struct.json";
-import { TExcursion } from "./DetailsExcursionScreen";
+import fichierJson from "assets/Tiles/tiles_struct.json";
+import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
