@@ -9,5 +9,4 @@ export * from "./TextField";
 export * from "./Toggle";
 export * from "./EmptyState";
 export * from "./GraphiqueDenivele";
-export * from "./GpxDownloader";
 export * from "./CarteSignalement";

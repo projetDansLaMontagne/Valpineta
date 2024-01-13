@@ -10,7 +10,8 @@ import {
   Dimensions,
 } from "react-native";
 import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
-import { Text, GpxDownloader, Screen } from "app/components";
+import { GpxDownloader } from "./GpxDownloader";
+import { Text, Screen } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
