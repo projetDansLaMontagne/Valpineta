@@ -1,8 +1,10 @@
 import { Button, CarteSignalement } from "app/components";
+import { T_Point } from "app/screens/DetailsExcursionScreen/";
 import { colors, spacing } from "app/theme";
 import { recupDistance } from "app/utils/recupDistance";
 import { observer } from "mobx-react-lite";
 import { Dimensions, ScrollView, TouchableWithoutFeedback, View, ViewStyle } from "react-native";
+import { LatLng } from "react-native-maps";
 
 /**
  * @params setIsAllSignalements, excursion, userLocation
@@ -13,6 +15,7 @@ export interface ListeSignalementsProps {
   excursion;
   userLocation;
   footerHeight;
+  setStartPoint?: React.Dispatch<React.SetStateAction<LatLng>>;
   style: ViewStyle;
 }
 
@@ -24,13 +27,17 @@ export function ListeSignalements(props: ListeSignalementsProps) {
           <View style={$containerSignalements}>
             {props?.excursion?.signalements?.map((signalement, index) => {
               // Calcule de la distance pour chaque avertissement
-              const coordSignalement = {
+              const coordSignalement: T_Point = {
                 lat: signalement.latitude,
                 lon: signalement.longitude,
-                alt: null,
-                dist: null,
+                /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
+                alt: 0,
+                dist: 0,
+                pos: 0,
               };
-              const distanceSignalement = props.userLocation ? recupDistance(coordSignalement) : 0;
+              const distanceSignalement = props.userLocation
+                ? recupDistance(coordSignalement, props.excursion.track)
+                : 0;
               const carteType =
                 signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
               return (
@@ -42,6 +49,15 @@ export function ListeSignalements(props: ListeSignalementsProps) {
                     distanceDuDepart={`${distanceSignalement}`}
                     description={signalement.description}
                     imageSignalement={signalement.image}
+                    onPress={() => {
+                      // go to the signalement on the map
+                      // setIsAllSignalements(false);
+                      props.setStartPoint &&
+                        props.setStartPoint({
+                          latitude: signalement.latitude,
+                          longitude: signalement.longitude,
+                        } as LatLng);
+                    }}
                   />
                 </View>
               );

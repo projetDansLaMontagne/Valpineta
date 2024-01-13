@@ -1,23 +1,20 @@
 /**@warning cette fonction n est pas utile. On peit acceder a cette distance en soustrayant la distance du point par la sienne  */
 
 // A SUPPRIMER : importation Coordonnees
-import { Coordonnees } from "../screens/DetailsExcursionScreen/DetailsExcursionScreen";
+import { T_Point } from "app/screens/DetailsExcursionScreen/";
 import { distanceEntrePoints } from "./distanceEntrePoints";
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-export const recupDistance = (point: Coordonnees) => {
-  // Charger le fichier JSON avec les coordonnées
-  const data: Coordonnees[] = require("../../assets/JSON/exemple_cruz_del_guardia.json");
-
-  // Assurez-vous que les coordonnées du signalement sont définies
+export const recupDistance = (point: T_Point, data: any) => {
   if (!point || !point.lat || !point.lon) {
-    throw new Error("Coordonnées du signalement non valides");
+    console.error("Coordonnées du signalement non valides");
+    return 0;
   }
 
   // Initialiser la distance minimale avec une valeur élevée
   let distanceMinimale: number = Number.MAX_VALUE;
 
-  let coordPointPlusProche: Coordonnees;
+  let coordPointPlusProche: T_Point;
 
   // Parcourir toutes les coordonnées dans le fichier
   for (const coord of data) {

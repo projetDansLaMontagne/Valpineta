@@ -14,11 +14,11 @@ import {
 } from "react-native";
 import { Text, GraphiqueDenivele } from "app/components";
 /**@warning A SUPPRIMER ET DECALER DANS APPNAVIGATOR : */
-import { T_Point } from "app/components/GraphiqueDenivele";
+import { T_Point } from "app/screens/DetailsExcursionScreen/";
 import { observer } from "mobx-react-lite";
 
 /**@warning SUPPRIMER CE TYPE et le mettre dans appNavigator */
-interface Signalement {
+interface TSignalement {
   type: string;
   nom: string;
   description: string;
@@ -27,25 +27,22 @@ interface Signalement {
   longitude: number;
 }
 
-
 export interface InfosExcursionProps {
-  excursion: Record<string, unknown>,
-  navigation: any,
-  setIsAllSignalements,
-  userLocation,
+  excursion: Record<string, unknown>;
+  navigation: any;
+  setIsAllSignalements;
+  userLocation;
 }
 
-export function InfosExcursion(
-  props: InfosExcursionProps,
-) {
+export function InfosExcursion(props: InfosExcursionProps) {
   const { excursion, navigation, setIsAllSignalements, userLocation } = props;
 
-  var duree: string = "";
-  var distance: string = "";
-  var difficulteOrientation: number = 0;
-  var difficulteTechnique: number = 0;
-  var description: string = "";
-  var signalements: Signalement[] = [];
+  let duree: string = "";
+  let distance: string = "";
+  let difficulteOrientation: number = 0;
+  let difficulteTechnique: number = 0;
+  let description: string = "";
+  let signalements: TSignalement[] = [];
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -63,7 +60,7 @@ export function InfosExcursion(
     difficulteTechnique = excursion.difficulteTechnique as number;
     difficulteOrientation = excursion.difficulteOrientation as number;
     description = excursion.description as string;
-    signalements = excursion.signalements as Signalement[];
+    signalements = excursion.signalements as TSignalement[];
   }
 
   /**
@@ -146,14 +143,16 @@ export function InfosExcursion(
                     <View style={$scrollLine}>
                       {signalements.map((signalement, index) => {
                         // Calculate the distance for each warning
-                        const coordSignalement = {
+                        const coordSignalement: T_Point = {
                           lat: signalement.latitude,
                           lon: signalement.longitude,
-                          alt: null,
-                          dist: null,
+                          /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
+                          alt: 0,
+                          dist: 0,
+                          pos: 0,
                         };
                         const distanceSignalement = userLocation
-                          ? recupDistance(coordSignalement)
+                          ? recupDistance(coordSignalement, props.excursion.track)
                           : 0;
                         const carteType =
                           signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
@@ -188,7 +187,7 @@ export function InfosExcursion(
       </TouchableWithoutFeedback>
     </ScrollView>
   );
-};
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                   STYLES                                   */

@@ -1,7 +1,8 @@
+import { T_Point } from "app/components";
 import { Coordonnees } from "../screens/DetailsExcursionScreen/DetailsExcursionScreen";
 
 // Fonction de calcul de distance entre deux coordonnées
-export const distanceEntrePoints = (coord1: Coordonnees, coord2: Coordonnees) => {
+export const distanceEntrePoints = (coord1: T_Point, coord2: T_Point) => {
   // Assurez-vous que coord1 et coord2 sont définis
   if (
     !coord1 ||
