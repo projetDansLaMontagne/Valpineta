@@ -1,6 +1,5 @@
 export * from "./AutoImage";
 export * from "./Button";
-export * from "./CarteExcursion";
 export * from "./Header";
 export * from "./Icon";
 export * from "./ListItem";

@@ -11,7 +11,8 @@ import {
   Keyboard,
 } from "react-native";
 import { AppStackScreenProps, T_excursion, TFiltres, T_valeurs_filtres } from "app/navigators";
-import { Screen, CarteExcursion, Text } from "app/components";
+import { Screen, Text } from "app/components";
+import { CarteExcursion } from "./CarteExcursion";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
 

@@ -3,9 +3,9 @@ import { Image, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
-import { colors, spacing } from "../theme";
-import { Text } from "./Text";
-import { GraphiqueDenivele } from "./GraphiqueDenivele";
+import { colors, spacing } from "app/theme";
+import { Text } from "app/components/Text";
+import { GraphiqueDenivele } from "app/components/GraphiqueDenivele";
 import { T_excursion } from "app/navigators";
 
 /**@warning L absence de parametre n est pas geree */
