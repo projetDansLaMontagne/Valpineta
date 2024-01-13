@@ -153,6 +153,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const mapRef = useRef<MapView>(null);
 
   // buttons
+  /**@warning la navigation doit se faire avec props.navigation avec Ignite */
   const followLocationButtonRef = useRef(null);
   const toggleBtnMenuRef = useRef(null);
   const addPOIBtnRef = useRef(null);

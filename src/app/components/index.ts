@@ -8,7 +8,6 @@ export * from "./Text";
 export * from "./TextField";
 export * from "./Toggle";
 export * from "./EmptyState";
-export * from "./CarteAvis";
 export * from "./GraphiqueDenivele";
 export * from "./GpxDownloader";
 export * from "./CarteSignalement";
