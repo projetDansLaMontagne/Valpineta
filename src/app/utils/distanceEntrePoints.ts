@@ -1,8 +1,9 @@
 import { T_Point } from "app/components";
 import { Coordonnees } from "../screens/DetailsExcursionScreen/DetailsExcursionScreen";
+import { TPoint, T_flat_point } from "app/navigators";
 
 // Fonction de calcul de distance entre deux coordonnées
-export const distanceEntrePoints = (coord1: T_Point, coord2: T_Point) => {
+export const distanceEntrePoints = (coord1: T_flat_point, coord2: T_flat_point) => {
   // Assurez-vous que coord1 et coord2 sont définis
   if (
     !coord1 ||
@@ -30,9 +31,9 @@ export const distanceEntrePoints = (coord1: T_Point, coord2: T_Point) => {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-      Math.cos(toRadians(coord2.lat)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRadians(coord2.lat)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));

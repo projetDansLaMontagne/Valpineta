@@ -51,11 +51,14 @@ export type T_valeurs_filtres = {
   difficulteTechniqueMax: number;
   difficulteOrientationMax: number;
 };
-export interface TPoint {
+
+export interface T_flat_point {
+  lat: number;
+  lon: number;
+}
+export interface TPoint extends T_flat_point {
   alt: number; // Altitude
   dist: number; // Distance par rapport au point de départ
-  lat: number; // Latitude
-  lon: number; // Longitude
   pos: number; // Denivele positif
 }
 export type TFiltres = {

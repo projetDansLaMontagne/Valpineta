@@ -13,13 +13,14 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from "react-native";
-import { Text, Screen, CarteSignalement, GraphiqueDenivele } from "app/components";
+import { Text, Screen, CarteSignalement, GraphiqueDenivele, T_Point } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { recupDistance } from "app/utils/recupDistance";
+import { TPoint, T_flat_point } from "app/navigators";
 const { width, height } = Dimensions.get("window");
 
-// Composants
 
 export interface SuiviTrackProps {
   excursion: Record<string, unknown>;
@@ -95,37 +96,8 @@ export function SuiviTrack(props: SuiviTrackProps) {
         />
       </TouchableOpacity>
       <SwipeUpDown
-        itemMini={item(
-          excursion,
-          progress,
-          setProgress,
-          chronoTime,
-          toggleChrono,
-          resetChrono,
-          formatTime,
-          chronoRunning,
-          deniveleMonte,
-          deniveleDescendu,
-          true,
-        )}
-        itemFull={item(
-          excursion,
-          progress,
-          setProgress,
-          chronoTime,
-          toggleChrono,
-          resetChrono,
-          formatTime,
-          chronoRunning,
-          deniveleMonte,
-          deniveleDescendu,
-          false,
-          altitudeActuelle,
-          userLocation,
-          containerInfoAffiche,
-          setcontainerInfoAffiche,
-          setDeniveleMonte,
-        )}
+        itemMini={item(true)}
+        itemFull={item(false)}
         animation="easeInEaseOut"
         swipeHeight={height / 5 + footerHeight}
         disableSwipeIcon={true}
@@ -143,219 +115,126 @@ export function SuiviTrack(props: SuiviTrackProps) {
       </View>
     </Screen>
   );
+
+  //Fonction principale
+  function item(isMini) {
+    const increaseProgress = () => {
+      if (progress < 100) { // 100 a remplacer par la valeur max de la barre de progression ( la distance totale de l'excursion)
+        setProgress(progress + 2); // Augmente la valeur de progression de 2 (à ajuster en fonction de la distance parcourue) 
+      }
+    };
+
+    let distance = 0;
+    if (excursion !== undefined) {
+      distance = excursion.distance as number;
+    }
+
+    return (
+      <View style={isMini ? $containerPetit : $containerGrand}>
+        <View style={$containerBoutonChrono}>
+          <TouchableOpacity onPress={() => { toggleChrono() }}>
+            <Image
+              style={$boutonPauseArret}
+              tintColor={colors.bouton}
+              source={chronoRunning ? require("../../assets/icons/pause.png") : require("../../assets/icons/play.png")} />
+          </TouchableOpacity>
+          {/* Bouton pour augmenter la progression temporaire avant de faire avec l'avancement localisé*/}
+          <TouchableOpacity style={$buttonIncreaseProgress} onPress={increaseProgress}>
+            <Image source={require("../../assets/icons/caretRight.png")} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { resetChrono() }}>
+            <Image style={$boutonPauseArret} source={require("../../assets/icons/arret.png")} />
+          </TouchableOpacity>
+        </View>
+        <View style={$listeDescription}>
+          <View style={$containerInfo}>
+            <Image style={$icone} source={require("../../assets/icons/duree.png")} />
+            <Text style={$texteInfo}>{formatTime(chronoTime)}</Text>
+          </View>
+          <View style={$containerInfo}>
+            <Image
+              style={$icone}
+              source={require("../../assets/icons/denivelePositifV2.png")}
+            />
+            <Text style={$texteInfo}> {deniveleMonte.toFixed()} m</Text>
+          </View>
+          <View style={$containerInfo}>
+            <Image style={$icone} source={require("../../assets/icons/deniveleNegatif.png")} />
+            <Text style={$texteInfo}> {deniveleDescendu.toFixed()} m</Text>
+          </View>
+        </View>
+        {/* Barre de progression */}
+        <View>
+          <View style={$containerProgress}>
+            <View style={$progressBar}>
+              <View style={{ ...$progressBarFill, width: `${progress}%` }} />
+            </View>
+            {/* Flèche d'avancement */}
+            <View style={{ ...$fleche, left: `${progress / 1.14}%` }}>
+              <Image style={$iconeFleche} source={require("../../assets/icons/fleche.png")} />
+            </View>
+          </View>
+        </View>
+        <View style={$listeDistances}>
+          <View style={$containerTextVariable}>
+            <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
+            <Text size="xs" weight="bold"> 0 km</Text>
+          </View>
+          <View style={$containerTextVariable}>
+            <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
+            <Text size="xs" weight="bold">{distance} km</Text>
+          </View>
+        </View>
+        {isMini ? null :
+          <View>
+            <View style={$containerBouton}>
+              <TouchableOpacity
+                onPress={() => {
+                  setcontainerInfoAffiche(true);
+                }}
+                style={$boutonDescriptionignalements}
+              >
+                <Text
+                  tx="suiviTrack.titres.description"
+                  size="lg"
+                  style={[containerInfoAffiche ? { color: colors.bouton, paddingLeft: spacing.lg } : { color: colors.text, paddingLeft: spacing.lg }]}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setcontainerInfoAffiche(false);
+                }}
+                style={$boutonDescriptionignalements}
+              >
+                <Text
+                  tx="suiviTrack.titres.signalements"
+                  size="lg"
+                  style={[containerInfoAffiche ? { color: colors.text, paddingEnd: spacing.lg } : { color: colors.bouton, paddingEnd: spacing.lg }]}
+                />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={[
+                $souligneDescriptionAvis,
+                containerInfoAffiche
+                  ? { left: spacing.lg }
+                  : { left: width / 2 },
+              ]}
+            ></View>
+            {containerInfoAffiche
+              ? descritpion(excursion, altitudeActuelle)
+              : listeSignalements(excursion, userLocation)}
+          </View>
+        }
+      </View >
+    );
+  }
 }
+
 
 /* --------------------------------- Fonctions --------------------------------- */
 
-function item(
-  excursion: Record<string, unknown>,
-  progress: number,
-  setProgress: any,
-  chronoTime: number,
-  toggleChrono: () => void,
-  resetChrono: () => void,
-  formatTime: (timeInSeconds: number) => string,
-  chronoRunning: boolean,
-  deniveleMonte: number,
-  deniveleDescendu: number,
-  isMini: boolean,
-  altitudeActuelle?,
-  userLocation?: any,
-  containerInfoAffiche?: boolean,
-  setcontainerInfoAffiche?: any,
-  setDeniveleMonte?,
-) {
-  const increaseProgress = () => {
-    if (progress < 100) {
-      // 100 a remplacer par la valeur max de la barre de progression ( la distance totale de l'excursion)
-      setProgress(progress + 2); // Augmente la valeur de progression de 2 (à ajuster en fonction de la distance parcourue)
-    }
-  };
-
-  let distance = 0;
-  if (excursion !== undefined) {
-    distance = excursion.distance as number;
-  }
-
-  return (
-    <View style={isMini ? $containerPetit : $containerGrand}>
-      <View style={$containerBoutonChrono}>
-        <TouchableOpacity
-          onPress={() => {
-            toggleChrono();
-          }}
-        >
-          <Image
-            style={$boutonPauseArret}
-            tintColor={colors.bouton}
-            source={
-              chronoRunning
-                ? require("../../assets/icons/pause.png")
-                : require("../../assets/icons/play.png")
-            }
-          />
-        </TouchableOpacity>
-        {/* Bouton pour augmenter la progression temporaire avant de faire avec l'avancement localisé*/}
-        <TouchableOpacity style={$buttonIncreaseProgress} onPress={increaseProgress}>
-          <Image source={require("../../assets/icons/caretRight.png")} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            resetChrono();
-          }}
-        >
-          <Image style={$boutonPauseArret} source={require("../../assets/icons/arret.png")} />
-        </TouchableOpacity>
-      </View>
-      <View style={$listeDescription}>
-        <View style={$containerInfo}>
-          <Image style={$icone} source={require("../../assets/icons/duree.png")} />
-          <Text style={$texteInfo}>{formatTime(chronoTime)}</Text>
-        </View>
-        <View style={$containerInfo}>
-          <Image style={$icone} source={require("../../assets/icons/denivelePositifV2.png")} />
-          <Text style={$texteInfo}> {deniveleMonte.toFixed()} m</Text>
-        </View>
-        <View style={$containerInfo}>
-          <Image style={$icone} source={require("../../assets/icons/deniveleNegatif.png")} />
-          <Text style={$texteInfo}> {deniveleDescendu.toFixed()} m</Text>
-        </View>
-      </View>
-      {/* Barre de progression */}
-      <View>
-        <View style={$containerProgress}>
-          <View style={$progressBar}>
-            <View style={{ ...$progressBarFill, width: `${progress}%` }} />
-          </View>
-          {/* Flèche d'avancement */}
-          <View style={{ ...$fleche, left: `${progress / 1.14}%` }}>
-            <Image style={$iconeFleche} source={require("../../assets/icons/fleche.png")} />
-          </View>
-        </View>
-      </View>
-      <View style={$listeDistances}>
-        <View style={$containerTextVariable}>
-          <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
-          <Text size="xs" weight="bold">
-            {" "}
-            0 km
-          </Text>
-        </View>
-        <View style={$containerTextVariable}>
-          <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
-          <Text size="xs" weight="bold">
-            {distance} km
-          </Text>
-        </View>
-      </View>
-      {isMini ? null : (
-        <View>
-          <View style={$containerBouton}>
-            <TouchableOpacity
-              onPress={() => {
-                setcontainerInfoAffiche(true);
-              }}
-              style={$boutonDescriptionignalements}
-            >
-              <Text
-                tx="suiviTrack.titres.description"
-                size="lg"
-                style={[
-                  containerInfoAffiche
-                    ? { color: colors.bouton, paddingLeft: spacing.lg }
-                    : { color: colors.text, paddingLeft: spacing.lg },
-                ]}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setcontainerInfoAffiche(false);
-              }}
-              style={$boutonDescriptionignalements}
-            >
-              <Text
-                tx="suiviTrack.titres.signalements"
-                size="lg"
-                style={[
-                  containerInfoAffiche
-                    ? { color: colors.text, paddingEnd: spacing.lg }
-                    : { color: colors.bouton, paddingEnd: spacing.lg },
-                ]}
-              />
-            </TouchableOpacity>
-          </View>
-          <View
-            style={[
-              $souligneDescriptionAvis,
-              containerInfoAffiche ? { left: spacing.lg } : { left: width / 2 },
-            ]}
-          ></View>
-          {containerInfoAffiche
-            ? descritpion(excursion, altitudeActuelle)
-            : listeSignalements(excursion, userLocation)}
-        </View>
-      )}
-    </View>
-  );
-}
-
-// Fonction pour obtenir la localisation
-async function getUserLocation() {
-  try {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.error("Permission d'accès à la localisation refusée");
-      return null;
-    }
-
-    const location = await Location.getCurrentPositionAsync({});
-    return location.coords;
-  } catch (error) {
-    console.error("Erreur lors de la récupération de la position", error);
-    throw error;
-  }
-}
-
-// Fonction pour effectuer les actions sur les useStates
-function handleLocationUpdate(
-  nouvelleAltitude,
-  altitudePrecedente,
-  setAltitudeActuelle,
-  setDeniveleMonte,
-  deniveleMonte,
-  setDeniveleDescendu,
-  deniveleDescendu,
-) {
-  setAltitudeActuelle(nouvelleAltitude);
-
-  // Mettre à jour deniveleMonte et deniveleDescendu en fonction de l'altitude
-  if (altitudePrecedente !== 0) {
-    if (nouvelleAltitude > altitudePrecedente) {
-      setDeniveleMonte(
-        prevDeniveleMonte => prevDeniveleMonte + (nouvelleAltitude - altitudePrecedente),
-      );
-    } else if (nouvelleAltitude < altitudePrecedente) {
-      setDeniveleDescendu(
-        prevDeniveleDescendu => prevDeniveleDescendu + (altitudePrecedente - nouvelleAltitude),
-      );
-    }
-  } else {
-    // Première mise à jour, pas de calcul de dénivelé
-    altitudePrecedente = nouvelleAltitude;
-  }
-
-  // Mettre à jour l'altitude précédente
-  altitudePrecedente = nouvelleAltitude;
-}
-
-// Fonction principale
-function getUserLocationAndUpdate(
-  setAltitudeActuelle,
-  setDeniveleMonte,
-  deniveleMonte,
-  setDeniveleDescendu,
-  deniveleDescendu,
-) {
+function getUserLocationAndUpdate(setAltitudeActuelle, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu) {
   return new Promise(async (resolve, reject) => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -510,16 +389,21 @@ function listeSignalements(excursion, userLocation) {
           <View style={$containerSignalements}>
             {excursion?.signalements?.map((signalement, index) => {
               // Calcule de la distance pour chaque avertissement
-              const coordSignalement = {
+              const coordSignalement: T_flat_point = {
                 lat: signalement.latitude,
                 lon: signalement.longitude,
-                alt: null,
-                dist: null,
               };
 
-              let distanceSignalement = userLocation
-                ? recupDistance(coordSignalement, excursion.track, userLocation)
-                : 0;
+              let distanceDepartPointLePlusProcheSignalement = recupDistance(coordSignalement, excursion.track);
+
+              let distanceDepartPointLePlusProcheUtilisateur = recupDistance(userLocation as T_flat_point, excursion.track);
+
+              let distanceSignalement = (distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
+
+              //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
+              // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProcheSignalement; //c'est donc pas vraiment ce calcul qu'il faut faire
+              // return distanceTotale;
+
               if (Number(distanceSignalement) < 0) {
                 distanceSignalement = "depassé                                    ";
               }
@@ -546,77 +430,75 @@ function listeSignalements(excursion, userLocation) {
   );
 }
 
-function recupDistance(coordonneeSignalement, data: any, userLocation) {
-  //on va devoir trouver le point le plus proche de nos coordonnées, puis on calcule la distance entre ce point et le signalement
-  const cooredonneesUtilsateur = {
-    lat: userLocation.latitude,
-    lon: userLocation.longitude,
-    alt: null,
-    dist: null,
-  };
 
-  // Assurez-vous que les coordonnées du signalement sont définies
-  if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
-    throw new Error("Coordonnées du signalement non valides");
-  }
 
-  // Initialiser la distance minimale avec une valeur élevée
-  let distanceMinimaleSignalement: number = Number.MAX_VALUE;
-  let distanceMinimaleUtilisateur: number = Number.MAX_VALUE;
+// function recupDistance(coordonneeSignalement, data: any, userLocation) {
+//   //on va devoir trouver le point le plus proche de nos coordonnées, puis on calcule la distance entre ce point et le signalement
+//   const cooredonneesUtilsateur = {
+//     lat: userLocation.latitude,
+//     lon: userLocation.longitude,
+//     alt: null,
+//     dist: null,
+//   };
 
-  let coordPointPlusProcheSignalement;
-  let coordPointPlusProcheUtilisateur;
+//   // Assurez-vous que les coordonnées du signalement sont définies
+//   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
+//     throw new Error("Coordonnées du signalement non valides");
+//   }
 
-  // Parcourir toutes les coordonnées dans le fichier
-  for (const coord of data) {
-    // Assurez-vous que les coordonnées dans le fichier sont définies
-    if (!coord.lat || !coord.lon) {
-      console.error("Coordonnées dans le fichier non valides");
-      continue;
-    }
+//   // Initialiser la distance minimale avec une valeur élevée
+//   let distanceMinimaleSignalement: number = Number.MAX_VALUE;
+//   let distanceMinimaleUtilisateur: number = Number.MAX_VALUE;
 
-    // Calculer la distance entre le signalement et la coordonnée actuelle du fichier
-    const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(
-      coordonneeSignalement,
-      coord,
-    ); //on ignore pour l'instant
+//   let coordPointPlusProcheSignalement;
+//   let coordPointPlusProcheUtilisateur;
 
-    // Mettre à jour la distance minimale si la distance actuelle est plus petite
-    if (distanceSignalementPointLePlusProche < distanceMinimaleSignalement) {
-      distanceMinimaleSignalement = distanceSignalementPointLePlusProche;
-      coordPointPlusProcheSignalement = coord;
-    }
+//   // Parcourir toutes les coordonnées dans le fichier
+//   for (const coord of data) {
+//     // Assurez-vous que les coordonnées dans le fichier sont définies
+//     if (!coord.lat || !coord.lon) {
+//       console.error("Coordonnées dans le fichier non valides");
+//       continue;
+//     }
 
-    //on fait la même chpse pour trouver le point le plus proche de l'utilisateur
-    // on trouve le point le plus proche de l'utilisateur
-    // on calcule la distance entre ce point et le point de départ en faisant coordPointPlusProche.dist
+//     // Calculer la distance entre le signalement et la coordonnée actuelle du fichier
+//     const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(
+//       coordonneeSignalement,
+//       coord,
+//     );  //on ignore pour l'instant 
 
-    const distanceUtilisateurPointLePlusProche = calculeDistanceEntreDeuxPoints(
-      cooredonneesUtilsateur,
-      coord,
-    );
+//     // Mettre à jour la distance minimale si la distance actuelle est plus petite
+//     if (distanceSignalementPointLePlusProche < distanceMinimaleSignalement) {
+//       distanceMinimaleSignalement = distanceSignalementPointLePlusProche;
+//       coordPointPlusProcheSignalement = coord;
+//     }
 
-    if (distanceUtilisateurPointLePlusProche < distanceMinimaleUtilisateur) {
-      distanceMinimaleUtilisateur = distanceUtilisateurPointLePlusProche;
-      coordPointPlusProcheUtilisateur = coord;
-    }
-  }
+//     //on fait la même chpse pour trouver le point le plus proche de l'utilisateur
+//     // on trouve le point le plus proche de l'utilisateur
+//     // on calcule la distance entre ce point et le point de départ en faisant coordPointPlusProche.dist
 
-  const distanceDepartPointLePlusProcheSignalement: number =
-    coordPointPlusProcheSignalement.dist / 1000; //distance entre le point de départ et le point le plus proche du signalement
+//     const distanceUtilisateurPointLePlusProche = calculeDistanceEntreDeuxPoints(
+//       cooredonneesUtilsateur,
+//       coord,
+//     );
 
-  const distanceDepartPointLePlusProcheUtilisateur: number =
-    coordPointPlusProcheUtilisateur.dist / 1000; //distance entre le point de départ et le point le plus proche de l'utilisateur
+//     if (distanceUtilisateurPointLePlusProche < distanceMinimaleUtilisateur) {
+//       distanceMinimaleUtilisateur = distanceUtilisateurPointLePlusProche;
+//       coordPointPlusProcheUtilisateur = coord;
+//     }
+//   }
 
-  const distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement = (
-    distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur
-  ).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
+//   const distanceDepartPointLePlusProcheSignalement: number = (coordPointPlusProcheSignalement.dist / 1000); //distance entre le point de départ et le point le plus proche du signalement
 
-  //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
-  // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProcheSignalement; //c'est donc pas vraiment ce calcul qu'il faut faire
-  // return distanceTotale;
-  return distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement;
-}
+//   const distanceDepartPointLePlusProcheUtilisateur: number = (coordPointPlusProcheUtilisateur.dist / 1000); //distance entre le point de départ et le point le plus proche de l'utilisateur
+
+//   const distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement = (distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
+
+//   //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
+//   // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProcheSignalement; //c'est donc pas vraiment ce calcul qu'il faut faire
+//   // return distanceTotale;
+//   return distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement;
+// }
 
 // Fonction de calcul de distance entre deux coordonnées
 function calculeDistanceEntreDeuxPoints(coord1, coord2) {
@@ -646,9 +528,9 @@ function calculeDistanceEntreDeuxPoints(coord1, coord2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-      Math.cos(toRadians(coord2.lat)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRadians(coord2.lat)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
