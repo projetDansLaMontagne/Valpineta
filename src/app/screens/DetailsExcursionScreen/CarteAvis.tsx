@@ -40,7 +40,7 @@ export const CarteAvis = observer(function CarteAvis(props: CarteAvisProps) {
             <Image
               style={$icon}
               key={index}
-              source={require("../../assets/icons/etoile_pleine.png")}
+              source={require("assets/icons/etoile_pleine.png")}
             />
           ))}
         {Array(etoilesVides)
@@ -49,7 +49,7 @@ export const CarteAvis = observer(function CarteAvis(props: CarteAvisProps) {
             <Image
               style={$icon}
               key={index}
-              source={require("../../assets/icons/etoile_vide.png")}
+              source={require("assets/icons/etoile_vide.png")}
             />
           ))}
       </View>

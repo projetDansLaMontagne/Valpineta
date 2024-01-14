@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
 import { LineChart } from "react-native-chart-kit";
 
-type T_Point = {
+export type T_Point = {
   lat: number;
   lon: number;
   alt: number;
