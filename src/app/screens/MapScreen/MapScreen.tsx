@@ -56,24 +56,6 @@ let COMPTEUR = 0;
 const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
 
 // Fonction(s)
-const copyFilesInBatch = async (filesToCopy, batchCount) => {
-  for (let i = 0; i < filesToCopy.length; i += batchCount) {
-    const batchFiles = filesToCopy.slice(i, i + batchCount);
-
-    // Copie des fichiers dans ce lot
-    await Promise.all(
-      batchFiles.map(async file => {
-        // Effectuer la copie du fichier ici avec FileSystem.copyAsync
-        // (Exemple: À adapter selon votre structure de fichier)
-        await fileSystem.copyAsync({
-          from: file.source,
-          to: file.destination,
-        });
-      }),
-    );
-  }
-};
-
 /**
  * Create the folder structure (recursively)
  *
@@ -99,21 +81,11 @@ const createFolderStruct = async (
 
         const assetsListUri = assetsList[COMPTEUR].localUri;
         COMPTEUR++;
-        // console.log(`downloaded ${COMPTEUR} files`)
 
-        // Copier les fichiers en lot en utilisant copyFilesInBatch
-        // Préparez la liste de fichiers à copier pour ce dossier
-        const filesToCopy = [
-          {
-            source: assetsListUri,
-            destination: `${folderDest}${fileFolder}/${fileName}`,
-          },
-          // ... autres fichiers à copier pour ce dossier
-        ];
-
-        // Copie par lot des fichiers
-        const batchCount = 10; // Nombre de fichiers par lot
-        await copyFilesInBatch(filesToCopy, batchCount);
+        await fileSystem.copyAsync({
+          from: assetsListUri,
+          to: `${folderDest}${fileFolder}/${fileName}`,
+        });
       } else {
         // Récursivement créer la structure des dossiers pour les sous-dossiers
         await createFolderStruct(folderStruct[folder], `${folderPath}/${folder}`, assetsList);
