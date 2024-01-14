@@ -21,13 +21,13 @@ const { width, height } = Dimensions.get("window");
 
 // Composants
 
-export interface SuiviTrackScreenProps {
+export interface SuiviTrackProps {
   excursion: Record<string, unknown>;
   navigation: any;
   setIsSuiviTrack: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function SuiviTrackScreen(props: SuiviTrackScreenProps) {
+export function SuiviTrack(props: SuiviTrackProps) {
   const { excursion, navigation } = props;
 
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
@@ -41,15 +41,14 @@ export function SuiviTrackScreen(props: SuiviTrackScreenProps) {
   const [chronoRunning, setChronoRunning] = useState(false);
   const [chronoTime, setChronoTime] = useState(0);
 
-
   function toggleChrono() {
     setChronoRunning(!chronoRunning);
-  };
+  }
 
   function resetChrono() {
     setChronoRunning(false);
     setChronoTime(0);
-  };
+  }
 
   function formatTime(timeInSeconds: number) {
     const hours = Math.floor(timeInSeconds / 3600);
@@ -57,14 +56,14 @@ export function SuiviTrackScreen(props: SuiviTrackScreenProps) {
     const seconds = timeInSeconds % 60;
     const format = (num: number) => (num < 10 ? `0${num}` : `${num}`);
     return `${format(hours)}:${format(minutes)}:${format(seconds)}`;
-  };
+  }
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
     if (chronoRunning) {
       interval = setInterval(() => {
-        setChronoTime((prevTime) => prevTime + 1);
+        setChronoTime(prevTime => prevTime + 1);
       }, 1000);
     } else {
       clearInterval(interval);
@@ -74,7 +73,13 @@ export function SuiviTrackScreen(props: SuiviTrackScreenProps) {
 
   useEffect(() => {
     const fetchLocation = async () => {
-      const location = await getUserLocationAndUpdate(setAltitudeActuelle, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu);
+      const location = await getUserLocationAndUpdate(
+        setAltitudeActuelle,
+        setDeniveleMonte,
+        deniveleMonte,
+        setDeniveleDescendu,
+        deniveleDescendu,
+      );
       setUserLocation(location);
     };
 
@@ -83,18 +88,44 @@ export function SuiviTrackScreen(props: SuiviTrackScreenProps) {
 
   return excursion ? (
     <SafeAreaView style={$container}>
-      <TouchableOpacity
-        style={$boutonRetour}
-        onPress={() => props.setIsSuiviTrack(false)}
-      >
+      <TouchableOpacity style={$boutonRetour} onPress={() => props.setIsSuiviTrack(false)}>
         <Image
           style={{ tintColor: colors.bouton }}
           source={require("../../assets/icons/back.png")}
         />
       </TouchableOpacity>
       <SwipeUpDown
-        itemMini={item(excursion, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, deniveleMonte, deniveleDescendu, true)}
-        itemFull={item(excursion, progress, setProgress, chronoTime, toggleChrono, resetChrono, formatTime, chronoRunning, deniveleMonte, deniveleDescendu, false, altitudeActuelle, userLocation, containerInfoAffiche, setcontainerInfoAffiche, setDeniveleMonte)}
+        itemMini={item(
+          excursion,
+          progress,
+          setProgress,
+          chronoTime,
+          toggleChrono,
+          resetChrono,
+          formatTime,
+          chronoRunning,
+          deniveleMonte,
+          deniveleDescendu,
+          true,
+        )}
+        itemFull={item(
+          excursion,
+          progress,
+          setProgress,
+          chronoTime,
+          toggleChrono,
+          resetChrono,
+          formatTime,
+          chronoRunning,
+          deniveleMonte,
+          deniveleDescendu,
+          false,
+          altitudeActuelle,
+          userLocation,
+          containerInfoAffiche,
+          setcontainerInfoAffiche,
+          setDeniveleMonte,
+        )}
         animation="easeInEaseOut"
         swipeHeight={height / 5 + footerHeight}
         disableSwipeIcon={true}
@@ -114,13 +145,30 @@ export function SuiviTrackScreen(props: SuiviTrackScreenProps) {
   );
 }
 
-
 /* --------------------------------- Fonctions --------------------------------- */
 
-function item(excursion: Record<string, unknown>, progress: number, setProgress: any, chronoTime: number, toggleChrono: () => void, resetChrono: () => void, formatTime: (timeInSeconds: number) => string, chronoRunning: boolean, deniveleMonte: number, deniveleDescendu: number, isMini: boolean, altitudeActuelle?, userLocation?: any, containerInfoAffiche?: boolean, setcontainerInfoAffiche?: any, setDeniveleMonte?) {
+function item(
+  excursion: Record<string, unknown>,
+  progress: number,
+  setProgress: any,
+  chronoTime: number,
+  toggleChrono: () => void,
+  resetChrono: () => void,
+  formatTime: (timeInSeconds: number) => string,
+  chronoRunning: boolean,
+  deniveleMonte: number,
+  deniveleDescendu: number,
+  isMini: boolean,
+  altitudeActuelle?,
+  userLocation?: any,
+  containerInfoAffiche?: boolean,
+  setcontainerInfoAffiche?: any,
+  setDeniveleMonte?,
+) {
   const increaseProgress = () => {
-    if (progress < 100) { // 100 a remplacer par la valeur max de la barre de progression ( la distance totale de l'excursion)
-      setProgress(progress + 2); // Augmente la valeur de progression de 2 (à ajuster en fonction de la distance parcourue) 
+    if (progress < 100) {
+      // 100 a remplacer par la valeur max de la barre de progression ( la distance totale de l'excursion)
+      setProgress(progress + 2); // Augmente la valeur de progression de 2 (à ajuster en fonction de la distance parcourue)
     }
   };
 
@@ -132,17 +180,30 @@ function item(excursion: Record<string, unknown>, progress: number, setProgress:
   return (
     <View style={isMini ? $containerPetit : $containerGrand}>
       <View style={$containerBoutonChrono}>
-        <TouchableOpacity onPress={() => { toggleChrono() }}>
+        <TouchableOpacity
+          onPress={() => {
+            toggleChrono();
+          }}
+        >
           <Image
             style={$boutonPauseArret}
             tintColor={colors.bouton}
-            source={chronoRunning ? require("../../assets/icons/pause.png") : require("../../assets/icons/play.png")} />
+            source={
+              chronoRunning
+                ? require("../../assets/icons/pause.png")
+                : require("../../assets/icons/play.png")
+            }
+          />
         </TouchableOpacity>
         {/* Bouton pour augmenter la progression temporaire avant de faire avec l'avancement localisé*/}
         <TouchableOpacity style={$buttonIncreaseProgress} onPress={increaseProgress}>
           <Image source={require("../../assets/icons/caretRight.png")} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { resetChrono() }}>
+        <TouchableOpacity
+          onPress={() => {
+            resetChrono();
+          }}
+        >
           <Image style={$boutonPauseArret} source={require("../../assets/icons/arret.png")} />
         </TouchableOpacity>
       </View>
@@ -152,10 +213,7 @@ function item(excursion: Record<string, unknown>, progress: number, setProgress:
           <Text style={$texteInfo}>{formatTime(chronoTime)}</Text>
         </View>
         <View style={$containerInfo}>
-          <Image
-            style={$icone}
-            source={require("../../assets/icons/denivelePositifV2.png")}
-          />
+          <Image style={$icone} source={require("../../assets/icons/denivelePositifV2.png")} />
           <Text style={$texteInfo}> {deniveleMonte.toFixed()} m</Text>
         </View>
         <View style={$containerInfo}>
@@ -178,14 +236,19 @@ function item(excursion: Record<string, unknown>, progress: number, setProgress:
       <View style={$listeDistances}>
         <View style={$containerTextVariable}>
           <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
-          <Text size="xs" weight="bold"> 0 km</Text>
+          <Text size="xs" weight="bold">
+            {" "}
+            0 km
+          </Text>
         </View>
         <View style={$containerTextVariable}>
           <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
-          <Text size="xs" weight="bold">{distance} km</Text>
+          <Text size="xs" weight="bold">
+            {distance} km
+          </Text>
         </View>
       </View>
-      {isMini ? null :
+      {isMini ? null : (
         <View>
           <View style={$containerBouton}>
             <TouchableOpacity
@@ -197,7 +260,11 @@ function item(excursion: Record<string, unknown>, progress: number, setProgress:
               <Text
                 tx="suiviTrack.titres.description"
                 size="lg"
-                style={[containerInfoAffiche ? { color: colors.bouton, paddingLeft: spacing.lg } : { color: colors.text, paddingLeft: spacing.lg }]}
+                style={[
+                  containerInfoAffiche
+                    ? { color: colors.bouton, paddingLeft: spacing.lg }
+                    : { color: colors.text, paddingLeft: spacing.lg },
+                ]}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -209,24 +276,26 @@ function item(excursion: Record<string, unknown>, progress: number, setProgress:
               <Text
                 tx="suiviTrack.titres.signalements"
                 size="lg"
-                style={[containerInfoAffiche ? { color: colors.text, paddingEnd: spacing.lg } : { color: colors.bouton, paddingEnd: spacing.lg }]}
+                style={[
+                  containerInfoAffiche
+                    ? { color: colors.text, paddingEnd: spacing.lg }
+                    : { color: colors.bouton, paddingEnd: spacing.lg },
+                ]}
               />
             </TouchableOpacity>
           </View>
           <View
             style={[
               $souligneDescriptionAvis,
-              containerInfoAffiche
-                ? { left: spacing.lg }
-                : { left: width / 2 },
+              containerInfoAffiche ? { left: spacing.lg } : { left: width / 2 },
             ]}
           ></View>
           {containerInfoAffiche
             ? descritpion(excursion, altitudeActuelle)
             : listeSignalements(excursion, userLocation)}
         </View>
-      }
-    </View >
+      )}
+    </View>
   );
 }
 
@@ -255,16 +324,20 @@ function handleLocationUpdate(
   setDeniveleMonte,
   deniveleMonte,
   setDeniveleDescendu,
-  deniveleDescendu
+  deniveleDescendu,
 ) {
   setAltitudeActuelle(nouvelleAltitude);
 
   // Mettre à jour deniveleMonte et deniveleDescendu en fonction de l'altitude
   if (altitudePrecedente !== 0) {
     if (nouvelleAltitude > altitudePrecedente) {
-      setDeniveleMonte((prevDeniveleMonte) => prevDeniveleMonte + (nouvelleAltitude - altitudePrecedente));
+      setDeniveleMonte(
+        prevDeniveleMonte => prevDeniveleMonte + (nouvelleAltitude - altitudePrecedente),
+      );
     } else if (nouvelleAltitude < altitudePrecedente) {
-      setDeniveleDescendu((prevDeniveleDescendu) => prevDeniveleDescendu + (altitudePrecedente - nouvelleAltitude));
+      setDeniveleDescendu(
+        prevDeniveleDescendu => prevDeniveleDescendu + (altitudePrecedente - nouvelleAltitude),
+      );
     }
   } else {
     // Première mise à jour, pas de calcul de dénivelé
@@ -276,7 +349,13 @@ function handleLocationUpdate(
 }
 
 // Fonction principale
-function getUserLocationAndUpdate(setAltitudeActuelle, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu) {
+function getUserLocationAndUpdate(
+  setAltitudeActuelle,
+  setDeniveleMonte,
+  deniveleMonte,
+  setDeniveleDescendu,
+  deniveleDescendu,
+) {
   return new Promise(async (resolve, reject) => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -308,8 +387,7 @@ function getUserLocationAndUpdate(setAltitudeActuelle, setDeniveleMonte, denivel
             } else if (nouvelleAltitude < altitudePrecedente) {
               deniveleDescendu = deniveleDescendu + (altitudePrecedente - nouvelleAltitude);
             }
-          }
-          else {
+          } else {
             altitudePrecedente = nouvelleAltitude;
           }
 
@@ -332,15 +410,13 @@ function getUserLocationAndUpdate(setAltitudeActuelle, setDeniveleMonte, denivel
   });
 }
 
-
-
 function descritpion(excursion, altitudeActuelle) {
   let track = excursion.track;
   let altitudeMax = 0;
   let altitudeMin = Infinity;
 
   if (track !== undefined) {
-    track.forEach((element) => {
+    track.forEach(element => {
       if (element.alt > altitudeMax) {
         altitudeMax = element.alt;
       }
@@ -351,7 +427,9 @@ function descritpion(excursion, altitudeActuelle) {
   }
   return (
     <View style={$containerDescription}>
-      <Text weight="bold" style={$nomExcursion}>{excursion.nom}</Text>
+      <Text weight="bold" style={$nomExcursion}>
+        {excursion.nom}
+      </Text>
       <View style={$typeParcours}>
         <Text size="xs" tx="suiviTrack.description.typeParcours" />
         <Text size="xs">{excursion.typeParcours}</Text>
@@ -362,30 +440,38 @@ function descritpion(excursion, altitudeActuelle) {
             <Image style={$iconDescription} source={require("../../assets/icons/distance.png")} />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.distance" />
-              <Text style={$texteDescription} >{excursion.distance} km</Text>
+              <Text style={$texteDescription}>{excursion.distance} km</Text>
             </View>
           </View>
           <View style={$blocInfo}>
             <Image style={$iconDescription} source={require("../../assets/icons/duree.png")} />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.duree" />
-              <Text style={$texteDescription} >{excursion.duree.h}h{excursion.duree.m}</Text>
+              <Text style={$texteDescription}>
+                {excursion.duree.h}h{excursion.duree.m}
+              </Text>
             </View>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: "space-around" }}>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-around" }}>
           <View style={$blocInfo}>
-            <Image style={$iconDescription} source={require("../../assets/icons/difficulteTechnique.png")} />
+            <Image
+              style={$iconDescription}
+              source={require("../../assets/icons/difficulteTechnique.png")}
+            />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.difficulteTech" />
-              <Text style={$texteDescription} >{excursion.difficulteTechnique}/3</Text>
+              <Text style={$texteDescription}>{excursion.difficulteTechnique}/3</Text>
             </View>
           </View>
           <View style={$blocInfo}>
-            <Image style={$iconDescription} source={require("../../assets/icons/difficulteOrientation.png")} />
+            <Image
+              style={$iconDescription}
+              source={require("../../assets/icons/difficulteOrientation.png")}
+            />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.difficulteOrientation" />
-              <Text style={$texteDescription} >{excursion.difficulteOrientation}/3</Text>
+              <Text style={$texteDescription}>{excursion.difficulteOrientation}/3</Text>
             </View>
           </View>
         </View>
@@ -393,7 +479,9 @@ function descritpion(excursion, altitudeActuelle) {
       <View style={$containerDenivele}>
         <View>
           <Text style={$texteDenivele} weight="bold" tx="suiviTrack.description.denivele" />
-          {excursion.track && <GraphiqueDenivele points={excursion.track} detaille={false} largeur={width / 1.5} />}
+          {excursion.track && (
+            <GraphiqueDenivele points={excursion.track} detaille={false} largeur={width / 1.5} />
+          )}
         </View>
         <View style={$listeAltitudes}>
           <View style={$blocAltitude}>
@@ -410,8 +498,8 @@ function descritpion(excursion, altitudeActuelle) {
           </View>
         </View>
       </View>
-    </View >
-  )
+    </View>
+  );
 }
 
 function listeSignalements(excursion, userLocation) {
@@ -429,9 +517,11 @@ function listeSignalements(excursion, userLocation) {
                 dist: null,
               };
 
-              let distanceSignalement = userLocation ? recupDistance(coordSignalement, excursion.track, userLocation) : 0;
+              let distanceSignalement = userLocation
+                ? recupDistance(coordSignalement, excursion.track, userLocation)
+                : 0;
               if (Number(distanceSignalement) < 0) {
-                distanceSignalement = "depassé                                    "
+                distanceSignalement = "depassé                                    ";
               }
 
               const carteType =
@@ -452,7 +542,7 @@ function listeSignalements(excursion, userLocation) {
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
-    </View >
+    </View>
   );
 }
 
@@ -489,7 +579,7 @@ function recupDistance(coordonneeSignalement, data: any, userLocation) {
     const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(
       coordonneeSignalement,
       coord,
-    );  //on ignore pour l'instant 
+    ); //on ignore pour l'instant
 
     // Mettre à jour la distance minimale si la distance actuelle est plus petite
     if (distanceSignalementPointLePlusProche < distanceMinimaleSignalement) {
@@ -512,11 +602,15 @@ function recupDistance(coordonneeSignalement, data: any, userLocation) {
     }
   }
 
-  const distanceDepartPointLePlusProcheSignalement: number = (coordPointPlusProcheSignalement.dist / 1000); //distance entre le point de départ et le point le plus proche du signalement
+  const distanceDepartPointLePlusProcheSignalement: number =
+    coordPointPlusProcheSignalement.dist / 1000; //distance entre le point de départ et le point le plus proche du signalement
 
-  const distanceDepartPointLePlusProcheUtilisateur: number = (coordPointPlusProcheUtilisateur.dist / 1000); //distance entre le point de départ et le point le plus proche de l'utilisateur
+  const distanceDepartPointLePlusProcheUtilisateur: number =
+    coordPointPlusProcheUtilisateur.dist / 1000; //distance entre le point de départ et le point le plus proche de l'utilisateur
 
-  const distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement = (distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
+  const distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement = (
+    distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur
+  ).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
 
   //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
   // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProcheSignalement; //c'est donc pas vraiment ce calcul qu'il faut faire
@@ -552,9 +646,9 @@ function calculeDistanceEntreDeuxPoints(coord1, coord2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-    Math.cos(toRadians(coord2.lat)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos(toRadians(coord2.lat)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -597,7 +691,6 @@ const $containerPetit: ViewStyle = {
   paddingTop: spacing.md,
 };
 
-
 const $containerGrand: ViewStyle = {
   flex: 1,
   width: width,
@@ -607,7 +700,7 @@ const $containerGrand: ViewStyle = {
   borderRadius: 10,
   marginTop: height / 4.5,
   paddingTop: spacing.md,
-  height: height
+  height: height,
 };
 
 const $containerInfo: ViewStyle = {
@@ -758,14 +851,14 @@ const $iconDescription: ImageStyle = {
   width: 25,
   height: 25,
   // tintColor: colors.palette.vert,
-  marginEnd: spacing.xs
+  marginEnd: spacing.xs,
 };
 
 const $listeInfos: ViewStyle = {
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: "space-around"
-}
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-around",
+};
 
 const $blocInfo: ViewStyle = {
   flexDirection: "row",
@@ -793,7 +886,7 @@ const $texteDenivele: TextStyle = {
   fontSize: spacing.md,
   lineHeight: 16,
   textAlign: "center",
-  paddingStart: spacing.xxl
+  paddingStart: spacing.xxl,
 };
 
 const $listeAltitudes: ViewStyle = {
