@@ -109,6 +109,7 @@ type CarteStackParamList = {
   Carte: undefined;
   DetailsExcursion: undefined | { excursion: T_excursion };
   Description: { excursion: T_excursion };
+  SuiviTrack: { excursion: T_excursion };
 };
 
 type ParametresStackParamList = {
@@ -233,6 +234,7 @@ const CarteStackScreen = () => (
     <CarteStack.Screen name="Carte" component={Screens.MapScreen} />
     <CarteStack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
     <CarteStack.Screen name="Description" component={Screens.DescriptionScreen} />
+    <CarteStack.Screen name="SuiviTrack" component={Screens.SuiviTrackScreen} />
   </CarteStack.Navigator>
 );
 

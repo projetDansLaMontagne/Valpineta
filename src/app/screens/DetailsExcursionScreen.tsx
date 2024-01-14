@@ -292,6 +292,13 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           />
         </TouchableOpacity>
 
+        <TouchableOpacity style={$boutonSuivi} onPress={() => navigation.navigate("SuiviTrack", { excursion })}>
+          <Image
+            style={{ tintColor: colors.bouton }}
+            source={require("../../assets/icons/back.png")}
+          />
+        </TouchableOpacity>
+
         {
           allPoints && startPoint && (
             <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
