@@ -128,7 +128,7 @@ const createFolderStruct = async (
  * @returns {Promise<TExcursion[]>} The list of all the tracks
  */
 const getAllTracks = (): TExcursion[] => {
-  return require("../../assets/JSON/excursions.json") as TExcursion[];
+  return require("assets/JSON/excursions.json") as TExcursion[];
 };
 
 // Component(s)
@@ -373,7 +373,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-  const image: ImageSource = require("../../assets/icons/location.png");
+  const image: ImageSource = require("assets/icons/location.png");
 
   return (
     <Screen style={$container} safeAreaEdges={["bottom"]}>

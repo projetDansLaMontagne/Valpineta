@@ -38,13 +38,13 @@ export function CarteExcursion(props: CarteExcursionProps) {
     track = props.excursion.track;
   }
 
-  const valleeIcone = require("../../assets/icons/zone.png");
-  const typeParcoursIcone = require("../../assets/icons/parcours.png");
-  const dureeIcone = require("../../assets/icons/duree.png");
-  const distanceIcone = require("../../assets/icons/distance.png");
-  const deniveleIcone = require("../../assets/icons/denivele.png");
-  const difficulteTechniqueIcone = require("../../assets/icons/difficulteTechnique.png");
-  const difficulteOrientationIcone = require("../../assets/icons/difficulteOrientation.png");
+  const valleeIcone = require("assets/icons/zone.png");
+  const typeParcoursIcone = require("assets/icons/parcours.png");
+  const dureeIcone = require("assets/icons/duree.png");
+  const distanceIcone = require("assets/icons/distance.png");
+  const deniveleIcone = require("assets/icons/denivele.png");
+  const difficulteTechniqueIcone = require("assets/icons/difficulteTechnique.png");
+  const difficulteOrientationIcone = require("assets/icons/difficulteOrientation.png");
 
   const styles = StyleSheet.create({
     carteGlobale: {
