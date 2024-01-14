@@ -20,19 +20,19 @@ import {
 } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { Screen } from "app/components";
-import { spacing, colors } from "../theme";
+import { spacing, colors } from "app/theme";
 
 // location
 import * as Location from "expo-location";
 import MapView, { LatLng, Marker, Polyline, UrlTile } from "react-native-maps";
-import MapButton from "../components/MapButton";
+import MapButton from "./MapButton";
 import { Asset } from "expo-asset";
 
 import * as fileSystem from "expo-file-system";
-import TilesRequire from "../services/importAssets/tilesRequire";
+import TilesRequire from "app/services/importAssets/tilesRequire";
 
-import fichierJson from "../../assets/Tiles/tiles_struct.json";
-import { TExcursion } from "./DetailsExcursionScreen";
+import fichierJson from "assets/Tiles/tiles_struct.json";
+import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
@@ -128,7 +128,7 @@ const createFolderStruct = async (
  * @returns {Promise<TExcursion[]>} The list of all the tracks
  */
 const getAllTracks = (): TExcursion[] => {
-  return require("../../assets/JSON/excursions.json") as TExcursion[];
+  return require("assets/JSON/excursions.json") as TExcursion[];
 };
 
 // Component(s)
@@ -153,6 +153,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const mapRef = useRef<MapView>(null);
 
   // buttons
+  /**@warning la navigation doit se faire avec props.navigation avec Ignite */
   const followLocationButtonRef = useRef(null);
   const toggleBtnMenuRef = useRef(null);
   const addPOIBtnRef = useRef(null);
@@ -372,7 +373,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-  const image: ImageSource = require("../../assets/icons/location.png");
+  const image: ImageSource = require("assets/icons/location.png");
 
   return (
     <Screen style={$container} safeAreaEdges={["bottom"]}>
