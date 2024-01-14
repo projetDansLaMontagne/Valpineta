@@ -19,6 +19,7 @@ import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { recupDistance } from "app/utils/recupDistance";
 import { TPoint, T_flat_point } from "app/navigators";
+import { Erreur } from "./Erreur";
 const { width, height } = Dimensions.get("window");
 
 
@@ -105,15 +106,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
     </SafeAreaView>
   ) : (
     //sinon on affiche une erreur
-    <Screen preset="fixed">
-      <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-        <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-      </TouchableOpacity>
-      <View style={$containerErreur}>
-        <Text tx="detailsExcursion.erreur.titre" size="xxl" />
-        <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
-      </View>
-    </Screen>
+    <Erreur navigation={navigation} />
   );
 
   //Fonction principale
@@ -779,19 +772,4 @@ const $listeAltitudes: ViewStyle = {
 const $blocAltitude: ViewStyle = {
   flexDirection: "row",
   paddingBottom: spacing.md,
-};
-
-/* ------------------------------ Style Erreur ------------------------------ */
-
-const $containerErreur: ViewStyle = {
-  justifyContent: "center",
-  alignItems: "center",
-  width: width,
-  height: height,
-  padding: spacing.lg,
-};
-
-const $texteErreur: TextStyle = {
-  marginTop: spacing.lg,
-  marginBottom: height / 2,
 };

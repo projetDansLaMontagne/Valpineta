@@ -24,6 +24,7 @@ import { LatLng, Marker, Polyline } from "react-native-maps";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import { MapScreen } from "app/screens/MapScreen";
 import { SuiviTrack } from "./SuiviTrack";
+import { Erreur } from "./Erreur";
 
 const { width, height } = Dimensions.get("window");
 
@@ -172,16 +173,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         />
       </SafeAreaView>
     ) : (
-      //sinon on affiche une erreur
-      <Screen preset="fixed">
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-          <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-        </TouchableOpacity>
-        <View style={$containerErreur}>
-          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
-          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
-        </View>
-      </Screen>
+      //sinon on affiche une 
+      <Erreur navigation={navigation}/>erreur
     );
 
     /**
@@ -543,19 +536,4 @@ const $souligneInfosAvis: ViewStyle = {
   height: 2,
   width: width / 2.5,
   position: "relative",
-};
-
-/* --------------------------------- ERREUR --------------------------------- */
-
-const $containerErreur: ViewStyle = {
-  justifyContent: "center",
-  alignItems: "center",
-  width: width,
-  height: height,
-  padding: spacing.lg,
-};
-
-const $texteErreur: TextStyle = {
-  marginTop: spacing.lg,
-  marginBottom: height / 2,
 };
