@@ -33,8 +33,10 @@ export class Api {
     this.apisauce = create({
       baseURL: this.config.url,
       timeout: this.config.timeout,
+      responseType: "arraybuffer",
       headers: {
         Accept: "application/json",
+        "Content-Type": "multipart/form-data",
       },
     });
   }

@@ -23,7 +23,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { Screen, Text } from "app/components";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
-  type: "avertissement" | "pointInteret";
+  type: "Avertissement" | "PointInteret";
 }
 
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
@@ -236,6 +236,42 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           );
         }
       }
+      else if (status == "erreurBDD") {
+        if (parametres.langues == "fr") {
+          Alert.alert(
+            "Erreur",
+            "Une erreur est survenue lors de l'envoi du signalement en base de données",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+        else {
+          Alert.alert(
+            "Error",
+            "Se produjo un error al enviar el informe a la base de datos",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+      }
+      else{
+        if (parametres.langues == "fr") {
+          Alert.alert(
+            "Erreur",
+            "Une erreur est survenue",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+        else {
+          Alert.alert(
+            "Error",
+            "Se produjo un error",
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+        }
+      }
     };
 
     /**
@@ -246,8 +282,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      */
     const envoyerSignalement = async (
       titreSignalement: string,
+      type: string,
       descriptionSignalement: string,
       photoSignalement: string,
+      lat: number,
+      lon: number,
       synchroMontanteStore: SynchroMontanteStore,
     ): Promise<void> => {
       let status: string = "En attente";
@@ -260,8 +299,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         setIsLoading(true);
         status = (await synchroMontante(
           titreSignalement,
+          type,
           descriptionSignalement,
           photoSignalement,
+          lat,
+          lon,
           synchroMontanteStore,
         )) as string;
         setIsLoading(false);
@@ -288,7 +330,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         <Text
           style={$h1}
           tx={
-            type === "avertissement"
+            type === "Avertissement"
               ? "pageNouveauSignalement.titreAvertissement"
               : "pageNouveauSignalement.titrePointInteret"
           }
@@ -362,8 +404,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             onPress={() =>
               envoyerSignalement(
                 titreSignalement,
+                type,
                 descriptionSignalement,
                 photoSignalement,
+                45.564,
+                48.564,
                 synchroMontanteStore,
               )
             }

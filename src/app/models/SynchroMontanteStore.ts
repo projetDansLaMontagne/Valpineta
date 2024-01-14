@@ -4,10 +4,14 @@ import { remove } from "app/utils/storage";
 
 // Modèle pour représenter un signalement individuel
 const signalement = types.model({
-  photoURL: types.string,
-  photoBlob: types.string,
-  titre: types.string,
+  nom: types.string,
+  type: types.union(types.literal("Avertissement"), types.literal("PointInteret")),
   description: types.string,
+  image: types.string,
+  //sert à stocker le lien vers l'image dans le storage afin de pouvoir comparer
+  lienURLImage: types.string,
+  lat: types.number,
+  lon: types.number,
 });
 
 /**

@@ -71,6 +71,7 @@
     "react-native-bootsplash": "4.5.0",
     "react-native-chart-kit": "^6.12.0",
     "react-native-gesture-handler": "~2.12.0",
+    "react-native-image-picker": "^7.1.0",
     "react-native-maps": "1.7.1",
     "react-native-reanimated": "~3.3.0",
     "react-native-render-html": "^6.3.4",
@@ -82,7 +83,8 @@
     "react-native-vector-icons": "^10.0.1",
     "reactotron-mst": "3.1.4",
     "reactotron-react-js": "^3.3.7",
-    "reactotron-react-native": "5.0.3"
+    "reactotron-react-native": "5.0.3",
+    "expo-image-manipulator": "~11.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

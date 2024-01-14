@@ -21,7 +21,7 @@ import I18n from "i18n-js";
 
 //Import pour la synchro
 import NetInfo from "@react-native-community/netinfo";
-import { envoieBaseDeDonnées } from "app/services/synchroMontante/synchroMontanteService";
+import { envoieBaseDeDonnees } from "app/services/synchroMontante/synchroMontanteService";
 import { useToast } from "react-native-toast-notifications";
 import { tr } from "date-fns/locale";
 
@@ -107,7 +107,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   // Utilise useEffect pour déclencher l'alerte en cas de changement de connexion
   useEffect(() => {
     if (connected !== null && connected) {
-      const envoieStatus = envoieBaseDeDonnées(synchroMontanteStore);
+      const envoieStatus = envoieBaseDeDonnees(synchroMontanteStore);
       envoieStatus.then(status => {
         if (status === true) {
           parametres.langues === "fr"
