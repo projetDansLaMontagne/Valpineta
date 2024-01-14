@@ -107,17 +107,24 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   // Utilise useEffect pour déclencher l'alerte en cas de changement de connexion
   useEffect(() => {
     if (connected !== null && connected) {
-      const envoieStatus = envoieBaseDeDonnees(synchroMontanteStore);
-      envoieStatus.then(status => {
-        if (status === true) {
+      const signalements = synchroMontanteStore.getSignalements();
+  
+      // Utilisation de Promise.all pour attendre que toutes les promesses soient résolues
+      Promise.all(
+        signalements.map(async (signalement) => {
+          return await envoieBaseDeDonnees(signalement, synchroMontanteStore);
+        })
+      ).then((tabStatus) => {
+        // Si tous les statuts sont true, affichez le toast
+        if (tabStatus.every((status) => status === true)) {
           parametres.langues === "fr"
             ? toast.show("Les signalements ont bien été envoyés", { type: "success" })
-            : parametres.langues === "es"
-            toast.show("Las denuncias fueron enviadas correctamente", { type: "success" })
+            : parametres.langues === "es" && toast.show("Las denuncias fueron enviadas correctamente", { type: "success" });
         }
       });
     }
   }, [connected]);
+  
 
   return (
     <NavigationContainer
