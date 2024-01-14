@@ -428,9 +428,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 excursions.map((excursion, index) => {
                   if (excursion.track) {
                     return (
-                      <>
+                      <React.Fragment key={index}>
                         <Polyline
-                          key={index}
                           coordinates={excursion.track.map(point => {
                             return {
                               latitude: point.lat,
@@ -449,7 +448,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                             } as LatLng
                           }
                           title={excursion.fr.nom}
-                          key={index}
                           centerOffset={{ x: 0, y: -15 }}
                         >
                           <Image
@@ -461,7 +459,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                             }}
                           />
                         </Marker>
-                      </>
+                      </React.Fragment>
                     );
                   } else {
                     return null;
