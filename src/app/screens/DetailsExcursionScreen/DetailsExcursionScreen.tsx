@@ -23,6 +23,7 @@ import { Avis } from "./Avis";
 import { LatLng, Marker, Polyline } from "react-native-maps";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import { MapScreen } from "app/screens/MapScreen";
+import { SuiviTrack } from "./SuiviTrack";
 
 const { width, height } = Dimensions.get("window");
 
@@ -59,7 +60,7 @@ export type TExcursion = {
   track: T_Point[];
 };
 
-interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
+interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> { }
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props;
@@ -69,14 +70,16 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
     const [startPoint, setStartPoint] = useState<LatLng>();
+    const [isSuiviTrack, setIsSuiviTrack] = useState(false);
+
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
     const footerHeight = useBottomTabBarHeight();
     const allPoints = excursion.track.map(
       (point: T_Point) =>
-        ({
-          latitude: point.lat,
-          longitude: point.lon,
-        } as LatLng),
+      ({
+        latitude: point.lat,
+        longitude: point.lon,
+      } as LatLng),
     );
 
     const changeStartPoint = (point: LatLng) => {
@@ -127,6 +130,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       <SafeAreaView style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
+        </TouchableOpacity>
+        <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
+          <Image
+            style={{ tintColor: colors.bouton }}
+            source={require("../../assets/icons/back.png")}
+          />
         </TouchableOpacity>
 
         {allPoints && startPoint && (
@@ -216,7 +225,17 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             style={$containerGrand}
           />
         );
-      } else {
+      }
+      else if (isSuiviTrack) {
+        return (
+          <SuiviTrack
+            excursion={excursion}
+            navigation={navigation}
+            setIsSuiviTrack={setIsSuiviTrack}
+          />
+        );
+      }
+      else {
         return (
           <View style={$containerGrand}>
             <View style={$containerTitre}>
@@ -442,6 +461,20 @@ const $containerGrand: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   marginTop: height / 4,
+};
+
+const $boutonSuivi: ViewStyle = {
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
+  padding: spacing.sm,
+  margin: spacing.lg,
+  width: 50,
+  position: "absolute",
+  top: 15,
+  zIndex: 1,
+  left: 70,
 };
 
 const $boutonRetour: ViewStyle = {
