@@ -291,68 +291,57 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
-<<<<<<< HEAD
 
-    {
-      allPoints && startPoint && (
-        <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
-          <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
+        {
+          allPoints && startPoint && (
+            <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
+              <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
 
-          {startMiddleAndEndHandler(
-            excursion.track,
-            excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
+              {startMiddleAndEndHandler(
+                excursion.track,
+                excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
+              )}
+
+              {signalementsHandler(excursion.signalements)}
+            </MapScreen>
+          )
+        }
+
+        <SwipeUpDown
+          itemMini={itemMini()}
+          itemFull={itemFull(
+            excursion,
+            navigation,
+            containerInfoAffiche,
+            setcontainerInfoAffiche,
+            isAllSignalements,
+            setIsAllSignalements,
+            userLocation,
+            footerHeight,
+
+            changeStartPoint,
           )}
-
-          {signalementsHandler(excursion.signalements)}
-        </MapScreen>
-      )
-    }
-
-=======
-        <TouchableOpacity style={$boutonSuivi}
-          onPress={() => navigation.navigate("SuiviTrack", { excursion: excursion })}
-        >
+          animation="easeInEaseOut"
+          swipeHeight={30 + footerHeight}
+          disableSwipeIcon={true}
+          ref={swipeUpDownRef}
+        />
+      </SafeAreaView >
+    ) : (
+      // sinon on affiche une erreur
+      <Screen preset="fixed">
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
->>>>>>> 483978b1 (Première version fonctionnelle sans signalements)
-    <SwipeUpDown
-      itemMini={itemMini()}
-      itemFull={itemFull(
-        excursion,
-        navigation,
-        containerInfoAffiche,
-        setcontainerInfoAffiche,
-        isAllSignalements,
-        setIsAllSignalements,
-        userLocation,
-        footerHeight,
-
-        changeStartPoint,
-      )}
-      animation="easeInEaseOut"
-      swipeHeight={30 + footerHeight}
-      disableSwipeIcon={true}
-      ref={swipeUpDownRef}
-    />
-      </SafeAreaView >
-    ) : (
-  // sinon on affiche une erreur
-  <Screen preset="fixed">
-    <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-      <Image
-        style={{ tintColor: colors.bouton }}
-        source={require("../../assets/icons/back.png")}
-      />
-    </TouchableOpacity>
-    <View style={$containerErreur}>
-      <Text tx="detailsExcursion.erreur.titre" size="xxl" />
-      <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
-    </View>
-  </Screen>
-);
+        <View style={$containerErreur}>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
+          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
+        </View>
+      </Screen>
+    );
   },
 );
 
