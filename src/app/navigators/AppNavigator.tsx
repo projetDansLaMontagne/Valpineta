@@ -23,7 +23,7 @@ import I18n from "i18n-js";
 import NetInfo from "@react-native-community/netinfo";
 import { envoieBaseDeDonnees } from "app/services/synchroMontante/synchroMontanteService";
 import { useToast } from "react-native-toast-notifications";
-import { tr } from "date-fns/locale";
+
 
 const explorerLogo = require("./../../assets/icons/explorer.png");
 const carteLogo = require("./../../assets/icons/carte.png");

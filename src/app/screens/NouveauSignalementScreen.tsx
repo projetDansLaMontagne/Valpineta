@@ -10,6 +10,7 @@ import {
   ViewStyle,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
@@ -18,7 +19,8 @@ import * as ImagePicker from "expo-image-picker";
 import { RootStore, SynchroMontanteStore, useStores } from "app/models";
 import { synchroMontante } from "app/services/synchroMontante/synchroMontanteService";
 import NetInfo from "@react-native-community/netinfo";
-
+import { goBack } from "app/navigators";
+import {useActionSheet } from "@expo/react-native-action-sheet";
 // Composants
 import { Screen, Text } from "app/components";
 
@@ -55,6 +57,24 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 
     const [status, setStatus] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    const { showActionSheetWithOptions } = useActionSheet();
+
+    const choixPhoto = () => {
+      showActionSheetWithOptions(
+        {
+          options: parametres.langues == "fr" ? ["Prendre une photo", "Choisir une photo", "Annuler"] : ["Tomar una foto", "Elegir una foto", "Cancelar"],
+          cancelButtonIndex: 2,
+        },
+        buttonIndex => {
+          if (buttonIndex === 0) {
+            prendrePhoto();
+          } else if (buttonIndex === 1) {
+            choisirPhoto();
+          }
+        },
+      );
+    };
 
     /**
      * Fonction pour prendre une photo avec la caméra
@@ -154,7 +174,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         setPhotoError(true);
       } else {
         // Vérification de la taille de la photo (max 5Mo) ainsi que du format
-        const imageFormats = ["jpg", "jpeg", "png", "gif"]; // Liste des formats autorisés
+        const imageFormats = ["jpg", "jpeg", "png", "gif", "heic", "heif", "webp"];
         const extension = photoSignalement.split(".").pop().toLowerCase();
         if (!imageFormats.includes(extension)) {
           setPhotoError(true);
@@ -192,8 +212,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             [{ text: "OK" }],
             { cancelable: false },
           );
-        }
-        else {
+        } else {
           Alert.alert(
             "Informe ya existente",
             "Este informe ya existe en la base de datos, elija otro",
@@ -209,8 +228,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             [{ text: "OK" }],
             { cancelable: false },
           );
-        }
-        else {
+        } else {
           Alert.alert(
             "Formato incorrecto",
             "Verifique que los campos estén completados correctamente",
@@ -226,8 +244,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             [{ text: "OK" }],
             { cancelable: false },
           );
-        }
-        else {
+        } else {
           Alert.alert(
             "Informe enviado",
             "Su informe ha sido enviado a la base de datos",
@@ -235,8 +252,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             { cancelable: false },
           );
         }
-      }
-      else if (status == "erreurBDD") {
+      } else if (status == "erreurBDD") {
         if (parametres.langues == "fr") {
           Alert.alert(
             "Erreur",
@@ -244,8 +260,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             [{ text: "OK" }],
             { cancelable: false },
           );
-        }
-        else {
+        } else {
           Alert.alert(
             "Error",
             "Se produjo un error al enviar el informe a la base de datos",
@@ -253,23 +268,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             { cancelable: false },
           );
         }
-      }
-      else{
+      } else {
         if (parametres.langues == "fr") {
-          Alert.alert(
-            "Erreur",
-            "Une erreur est survenue",
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
-        }
-        else {
-          Alert.alert(
-            "Error",
-            "Se produjo un error",
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
+          Alert.alert("Erreur", "Une erreur est survenue", [{ text: "OK" }], { cancelable: false });
+        } else {
+          Alert.alert("Error", "Se produjo un error", [{ text: "OK" }], { cancelable: false });
         }
       }
     };
@@ -294,6 +297,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       // Vérification des champs
       verifSignalement();
 
+      console.log("-----------------");
+      console.log("titreError", !titreError);
+      console.log("descriptionError", !descriptionError);
+      console.log("photoError", !photoError);
+
       // Si les champs sont corrects
       if (!titreError && !descriptionError && !photoError) {
         setIsLoading(true);
@@ -309,15 +317,10 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         setIsLoading(false);
       } else {
         status = "format";
-        AlerteStatus(status);
       }
 
       AlerteStatus(status);
     };
-
-    useEffect(() => {
-      verifSignalement();
-    }, [titreSignalement, descriptionSignalement, photoSignalement]);
 
     // Utilisation d'effets secondaires pour déclencher la vérification des erreurs après chaque modification d'état
 
@@ -326,97 +329,101 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         <ActivityIndicator size="large" color={colors.palette.vert} />
       </Screen>
     ) : (
-      <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
-        <Text
-          style={$h1}
-          tx={
-            type === "Avertissement"
-              ? "pageNouveauSignalement.titreAvertissement"
-              : "pageNouveauSignalement.titrePointInteret"
-          }
-          size="xxl"
-        />
-        <Text text="Track : Col de la marmotte" size="lg" />
-        <Text tx="pageNouveauSignalement.consigne" size="sm" />
-        {titreError && (
-          <Text
-            tx="pageNouveauSignalement.erreur.titre"
-            size="xs"
-            style={{ color: colors.palette.rouge }}
-          />
-        )}
-        <TextInput
-          placeholder={parametres.langues == "fr" ? "Insérez un titre" : "Insertar un título"}
-          placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
-          onChangeText={setTitreSignalement}
-          value={titreSignalement}
-          style={[
-            { ...$inputTitre },
-            titreError
-              ? { borderColor: colors.palette.rouge }
-              : { borderColor: colors.palette.vert },
-          ]}
-        />
-        {descriptionError && (
-          <Text
-            tx="pageNouveauSignalement.erreur.description"
-            size="xs"
-            style={{ color: colors.palette.rouge }}
-          />
-        )}
-        <TextInput
-          placeholder={
-            parametres.langues == "fr" ? "Insérez une description" : "Insertar una descripción"
-          }
-          placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
-          onChangeText={setDescriptionSignalement}
-          multiline={true}
-          value={descriptionSignalement}
-          style={[
-            { ...$inputDescription },
-            descriptionError
-              ? { borderColor: colors.palette.rouge }
-              : { borderColor: colors.palette.vert },
-          ]}
-        />
-        <View>
-          {photoError && !photoSignalement && (
-            <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
-          )}
-          {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}
-          <View style={$boutonContainer}>
-            <Button
-              style={$bouton}
-              tx="pageNouveauSignalement.boutons.photo"
-              onPress={prendrePhoto}
-              textStyle={$textBouton}
+        <View style={$view}>
+          <TouchableOpacity style={$boutonRetour} onPress={() => goBack()}>
+            <Image
+              style={{ tintColor: colors.bouton }}
+              source={require("../../assets/icons/back.png")}
             />
-            <Button
-              style={$bouton}
-              tx="pageNouveauSignalement.boutons.librairie"
-              onPress={choisirPhoto}
-              textStyle={$textBouton}
+          </TouchableOpacity>
+          <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
+            <Text
+              style={$h1}
+              tx={
+                type === "Avertissement"
+                  ? "pageNouveauSignalement.titreAvertissement"
+                  : "pageNouveauSignalement.titrePointInteret"
+              }
+              size="xxl"
             />
-          </View>
-          <Button
-            style={$bouton}
-            tx="pageNouveauSignalement.boutons.valider"
-            onPress={() =>
-              envoyerSignalement(
-                titreSignalement,
-                type,
-                descriptionSignalement,
-                photoSignalement,
-                45.564,
-                48.564,
-                synchroMontanteStore,
-              )
-            }
-            textStyle={$textBouton}
-          />
+            <Text text="Col de la marmotte" size="lg" />
+            {titreError && (
+              <Text
+                tx="pageNouveauSignalement.erreur.titre"
+                size="xs"
+                style={{ color: colors.palette.rouge }}
+              />
+            )}
+            <TextInput
+              placeholder={parametres.langues == "fr" ? "Insérez un titre" : "Insertar un título"}
+              placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
+              onChangeText={setTitreSignalement}
+              value={titreSignalement}
+              style={[
+                { ...$inputTitre },
+                titreError
+                  ? { borderColor: colors.palette.rouge }
+                  : { borderColor: colors.palette.vert },
+              ]}
+            />
+            {descriptionError && (
+              <Text
+                tx="pageNouveauSignalement.erreur.description"
+                size="xs"
+                style={{ color: colors.palette.rouge }}
+              />
+            )}
+            <TextInput
+              placeholder={
+                parametres.langues == "fr" ? "Insérez une description" : "Insertar una descripción"
+              }
+              placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
+              onChangeText={setDescriptionSignalement}
+              multiline={true}
+              value={descriptionSignalement}
+              style={[
+                { ...$inputDescription },
+                descriptionError
+                  ? { borderColor: colors.palette.rouge }
+                  : { borderColor: colors.palette.vert },
+              ]}
+            />
+            <View>
+              {photoError && !photoSignalement && (
+                <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
+              )}
+              {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}
+                <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
+                  <Image
+                    style={{ tintColor: colors.palette.vert }}
+                    source={require("../../assets/icons/camera.png")}
+                  />
+                  <Text
+                    tx="pageNouveauSignalement.boutons.photo"
+                    size="xs"
+                    style={$textBoutonPhoto}
+                  />
+                </TouchableOpacity>
+              <Button
+                style={$bouton}
+                tx="pageNouveauSignalement.boutons.valider"
+                onPress={() =>
+                  envoyerSignalement(
+                    titreSignalement,
+                    type,
+                    descriptionSignalement,
+                    photoSignalement,
+                    45.564,
+                    48.564,
+                    synchroMontanteStore,
+                  )
+                }
+                textStyle={$textBouton}
+              />
+            </View>
+            <Text text={status} size="md" />
+          </Screen>
         </View>
-        <Text text={status} size="md" />
-      </Screen>
     );
   },
 );
@@ -424,6 +431,10 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 // Styles
 
 const { width } = Dimensions.get("window");
+
+const $view: ViewStyle = {
+  flex: 1,
+};
 
 const $container: ViewStyle = {
   paddingRight: spacing.sm,
@@ -436,7 +447,21 @@ const $containerLoader: ViewStyle = {
   alignItems: "center",
 };
 
+const $boutonRetour: ViewStyle = {
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
+  padding: spacing.sm,
+  margin: spacing.lg,
+  width: 50,
+  position: "absolute",
+  top: 0,
+  zIndex: 1,
+};
+
 const $h1: TextStyle = {
+  marginTop: 50,
   textAlign: "center",
   marginBottom: spacing.sm,
 };
@@ -468,16 +493,25 @@ const $imageError: TextStyle = {
 };
 
 const $boutonContainer: ViewStyle = {
-  justifyContent: "space-around",
+  alignItems: "center",
   flexDirection: "row",
+  alignSelf: "center",
+  marginBottom: spacing.sm,
+};
+
+const $textBoutonPhoto: TextStyle = {
+  color: colors.palette.marron,
+  marginLeft: spacing.sm,
 };
 
 const $bouton: TextStyle = {
   marginBottom: spacing.sm,
   borderRadius: spacing.sm,
-  backgroundColor: colors.palette.vert,
+  backgroundColor: colors.palette.blanc,
+  borderWidth: 2,
+  borderColor: colors.palette.vert,
 };
 
 const $textBouton: TextStyle = {
-  color: colors.palette.blanc,
+  color: colors.palette.vert,
 };

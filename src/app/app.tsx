@@ -33,6 +33,9 @@ import { colors } from "./theme";
 // Import pour la synchro
 import { ToastProvider } from "react-native-toast-notifications";
 
+//Import pour l'ui de l'ActionSheet
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
 
 // Web linking configuration
@@ -99,16 +102,16 @@ function App(props: AppProps) {
   // otherwise, we're ready to render the app
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ToastProvider 
-      placement="top"
-      >
-        <ErrorBoundary catchErrors={Config.catchErrors}>
-          <AppNavigator
-            linking={linking}
-            initialState={initialNavigationState}
-            onStateChange={onNavigationStateChange}
-          />
-        </ErrorBoundary>
+      <ToastProvider placement="top">
+        <ActionSheetProvider>
+          <ErrorBoundary catchErrors={Config.catchErrors}>
+            <AppNavigator
+              linking={linking}
+              initialState={initialNavigationState}
+              onStateChange={onNavigationStateChange}
+            />
+          </ErrorBoundary>
+        </ActionSheetProvider>
       </ToastProvider>
     </SafeAreaProvider>
   );

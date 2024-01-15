@@ -36,6 +36,7 @@
     "@expo-google-fonts/space-grotesk": "^0.2.2",
     "@expo-google-fonts/work-sans": "^0.2.3",
     "@expo/metro-config": "~0.10.0",
+    "@expo/react-native-action-sheet": "^4.0.1",
     "@expo/vector-icons": "^13.0.0",
     "@expo/webpack-config": "^19.0.0",
     "@react-native-async-storage/async-storage": "1.18.2",
@@ -52,6 +53,7 @@
     "expo-constants": "~14.4.2",
     "expo-file-system": "~15.4.5",
     "expo-font": "~11.4.0",
+    "expo-image-manipulator": "~11.3.0",
     "expo-image-picker": "~14.1.1",
     "expo-linking": "~5.0.2",
     "expo-localization": "~14.3.0",
@@ -83,8 +85,7 @@
     "react-native-vector-icons": "^10.0.1",
     "reactotron-mst": "3.1.4",
     "reactotron-react-js": "^3.3.7",
-    "reactotron-react-native": "5.0.3",
-    "expo-image-manipulator": "~11.3.0"
+    "reactotron-react-native": "5.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

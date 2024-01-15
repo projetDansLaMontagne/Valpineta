@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Image, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
 
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import { colors, spacing } from "../theme";

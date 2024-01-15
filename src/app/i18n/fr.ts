@@ -112,8 +112,7 @@ const fr = {
     titrePointInteret: "Nouveau point d'intérêt",
     consigne: "Insérez un titre et une description",
     boutons: {
-      photo: "Prendre une photo",
-      librairie: "Ajouter une photo",
+      photo: "Ajouter une photo",
       valider: "Valider",
     },
     erreur: {
