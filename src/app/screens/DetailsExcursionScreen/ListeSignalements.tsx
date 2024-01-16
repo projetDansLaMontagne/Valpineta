@@ -17,6 +17,7 @@ export interface ListeSignalementsProps {
   setStartPoint?: React.Dispatch<React.SetStateAction<LatLng>>;
   style: ViewStyle;
   distanceDepuisUser?: boolean;
+  swipeDown?: () => void;
 }
 
 export function ListeSignalements(props: ListeSignalementsProps) {
@@ -74,6 +75,7 @@ export function ListeSignalements(props: ListeSignalementsProps) {
                           latitude: signalement.latitude,
                           longitude: signalement.longitude,
                         } as LatLng);
+                      props.swipeDown();
                     }}
                   />
                 </View>

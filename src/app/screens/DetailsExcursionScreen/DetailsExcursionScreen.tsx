@@ -107,6 +107,11 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       fetchLocation();
     }, []);
 
+    function showMini() {
+      if (swipeUpDownRef.current)
+        swipeUpDownRef.current.showMini();
+    }
+
     /**
      * ! FIN Pas nécessaire pour le moment
      */
@@ -225,6 +230,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             footerHeight={footerHeight}
             setStartPoint={setStartPoint}
             style={$containerGrand}
+            swipeDown={showMini}
           />
         );
       }

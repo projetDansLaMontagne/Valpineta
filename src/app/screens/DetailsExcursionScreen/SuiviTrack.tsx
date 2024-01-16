@@ -1,5 +1,5 @@
 // Librairies
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import {
   View,
@@ -38,7 +38,12 @@ export function SuiviTrack(props: SuiviTrackProps) {
   const [progress, setProgress] = useState(0);
   const [chronoRunning, setChronoRunning] = useState(false);
   const [chronoTime, setChronoTime] = useState(0);
+  const swipeUpDownRef = useRef();
 
+  function showMini() {
+    if (swipeUpDownRef.current)
+      swipeUpDownRef.current.showMini();
+  }
 
   function toggleChrono() {
     setChronoRunning(!chronoRunning);
@@ -87,11 +92,13 @@ export function SuiviTrack(props: SuiviTrackProps) {
 
   return excursion ? (
     <SwipeUpDown
+      ref={swipeUpDownRef}
       itemMini={item(true)}
       itemFull={item(false)}
       animation="easeInEaseOut"
       swipeHeight={height / 5 + footerHeight}
       disableSwipeIcon={true}
+
     />
   ) : (
     //sinon on affiche une erreur
@@ -209,6 +216,9 @@ export function SuiviTrack(props: SuiviTrackProps) {
                 userLocation={userLocation}
                 distanceDepuisUser={true}
                 setStartPoint={props.setStartPoint}
+                swipeDown={showMini}
+
+
               />
             }
           </View>
