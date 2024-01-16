@@ -197,7 +197,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       setIsAllSignalements: React.Dispatch<any>,
       userLocation: Array<number>,
       footerHeight: number,
-      changeStartPoint?: (point: LatLng) => void,
     ) {
       let nomExcursion = "";
       if (excursion !== undefined) {
