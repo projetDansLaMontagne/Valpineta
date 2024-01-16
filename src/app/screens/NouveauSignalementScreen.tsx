@@ -173,14 +173,17 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       if (photoSignalement === undefined || photoSignalement === null) {
         setPhotoError(true);
       } else {
-        // Vérification de la taille de la photo (max 5Mo) ainsi que du format
-        const imageFormats = ["jpg", "jpeg", "png", "gif", "heic", "heif", "webp"];
-        const extension = photoSignalement.split(".").pop().toLowerCase();
-        if (!imageFormats.includes(extension)) {
-          setPhotoError(true);
-        } else {
-          setPhotoError(false);
-        }
+        // // Vérification de la taille de la photo (max 5Mo) ainsi que du format
+        // const imageFormats = ["jpg", "jpeg", "png", "gif", "heic", "heif", "webp"];
+        // console.log(photoSignalement);
+        // const extension = photoSignalement.split(".").pop().toLowerCase();
+        // console.log(extension);
+        // if (!imageFormats.includes(extension)) {
+        //   setPhotoError(true);
+        // } else {
+        //   setPhotoError(false);
+        // }
+        setPhotoError(false);
       }
     };
 
@@ -241,14 +244,20 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           Alert.alert(
             "Signalement envoyé",
             "Votre signalement a bien été envoyé en base de données",
-            [{ text: "OK" }],
+            [
+              { text: "Ajouter un autre" },
+              { text: "Retour", onPress: () => props.navigation.goBack() },
+            ],
             { cancelable: false },
           );
         } else {
           Alert.alert(
             "Informe enviado",
             "Su informe ha sido enviado a la base de datos",
-            [{ text: "OK" }],
+            [
+              { text: "Añadir otro" },
+              { text: "Volver", onPress: () => props.navigation.goBack() },
+            ],
             { cancelable: false },
           );
         }

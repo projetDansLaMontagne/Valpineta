@@ -110,6 +110,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       const signalements = synchroMontanteStore.getSignalements();
   
       // Utilisation de Promise.all pour attendre que toutes les promesses soient résolues
+      if (signalements.length > 0)
       Promise.all(
         signalements.map(async (signalement) => {
           return await envoieBaseDeDonnees(signalement, synchroMontanteStore);
@@ -121,9 +122,11 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
             ? toast.show("Les signalements ont bien été envoyés", { type: "success" })
             : parametres.langues === "es" && toast.show("Las denuncias fueron enviadas correctamente", { type: "success" });
         }
-      });
+      }
+      );
     }
-  }, [connected]);
+  }
+  , [connected]);
   
 
   return (
