@@ -33,8 +33,6 @@ export function ListeSignalements(props: ListeSignalementsProps) {
                 lon: signalement.longitude,
               };
 
-
-
               let distanceSignalement;
 
               if (props.distanceDepuisUser) {

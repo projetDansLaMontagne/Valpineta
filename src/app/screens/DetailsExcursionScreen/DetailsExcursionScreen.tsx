@@ -112,25 +112,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         swipeUpDownRef.current.showMini();
     }
 
-    /**
-     * ! FIN Pas nécessaire pour le moment
-     */
-
-    /**
-     * ! NON FONCTIONNEL
-     * J'aimerai que le swipeUpDown se baisse automatiquement
-     * lors du click sur un signalement
-     */
-    // if (swipeUpDownRef) {
-    //   r(`[DetailsExcursionScreen - useEffect] aled`);
-    //   swipeUpDownRef.current.showMini();
-    // } else {
-    //   console.error("swipeUpDownRef.current is null");
-    // }
-    /**
-     * ! FIN NON FONCTIONNEL
-     */
-
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <View style={$container} >

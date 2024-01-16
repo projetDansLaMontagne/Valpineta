@@ -148,13 +148,11 @@ export function SuiviTrack(props: SuiviTrackProps) {
             <Text style={$texteInfo}> {deniveleDescendu.toFixed()} m</Text>
           </View>
         </View>
-        {/* Barre de progression */}
         <View>
           <View style={$containerProgress}>
             <View style={$progressBar}>
               <View style={{ ...$progressBarFill, width: `${progress}%` }} />
             </View>
-            {/* Flèche d'avancement */}
             <View style={{ ...$fleche, left: `${progress / 1.14}%` }}>
               <Image style={$iconeFleche} source={require("assets/icons/fleche.png")} />
             </View>
@@ -217,8 +215,6 @@ export function SuiviTrack(props: SuiviTrackProps) {
                 distanceDepuisUser={true}
                 setStartPoint={props.setStartPoint}
                 swipeDown={showMini}
-
-
               />
             }
           </View>
