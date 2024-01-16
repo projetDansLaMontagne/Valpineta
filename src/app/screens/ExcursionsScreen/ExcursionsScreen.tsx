@@ -11,7 +11,8 @@ import {
   Keyboard,
 } from "react-native";
 import { AppStackScreenProps, T_excursion, TFiltres, T_valeurs_filtres } from "app/navigators";
-import { Screen, CarteExcursion, Text } from "app/components";
+import { Screen, Text } from "app/components";
+import { CarteExcursion } from "./CarteExcursion";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
 
@@ -24,7 +25,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   const filtres = props.route.params?.filtres;
 
-  const filtreIcone = require("../../assets/icons/filtre.png");
+  const filtreIcone = require("assets/icons/filtre.png");
 
   // -- FONCTIONS D INITIALISATION --
   /**
@@ -192,7 +193,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   // Initialisation des excursions
   useEffect(() => {
     try {
-      setAllExcursions(require("../../assets/JSON/excursions.json"));
+      setAllExcursions(require("assets/JSON/excursions.json"));
     } catch (error) {
       throw new Error("Erreur lors du chargement du fichier JSON : " + error);
     }
@@ -200,13 +201,10 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   /* ------------------------------- CALL BACKS ------------------------------- */
   const clicExcursion = (excursion: T_excursion) => {
-    props.navigation.navigate("DetailsExcursion", { excursion });
-
-    // REMPLACER PAR CA si la navigation ne fonctionne pas (dire a Nicolas)
-    // props.navigation.navigate("CarteStack", {
-    //   screen: "DetailsExcursion",
-    //   params: { excursion },
-    // });
+    props.navigation.navigate("CarteStack", {
+      screen: "DetailsExcursion",
+      params: { excursion },
+    });
   };
 
   return (

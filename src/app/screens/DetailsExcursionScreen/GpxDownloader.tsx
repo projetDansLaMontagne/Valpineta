@@ -26,7 +26,7 @@ export const GpxDownloader = observer(function GpxDownloader(props: GpxDownloade
   return (
     <View style={$styles}>
       <TouchableOpacity onPress={() => downloadAndSaveFile()}>
-        <Image source={require("../../assets/icons/download.png")} style={$iconDownload}></Image>
+        <Image source={require("assets/icons/download.png")} style={$iconDownload}></Image>
       </TouchableOpacity>
     </View>
   );

@@ -14,6 +14,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
+/**@warning Avec Ignite, il faut utiliser les fonctions sur props.navigation et non natives*/
 import { forwardRef, RefObject } from "react";
 // END IMPORTS ==========================================================================================   END IMPORTS
 
@@ -46,7 +47,7 @@ export interface MapButtonProps extends PressableProps {
  * @return
  * @constructor
  **/
-const MapButton = forwardRef((props: MapButtonProps, ref) => {
+const MapButton = forwardRef((props: MapButtonProps, ref: RefObject<any>) => {
   // Props
   const {
     onPressIn,
@@ -64,7 +65,7 @@ const MapButton = forwardRef((props: MapButtonProps, ref) => {
   return (
     <Animated.View>
       <TouchableOpacity
-        ref={ref as RefObject<any>}
+        ref={ref}
         style={style}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
