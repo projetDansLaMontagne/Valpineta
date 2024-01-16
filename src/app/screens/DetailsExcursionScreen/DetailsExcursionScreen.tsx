@@ -128,7 +128,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
-      <SafeAreaView style={$container}>
+      <View style={$container} >
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>
@@ -153,28 +153,37 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           </MapScreen>
         )}
 
-        <SwipeUpDown
-          itemMini={itemMini()}
-          itemFull={itemFull(
-            excursion,
-            navigation,
-            containerInfoAffiche,
-            setcontainerInfoAffiche,
-            isAllSignalements,
-            setIsAllSignalements,
-            userLocation,
-            footerHeight,
-            changeStartPoint,
-          )}
-          animation="easeInEaseOut"
-          swipeHeight={30 + footerHeight}
-          disableSwipeIcon={true}
-          ref={swipeUpDownRef}
-        />
-      </SafeAreaView>
+        {isSuiviTrack ? (
+          <SuiviTrack
+            excursion={excursion}
+            navigation={navigation}
+            setIsSuiviTrack={setIsSuiviTrack}
+          />
+        ) : (
+
+          <SwipeUpDown
+            itemMini={itemMini()}
+            itemFull={itemFull(
+              excursion,
+              navigation,
+              containerInfoAffiche,
+              setcontainerInfoAffiche,
+              isAllSignalements,
+              setIsAllSignalements,
+              userLocation,
+              footerHeight,
+              changeStartPoint,
+            )}
+            animation="easeInEaseOut"
+            swipeHeight={30 + footerHeight}
+            disableSwipeIcon={true}
+            ref={swipeUpDownRef}
+          />
+        )}
+      </View>
     ) : (
       //sinon on affiche une 
-      <Erreur navigation={navigation}/>erreur
+      <Erreur navigation={navigation} />
     );
 
     /**
@@ -216,15 +225,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             footerHeight={footerHeight}
             setStartPoint={setStartPoint}
             style={$containerGrand}
-          />
-        );
-      }
-      else if (isSuiviTrack) {
-        return (
-          <SuiviTrack
-            excursion={excursion}
-            navigation={navigation}
-            setIsSuiviTrack={setIsSuiviTrack}
           />
         );
       }

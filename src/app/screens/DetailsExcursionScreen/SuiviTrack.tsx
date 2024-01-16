@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import {
   View,
-  SafeAreaView,
   ViewStyle,
   TouchableOpacity,
   Image,
@@ -13,12 +12,12 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from "react-native";
-import { Text, Screen, CarteSignalement, GraphiqueDenivele, T_Point } from "app/components";
+import { Text, CarteSignalement, GraphiqueDenivele, T_Point } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { recupDistance } from "app/utils/recupDistance";
-import { TPoint, T_flat_point } from "app/navigators";
+import { T_flat_point } from "app/navigators";
 import { Erreur } from "./Erreur";
 const { width, height } = Dimensions.get("window");
 
@@ -89,21 +88,13 @@ export function SuiviTrack(props: SuiviTrackProps) {
   }, []);
 
   return excursion ? (
-    <SafeAreaView style={$container}>
-      <TouchableOpacity style={$boutonRetour} onPress={() => props.setIsSuiviTrack(false)}>
-        <Image
-          style={{ tintColor: colors.bouton }}
-          source={require("assets/icons/back.png")}
-        />
-      </TouchableOpacity>
-      <SwipeUpDown
-        itemMini={item(true)}
-        itemFull={item(false)}
-        animation="easeInEaseOut"
-        swipeHeight={height / 5 + footerHeight}
-        disableSwipeIcon={true}
-      />
-    </SafeAreaView>
+    <SwipeUpDown
+      itemMini={item(true)}
+      itemFull={item(false)}
+      animation="easeInEaseOut"
+      swipeHeight={height / 5 + footerHeight}
+      disableSwipeIcon={true}
+    />
   ) : (
     //sinon on affiche une erreur
     <Erreur navigation={navigation} />
@@ -552,7 +543,7 @@ const $boutonRetour: ViewStyle = {
 const $container: ViewStyle = {
   flex: 1,
   width: width,
-  height: height,
+  height: height / 2,
   backgroundColor: colors.erreur,
 };
 
