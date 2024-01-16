@@ -93,7 +93,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
       <TouchableOpacity style={$boutonRetour} onPress={() => props.setIsSuiviTrack(false)}>
         <Image
           style={{ tintColor: colors.bouton }}
-          source={require("../../assets/icons/back.png")}
+          source={require("/assets/icons/back.png")}
         />
       </TouchableOpacity>
       <SwipeUpDown
@@ -309,14 +309,14 @@ function descritpion(excursion, altitudeActuelle) {
       <View>
         <View style={$listeInfos}>
           <View style={$blocInfo}>
-            <Image style={$iconDescription} source={require("../../assets/icons/distance.png")} />
+            <Image style={$iconDescription} source={require("assets/icons/distance.png")} />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.distance" />
               <Text style={$texteDescription}>{excursion.distance} km</Text>
             </View>
           </View>
           <View style={$blocInfo}>
-            <Image style={$iconDescription} source={require("../../assets/icons/duree.png")} />
+            <Image style={$iconDescription} source={require("assets/icons/duree.png")} />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.duree" />
               <Text style={$texteDescription}>
@@ -329,7 +329,7 @@ function descritpion(excursion, altitudeActuelle) {
           <View style={$blocInfo}>
             <Image
               style={$iconDescription}
-              source={require("../../assets/icons/difficulteTechnique.png")}
+              source={require("assets/icons/difficulteTechnique.png")}
             />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.difficulteTech" />
@@ -339,7 +339,7 @@ function descritpion(excursion, altitudeActuelle) {
           <View style={$blocInfo}>
             <Image
               style={$iconDescription}
-              source={require("../../assets/icons/difficulteOrientation.png")}
+              source={require("assets/icons/difficulteOrientation.png")}
             />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.difficulteOrientation" />
