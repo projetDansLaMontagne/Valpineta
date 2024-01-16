@@ -390,9 +390,18 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             minZoomLevel={10} // Niveau de zoom minimum
             maxZoomLevel={15} // Niveau de zoom maximum
           >
-            <UrlTile urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"} tileSize={256} />
+            <UrlTile
+              urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
+              tileSize={256}
+              // shouldReplaceMapContent={true}
+              style={{
+                zIndex: -1,
+                pointerEvents: "none",
+              }}
+            />
 
             {_props.children}
+
             {
               // Oier voulait toutes les excursions sur la carte
               // si on était pas dans la page détail excursion.
@@ -412,13 +421,16 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                           })}
                           strokeColor={colors.palette.vert}
                           strokeWidth={5}
+                          style={{
+                            zIndex: 1000000,
+                          }}
                         />
 
                         <Marker
                           coordinate={
                             {
-                              latitude: excursion.track[0].lat,
-                              longitude: excursion.track[0].lon,
+                              latitude: excursion.track[0].lat ?? 0,
+                              longitude: excursion.track[0].lon ?? 0,
                             } as LatLng
                           }
                           title={excursion.fr.nom}

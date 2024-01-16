@@ -339,8 +339,8 @@ const startMiddleAndEndHandler = (
     return (
       <Marker
         coordinate={{
-          latitude: point.lat,
-          longitude: point.lon,
+          latitude: point.lat ?? 0,
+          longitude: point.lon ?? 0,
         }}
         key={index}
         // Si l'array de points ne contient que 2 points,
@@ -402,8 +402,8 @@ const signalementsHandler = (signalements: TSignalement[]) => {
         return (
           <Marker
             coordinate={{
-              latitude: signalement.latitude,
-              longitude: signalement.longitude,
+              latitude: signalement.latitude ?? 0,
+              longitude: signalement.longitude ?? 0,
             }}
             // key={point.dist}
             key={index}
