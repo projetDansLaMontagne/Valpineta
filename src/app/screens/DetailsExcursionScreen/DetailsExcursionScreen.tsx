@@ -8,6 +8,7 @@ import {
   Image,
   TextStyle,
   Dimensions,
+  Button,
 } from "react-native";
 import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
@@ -69,7 +70,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
     const [startPoint, setStartPoint] = useState<LatLng>();
+
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
+
     const footerHeight = useBottomTabBarHeight();
     const allPoints = excursion.track.map(
       (point: T_Point) =>
@@ -102,25 +105,18 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
       fetchLocation();
     }, []);
-
     /**
      * ! FIN Pas nécessaire pour le moment
      */
 
-    /**
-     * ! NON FONCTIONNEL
-     * J'aimerai que le swipeUpDown se baisse automatiquement
-     * lors du click sur un signalement
-     */
-    // if (swipeUpDownRef) {
-    //   r(`[DetailsExcursionScreen - useEffect] aled`);
-    //   swipeUpDownRef.current.showMini();
-    // } else {
-    //   console.error("swipeUpDownRef.current is null");
-    // }
-    /**
-     * ! FIN NON FONCTIONNEL
-     */
+    const swipeUpDown = () => {
+      if (swipeUpDownRef) {
+        console.log(`[DetailsExcursionScreen - useEffect] aled`);
+        swipeUpDownRef.current.showMini();
+      } else {
+        console.error("swipeUpDownRef.current is null");
+      }
+    };
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
@@ -199,7 +195,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       setIsAllSignalements: React.Dispatch<any>,
       userLocation: Array<number>,
       footerHeight: number,
-      changeStartPoint?: (point: LatLng) => void,
     ) {
       let nomExcursion = "";
       if (excursion !== undefined) {
@@ -213,6 +208,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             setIsAllSignalements={setIsAllSignalements}
             footerHeight={footerHeight}
             setStartPoint={setStartPoint}
+            swipeDown={swipeUpDown}
             style={$containerGrand}
           />
         );
@@ -380,9 +376,6 @@ const signalementsHandler = (signalements: TSignalement[]) => {
   return (
     <>
       {signalements.map((signalement, index) => {
-        /**
-         * ! ATTENDRE PR DE NICO QUI A TYPÉ LES SIGNALEMENTS
-         */
         let iconColor: string;
         let image: ImageSource;
 
