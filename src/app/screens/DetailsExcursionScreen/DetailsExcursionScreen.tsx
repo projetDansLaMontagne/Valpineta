@@ -2,7 +2,6 @@ import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import {
   View,
-  SafeAreaView,
   ViewStyle,
   TouchableOpacity,
   Image,
@@ -124,7 +123,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
-      <SafeAreaView style={$container}>
+      <View style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>
@@ -161,9 +160,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           disableSwipeIcon={true}
           ref={swipeUpDownRef}
         />
-      </SafeAreaView>
+      </View>
     ) : (
-      //sinon on affiche une erreur
       <Screen preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
@@ -461,7 +459,7 @@ const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
-  backgroundColor: colors.erreur,
+  backgroundColor: colors.fond,
 };
 
 //Style de itemMini
