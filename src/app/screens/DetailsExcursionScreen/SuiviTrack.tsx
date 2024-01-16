@@ -129,30 +129,30 @@ export function SuiviTrack(props: SuiviTrackProps) {
             <Image
               style={$boutonPauseArret}
               tintColor={colors.bouton}
-              source={chronoRunning ? require("../../assets/icons/pause.png") : require("../../assets/icons/play.png")} />
+              source={chronoRunning ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
           </TouchableOpacity>
           {/* Bouton pour augmenter la progression temporaire avant de faire avec l'avancement localisé*/}
           <TouchableOpacity style={$buttonIncreaseProgress} onPress={increaseProgress}>
-            <Image source={require("../../assets/icons/caretRight.png")} />
+            <Image source={require("assets/icons/caretRight.png")} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { resetChrono() }}>
-            <Image style={$boutonPauseArret} source={require("../../assets/icons/arret.png")} />
+            <Image style={$boutonPauseArret} source={require("assets/icons/arret.png")} />
           </TouchableOpacity>
         </View>
         <View style={$listeDescription}>
           <View style={$containerInfo}>
-            <Image style={$icone} source={require("../../assets/icons/duree.png")} />
+            <Image style={$icone} source={require("assets/icons/duree.png")} />
             <Text style={$texteInfo}>{formatTime(chronoTime)}</Text>
           </View>
           <View style={$containerInfo}>
             <Image
               style={$icone}
-              source={require("../../assets/icons/denivelePositifV2.png")}
+              source={require("assets/icons/denivelePositifV2.png")}
             />
             <Text style={$texteInfo}> {deniveleMonte.toFixed()} m</Text>
           </View>
           <View style={$containerInfo}>
-            <Image style={$icone} source={require("../../assets/icons/deniveleNegatif.png")} />
+            <Image style={$icone} source={require("assets/icons/deniveleNegatif.png")} />
             <Text style={$texteInfo}> {deniveleDescendu.toFixed()} m</Text>
           </View>
         </View>
@@ -164,7 +164,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
             </View>
             {/* Flèche d'avancement */}
             <View style={{ ...$fleche, left: `${progress / 1.14}%` }}>
-              <Image style={$iconeFleche} source={require("../../assets/icons/fleche.png")} />
+              <Image style={$iconeFleche} source={require("assets/icons/fleche.png")} />
             </View>
           </View>
         </View>
