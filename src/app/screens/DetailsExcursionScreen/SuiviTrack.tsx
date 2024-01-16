@@ -91,7 +91,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
       <TouchableOpacity style={$boutonRetour} onPress={() => props.setIsSuiviTrack(false)}>
         <Image
           style={{ tintColor: colors.bouton }}
-          source={require("../../assets/icons/back.png")}
+          source={require("/assets/icons/back.png")}
         />
       </TouchableOpacity>
       <SwipeUpDown
@@ -190,34 +190,34 @@ function item(
             tintColor={colors.bouton}
             source={
               chronoRunning
-                ? require("../../assets/icons/pause.png")
-                : require("../../assets/icons/play.png")
+                ? require("/assets/icons/pause.png")
+                : require("/assets/icons/play.png")
             }
           />
         </TouchableOpacity>
         {/* Bouton pour augmenter la progression temporaire avant de faire avec l'avancement localisé*/}
         <TouchableOpacity style={$buttonIncreaseProgress} onPress={increaseProgress}>
-          <Image source={require("../../assets/icons/caretRight.png")} />
+          <Image source={require("/assets/icons/caretRight.png")} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             resetChrono();
           }}
         >
-          <Image style={$boutonPauseArret} source={require("../../assets/icons/arret.png")} />
+          <Image style={$boutonPauseArret} source={require("/assets/icons/arret.png")} />
         </TouchableOpacity>
       </View>
       <View style={$listeDescription}>
         <View style={$containerInfo}>
-          <Image style={$icone} source={require("../../assets/icons/duree.png")} />
+          <Image style={$icone} source={require("/assets/icons/duree.png")} />
           <Text style={$texteInfo}>{formatTime(chronoTime)}</Text>
         </View>
         <View style={$containerInfo}>
-          <Image style={$icone} source={require("../../assets/icons/denivelePositifV2.png")} />
+          <Image style={$icone} source={require("/assets/icons/denivelePositifV2.png")} />
           <Text style={$texteInfo}> {deniveleMonte.toFixed()} m</Text>
         </View>
         <View style={$containerInfo}>
-          <Image style={$icone} source={require("../../assets/icons/deniveleNegatif.png")} />
+          <Image style={$icone} source={require("/assets/icons/deniveleNegatif.png")} />
           <Text style={$texteInfo}> {deniveleDescendu.toFixed()} m</Text>
         </View>
       </View>
@@ -229,7 +229,7 @@ function item(
           </View>
           {/* Flèche d'avancement */}
           <View style={{ ...$fleche, left: `${progress / 1.14}%` }}>
-            <Image style={$iconeFleche} source={require("../../assets/icons/fleche.png")} />
+            <Image style={$iconeFleche} source={require("/assets/icons/fleche.png")} />
           </View>
         </View>
       </View>
@@ -437,14 +437,14 @@ function descritpion(excursion, altitudeActuelle) {
       <View>
         <View style={$listeInfos}>
           <View style={$blocInfo}>
-            <Image style={$iconDescription} source={require("../../assets/icons/distance.png")} />
+            <Image style={$iconDescription} source={require("/assets/icons/distance.png")} />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.distance" />
               <Text style={$texteDescription}>{excursion.distance} km</Text>
             </View>
           </View>
           <View style={$blocInfo}>
-            <Image style={$iconDescription} source={require("../../assets/icons/duree.png")} />
+            <Image style={$iconDescription} source={require("/assets/icons/duree.png")} />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.duree" />
               <Text style={$texteDescription}>
@@ -457,7 +457,7 @@ function descritpion(excursion, altitudeActuelle) {
           <View style={$blocInfo}>
             <Image
               style={$iconDescription}
-              source={require("../../assets/icons/difficulteTechnique.png")}
+              source={require("/assets/icons/difficulteTechnique.png")}
             />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.difficulteTech" />
@@ -467,7 +467,7 @@ function descritpion(excursion, altitudeActuelle) {
           <View style={$blocInfo}>
             <Image
               style={$iconDescription}
-              source={require("../../assets/icons/difficulteOrientation.png")}
+              source={require("/assets/icons/difficulteOrientation.png")}
             />
             <View style={$blocInterieurTexte}>
               <Text style={$texteDescription} tx="suiviTrack.description.difficulteOrientation" />
@@ -646,9 +646,9 @@ function calculeDistanceEntreDeuxPoints(coord1, coord2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-      Math.cos(toRadians(coord2.lat)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRadians(coord2.lat)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));

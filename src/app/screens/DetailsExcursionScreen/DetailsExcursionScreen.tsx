@@ -134,7 +134,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
           <Image
             style={{ tintColor: colors.bouton }}
-            source={require("../../assets/icons/back.png")}
+            source={require("/assets/icons/back.png")}
           />
         </TouchableOpacity>
 
