@@ -93,7 +93,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
       <TouchableOpacity style={$boutonRetour} onPress={() => props.setIsSuiviTrack(false)}>
         <Image
           style={{ tintColor: colors.bouton }}
-          source={require("/assets/icons/back.png")}
+          source={require("assets/icons/back.png")}
         />
       </TouchableOpacity>
       <SwipeUpDown
