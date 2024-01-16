@@ -33,14 +33,16 @@ export function ListeSignalements(props: ListeSignalementsProps) {
                 lon: signalement.longitude,
               };
 
-              const coordUser: T_flat_point = {
-                lat: props.userLocation?.latitude,
-                lon: props.userLocation?.longitude,
-              };
+
 
               let distanceSignalement;
 
               if (props.distanceDepuisUser) {
+                const coordUser: T_flat_point = {
+                  lat: props.userLocation?.latitude,
+                  lon: props.userLocation?.longitude,
+                };
+
                 let distanceDepartPointLePlusProcheSignalement = recupDistance(coordSignalement, props.excursion.track);
 
                 let distanceDepartPointLePlusProcheUtilisateur = recupDistance(coordUser, props.excursion.track);
