@@ -158,9 +158,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             excursion={excursion}
             navigation={navigation}
             setIsSuiviTrack={setIsSuiviTrack}
+            setStartPoint={setStartPoint}
           />
         ) : (
-
           <SwipeUpDown
             itemMini={itemMini()}
             itemFull={itemFull(

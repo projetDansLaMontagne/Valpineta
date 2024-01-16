@@ -9,23 +9,20 @@ import {
   TextStyle,
   ImageStyle,
   Dimensions,
-  ScrollView,
-  TouchableWithoutFeedback,
 } from "react-native";
-import { Text, CarteSignalement, GraphiqueDenivele, T_Point } from "app/components";
+import { Text, GraphiqueDenivele } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { recupDistance } from "app/utils/recupDistance";
-import { T_flat_point } from "app/navigators";
 import { Erreur } from "./Erreur";
+import { ListeSignalements } from "./ListeSignalements";
 const { width, height } = Dimensions.get("window");
-
 
 export interface SuiviTrackProps {
   excursion: Record<string, unknown>;
   navigation: any;
   setIsSuiviTrack: React.Dispatch<React.SetStateAction<boolean>>;
+  setStartPoint: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export function SuiviTrack(props: SuiviTrackProps) {
@@ -41,6 +38,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
   const [progress, setProgress] = useState(0);
   const [chronoRunning, setChronoRunning] = useState(false);
   const [chronoTime, setChronoTime] = useState(0);
+
 
   function toggleChrono() {
     setChronoRunning(!chronoRunning);
@@ -121,10 +119,6 @@ export function SuiviTrack(props: SuiviTrackProps) {
               style={$boutonPauseArret}
               tintColor={colors.bouton}
               source={chronoRunning ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
-          </TouchableOpacity>
-          {/* Bouton pour augmenter la progression temporaire avant de faire avec l'avancement localisé*/}
-          <TouchableOpacity style={$buttonIncreaseProgress} onPress={increaseProgress}>
-            <Image source={require("assets/icons/caretRight.png")} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { resetChrono() }}>
             <Image style={$boutonPauseArret} source={require("assets/icons/arret.png")} />
@@ -207,7 +201,16 @@ export function SuiviTrack(props: SuiviTrackProps) {
             ></View>
             {containerInfoAffiche
               ? descritpion(excursion, altitudeActuelle)
-              : listeSignalements(excursion, userLocation)}
+              :
+              <ListeSignalements
+                excursion={excursion}
+                footerHeight={footerHeight}
+                style={$containerSignalements}
+                userLocation={userLocation}
+                distanceDepuisUser={true}
+                setStartPoint={props.setStartPoint}
+              />
+            }
           </View>
         }
       </View >
@@ -365,188 +368,7 @@ function descritpion(excursion, altitudeActuelle) {
   );
 }
 
-function listeSignalements(excursion, userLocation) {
-  return (
-    <View>
-      <ScrollView>
-        <TouchableWithoutFeedback>
-          <View style={$containerSignalements}>
-            {excursion?.signalements?.map((signalement, index) => {
-              // Calcule de la distance pour chaque avertissement
-              const coordSignalement: T_flat_point = {
-                lat: signalement.latitude,
-                lon: signalement.longitude,
-              };
-
-              let distanceDepartPointLePlusProcheSignalement = recupDistance(coordSignalement, excursion.track);
-
-              let distanceDepartPointLePlusProcheUtilisateur = recupDistance(userLocation as T_flat_point, excursion.track);
-
-              let distanceSignalement = (distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
-
-              //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
-              // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProcheSignalement; //c'est donc pas vraiment ce calcul qu'il faut faire
-              // return distanceTotale;
-
-              if (Number(distanceSignalement) < 0) {
-                distanceSignalement = "depassé                                    ";
-              }
-
-              const carteType =
-                signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
-              return (
-                <View key={index}>
-                  <CarteSignalement
-                    type={carteType}
-                    details={true}
-                    nomSignalement={signalement.nom}
-                    distanceDuDepart={`${distanceSignalement}`}
-                    description={signalement.description}
-                    imageSignalement={signalement.image}
-                  />
-                </View>
-              );
-            })}
-          </View>
-        </TouchableWithoutFeedback>
-      </ScrollView>
-    </View>
-  );
-}
-
-
-
-// function recupDistance(coordonneeSignalement, data: any, userLocation) {
-//   //on va devoir trouver le point le plus proche de nos coordonnées, puis on calcule la distance entre ce point et le signalement
-//   const cooredonneesUtilsateur = {
-//     lat: userLocation.latitude,
-//     lon: userLocation.longitude,
-//     alt: null,
-//     dist: null,
-//   };
-
-//   // Assurez-vous que les coordonnées du signalement sont définies
-//   if (!coordonneeSignalement || !coordonneeSignalement.lat || !coordonneeSignalement.lon) {
-//     throw new Error("Coordonnées du signalement non valides");
-//   }
-
-//   // Initialiser la distance minimale avec une valeur élevée
-//   let distanceMinimaleSignalement: number = Number.MAX_VALUE;
-//   let distanceMinimaleUtilisateur: number = Number.MAX_VALUE;
-
-//   let coordPointPlusProcheSignalement;
-//   let coordPointPlusProcheUtilisateur;
-
-//   // Parcourir toutes les coordonnées dans le fichier
-//   for (const coord of data) {
-//     // Assurez-vous que les coordonnées dans le fichier sont définies
-//     if (!coord.lat || !coord.lon) {
-//       console.error("Coordonnées dans le fichier non valides");
-//       continue;
-//     }
-
-//     // Calculer la distance entre le signalement et la coordonnée actuelle du fichier
-//     const distanceSignalementPointLePlusProche = calculeDistanceEntreDeuxPoints(
-//       coordonneeSignalement,
-//       coord,
-//     );  //on ignore pour l'instant 
-
-//     // Mettre à jour la distance minimale si la distance actuelle est plus petite
-//     if (distanceSignalementPointLePlusProche < distanceMinimaleSignalement) {
-//       distanceMinimaleSignalement = distanceSignalementPointLePlusProche;
-//       coordPointPlusProcheSignalement = coord;
-//     }
-
-//     //on fait la même chpse pour trouver le point le plus proche de l'utilisateur
-//     // on trouve le point le plus proche de l'utilisateur
-//     // on calcule la distance entre ce point et le point de départ en faisant coordPointPlusProche.dist
-
-//     const distanceUtilisateurPointLePlusProche = calculeDistanceEntreDeuxPoints(
-//       cooredonneesUtilsateur,
-//       coord,
-//     );
-
-//     if (distanceUtilisateurPointLePlusProche < distanceMinimaleUtilisateur) {
-//       distanceMinimaleUtilisateur = distanceUtilisateurPointLePlusProche;
-//       coordPointPlusProcheUtilisateur = coord;
-//     }
-//   }
-
-//   const distanceDepartPointLePlusProcheSignalement: number = (coordPointPlusProcheSignalement.dist / 1000); //distance entre le point de départ et le point le plus proche du signalement
-
-//   const distanceDepartPointLePlusProcheUtilisateur: number = (coordPointPlusProcheUtilisateur.dist / 1000); //distance entre le point de départ et le point le plus proche de l'utilisateur
-
-//   const distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement = (distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
-
-//   //Distance totale DANS UN MONDE PARFAIT et pour calculer le temps de parcours en ajoutant la distance entre le point le plus proche et le départ sauf qu'il faut faire un algo parce que le point le pls proche peut ne pas être le point suivant (exemple un circuit qui fait un aller retour ou les points allez et retour sont proches)
-//   // const distanceTotale = distanceMinimale + distanceDepartPointLePlusProcheSignalement; //c'est donc pas vraiment ce calcul qu'il faut faire
-//   // return distanceTotale;
-//   return distancePointLePlusProcheUtilisateur_PointLePlusProcheSignalement;
-// }
-
-// Fonction de calcul de distance entre deux coordonnées
-function calculeDistanceEntreDeuxPoints(coord1, coord2) {
-  // Assurez-vous que coord1 et coord2 sont définis
-  if (
-    !coord1 ||
-    typeof coord1.lat === "undefined" ||
-    typeof coord1.lon === "undefined" ||
-    !coord2 ||
-    typeof coord2.lat === "undefined" ||
-    typeof coord2.lon === "undefined"
-  ) {
-    throw new Error("Coordonnées non valides");
-  }
-
-  // Rayon moyen de la Terre en kilomètres
-  const R = 6371;
-
-  // Convertir les degrés en radians
-  const toRadians = degree => degree * (Math.PI / 180);
-
-  // Calcul des distances
-  const dLat = toRadians(coord2.lat - coord1.lat);
-  const dLon = toRadians(coord2.lon - coord1.lon);
-
-  // Formule de Haversine pour calculer la distance entre deux points
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(coord1.lat)) *
-    Math.cos(toRadians(coord2.lat)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
-
-  // Distance en radians
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  // Distance en kilomètres
-  const distance = R * c;
-
-  return distance;
-}
-
 /* --------------------------------- Styles --------------------------------- */
-
-const $boutonRetour: ViewStyle = {
-  backgroundColor: colors.fond,
-  borderWidth: 1,
-  borderColor: colors.bordure,
-  borderRadius: 10,
-  padding: spacing.sm,
-  margin: spacing.lg,
-  width: 50,
-  position: "absolute",
-  top: 15,
-  zIndex: 1,
-};
-
-const $container: ViewStyle = {
-  flex: 1,
-  width: width,
-  height: height / 2,
-  backgroundColor: colors.erreur,
-};
-
 const $containerPetit: ViewStyle = {
   flex: 1,
   width: width,
@@ -651,15 +473,6 @@ const $progressBarFill: ViewStyle = {
   backgroundColor: colors.palette.vert, // Couleur de la partie remplie de la barre de progression
 };
 
-/* Styles pour le bouton d'augmentation de la progression */
-const $buttonIncreaseProgress: ViewStyle = {
-  marginTop: spacing.sm,
-  padding: spacing.sm,
-  backgroundColor: colors.bouton, // Couleur du bouton
-  borderRadius: 10,
-  alignItems: "center",
-};
-
 /* -------------------------------- La fleche ------------------------------- */
 
 /* Styles pour la flèche d'avancement */
@@ -681,7 +494,6 @@ const $iconeFleche: ImageStyle = {
 
 const $containerSignalements: ViewStyle = {
   margin: spacing.xs,
-  paddingBottom: height / 2,
 };
 
 /* ------------------------------ Description/Signalements ------------------------------ */
