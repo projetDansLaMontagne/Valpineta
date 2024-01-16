@@ -54,6 +54,7 @@ type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) =
 
 let COMPTEUR = 0;
 const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
+const cacheDirectory = `${fileSystem.cacheDirectory}cartes/OSM`;
 
 // Fonction(s)
 /**
@@ -173,10 +174,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       console.log("[MapScreen] Permission to access location was denied");
     } else {
       console.log("[MapScreen] Permission ok");
-      // Vérifier si les tuiles sont déjà dl cartes/OSM/17/65682/48390.jpg
-      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/");
-      if (folderInfo.exists && folderInfo.isDirectory) {
-        console.log("[MapScreen] Tuiles déjà DL");
+      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
+      console.log("[MapScreen] folderInfo: ", folderInfo);
+      if (folderInfo.exists && !folderInfo.isDirectory) {
+        console.log("Tuiles déjà DL")
+        await fileSystem.deleteAsync(cacheDirectory, { idempotent: true })
       } else {
         // Supprimer le dossier
         console.log("[MapScreen] Suppression du dossier");
