@@ -115,15 +115,15 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <View style={$container} >
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={$boutonRetour} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>
-        <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
+        {/* <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("assets/icons/back.png")}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {allPoints && startPoint && (
           /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
