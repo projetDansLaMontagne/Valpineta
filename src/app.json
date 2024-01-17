@@ -7,7 +7,7 @@
     "scheme": "valpineta",
     "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.jpg",
+    "icon": "./assets/images/logo.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -40,7 +40,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.valpineta.app"
+      "bundleIdentifier": "com.valpineta.app",
+      ""
     },
     "web": {
       "favicon": "./assets/images/logo.jpg"

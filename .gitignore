@@ -85,8 +85,11 @@ web-build/
 !env.js
 package-lock.json
 
+# Misc
+src/ios
+src/android
+
 # ASSETS
-src/assets/Tiles
 src/assets/tracks
 .commitignore
 commit_message.md
