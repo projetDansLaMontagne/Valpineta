@@ -121,8 +121,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * ! FIN NON FONCTIONNEL
      */
 
+    if (!excursion.track) {
+      console.log("[DetailExcursion] ATTENTION track sans excursion non affiché");
+    }
+
     // si excursion est défini, on affiche les informations de l'excursion
-    return excursion ? (
+    return excursion && excursion.track ? (
       <View style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
