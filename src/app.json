@@ -27,7 +27,7 @@
         "WRITE_EXTERNAL_STORAGE"
       ],
       "package": "com.valpineta.app",
-      "versionCode": 14,
+      "versionCode": 23,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
@@ -41,7 +41,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.valpineta.app",
-      ""
+      "buildNumber": "6"
     },
     "web": {
       "favicon": "./assets/images/logo.jpg"
@@ -57,6 +57,11 @@
     },
     "plugins": [
       "expo-localization"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c6e6cfd6-6eae-4fd5-8c34-b1e8535e3478"
+      }
+    }
   }
 }
