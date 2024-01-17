@@ -1,13 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import {
-  View,
-  ViewStyle,
-  TouchableOpacity,
-  Image,
-  TextStyle,
-  Dimensions,
-} from "react-native";
+import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
 import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Screen } from "app/components";
@@ -121,12 +114,17 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * ! FIN NON FONCTIONNEL
      */
 
-    if (!excursion.track) {
-      console.log("[DetailExcursion] ATTENTION track sans excursion non affiché");
-    }
+    const swipeUpDown = () => {
+      if (swipeUpDownRef) {
+        console.log(`[DetailsExcursionScreen - useEffect] aled`);
+        swipeUpDownRef.current.showMini();
+      } else {
+        console.error("swipeUpDownRef.current is null");
+      }
+    };
 
     // si excursion est défini, on affiche les informations de l'excursion
-    return excursion && excursion.track ? (
+    return excursion ? (
       <View style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
@@ -214,6 +212,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             setIsAllSignalements={setIsAllSignalements}
             footerHeight={footerHeight}
             setStartPoint={setStartPoint}
+            swipeDown={swipeUpDown}
             style={$containerGrand}
           />
         );

@@ -177,8 +177,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
       console.log("[MapScreen] folderInfo: ", folderInfo);
       if (folderInfo.exists && !folderInfo.isDirectory) {
-        console.log("Tuiles déjà DL")
-        await fileSystem.deleteAsync(cacheDirectory, { idempotent: true })
+        console.log("Tuiles déjà DL");
+        await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
       } else {
         // Supprimer le dossier
         console.log("[MapScreen] Suppression du dossier");

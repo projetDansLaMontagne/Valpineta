@@ -1,1 +1,1 @@
-export * from './ExcursionsScreen';
+export * from "./ExcursionsScreen";
