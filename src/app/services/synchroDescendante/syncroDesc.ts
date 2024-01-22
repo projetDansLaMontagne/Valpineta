@@ -22,8 +22,9 @@
  *       - Si un fichier est présent sur le serveur mais pas sur le téléphone, je le DL.
  *       - Si un fichier est présent sur le téléphone et sur le serveur, je vérifie la date de modification.
  *    - `excursions.json`:
- *     - Je lui envoie la date de dernière modification de mon fichier `excursions.json`.
- *     - Si la date de modification est différente, je DL le fichier.
+ *     - Je lui envoie la liste des excursions que j'ai sur le téléphone et leur signalements.
+ *     - Si une excursion est présente sur le téléphone mais pas sur le serveur, je la supprime ?
+ *     - Si une excursion est présente sur le serveur mais pas sur le téléphone, je la DL.
  *
  * @author Tom Planche
  */
