@@ -1,14 +1,11 @@
 import NetInfo from "@react-native-community/netinfo";
 import { SynchroMontanteStore } from "app/models";
-import { tr } from "date-fns/locale";
-import { Alert } from "react-native";
-import { useToast } from "react-native-toast-notifications";
 import { api } from "../api";
 import { getGeneralApiProblem } from "../api/apiProblem";
 import * as ImageManipulator from 'expo-image-manipulator';
 
 
-export function synchroMontante(
+export async function synchroMontante(
     titreSignalement: string,
     type: string,
     descriptionSignalement: string,
@@ -16,76 +13,84 @@ export function synchroMontante(
     lat: number,
     lon: number,
     synchroMontanteStore: SynchroMontanteStore,
-) {
-    return new Promise(async resolve => {
-        let status = "attente";
-        const connexion = await NetInfo.fetch();
-        console.log(synchroMontanteStore.signalements);
+): Promise<string> {
+    let status = "";
 
-        if (
-            !rechercheMemeSignalement(
-                titreSignalement,
-                type,
-                descriptionSignalement,
-                photoSignalement,
-                lat,
-                lon,
-                synchroMontanteStore,
-            )
-        ) {
-            try {
-                // Redimensionner l'image
-                const imageRedimensionnee = await resizeImageFromBlob(photoSignalement, 800, 600);
-                // Convertir le chemin de l'image en blob
-                const blob = await fetch(imageRedimensionnee).then(response => response.blob());
+    try {
+        const isConnected = await NetInfo.fetch().then(state => state.isConnected);
 
-                // Convertir le blob en base64
-                const base64data = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(blob);
-                });
+        if (!rechercheMemeSignalement(
+            titreSignalement,
+            type,
+            descriptionSignalement,
+            photoSignalement,
+            lat,
+            lon,
+            synchroMontanteStore,
+        )) {
+            const imageRedimensionnee = await resizeImageFromBlob(photoSignalement);
+            const blob = await fetch(imageRedimensionnee).then(response => response.blob());
+            const base64data = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
 
-                const unSignalement = {
+            const newSignalement = {
+                nom: titreSignalement,
+                type: type,
+                description: descriptionSignalement,
+                image: base64data,
+                lienURLImage: photoSignalement,
+                lat: lat,
+                lon: lon,
+            };
+
+            synchroMontanteStore.addSignalement(newSignalement);
+
+            if (isConnected) {
+                const formattedSignalement = {
                     nom: titreSignalement,
                     type: type,
                     description: descriptionSignalement,
                     image: base64data,
-                    lienURLImage: photoSignalement,
                     lat: lat,
                     lon: lon,
                 };
-                synchroMontanteStore.addSignalement(unSignalement);
-                if (connexion.isConnected) {
-                    const signalementFormate = {
-                        nom: titreSignalement,
-                        type: type,
-                        description: descriptionSignalement,
-                        image: base64data,
-                        lat: lat,
-                        lon: lon,
-                    };
-                    const statusEnvoie = await envoieBaseDeDonnees(signalementFormate, synchroMontanteStore);
-                    if (statusEnvoie) {
-                        status = "envoye";
-                    } else {
-                        status = "erreurBDD";
-                    }
+
+                const sendStatus = await envoieBaseDeDonnees(formattedSignalement, synchroMontanteStore);
+
+                if (sendStatus) {
+                    status = "envoye";
                 } else {
-                    status = "ajoute";
+                    status = "erreur";
                 }
-            } catch (error) {
-                console.error("[SynchroMontanteService] Erreur lors de la conversion de l'image :", error);
-                status = "erreur";
+            } else {
+                status = "ajoute";
             }
         } else {
             status = "existe";
         }
-        resolve(status);
-    });
+    } catch (error) {
+        console.error("[SynchroMontanteService -> synchroMontante] Erreur :", error);
+        status = "erreur";
+    }
+
+    return status;
 }
 
+/**
+ * 
+ * @param titreSignalement 
+ * @param type 
+ * @param descriptionSignalement 
+ * @param photoSignalement 
+ * @param lat 
+ * @param lon 
+ * @param synchroMontanteStore 
+ * @returns 
+ */
 function rechercheMemeSignalement(
     titreSignalement: string,
     type: string,
@@ -113,57 +118,66 @@ function rechercheMemeSignalement(
     return memeSignalement;
 }
 
+/**
+ * 
+ * @param signalement 
+ * @param synchroMontanteStore 
+ * @returns Promise<boolean>
+ */
 export async function envoieBaseDeDonnees(signalement: any, synchroMontanteStore: SynchroMontanteStore): Promise<boolean> {
-    return new Promise(async resolve => {
-        let status = false;
-        const post_id = 2049;
+    const post_id = 2049;
 
+    try {
         if (synchroMontanteStore.getSignalementsCount() > 0) {
-            console.log("[SynchroMontanteService] Envoi des données");
-            
-            try {
-                const response = await api.apisauce.post(
-                    "set-signalement",
-                    {
-                        signalement: JSON.stringify(signalement),
-                        post_id: post_id,
-                    },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    },
-                );
+            console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Envoi des données");
 
-                if (response.ok) {
-                    console.log("[SynchroMontanteService] Données envoyées");
-                    status = true;
-                } else {
-                    console.log("[SynchroMontanteService] Erreur lors de l'envoi des données : ", getGeneralApiProblem(response));
-                    status = false;
-                }
-            } catch (error) {
-                console.error("[SynchroMontanteService] Erreur lors de l'envoi des données :", error);
-                status = false;
+            const response = await api.apisauce.post(
+                "set-signalement",
+                {
+                    signalement: JSON.stringify(signalement),
+                    post_id: post_id,
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                },
+            );
+
+            if (response.ok) {
+                console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Données envoyées");
+                // Supprimer les signalements
+                synchroMontanteStore.removeAllSignalements();
+                return true;
+            } else {
+                console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Erreur lors de l'envoi des données : ", getGeneralApiProblem(response));
+                return false;
             }
+        } else {
+            console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Aucun signalement à envoyer.");
+            return false;
         }
-
-        // Supprimer les signalements indépendamment du succès ou de l'échec de l'envoi
-        synchroMontanteStore.removeAllSignalements();
-        
-        // Renvoyer le statut une fois tout terminé
-        resolve(status);
-    });
+    } catch (error) {
+        console.error("[SynchroMontanteService -> envoieBaseDeDonnees] Erreur lors de l'envoi des données :", error);
+        return false;
+    }
 }
 
-const resizeImageFromBlob = async (uri: string, maxWidth: number, maxHeight: number, quality: number = 0.1) => {
-    console.log(uri);
+/**
+ * 
+ * @param uri 
+ * @param maxWidth par défaut 800
+ * @param maxHeight par défaut 600
+ * @param quality par défaut 0.1
+ * @returns uri de l'image redimensionnée
+ */
+const resizeImageFromBlob = async (uri: string, maxWidth: number = 800, maxHeight: number = 600, quality: number = 0.1) => {
 
     try {
         const resizedImage = await ImageManipulator.manipulateAsync(
             uri,
             [
-                { resize: { width: maxWidth, height: maxHeight } },                
+                { resize: { width: maxWidth, height: maxHeight } },
             ],
             { format: ImageManipulator.SaveFormat.JPEG, compress: quality }
         );
@@ -171,7 +185,7 @@ const resizeImageFromBlob = async (uri: string, maxWidth: number, maxHeight: num
         // Retourne le chemin de la nouvelle image redimensionnée
         return resizedImage.uri;
     } catch (error) {
-        console.error('Erreur lors du redimensionnement de l\'image :', error);
+        console.error('[SynchroMontanteService -> resizeImageFromBlob ] Erreur lors du redimensionnement de l\'image :', error);
         return null;
     }
 };

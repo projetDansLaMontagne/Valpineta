@@ -141,7 +141,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @returns {void}
      * @function envoyerSignalement
      */
-    const verifSignalement = (): void => {
+    const verifSignalement = (
+      titreSignalement: string,
+      descriptionSignalement: string,
+      photoSignalement: string,
+    ): boolean => {
+
+      let contientErreur = false;
       // Regex pour vérifier si les champs sont corrects et contiennent uniquement des caractères autorisés
       const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*-+,.:;"]+$/;
 
@@ -153,6 +159,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         titreSignalement.length > 50
       ) {
         setTitreError(true);
+        contientErreur = true;
       } else {
         setTitreError(false);
       }
@@ -165,6 +172,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         descriptionSignalement.length > 1000
       ) {
         setDescriptionError(true);
+        contientErreur = true;
       } else {
         setDescriptionError(false);
       }
@@ -172,20 +180,12 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       // Vérification de la photo
       if (photoSignalement === undefined || photoSignalement === null) {
         setPhotoError(true);
+        contientErreur = true;
       } else {
-        // // Vérification de la taille de la photo (max 5Mo) ainsi que du format
-        // const imageFormats = ["jpg", "jpeg", "png", "gif", "heic", "heif", "webp"];
-        // console.log(photoSignalement);
-        // const extension = photoSignalement.split(".").pop().toLowerCase();
-        // console.log(extension);
-        // if (!imageFormats.includes(extension)) {
-        //   setPhotoError(true);
-        // } else {
-        //   setPhotoError(false);
-        // }
         setPhotoError(false);
       }
-    };
+      return contientErreur;
+    };   
 
     const AlerteStatus = (status: string) => {
       if (status == "ajoute") {
@@ -301,37 +301,45 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       lon: number,
       synchroMontanteStore: SynchroMontanteStore,
     ): Promise<void> => {
-      let status: string = "En attente";
-
+    
       // Vérification des champs
-      verifSignalement();
-
+      const contientErreur = verifSignalement(
+        titreSignalement,
+        descriptionSignalement,
+        photoSignalement,
+      );
+    
       console.log("-----------------");
       console.log("titreError", !titreError);
       console.log("descriptionError", !descriptionError);
       console.log("photoError", !photoError);
-
+    
       // Si les champs sont corrects
-      if (!titreError && !descriptionError && !photoError) {
-        setIsLoading(true);
-        status = (await synchroMontante(
-          titreSignalement,
-          type,
-          descriptionSignalement,
-          photoSignalement,
-          lat,
-          lon,
-          synchroMontanteStore,
-        )) as string;
+      let status = "";
+      try {
+        if (!contientErreur) {
+          setIsLoading(true);
+          status = await synchroMontante(
+            titreSignalement,
+            type,
+            descriptionSignalement,
+            photoSignalement,
+            lat,
+            lon,
+            synchroMontanteStore,
+          );
+        } else {
+          status = "format";
+        }
+      } catch (error) {
+        console.error("[NouveauSignalementScreen -> envoyerSignalement] Erreur :", error);
+        status = "erreur"; 
+      } finally {
         setIsLoading(false);
-      } else {
-        status = "format";
+        AlerteStatus(status);
       }
-
-      AlerteStatus(status);
     };
-
-    // Utilisation d'effets secondaires pour déclencher la vérification des erreurs après chaque modification d'état
+    
 
     return isLoading ? (
       <Screen style={$containerLoader} preset="fixed" safeAreaEdges={["top", "bottom"]}>
@@ -416,8 +424,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
               <Button
                 style={$bouton}
                 tx="pageNouveauSignalement.boutons.valider"
-                onPress={() =>
-                  envoyerSignalement(
+                onPress={() =>  envoyerSignalement(
                     titreSignalement,
                     type,
                     descriptionSignalement,
@@ -430,7 +437,6 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
                 textStyle={$textBouton}
               />
             </View>
-            <Text text={status} size="md" />
           </Screen>
         </View>
     );
