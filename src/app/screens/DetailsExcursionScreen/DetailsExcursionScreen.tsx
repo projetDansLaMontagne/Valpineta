@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
+import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions, ImageStyle } from "react-native";
 import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Screen, Button } from "app/components";
@@ -19,6 +19,8 @@ import { SuiviTrack } from "./SuiviTrack";
 import { Erreur } from "./Erreur";
 import { DemarrerExcursion } from "./DemarrerExcursion";
 import { PopupSignalement } from "./PopupSignalement";
+import { ToastProvider } from "react-native-toast-notifications";
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -117,59 +119,95 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
-      <View style={$container}>
-        <PopupSignalement signalement={excursion.signalements} userLocation={userLocation} />
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-          <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-        </TouchableOpacity>
-        <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
-          <Image
-            style={{ tintColor: colors.bouton }}
-            source={require("assets/icons/back.png")}
-          />
-        </TouchableOpacity>
+      <ToastProvider placement="top"
+        renderType={{
+          signalement: (toast) => (
+            <View style={$containerSignalement}>
+              <View style={$containerTitreSignalement}>
+                <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
+                <Text weight="bold" size="xl" style={$titreSignalement}>{toast.message}</Text>
+                <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
+              </View>
+              <View style={$containerImageDesc}>
+                <Image source={{ uri: `data:image/png;base64,${toast.data.image}` }} style={$imageStyle} />
+                <Text style={$descriptionSignalement}>{toast.data.description}</Text>
+              </View>
+              <View style={$containerBoutons}>
+                <Button
+                  style={[$bouton, { backgroundColor: colors.bouton }]}
+                  textStyle={$texteBouton}
+                  text="Toujours présent"
+                // onPress={() => }
+                />
+                <Button
+                  style={[$bouton, { backgroundColor: colors.palette.orange }]}
+                  textStyle={$texteBouton}
+                  text="Voir moins"
+                // onPress={() => }
+                />
+                {/* <View>
+                  <Text style={{ width: 100, textAlign: "center" }}>Toujours présent ?</Text>
+                  <Image source={require("assets/icons/aime.png")} tintColor={colors.bouton} style={[$iconeStyle, { width: 40, height: 40 }]} />
+                </View>
+                <Image source={require("assets/icons/deployer.png")} style={$iconeStyle} /> */}
+              </View>
+            </View>
+          ),
+        }}>
+        <View style={$container}>
+          <PopupSignalement signalement={excursion.signalements} userLocation={userLocation} />
+          <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+            <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
+          </TouchableOpacity>
+          <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
+            <Image
+              style={{ tintColor: colors.bouton }}
+              source={require("assets/icons/back.png")}
+            />
+          </TouchableOpacity>
 
-        {allPoints && startPoint && (
-          /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
-          <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
-            <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
+          {allPoints && startPoint && (
+            /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
+            <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
+              <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
 
-            {startMiddleAndEndHandler(
-              excursion.track,
-              excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
-            )}
+              {startMiddleAndEndHandler(
+                excursion.track,
+                excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
+              )}
 
-            {signalementsHandler(excursion.signalements)}
-          </MapScreen>
-        )}
+              {signalementsHandler(excursion.signalements)}
+            </MapScreen>
+          )}
 
-        {isSuiviTrack ? (
-          <SuiviTrack
-            excursion={excursion}
-            navigation={navigation}
-            setStartPoint={setStartPoint}
-          />
-        ) : (
-          <SwipeUpDown
-            itemMini={itemMini()}
-            itemFull={itemFull(
-              excursion,
-              navigation,
-              containerInfoAffiche,
-              setcontainerInfoAffiche,
-              isAllSignalements,
-              setIsAllSignalements,
-              userLocation,
-              footerHeight,
-              changeStartPoint,
-            )}
-            animation="easeInEaseOut"
-            swipeHeight={30 + footerHeight}
-            disableSwipeIcon={true}
-            ref={swipeUpDownRef}
-          />
-        )}
-      </View>
+          {isSuiviTrack ? (
+            <SuiviTrack
+              excursion={excursion}
+              navigation={navigation}
+              setStartPoint={setStartPoint}
+            />
+          ) : (
+            <SwipeUpDown
+              itemMini={itemMini()}
+              itemFull={itemFull(
+                excursion,
+                navigation,
+                containerInfoAffiche,
+                setcontainerInfoAffiche,
+                isAllSignalements,
+                setIsAllSignalements,
+                userLocation,
+                footerHeight,
+                changeStartPoint,
+              )}
+              animation="easeInEaseOut"
+              swipeHeight={30 + footerHeight}
+              disableSwipeIcon={true}
+              ref={swipeUpDownRef}
+            />
+          )}
+        </View>
+      </ToastProvider>
     ) : (
       //sinon on affiche une 
       <Erreur navigation={navigation} />
@@ -530,3 +568,81 @@ const $souligneInfosAvis: ViewStyle = {
 };
 
 
+//////////////////////////////////////
+
+
+
+const $containerSignalement: ViewStyle = {
+  backgroundColor: colors.palette.blanc,
+  padding: 10,
+  borderRadius: 20,
+  margin: spacing.sm,
+  width: "90%"
+}
+
+const $containerTitreSignalement: ViewStyle = {
+  flexDirection: "row",
+  alignSelf: "center",
+  marginBottom: spacing.sm
+}
+
+const $titreSignalement: TextStyle = {
+  color: "black",
+  paddingLeft: spacing.sm,
+  paddingRight: spacing.sm
+}
+
+const $iconeStyle: ImageStyle = {
+  width: 30,
+  height: 30,
+  alignSelf: "center"
+}
+
+const $imageStyle: ImageStyle = {
+  marginStart: spacing.md,
+  width: 125,
+  height: 125,
+  alignSelf: "center",
+  borderRadius: 10
+}
+
+const $descriptionSignalement: TextStyle = {
+  padding: spacing.sm,
+  textAlign: "center",
+  color: "black",
+  flex: 1,
+}
+
+const $containerBoutons: ViewStyle = {
+  flexDirection: "row",
+  alignSelf: "center",
+  justifyContent: "space-around",
+  padding: 12,
+  width: "100%"
+}
+
+const $containerImageDesc: ViewStyle = {
+  flexDirection: "row",
+  alignSelf: "center",
+  paddingHorizontal: spacing.sm
+}
+
+const $bouton: ViewStyle = {
+  alignSelf: "center",
+  backgroundColor: colors.bouton,
+  borderRadius: 13,
+  borderColor: colors.fond,
+  minHeight: 10,
+  height: 25,
+  paddingVertical: 0,
+  paddingHorizontal: spacing.sm,
+  marginLeft: spacing.sm,
+  marginRight: spacing.sm
+}
+
+const $texteBouton: TextStyle = {
+  color: colors.palette.blanc,
+  fontSize: spacing.md,
+  fontWeight: "bold",
+  justifyContent: "center"
+}
