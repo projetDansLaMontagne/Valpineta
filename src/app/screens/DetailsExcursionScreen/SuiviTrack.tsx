@@ -21,12 +21,12 @@ const { width, height } = Dimensions.get("window");
 export interface SuiviTrackProps {
   excursion: Record<string, unknown>;
   navigation: any;
-  setIsSuiviTrack: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsSuiviTrack: React.Dispatch<React.SetStateAction<boolean>>;
   setStartPoint: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export function SuiviTrack(props: SuiviTrackProps) {
-  const { excursion, navigation } = props;
+  const { excursion, navigation, setStartPoint } = props;
 
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
@@ -213,7 +213,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
                 style={$containerSignalements}
                 userLocation={userLocation}
                 distanceDepuisUser={true}
-                setStartPoint={props.setStartPoint}
+                setStartPoint={setStartPoint}
                 swipeDown={showMini}
               />
             }

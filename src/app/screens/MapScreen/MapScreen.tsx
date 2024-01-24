@@ -42,12 +42,12 @@ type MapScreenProps = AppStackScreenProps<"Carte"> & {
   children?: React.ReactNode;
 } & (
     | {
-        hideOverlay: true;
-      }
+      hideOverlay: true;
+    }
     | {
-        hideOverlay: false;
-        overlayDebugMode?: boolean;
-      }
+      hideOverlay: false;
+      overlayDebugMode?: boolean;
+    }
   );
 
 type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) => void;
@@ -406,51 +406,51 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               // Oier voulait toutes les excursions sur la carte
               // si on était pas dans la page détail excursion.
               !_props.isInDetailExcursion &&
-                excursions !== undefined &&
-                excursions.length > 0 &&
-                excursions.map((excursion, index) => {
-                  if (excursion.track) {
-                    return (
-                      <React.Fragment key={index}>
-                        <Polyline
-                          coordinates={excursion.track.map(point => {
-                            return {
-                              latitude: point.lat,
-                              longitude: point.lon,
-                            } as LatLng;
-                          })}
-                          strokeColor={colors.palette.vert}
-                          strokeWidth={5}
+              excursions !== undefined &&
+              excursions.length > 0 &&
+              excursions.map((excursion, index) => {
+                if (excursion.track) {
+                  return (
+                    <React.Fragment key={index}>
+                      <Polyline
+                        coordinates={excursion.track.map(point => {
+                          return {
+                            latitude: point.lat,
+                            longitude: point.lon,
+                          } as LatLng;
+                        })}
+                        strokeColor={colors.palette.vert}
+                        strokeWidth={5}
+                        style={{
+                          zIndex: 1000000,
+                        }}
+                      />
+
+                      <Marker
+                        coordinate={
+                          {
+                            latitude: excursion.track[0].lat ?? 0,
+                            longitude: excursion.track[0].lon ?? 0,
+                          } as LatLng
+                        }
+                        title={excursion.fr.nom}
+                        centerOffset={{ x: 0, y: -15 }}
+                      >
+                        <Image
+                          source={image}
                           style={{
-                            zIndex: 1000000,
+                            width: 30,
+                            height: 30,
+                            tintColor: colors.palette.marron,
                           }}
                         />
-
-                        <Marker
-                          coordinate={
-                            {
-                              latitude: excursion.track[0].lat ?? 0,
-                              longitude: excursion.track[0].lon ?? 0,
-                            } as LatLng
-                          }
-                          title={excursion.fr.nom}
-                          centerOffset={{ x: 0, y: -15 }}
-                        >
-                          <Image
-                            source={image}
-                            style={{
-                              width: 30,
-                              height: 30,
-                              tintColor: colors.palette.marron,
-                            }}
-                          />
-                        </Marker>
-                      </React.Fragment>
-                    );
-                  } else {
-                    return null;
-                  }
-                })
+                      </Marker>
+                    </React.Fragment>
+                  );
+                } else {
+                  return null;
+                }
+              })
             }
           </MapView>
 

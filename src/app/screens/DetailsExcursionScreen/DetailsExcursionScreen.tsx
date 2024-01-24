@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
 import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
-import { Text, Screen } from "app/components";
+import { Text, Screen, Button } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
@@ -17,6 +17,7 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 import { MapScreen } from "app/screens/MapScreen";
 import { SuiviTrack } from "./SuiviTrack";
 import { Erreur } from "./Erreur";
+import { DemarrerExcursion } from "./DemarrerExcursion";
 
 const { width, height } = Dimensions.get("window");
 
@@ -119,12 +120,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>
-        {/* <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
+        <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("assets/icons/back.png")}
           />
-        </TouchableOpacity> */}
+        </TouchableOpacity>
 
         {allPoints && startPoint && (
           /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
@@ -144,7 +145,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           <SuiviTrack
             excursion={excursion}
             navigation={navigation}
-            setIsSuiviTrack={setIsSuiviTrack}
             setStartPoint={setStartPoint}
           />
         ) : (
@@ -257,7 +257,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                     ? { left: spacing.lg }
                     : { left: width - width / 2.5 - spacing.lg / 1.5 },
                 ]}
-              ></View>
+              />
+              <DemarrerExcursion excursion={excursion} setIsSuiviTrack={setIsSuiviTrack} isSuiviTrack={isSuiviTrack} userLocation={userLocation} />
               {containerInfoAffiche ? (
                 <InfosExcursion
                   excursion={excursion}
@@ -525,3 +526,5 @@ const $souligneInfosAvis: ViewStyle = {
   width: width / 2.5,
   position: "relative",
 };
+
+
