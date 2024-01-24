@@ -19,10 +19,10 @@ if (__DEV__) {
 import "./i18n";
 import "./utils/ignoreWarnings";
 import { useFonts } from "expo-font";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as Linking from "expo-linking";
-import { useInitialRootStore } from "./models";
+import { useInitialRootStore, useStores } from "./models";
 import { AppNavigator, useNavigationPersistence } from "./navigators";
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary";
 import * as storage from "./utils/storage";
@@ -31,9 +31,11 @@ import Config from "./config";
 import { colors } from "./theme";
 
 // Import pour la synchro
-import { ToastProvider } from "react-native-toast-notifications";
+import NetInfo from "@react-native-community/netinfo";
+// import BackgroundFetch from "react-native-background-fetch";
 
 //Import pour l'ui de l'ActionSheet
+import { ToastProvider } from "react-native-toast-notifications";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
@@ -99,7 +101,41 @@ function App(props: AppProps) {
     config,
   };
 
-  // otherwise, we're ready to render the app
+  // useEffect(() => {
+  //   initBackgroundFetch();
+  // }, [])
+
+  // const addEvent = (taskId) => {
+
+  //   return NetInfo.fetch().then(state => {
+  //     if (state.isConnected) {
+  //       // send notification
+  //     }
+  //   });
+  // }
+
+  // const initBackgroundFetch = async () => {
+  //   // BackgroundFetch event handler.
+  //   const onEvent = async (taskId) => {
+  //     console.log('[BackgroundFetch] task: ', taskId);
+  //     // Do your background work...
+  //     await addEvent(taskId);
+  //     // IMPORTANT:  You must signal to the OS that your task is complete.
+  //     BackgroundFetch.finish(taskId);
+  //   }
+
+  //   // Timeout callback is executed when your Task has exceeded its allowed running-time.
+  //   // You must stop what you're doing immediately BackgroundFetch.finish(taskId)
+  //   const onTimeout = async (taskId) => {
+  //     console.warn('[BackgroundFetch] TIMEOUT task: ', taskId);
+  //     BackgroundFetch.finish(taskId);
+  //   }
+
+  //   // Initialize BackgroundFetch only once when component mounts.
+  //   let status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEvent, onTimeout);
+
+  //   console.log('[BackgroundFetch] configure status: ', status);
+  // }
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ToastProvider placement="top">

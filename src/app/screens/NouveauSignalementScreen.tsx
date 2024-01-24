@@ -309,11 +309,6 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         photoSignalement,
       );
     
-      console.log("-----------------");
-      console.log("titreError", !titreError);
-      console.log("descriptionError", !descriptionError);
-      console.log("photoError", !photoError);
-    
       // Si les champs sont corrects
       let status = "";
       try {
@@ -429,8 +424,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
                     type,
                     descriptionSignalement,
                     photoSignalement,
-                    45.564,
-                    48.564,
+                    42.666,
+                    0.1034,
                     synchroMontanteStore,
                   )
                 }

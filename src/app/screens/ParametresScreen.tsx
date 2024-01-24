@@ -15,10 +15,6 @@ const { width, height } = Dimensions.get("window");
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
   const { parametres } = useStores();
 
-  useEffect(() => {
-    parametres.setLangues(I18n.locale);
-  }, []);
-
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
       <View style={$souligne}>

@@ -18,31 +18,30 @@ export async function synchroMontante(
 
     try {
         const isConnected = await NetInfo.fetch().then(state => state.isConnected);
+        const imageRedimensionnee = await resizeImageFromBlob(photoSignalement);
+        const blob = await fetch(imageRedimensionnee).then(response => response.blob());
+        const base64data = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
 
         if (!rechercheMemeSignalement(
             titreSignalement,
             type,
             descriptionSignalement,
-            photoSignalement,
+            base64data,
             lat,
             lon,
             synchroMontanteStore,
         )) {
-            const imageRedimensionnee = await resizeImageFromBlob(photoSignalement);
-            const blob = await fetch(imageRedimensionnee).then(response => response.blob());
-            const base64data = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
 
             const newSignalement = {
                 nom: titreSignalement,
                 type: type,
                 description: descriptionSignalement,
                 image: base64data,
-                lienURLImage: photoSignalement,
                 lat: lat,
                 lon: lon,
             };
@@ -50,16 +49,9 @@ export async function synchroMontante(
             synchroMontanteStore.addSignalement(newSignalement);
 
             if (isConnected) {
-                const formattedSignalement = {
-                    nom: titreSignalement,
-                    type: type,
-                    description: descriptionSignalement,
-                    image: base64data,
-                    lat: lat,
-                    lon: lon,
-                };
 
-                const sendStatus = await envoieBaseDeDonnees(formattedSignalement, synchroMontanteStore);
+                const sendStatus = await envoieBaseDeDonnees(synchroMontanteStore.signalements, synchroMontanteStore);
+                // const sendStatus = "envoye"
 
                 if (sendStatus) {
                     status = "envoye";
@@ -95,7 +87,7 @@ function rechercheMemeSignalement(
     titreSignalement: string,
     type: string,
     descriptionSignalement: string,
-    photoSignalement: string,
+    photoSignalement: unknown,
     lat: number,
     lon: number,
     synchroMontanteStore: SynchroMontanteStore,
@@ -107,7 +99,7 @@ function rechercheMemeSignalement(
             signalement.nom === titreSignalement &&
             signalement.type === type &&
             signalement.description === descriptionSignalement &&
-            signalement.lienURLImage === photoSignalement &&
+            signalement.image === photoSignalement &&
             signalement.lat === lat &&
             signalement.lon === lon
         ) {
@@ -124,7 +116,7 @@ function rechercheMemeSignalement(
  * @param synchroMontanteStore 
  * @returns Promise<boolean>
  */
-export async function envoieBaseDeDonnees(signalement: any, synchroMontanteStore: SynchroMontanteStore): Promise<boolean> {
+export async function envoieBaseDeDonnees(signalements: any, synchroMontanteStore: SynchroMontanteStore): Promise<boolean> {
     const post_id = 2049;
 
     try {
@@ -134,7 +126,7 @@ export async function envoieBaseDeDonnees(signalement: any, synchroMontanteStore
             const response = await api.apisauce.post(
                 "set-signalement",
                 {
-                    signalement: JSON.stringify(signalement),
+                    signalements: JSON.stringify(signalements),
                     post_id: post_id,
                 },
                 {
@@ -171,7 +163,7 @@ export async function envoieBaseDeDonnees(signalement: any, synchroMontanteStore
  * @param quality par défaut 0.1
  * @returns uri de l'image redimensionnée
  */
-const resizeImageFromBlob = async (uri: string, maxWidth: number = 800, maxHeight: number = 600, quality: number = 0.1) => {
+const resizeImageFromBlob = async (uri: string, maxWidth: number = 800, maxHeight: number = 600, quality: number = 1) => {
 
     try {
         const resizedImage = await ImageManipulator.manipulateAsync(
