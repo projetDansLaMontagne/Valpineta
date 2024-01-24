@@ -10,17 +10,17 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
   Animated,
-  View,
-  StyleSheet,
-  GestureResponderEvent,
-  Platform,
-  ViewStyle,
   Dimensions,
+  GestureResponderEvent,
   Image,
+  Platform,
+  StyleSheet,
+  View,
+  ViewStyle,
 } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps, TExcursion, TPoint } from "app/navigators";
 import { Screen } from "app/components";
-import { spacing, colors } from "app/theme";
+import { colors, spacing } from "app/theme";
 
 // location
 import * as Location from "expo-location";
@@ -32,8 +32,13 @@ import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
 
 import fichierJson from "assets/Tiles/tiles_struct.json";
-import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
+import {
+  copyExcursionsJson,
+  excursionsJsonExists,
+  getAndCopyGPXFiles,
+  getExcursionsJson,
+} from "../../services/synchroDescendante/synchroDesc";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
@@ -96,12 +101,15 @@ const createFolderStruct = async (
 };
 
 /**
- * Get all the tracks of the `src/assets/JSON/excursions.json` file.
- *
+ * Récupère la liste de toutes les excursions grâce au fichier JSON.
+ * Fichier dont le chemin est `EXCURSIONS_FILE_DEST`.
+ * @see src/app/services/synchroDescendante/syncroDesc.ts
  * @returns {Promise<TExcursion[]>} The list of all the tracks
  */
-const getAllTracks = (): TExcursion[] => {
-  return require("assets/JSON/excursions.json") as TExcursion[];
+const getAllTracks = async (): Promise<TExcursion[]> => {
+  return await getExcursionsJson().then((excursions: TExcursion[]) => {
+    return excursions;
+  });
 };
 
 // Component(s)
@@ -126,7 +134,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const mapRef = useRef<MapView>(null);
 
   // buttons
-  /**@warning la navigation doit se faire avec props.navigation avec Ignite */
+  /**
+   * @warning la navigation doit se faire avec props.navigation avec Ignite
+   * */
   const followLocationButtonRef = useRef(null);
   const toggleBtnMenuRef = useRef(null);
   const addPOIBtnRef = useRef(null);
@@ -167,21 +177,21 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     }
   };
 
-  const downloadTiles = async () => {
+  const downloadTiles = async (debug?: boolean) => {
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
       console.log("[MapScreen] Permission to access location was denied");
     } else {
-      console.log("[MapScreen] Permission ok");
+      debug && console.log("[MapScreen] Permission ok");
       const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
-      console.log("[MapScreen] folderInfo: ", folderInfo);
+      debug && console.log("[MapScreen] folderInfo: ", folderInfo);
       if (folderInfo.exists && !folderInfo.isDirectory) {
-        console.log("Tuiles déjà DL");
+        debug && console.log("Tuiles déjà DL");
         await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
       } else {
         // Supprimer le dossier
-        console.log("[MapScreen] Suppression du dossier");
+        debug && console.log("[MapScreen] Suppression du dossier");
         await fileSystem.deleteAsync(folderDest, { idempotent: true });
 
         const assets = await TilesRequire();
@@ -328,11 +338,30 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [excursions]);
 
   useEffect(() => {
-    downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
+    downloadTiles().then(() => {
+      console.log("[MapScreen] PAGE CHARGEE");
 
-    if (!_props.isInDetailExcursion) {
-      setExcursions(getAllTracks());
-    }
+      console.log(`[MapScreen] Vérification de l'existence de excursions.json`);
+      excursionsJsonExists()
+        .then((fileExists: boolean) => {
+          if (fileExists) {
+            console.log("[MapScreen] excursions.json existe");
+          } else {
+            console.log("[MapScreen] excursions.json n'existe pas. Création du fichier.");
+            copyExcursionsJson()
+              .then(() => console.log("[MapScreen] excursions.json copié"))
+              .catch(() => console.log("[MapScreen] excursions.json n'a pas pu être copié"));
+          }
+        })
+        .catch(() => console.log("[MapScreen] excursions.json n'existe pas"))
+        .finally(async () => {
+          if (!_props.isInDetailExcursion) {
+            setExcursions(await getAllTracks());
+          }
+        });
+    });
+
+    getAndCopyGPXFiles(); // ! pas de `.then()` car on ne veut pas attendre la fin de la copie des fichiers GPX
 
     return () => {
       removeLocationSubscription();
@@ -413,7 +442,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                     return (
                       <React.Fragment key={index}>
                         <Polyline
-                          coordinates={excursion.track.map(point => {
+                          coordinates={excursion.track.map((point: TPoint) => {
                             return {
                               latitude: point.lat,
                               longitude: point.lon,

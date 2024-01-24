@@ -25,31 +25,6 @@ export interface Coordonnees {
   alt: number;
   dist: number;
 }
-export interface T_Point extends TPoint {
-  title?: string;
-}
-type T_Language = "fr" | "es";
-type T_TypeParcoursEs = "Ida" | "Ida y Vuelta" | "Circular";
-type T_TypeParcoursFr = "Aller simple" | "Aller-retour" | "Boucle";
-type T_LanguageContent<T extends T_Language> = {
-  nom: string;
-  description: string;
-  typeParcours: T extends "fr" ? T_TypeParcoursFr : T_TypeParcoursEs;
-};
-export type TExcursion = {
-  [key in T_Language]: T_LanguageContent<key>;
-} & {
-  denivele: string;
-  difficulteOrientation: string;
-  difficulteTechnique: string;
-  distance: string;
-  duree: string;
-  vallee: string;
-  postId: number;
-  signalements: TSignalement[];
-  nomTrackGpx: string;
-  track: T_Point[];
-};
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
@@ -64,7 +39,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
     const footerHeight = useBottomTabBarHeight();
     const allPoints = excursion.track.map(
-      (point: T_Point) =>
+      (point: TPoint) =>
         ({
           latitude: point.lat,
           longitude: point.lon,
@@ -283,13 +258,13 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
  * Un parcours en aller-retour a un point d'arrivée.
  * Tous les parcours ont un point de départ et un point de milieu.
  *
- * @param track {T_Point[]} - le fichier gpx de l'excursion
+ * @param track {TPoint[]} - le fichier gpx de l'excursion
  * @param typeParcours {"Ida" | "Ida y Vuelta" | "Circular"} - le type de parcours
  *
  * @returns les points de départ, milieu et fin de l'excursion
  */
 const startMiddleAndEndHandler = (
-  track: T_Point[],
+  track: TPoint[],
   typeParcours: "Ida" | "Ida y Vuelta" | "Circular",
 ) => {
   // Point d'arrivée
@@ -301,7 +276,7 @@ const startMiddleAndEndHandler = (
     ...track[track.length - 1],
     title: "Arrivée",
   };
-  let points: T_Point[];
+  let points: TPoint[];
 
   // Calcul du point du milieu
   // Si c'est un aller-retour, le parcours étant symétrique,

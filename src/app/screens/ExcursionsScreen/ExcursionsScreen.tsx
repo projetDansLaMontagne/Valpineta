@@ -10,11 +10,12 @@ import {
   TouchableOpacity,
   Keyboard,
 } from "react-native";
-import { AppStackScreenProps, T_excursion, TFiltres, T_valeurs_filtres } from "app/navigators";
+import { AppStackScreenProps, TExcursion, TFiltres, T_valeurs_filtres } from "app/navigators";
 import { Screen, Text } from "app/components";
 import { CarteExcursion } from "./CarteExcursion";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
+import { getExcursionsJson } from "../../services/synchroDescendante/synchroDesc";
 
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
 
@@ -32,7 +33,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Cette fonction doit etre executee systematiquement lors de la synchro descendante
    * Recupere les valeurs max et les intervalles de chaque filtre (valeurs max, types de parcours, vallees)
    */
-  const calculValeursFiltres = (excursions: T_excursion[]): T_valeurs_filtres => {
+  const calculValeursFiltres = (excursions: TExcursion[]): T_valeurs_filtres => {
     // Parcourt de chaque excursion pour connaitre les maximas
     let distanceMax = 0;
     let dureeMax = 0;
@@ -90,7 +91,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Tri et filtre des excursions avec les filtres
    * Doit etre effectué a chaque modification des filtres
    */
-  function filtrageParametre(excursions: T_excursion[], filtres: TFiltres) {
+  function filtrageParametre(excursions: TExcursion[], filtres: TFiltres) {
     const nomsTypesParcours =
       parametres.langues == "fr"
         ? ["Aller simple", "Aller/retour", "Circuit"]
@@ -133,7 +134,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   /**
    * Filtre les excursions contenant le texte de la barre de recherche
    */
-  function filtrageBarre(excursionsAFiltrer: T_excursion[], recherche: string) {
+  function filtrageBarre(excursionsAFiltrer: TExcursion[], recherche: string) {
     // Filtre de la barre de recherche
     return excursionsAFiltrer.filter(excursion =>
       excursion.nom.toLowerCase().includes(recherche?.toLowerCase()),
@@ -141,7 +142,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   }
 
   // Applique la langue aux excursions
-  function applicationLangue(excursions: T_excursion[]) {
+  function applicationLangue(excursions: TExcursion[]) {
     const langue = parametres.langues;
 
     return excursions.map(excursion => {
@@ -166,15 +167,15 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   }
 
   /* --------------------------------- STATES --------------------------------- */
-  const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
+  const [allExcursions, setAllExcursions] = useState<TExcursion[]>(undefined);
   const [saisieBarre, setSaisieBarre] = useState<string>("");
 
-  const excursionsTraduites = useMemo<T_excursion[]>(
+  const excursionsTraduites = useMemo<TExcursion[]>(
     () => allExcursions && applicationLangue(allExcursions),
     [allExcursions, parametres.langues],
   );
 
-  const excursionsFiltreesParams = useMemo<T_excursion[]>(
+  const excursionsFiltreesParams = useMemo<TExcursion[]>(
     () =>
       excursionsTraduites && filtres
         ? filtrageParametre(excursionsTraduites, filtres)
@@ -192,15 +193,20 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   // Initialisation des excursions
   useEffect(() => {
+    const getExcursions = async () => {
+      const excursions = await getExcursionsJson();
+      setAllExcursions(excursions);
+    };
+
     try {
-      setAllExcursions(require("assets/JSON/excursions.json"));
+      getExcursions().then(() => console.log("Excursions chargées"));
     } catch (error) {
       throw new Error("Erreur lors du chargement du fichier JSON : " + error);
     }
   }, []);
 
   /* ------------------------------- CALL BACKS ------------------------------- */
-  const clicExcursion = (excursion: T_excursion) => {
+  const clicExcursion = (excursion: TExcursion) => {
     props.navigation.navigate("CarteStack", {
       screen: "DetailsExcursion",
       params: { excursion },
