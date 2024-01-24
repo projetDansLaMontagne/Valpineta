@@ -11,6 +11,7 @@ const palette = {
   rouge: "#FF0000",
   jaune: "#FFEE00",
   noir: "#000000",
+  orange: "#FFA500",
 
   bleuLocActive: "#3478f6",
   bleuLocInactive: "#3478f660",

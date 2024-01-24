@@ -18,6 +18,7 @@ import { MapScreen } from "app/screens/MapScreen";
 import { SuiviTrack } from "./SuiviTrack";
 import { Erreur } from "./Erreur";
 import { DemarrerExcursion } from "./DemarrerExcursion";
+import { PopupSignalement } from "./PopupSignalement";
 
 const { width, height } = Dimensions.get("window");
 
@@ -117,6 +118,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <View style={$container}>
+        <PopupSignalement signalement={excursion.signalements} userLocation={userLocation} />
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>

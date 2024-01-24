@@ -1,7 +1,7 @@
 import { Button } from "app/components";
 import { T_flat_point } from "app/navigators";
 import { colors } from "app/theme";
-import { distanceEntrePoints, recupDistance } from "app/utils/distanceEntrePoints";
+import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 import { Dimensions, ViewStyle } from "react-native";
 const { width, height } = Dimensions.get("window");
 

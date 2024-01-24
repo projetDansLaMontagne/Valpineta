@@ -26,8 +26,11 @@ import { useInitialRootStore } from "./models";
 import { AppNavigator, useNavigationPersistence } from "./navigators";
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary";
 import * as storage from "./utils/storage";
-import { customFontsToLoad } from "./theme";
+import { customFontsToLoad, spacing, colors } from "./theme";
 import Config from "./config";
+import { ToastProvider } from "react-native-toast-notifications";
+import { View, Image, TouchableOpacity, ViewStyle, ImageStyle, TextStyle } from "react-native";
+import { Button, Text } from "app/components";
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
 
@@ -95,15 +98,126 @@ function App(props: AppProps) {
   // otherwise, we're ready to render the app
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ErrorBoundary catchErrors={Config.catchErrors}>
-        <AppNavigator
-          linking={linking}
-          initialState={initialNavigationState}
-          onStateChange={onNavigationStateChange}
-        />
-      </ErrorBoundary>
+      <ToastProvider placement="top"
+        renderType={{
+          signalement: (toast) => (
+            <View style={$containerSignalement}>
+              <View style={$containerTitre}>
+                <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
+                <Text weight="bold" size="xl" style={$titreSignalement}>{toast.message}</Text>
+                <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
+              </View>
+              <View style={$containerImageDesc}>
+                <Image source={{ uri: `data:image/png;base64,${toast.data.image}` }} style={$imageStyle} />
+                <Text style={$descriptionSignalement}>{toast.data.description}</Text>
+              </View>
+              <View style={$containerBoutons}>
+                <Button
+                  style={[$bouton, { backgroundColor: colors.bouton }]}
+                  textStyle={$texteBouton}
+                  text="Toujours présent"
+                // onPress={() => }
+                />
+                <Button
+                  style={[$bouton, { backgroundColor: colors.palette.orange }]}
+                  textStyle={$texteBouton}
+                  text="Voir moins"
+                // onPress={() => }
+                />
+                {/* <View>
+                  <Text style={{ width: 100, textAlign: "center" }}>Toujours présent ?</Text>
+                  <Image source={require("assets/icons/aime.png")} tintColor={colors.bouton} style={[$iconeStyle, { width: 40, height: 40 }]} />
+                </View>
+                <Image source={require("assets/icons/deployer.png")} style={$iconeStyle} /> */}
+              </View>
+            </View>
+          ),
+        }}>
+        <ErrorBoundary catchErrors={Config.catchErrors}>
+          <AppNavigator
+            linking={linking}
+            initialState={initialNavigationState}
+            onStateChange={onNavigationStateChange}
+          />
+        </ErrorBoundary>
+      </ToastProvider>
     </SafeAreaProvider>
   );
+}
+
+const $containerSignalement: ViewStyle = {
+  backgroundColor: colors.palette.blanc,
+  padding: 10,
+  borderRadius: 20,
+  margin: spacing.sm,
+  width: "90%"
+}
+
+const $containerTitre: ViewStyle = {
+  flexDirection: "row",
+  alignSelf: "center",
+  marginBottom: spacing.sm
+}
+
+const $titreSignalement: TextStyle = {
+  color: "black",
+  paddingLeft: spacing.sm,
+  paddingRight: spacing.sm
+}
+
+const $iconeStyle: ImageStyle = {
+  width: 30,
+  height: 30,
+  alignSelf: "center"
+}
+
+const $imageStyle: ImageStyle = {
+  marginStart: spacing.md,
+  width: 125,
+  height: 125,
+  alignSelf: "center",
+  borderRadius: 10
+}
+
+const $descriptionSignalement: TextStyle = {
+  padding: spacing.sm,
+  textAlign: "center",
+  color: "black",
+  flex: 1,
+}
+
+const $containerBoutons: ViewStyle = {
+  flexDirection: "row",
+  alignSelf: "center",
+  justifyContent: "space-around",
+  padding: 12,
+  width: "100%"
+}
+
+const $containerImageDesc: ViewStyle = {
+  flexDirection: "row",
+  alignSelf: "center",
+  paddingHorizontal: spacing.sm
+}
+
+const $bouton: ViewStyle = {
+  alignSelf: "center",
+  backgroundColor: colors.bouton,
+  borderRadius: 13,
+  borderColor: colors.fond,
+  minHeight: 10,
+  height: 25,
+  paddingVertical: 0,
+  paddingHorizontal: spacing.sm,
+  marginLeft: spacing.sm,
+  marginRight: spacing.sm
+}
+
+const $texteBouton: TextStyle = {
+  color: colors.palette.blanc,
+  fontSize: spacing.md,
+  fontWeight: "bold",
+  justifyContent: "center"
 }
 
 export default App;
