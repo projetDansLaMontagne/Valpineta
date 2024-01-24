@@ -236,13 +236,15 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           <Text tx="excursions.absenceResultats" />
         ) : (
           <ScrollView style={styles.scrollContainer}>
-            {excursionsFiltreesBarre.map((excursion, i) => (
-              <CarteExcursion
-                key={i}
-                excursion={excursion}
-                onPress={() => clicExcursion(excursion)}
-              />
-            ))}
+            {excursionsFiltreesBarre.map((excursion, i) =>
+              excursion.track ? (
+                <CarteExcursion
+                  key={i}
+                  excursion={excursion}
+                  onPress={() => clicExcursion(excursion)}
+                />
+              ) : null,
+            )}
           </ScrollView>
         ))}
     </Screen>

@@ -15,6 +15,7 @@ export interface ListeSignalementsProps {
   userLocation;
   footerHeight;
   setStartPoint?: React.Dispatch<React.SetStateAction<LatLng>>;
+  swipeDown: () => void;
   style: ViewStyle;
   distanceDepuisUser?: boolean;
   swipeDown?: () => void;
