@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions, ImageStyle } from "react-native";
-import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
+import { AppStackScreenProps, TPoint, TSignalement, T_flat_point } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Screen, Button } from "app/components";
 import { spacing, colors } from "app/theme";
@@ -19,7 +19,8 @@ import { SuiviTrack } from "./SuiviTrack";
 import { Erreur } from "./Erreur";
 import { DemarrerExcursion } from "./DemarrerExcursion";
 import { PopupSignalement } from "./PopupSignalement";
-import { ToastProvider } from "react-native-toast-notifications";
+import { ToastProvider, useToast } from "react-native-toast-notifications";
+import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 
 
 const { width, height } = Dimensions.get("window");
@@ -117,45 +118,52 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }
     };
 
+    const toast = useToast();
+    //utilsier useEffect pour déclancher le toast lorsqu'on est a moins de 5 mètre d'un signalement
+    useEffect(() => {
+      if (userLocation) {
+        const coordUser: T_flat_point = {
+          lat: userLocation?.latitude,
+          lon: userLocation?.longitude,
+        };
+
+        for (let i = 0; i < excursion.signalements.length; i++) {
+          const coordSignalement: T_flat_point = {
+            lat: excursion.signalements[i].latitude,
+            lon: excursion.signalements[i].longitude,
+          };
+          console.log("coordSignalement", coordSignalement);
+          const distance = distanceEntrePoints(coordUser, coordSignalement);
+          if (distance < 0.03) {
+            toast.show(
+              excursion.signalements[i].nom,
+              {
+                type: "signalement",
+                data: {
+                  type: excursion.signalements[i].type,
+                  description: excursion.signalements[i].description,
+                  image: excursion.signalements[i].image,
+                },
+                duration: 20000,
+              }
+            )
+          }
+        }
+        console.log("coordUser", coordUser);
+      }
+    }
+      , [userLocation]);
+
+
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <ToastProvider placement="top"
         renderType={{
           signalement: (toast) => (
-            <View style={$containerSignalement}>
-              <View style={$containerTitrePopup}>
-                <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
-                <Text weight="bold" size="xl" style={$titreSignalement}>{toast.message}</Text>
-                <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
-              </View>
-              <View style={$containerImageDesc}>
-                <Image source={{ uri: `data:image/png;base64,${toast.data.image}` }} style={$imageStyle} />
-                <Text style={$descriptionSignalement}>{toast.data.description}</Text>
-              </View>
-              <View style={$containerBoutons}>
-                <Button
-                  style={[$bouton, { backgroundColor: colors.bouton }]}
-                  textStyle={$texteBouton}
-                  text="Toujours présent"
-                // onPress={() => }
-                />
-                <Button
-                  style={[$bouton, { backgroundColor: colors.palette.orange }]}
-                  textStyle={$texteBouton}
-                  text="Voir moins"
-                // onPress={() => }
-                />
-                {/* <View>
-                  <Text style={{ width: 100, textAlign: "center" }}>Toujours présent ?</Text>
-                  <Image source={require("assets/icons/aime.png")} tintColor={colors.bouton} style={[$iconeStyle, { width: 40, height: 40 }]} />
-                </View>
-                <Image source={require("assets/icons/deployer.png")} style={$iconeStyle} /> */}
-              </View>
-            </View>
+            toaster(toast)
           ),
         }}>
         <View style={$container}>
-          <PopupSignalement signalement={excursion.signalements} userLocation={userLocation} />
           <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
             <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
           </TouchableOpacity>
@@ -471,6 +479,41 @@ const signalementsHandler = (signalements: TSignalement[]) => {
     </>
   );
 };
+
+function toaster(toast) {
+  return (
+    <View style={$containerSignalement}>
+      <View style={$containerTitrePopup}>
+        <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
+        <Text weight="bold" size="xl" style={$titreSignalement}>{toast.message}</Text>
+        <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
+      </View>
+      <View style={$containerImageDesc}>
+        <Image source={{ uri: `data:image/png;base64,${toast.data.image}` }} style={$imageStyle} />
+        <Text style={$descriptionSignalement}>{toast.data.description}</Text>
+      </View>
+      <View style={$containerBoutons}>
+        <Button
+          style={[$bouton, { backgroundColor: colors.bouton }]}
+          textStyle={$texteBouton}
+          text="Toujours présent"
+        // onPress={() => }
+        />
+        <Button
+          style={[$bouton, { backgroundColor: colors.palette.orange }]}
+          textStyle={$texteBouton}
+          text="Voir moins"
+        // onPress={() => }
+        />
+        {/* <View>
+                  <Text style={{ width: 100, textAlign: "center" }}>Toujours présent ?</Text>
+                  <Image source={require("assets/icons/aime.png")} tintColor={colors.bouton} style={[$iconeStyle, { width: 40, height: 40 }]} />
+                </View>
+                <Image source={require("assets/icons/deployer.png")} style={$iconeStyle} /> */}
+      </View>
+    </View>
+  )
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                   STYLES                                   */
