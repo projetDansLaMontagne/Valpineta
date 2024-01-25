@@ -123,7 +123,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         renderType={{
           signalement: (toast) => (
             <View style={$containerSignalement}>
-              <View style={$containerTitreSignalement}>
+              <View style={$containerTitrePopup}>
                 <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
                 <Text weight="bold" size="xl" style={$titreSignalement}>{toast.message}</Text>
                 <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
@@ -580,7 +580,7 @@ const $containerSignalement: ViewStyle = {
   width: "90%"
 }
 
-const $containerTitreSignalement: ViewStyle = {
+const $containerTitrePopup: ViewStyle = {
   flexDirection: "row",
   alignSelf: "center",
   marginBottom: spacing.sm

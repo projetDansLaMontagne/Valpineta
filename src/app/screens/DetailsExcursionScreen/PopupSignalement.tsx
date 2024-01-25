@@ -17,13 +17,6 @@ export function PopupSignalement(props: PopupSignalementProps) {
     //utilsier useEffect pour déclancher le toast lorsqu'on est a moins de 5 mètre d'un signalement
 
     useEffect(() => {
-        // toute les 2 seconde je fais un toast
-
-        //     toast.show("This is a customized toast! you can impleme your own", {
-        //         type: "signalement",
-        //     })
-        // }, 5000);
-
         if (userLocation) {
             const coordUser: T_flat_point = {
                 lat: userLocation?.latitude,
@@ -38,26 +31,22 @@ export function PopupSignalement(props: PopupSignalementProps) {
                 console.log("coordSignalement", coordSignalement);
                 const distance = distanceEntrePoints(coordUser, coordSignalement);
                 if (distance < 0.03) {
-                    setInterval(() => {
-                        toast.show(
-                            signalement[i].nom,
-                            {
-                                type: "signalement",
-                                data: {
-                                    type: signalement[i].type,
-                                    description: signalement[i].description,
-                                    image: signalement[i].image,
-                                }
-                            }
-                        )
-                    }, 5000);
-                    // // console.log("distanceAAAAAAAAAAAAAAAAAAA", distance);
+                    toast.show(
+                        signalement[i].nom,
+                        {
+                            type: "signalement",
+                            data: {
+                                type: signalement[i].type,
+                                description: signalement[i].description,
+                                image: signalement[i].image,
+                            },
+                            duration: 20000,
+                        }
+                    )
                 }
             }
             console.log("coordUser", coordUser);
         }
     }
         , [userLocation]);
-
-
 }
