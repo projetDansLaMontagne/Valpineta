@@ -1,6 +1,5 @@
 import { Instance, SnapshotIn, SnapshotOut, onPatch, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import I18n from "i18n-js";
 import { reaction } from "mobx";
 
@@ -11,7 +10,6 @@ export const ParametresModel = types
   .model("Parametres")
   .props({
     langues: types.optional(types.string, "fr"),
-    isConnected: types.optional(types.boolean, false),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -19,11 +17,6 @@ export const ParametresModel = types
     setLangues: (langues: string) => {
       if (langues !== self.langues) {
         self.langues = langues;
-      }
-    },
-    setConnected: (isConnected: boolean) => {
-      if (isConnected !== self.isConnected) {
-        self.isConnected = isConnected;
       }
     },
     afterCreate() {

@@ -19,12 +19,6 @@ import { useStores } from "app/models";
 import { Text } from "app/components";
 import I18n from "i18n-js";
 
-//Import pour la synchro
-  import NetInfo from "@react-native-community/netinfo";
-import { envoieBaseDeDonnees } from "app/services/synchroMontante/synchroMontanteService";
-import { useToast } from "react-native-toast-notifications";
-
-
 const explorerLogo = require("./../../assets/icons/explorer.png");
 const carteLogo = require("./../../assets/icons/carte.png");
 const parametresLogo = require("./../../assets/icons/parametres.png");
@@ -78,36 +72,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
 
   useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
-  const { parametres, synchroMontanteStore } = useStores();
-  const [connected, setConnected] = useState(false);
-  const toast = useToast();
-
+  const { parametres } = useStores();
   useEffect(() => {}, [parametres.langues]);
-
-  // // Utilise useEffect pour déclencher l'alerte en cas de changement de connexion
-  // useEffect(() => {
-  //   if (connected !== null && connected) {
-  //     const signalements = synchroMontanteStore.getSignalements();
-  
-  //     // Utilisation de Promise.all pour attendre que toutes les promesses soient résolues
-  //     if (signalements.length > 0)
-  //     Promise.all(
-  //       signalements.map(async (signalement) => {
-  //         return await envoieBaseDeDonnees(signalement, synchroMontanteStore);
-  //       })
-  //     ).then((tabStatus) => {
-  //       // Si tous les statuts sont true, affichez le toast
-  //       if (tabStatus.every((status) => status === true)) {
-  //         parametres.langues === "fr"
-  //           ? toast.show("Les signalements ont bien été envoyés", { type: "success" })
-  //           : parametres.langues === "es" && toast.show("Las denuncias fueron enviadas correctamente", { type: "success" });
-  //       }
-  //     }
-  //     );
-  //   }
-  // }
-  // , [connected]);
-  
 
   return (
     <NavigationContainer

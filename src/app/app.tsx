@@ -32,11 +32,16 @@ import { colors } from "./theme";
 
 // Import pour la synchro
 import NetInfo from "@react-native-community/netinfo";
-// import BackgroundFetch from "react-native-background-fetch";
+import {
+  envoieBaseDeDonnees,
+  alertSynchroEffectuee,
+} from "./services/synchroMontante/synchroMontanteService";
+import { ToastProvider } from "react-native-toast-notifications";
 
 //Import pour l'ui de l'ActionSheet
-import { ToastProvider } from "react-native-toast-notifications";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import { View } from "react-native";
+import { set } from "date-fns";
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
 
@@ -69,6 +74,26 @@ interface AppProps {
  * This is the root component of our app.
  */
 function App(props: AppProps) {
+  const [isConnected, setIsConnected] = useState(false);
+  const { synchroMontanteStore } = useStores();
+
+  const checkConnection = async () => {
+    const state = await NetInfo.fetch();
+    setIsConnected(state.isConnected);
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      checkConnection();
+      isConnected &&
+        synchroMontanteStore.getSignalementsCount() > 0 &&
+        envoieBaseDeDonnees(synchroMontanteStore.getSignalements(), synchroMontanteStore) &&
+        alertSynchroEffectuee();
+    }, 1000*60*2);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   const { hideSplashScreen } = props;
   const {
     initialNavigationState,
@@ -101,54 +126,17 @@ function App(props: AppProps) {
     config,
   };
 
-  // useEffect(() => {
-  //   initBackgroundFetch();
-  // }, [])
-
-  // const addEvent = (taskId) => {
-
-  //   return NetInfo.fetch().then(state => {
-  //     if (state.isConnected) {
-  //       // send notification
-  //     }
-  //   });
-  // }
-
-  // const initBackgroundFetch = async () => {
-  //   // BackgroundFetch event handler.
-  //   const onEvent = async (taskId) => {
-  //     console.log('[BackgroundFetch] task: ', taskId);
-  //     // Do your background work...
-  //     await addEvent(taskId);
-  //     // IMPORTANT:  You must signal to the OS that your task is complete.
-  //     BackgroundFetch.finish(taskId);
-  //   }
-
-  //   // Timeout callback is executed when your Task has exceeded its allowed running-time.
-  //   // You must stop what you're doing immediately BackgroundFetch.finish(taskId)
-  //   const onTimeout = async (taskId) => {
-  //     console.warn('[BackgroundFetch] TIMEOUT task: ', taskId);
-  //     BackgroundFetch.finish(taskId);
-  //   }
-
-  //   // Initialize BackgroundFetch only once when component mounts.
-  //   let status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEvent, onTimeout);
-
-  //   console.log('[BackgroundFetch] configure status: ', status);
-  // }
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ToastProvider placement="top">
-        <ActionSheetProvider>
-          <ErrorBoundary catchErrors={Config.catchErrors}>
-            <AppNavigator
-              linking={linking}
-              initialState={initialNavigationState}
-              onStateChange={onNavigationStateChange}
-            />
-          </ErrorBoundary>
-        </ActionSheetProvider>
-      </ToastProvider>
+      <ActionSheetProvider>
+        <ErrorBoundary catchErrors={Config.catchErrors}>
+          <AppNavigator
+            linking={linking}
+            initialState={initialNavigationState}
+            onStateChange={onNavigationStateChange}
+          />
+        </ErrorBoundary>
+      </ActionSheetProvider>
     </SafeAreaProvider>
   );
 }

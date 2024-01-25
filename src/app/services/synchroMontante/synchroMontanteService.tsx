@@ -3,6 +3,8 @@ import { SynchroMontanteStore } from "app/models";
 import { api } from "../api";
 import { getGeneralApiProblem } from "../api/apiProblem";
 import * as ImageManipulator from 'expo-image-manipulator';
+import { useState } from "react";
+import { Alert } from "react-native";
 
 
 export async function synchroMontante(
@@ -14,10 +16,12 @@ export async function synchroMontante(
     lon: number,
     synchroMontanteStore: SynchroMontanteStore,
 ): Promise<string> {
+
     let status = "";
 
     try {
         const isConnected = await NetInfo.fetch().then(state => state.isConnected);
+
         const imageRedimensionnee = await resizeImageFromBlob(photoSignalement);
         const blob = await fetch(imageRedimensionnee).then(response => response.blob());
         const base64data = await new Promise((resolve, reject) => {
@@ -181,3 +185,13 @@ const resizeImageFromBlob = async (uri: string, maxWidth: number = 800, maxHeigh
         return null;
     }
 };
+
+export const alertSynchroEffectuee = () => {
+    Alert.alert(
+        "Synchronisation effectuée",
+        "Les données ont bien été envoyées au serveur.",
+        [
+            { text: "OK", onPress: () => console.log("OK Pressed") }
+        ]
+    );
+}
