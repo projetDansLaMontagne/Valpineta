@@ -37,7 +37,9 @@ import {
   copyExcursionsJson,
   excursionsJsonExists,
   getAndCopyGPXFiles,
-  getExcursionsJson,
+  getExcursionsJsonFromDevice,
+  TDebugMode,
+  updateExcursionsJsonRequest,
 } from "../../services/synchroDescendante/synchroDesc";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
@@ -104,10 +106,10 @@ const createFolderStruct = async (
  * Récupère la liste de toutes les excursions grâce au fichier JSON.
  * Fichier dont le chemin est `EXCURSIONS_FILE_DEST`.
  * @see src/app/services/synchroDescendante/syncroDesc.ts
- * @returns {Promise<TExcursion[]>} The list of all the tracks
+ * @returns {Promise<Array<TExcursion>>} The list of all the tracks
  */
-const getAllTracks = async (): Promise<TExcursion[]> => {
-  return await getExcursionsJson().then((excursions: TExcursion[]) => {
+const getAllTracks = async (): Promise<Array<TExcursion>> => {
+  return await getExcursionsJsonFromDevice().then((excursions: Array<TExcursion>) => {
     return excursions;
   });
 };
@@ -125,7 +127,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
-  const [excursions, setExcursions] = useState<TExcursion[]>(undefined);
+  const [excursions, setExcursions] = useState<Array<TExcursion>>(undefined);
 
   // Ref(s)
   const intervalRef = useRef(null);
@@ -358,6 +360,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
           if (!_props.isInDetailExcursion) {
             setExcursions(await getAllTracks());
           }
+
+          // TESTS
+          await updateExcursionsJsonRequest(TDebugMode.MEDIUM);
+          // FIN TESTS
         });
     });
 

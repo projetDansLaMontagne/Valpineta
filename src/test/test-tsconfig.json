@@ -1,10 +1,11 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "jsx": "react-native",
-    "module": "esnext",
+    "module": "es2015",
     "moduleResolution": "node",
     "noImplicitAny": false,
     "noImplicitReturns": true,
@@ -14,10 +15,7 @@
     "target": "esnext",
     "lib": ["esnext", "dom"],
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "baseUrl": "./"
+    "resolveJsonModule": true
   },
-  "exclude": ["node_modules"],
-  "include": ["index.js", "App.js", "app", "test", "*.js"],
-  "extends": "expo/tsconfig.base"
+  "include": ["**/*.test.ts", "**/*.test.tsx"]
 }

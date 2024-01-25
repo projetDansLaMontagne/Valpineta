@@ -15,7 +15,7 @@ import { Screen, Text } from "app/components";
 import { CarteExcursion } from "./CarteExcursion";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
-import { getExcursionsJson } from "../../services/synchroDescendante/synchroDesc";
+import { getExcursionsJsonFromDevice } from "../../services/synchroDescendante/synchroDesc";
 
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
 
@@ -38,8 +38,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     let distanceMax = 0;
     let dureeMax = 0;
     let deniveleMax = 0;
-    let typesParcours = [];
-    let vallees = [];
+    const typesParcours = [];
+    const vallees = [];
     let difficulteTechniqueMax = 0;
     let difficulteOrientationMax = 0;
 
@@ -76,13 +76,13 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     });
 
     return {
-      distanceMax: distanceMax,
-      dureeMax: dureeMax,
-      deniveleMax: deniveleMax,
-      typesParcours: typesParcours,
-      vallees: vallees,
-      difficulteTechniqueMax: difficulteTechniqueMax,
-      difficulteOrientationMax: difficulteOrientationMax,
+      distanceMax,
+      dureeMax,
+      deniveleMax,
+      typesParcours,
+      vallees,
+      difficulteTechniqueMax,
+      difficulteOrientationMax,
     };
   };
 
@@ -194,7 +194,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   // Initialisation des excursions
   useEffect(() => {
     const getExcursions = async () => {
-      const excursions = await getExcursionsJson();
+      const excursions = await getExcursionsJsonFromDevice();
       setAllExcursions(excursions);
     };
 
@@ -263,43 +263,43 @@ const $root: ViewStyle = {
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    marginBottom: 30,
-    height: "100%",
+  barreRecherche: {
+    flex: 1,
+    paddingLeft: 20,
   },
+  iconeFiltre: {
+    height: 30,
+    width: 30,
+  },
+
+  scrollContainer: {
+    height: "100%",
+    marginBottom: 30,
+  },
+
   searchBox: {
-    display: "flex",
-    flexDirection: "row",
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 20,
-    height: 50,
-    color: colors.palette.noir,
     backgroundColor: colors.palette.grisClair,
-    shadowColor: colors.palette.noir,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    borderWidth: 1,
+    color: colors.palette.noir,
+    display: "flex",
+    elevation: 3,
+    flexDirection: "row",
+    height: 50,
     justifyContent: "space-between",
+    shadowColor: colors.palette.noir,
     shadowOffset: {
       width: 0,
       height: 1,
     },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
-    elevation: 3,
   },
-
-  barreRecherche: {
-    flex: 1,
-    paddingLeft: 20,
-  },
-
   valleeIcone: {
-    height: "100%",
-    paddingHorizontal: 20,
-    justifyContent: "center",
     alignItems: "center",
-  },
-  iconeFiltre: {
-    width: 30,
-    height: 30,
+    height: "100%",
+    justifyContent: "center",
+    paddingHorizontal: 20,
   },
 });

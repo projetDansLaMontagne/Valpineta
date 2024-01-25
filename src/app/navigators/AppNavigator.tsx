@@ -70,6 +70,7 @@ export type TFiltres = {
   difficultesOrientation: number[];
 };
 export type TSignalement = {
+  id: number;
   description: string;
   image: string;
   latitude: number;
@@ -83,16 +84,16 @@ export type T_infoLangue = {
   typeParcours: string;
 };
 
-type T_Language = "fr" | "es";
-type T_TypeParcoursEs = "Ida" | "Ida y Vuelta" | "Circular";
-type T_TypeParcoursFr = "Aller simple" | "Aller-retour" | "Boucle";
-type T_LanguageContent<T extends T_Language> = {
+type TLanguage = "fr" | "es";
+type TTypeParcoursEs = "Ida" | "Ida y Vuelta" | "Circular";
+type TTypeParcoursFr = "Aller simple" | "Aller-retour" | "Boucle";
+export type TLanguageContent<T extends TLanguage> = {
   nom: string;
   description: string;
-  typeParcours: T extends "fr" ? T_TypeParcoursFr : T_TypeParcoursEs;
+  typeParcours: T extends "fr" ? TTypeParcoursFr : TTypeParcoursEs;
 };
 export type TExcursion = {
-  [key in T_Language]: T_LanguageContent<key>;
+  [key in TLanguage]: TLanguageContent<key>;
 } & {
   denivele: string;
   difficulteOrientation: string;
@@ -101,9 +102,9 @@ export type TExcursion = {
   duree: string;
   vallee: string;
   postId: number;
-  signalements: TSignalement[];
+  signalements: Array<TSignalement>;
   nomTrackGpx: string;
-  track: TPoint[];
+  track: Array<TPoint>;
 };
 
 // TYPES STACKS

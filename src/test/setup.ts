@@ -1,6 +1,6 @@
 // we always make sure 'react-native' gets included first
-import * as ReactNative from "react-native"
-import mockFile from "./mockFile"
+import * as ReactNative from "react-native";
+import mockFile from "./mockFile";
 
 // libraries to mock
 jest.doMock("react-native", () => {
@@ -9,7 +9,7 @@ jest.doMock("react-native", () => {
     {
       Image: {
         ...ReactNative.Image,
-        resolveAssetSource: jest.fn((_source) => mockFile), // eslint-disable-line @typescript-eslint/no-unused-vars
+        resolveAssetSource: jest.fn(_source => mockFile), // eslint-disable-line @typescript-eslint/no-unused-vars
         getSize: jest.fn(
           (
             uri: string, // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -20,23 +20,28 @@ jest.doMock("react-native", () => {
       },
     },
     ReactNative,
-  )
-})
+  );
+});
 
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
-)
+);
 
 jest.mock("i18n-js", () => ({
   currentLocale: () => "en",
   t: (key: string, params: Record<string, string>) => {
-    return `${key} ${JSON.stringify(params)}`
+    return `${key} ${JSON.stringify(params)}`;
   },
-}))
+}));
 
-declare const tron // eslint-disable-line @typescript-eslint/no-unused-vars
+jest.mock("expo-localization", () => ({
+  ...jest.requireActual("expo-localization"),
+  getLocales: () => [{ languageTag: "en-US", textDirection: "ltr" }],
+}));
 
-jest.useFakeTimers()
+declare const tron; // eslint-disable-line @typescript-eslint/no-unused-vars
+
+jest.useFakeTimers();
 declare global {
-  let __TEST__
+  let __TEST__: boolean;
 }
