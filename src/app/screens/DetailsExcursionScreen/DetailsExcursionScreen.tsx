@@ -562,7 +562,7 @@ const $container: ViewStyle = {
   backgroundColor: colors.fond,
 };
 
-//Style de itemMini
+/* ---------------------------- Style de itemMini --------------------------- */
 
 const $containerPetit: ViewStyle = {
   flex: 1,
@@ -575,7 +575,7 @@ const $containerPetit: ViewStyle = {
   padding: spacing.xxs,
 };
 
-//Style du container du titre et du bouton de téléchargement
+/* ------ Style du container du titre et du bouton de téléchargement ------ */
 
 const $containerTitre: ViewStyle = {
   flexDirection: "row",
@@ -590,7 +590,7 @@ const $titre: ViewStyle = {
   paddingRight: spacing.xl,
 };
 
-//Style du container des boutons infos et avis
+/* -------------- Style du container des boutons infos et avis -------------- */
 
 const $containerBouton: ViewStyle = {
   flexDirection: "row",
@@ -610,10 +610,7 @@ const $souligneInfosAvis: ViewStyle = {
   position: "relative",
 };
 
-
-//////////////////////////////////////
-
-
+/* ------------------------------- Style PopUp ------------------------------ */
 
 const $containerSignalement: ViewStyle = {
   backgroundColor: colors.palette.blanc,
