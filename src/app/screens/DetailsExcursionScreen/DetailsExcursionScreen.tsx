@@ -18,7 +18,6 @@ import { MapScreen } from "app/screens/MapScreen";
 import { SuiviTrack } from "./SuiviTrack";
 import { Erreur } from "./Erreur";
 import { DemarrerExcursion } from "./DemarrerExcursion";
-import { PopupSignalement } from "./PopupSignalement";
 import { ToastProvider, useToast } from "react-native-toast-notifications";
 import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 
@@ -69,6 +68,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [userLocation, setUserLocation] = useState(null);
     const [startPoint, setStartPoint] = useState<LatLng>();
     const [isSuiviTrack, setIsSuiviTrack] = useState(false);
+    const [estEntier, setEstEntier] = useState(false);
 
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
     const footerHeight = useBottomTabBarHeight();
@@ -160,7 +160,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       <ToastProvider placement="top"
         renderType={{
           signalement: (toast) => (
-            toaster(toast)
+            toaster(toast, estEntier, setEstEntier)
           ),
         }}>
         <View style={$container}>
@@ -480,7 +480,7 @@ const signalementsHandler = (signalements: TSignalement[]) => {
   );
 };
 
-function toaster(toast) {
+function toaster(toast, estEntier, setEstEntier) {
   return (
     <View style={$containerSignalement}>
       <View style={$containerTitrePopup}>
@@ -488,22 +488,26 @@ function toaster(toast) {
         <Text weight="bold" size="xl" style={$titreSignalement}>{toast.message}</Text>
         <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
       </View>
-      <View style={$containerImageDesc}>
-        <Image source={{ uri: `data:image/png;base64,${toast.data.image}` }} style={$imageStyle} />
-        <Text style={$descriptionSignalement}>{toast.data.description}</Text>
-      </View>
+      {estEntier ?
+        <View style={$containerImageDesc}>
+          <Image source={{ uri: `data:image/png;base64,${toast.data.image}` }} style={$imageStyle} />
+          <Text style={$descriptionSignalement}>{toast.data.description}</Text>
+        </View>
+        :
+        <Text style={$descriptionSignalement}>{toast.data.description}</Text>}
+
       <View style={$containerBoutons}>
         <Button
           style={[$bouton, { backgroundColor: colors.bouton }]}
           textStyle={$texteBouton}
-          text="Toujours présent"
+          tx="detailsExcursion.popup.present"
         // onPress={() => }
         />
         <Button
           style={[$bouton, { backgroundColor: colors.palette.orange }]}
           textStyle={$texteBouton}
-          text="Voir moins"
-        // onPress={() => }
+          tx={estEntier ? "detailsExcursion.popup.voirMoins" : "detailsExcursion.popup.voirPlus"}
+          onPress={() => setEstEntier(!estEntier)}
         />
         {/* <View>
                   <Text style={{ width: 100, textAlign: "center" }}>Toujours présent ?</Text>

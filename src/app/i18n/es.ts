@@ -67,6 +67,11 @@ const es = {
       titre: "Error",
       message: "Se produjo un error. Por favor, inténtalo de nuevo.",
     },
+    popup: {
+      present: "Siempre presente",
+      voirPlus: "Ver más",
+      voirMoins: "Ver menos",
+    },
   },
   suiviTrack: {
     titres: {

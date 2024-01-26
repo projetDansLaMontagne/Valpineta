@@ -68,6 +68,11 @@ const fr = {
       titre: "Erreur",
       message: "Une erreur est survenue, veuillez réessayer",
     },
+    popup: {
+      present: "Présent",
+      voirPlus: "Voir plus",
+      voirMoins: "Voir moins",
+    },
   },
   suiviTrack: {
     titres: {
