@@ -74,8 +74,8 @@ export type TFiltres = {
 export type TSignalement = {
   description: string;
   image: string;
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
   nom: string;
   type: "PointInteret" | "Avertissement";
 };

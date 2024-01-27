@@ -129,26 +129,27 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
         for (let i = 0; i < excursion.signalements.length; i++) {
           const coordSignalement: T_flat_point = {
-            lat: excursion.signalements[i].lat,
-            lon: excursion.signalements[i].lon,
+            lat: excursion.signalements[i].latitude,
+            lon: excursion.signalements[i].longitude,
           };
           // console.log("Excusrion Signalement", excursion.signalements[i])
           // console.log("coordSignalement DetailExcursion Screen", coordSignalement);
           // console.log("coordUser DetailExcursion Screen", coordUser);
           const distance = distanceEntrePoints(coordUser, coordSignalement);
           if (distance < 0.03) {
-            toast.show(
-              excursion.signalements[i].nom,
-              {
-                type: "signalement",
-                data: {
-                  type: excursion.signalements[i].type,
-                  description: excursion.signalements[i].description,
-                  image: excursion.signalements[i].image,
-                },
-                duration: 20000,
-              }
-            )
+
+            // toast.show(
+            //   excursion.signalements[i].nom,
+            //   {
+            //     type: "signalement",
+            //     data: {
+            //       type: excursion.signalements[i].type,
+            //       description: excursion.signalements[i].description,
+            //       image: excursion.signalements[i].image,
+            //     },
+            //     duration: 20000,
+            //   }
+            // )
           }
         }
         console.log("coordUser", coordUser);
