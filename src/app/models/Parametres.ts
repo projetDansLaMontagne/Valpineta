@@ -10,6 +10,7 @@ export const ParametresModel = types
   .model("Parametres")
   .props({
     langues: types.optional(types.string, "fr"),
+    tempsSynchro : types.optional(types.number, 1)
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -17,6 +18,11 @@ export const ParametresModel = types
     setLangues: (langues: string) => {
       if (langues !== self.langues) {
         self.langues = langues;
+      }
+    },
+    setTempsSynchro: (tempsSynchro: number) => {
+      if (tempsSynchro !== self.tempsSynchro) {
+        self.tempsSynchro = tempsSynchro;
       }
     },
     afterCreate() {

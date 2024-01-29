@@ -83,26 +83,26 @@ function App(props: AppProps) {
     setIsConnected(state.isConnected);
   };
 
-  // useEffect(() => {
-  //   const setupInterval = async () => {
-  //     const intervalId = setInterval(async () => {
-  //       await checkConnection();
-  //       let envoiResult = false;
+  useEffect(() => {
+    const setupInterval = async () => {
+      const intervalId = setInterval(async () => {
+        await checkConnection();
+        let envoiResult = false;
 
-  //       if (isConnected && synchroMontanteStore.getSignalementsCount() > 0) {
-  //         envoiResult = await envoieBaseDeDonnees(synchroMontanteStore.getSignalements(), synchroMontanteStore);
+        if (isConnected && synchroMontanteStore.getSignalementsCount() > 0) {
+          envoiResult = await envoieBaseDeDonnees(synchroMontanteStore.getSignalements(), synchroMontanteStore);
           
-  //         if (envoiResult) {
-  //           alertSynchroEffectuee(parametres.langues);
-  //         }
-  //       }
-  //     }, 10000);
+          if (envoiResult) {
+            alertSynchroEffectuee(parametres.langues);
+          }
+        }
+      }, parametres.tempsSynchro * 3600000);
   
-  //     return () => clearInterval(intervalId);
-  //   };
+      return () => clearInterval(intervalId);
+    };
   
-  //   setupInterval();
-  // }, [isConnected]);
+    setupInterval();
+  }, [isConnected]);
 
   const { hideSplashScreen } = props;
   const {

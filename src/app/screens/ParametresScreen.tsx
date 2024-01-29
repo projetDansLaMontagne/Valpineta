@@ -16,7 +16,6 @@ const { width, height } = Dimensions.get("window");
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
   const { parametres } = useStores();
-  const [tempsSynchro, setTempsSynchro] = useState();
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
@@ -62,8 +61,8 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
             { label: '12h', value: 12 },
             { label: '24h', value: 24 },
           ]}
-          selectedValue={tempsSynchro}
-          onValueChange={(value) => setTempsSynchro(value)}
+          selectedValue={parametres.tempsSynchro}
+          onValueChange={(value) => parametres.setTempsSynchro(value)}
           primaryColor={colors.palette.vert}
           dropdownStyle={$pickerSynchro}
           dropdownContainerStyle={$dropdownContainerStyle}
