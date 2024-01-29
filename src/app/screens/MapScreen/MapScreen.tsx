@@ -34,7 +34,7 @@ import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import {
-  copyExcursionsJson,
+  downloadExcursionsJson,
   excursionsJsonExists,
   getAndCopyGPXFiles,
   getExcursionsJsonFromDevice,
@@ -350,7 +350,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             console.log("[MapScreen] excursions.json existe");
           } else {
             console.log("[MapScreen] excursions.json n'existe pas. Création du fichier.");
-            copyExcursionsJson()
+            downloadExcursionsJson()
               .then(() => console.log("[MapScreen] excursions.json copié"))
               .catch(() => console.log("[MapScreen] excursions.json n'a pas pu être copié"));
           }

@@ -104,7 +104,7 @@ export const areObjectsEquals = <
 };
 
 /**
- * Vérifie si le fichier 'excursions.json' existe sur le téléphone.
+ * Vérifie si le fichier `excursions.json` existe sur le téléphone.
  *
  * @returns {Promise<boolean>}
  */
@@ -123,7 +123,7 @@ export const excursionsJsonExists = async (): Promise<boolean> => {
  *
  * @returns {Promise<void>}
  */
-export const copyExcursionsJson = async (): Promise<void> => {
+export const downloadExcursionsJson = async (): Promise<void> => {
   // On vérifie si le dossier 'fichiers' existe
   const fichiersFolder = await FileSystem.getInfoAsync(`${FileSystem.documentDirectory}fichiers`);
   // Si le dossier 'fichiers' n'existe pas, on le crée
@@ -132,9 +132,28 @@ export const copyExcursionsJson = async (): Promise<void> => {
   }
 
   // On copie le fichier 'excursions.json' dans le dossier 'fichiers', s'il existe, on le remplace
-  /* const { md5 } = */ await FileSystem.downloadAsync(API_EXCURSIONS_URL, EXCURSIONS_FILE_DEST, {
+  const { md5 } = await FileSystem.downloadAsync(API_EXCURSIONS_URL, EXCURSIONS_TEMP_FILE_DEST, {
     md5: true,
   });
+
+  // On récupère le MD5 du fichier sur le serveur
+  const md5API = await fetch(API_EXCURSIONS_MD5_URL).then(res => res.json() as Promise<string>);
+
+  // On compare les deux MD5 pour savoir si le téléchargement s'est bien passé.
+  if (md5 !== md5API) {
+    // Suppression du fichier temporaire
+    await FileSystem.deleteAsync(EXCURSIONS_TEMP_FILE_DEST);
+    throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
+  }
+
+  // On copie le fichier dans le dossier 'fichiers'
+  await FileSystem.copyAsync({
+    from: EXCURSIONS_TEMP_FILE_DEST,
+    to: EXCURSIONS_FILE_DEST,
+  });
+
+  // On supprime le fichier temporaire
+  await FileSystem.deleteAsync(EXCURSIONS_TEMP_FILE_DEST);
 };
 
 /**
@@ -149,7 +168,7 @@ export const getExcursionsJsonFromDevice = async (): Promise<Array<TExcursion>> 
   }
 
   throw new Error(
-    "Le fichier 'excursions.json' n'existe pas. Pensez à lancer la fonction 'copyExcursionsJson'.",
+    "Le fichier 'excursions.json' n'existe pas. Pensez à lancer la fonction 'downloadExcursionsJson'.",
   );
 };
 
@@ -348,7 +367,7 @@ const dlFile = async (file: `${string}.gpx`): Promise<void> => {
  * - Si le dossier 'GPX' n'existe pas, on le crée et on copie les fichiers.
  * - Si le dossier 'GPX' existe, on vérifie les fichiers présents et on copie les fichiers manquants.
  *
- * À exécuter au lancement de l'application mais après `copyExcursionsJson`.
+ * À exécuter au lancement de l'application mais après `downloadExcursionsJson`.
  *
  * @returns {Promise<void>}
  */
@@ -383,6 +402,44 @@ export const getAndCopyGPXFiles = async (): Promise<void> => {
     console.log(`[synchroDesc] ${missingFiles.length} fichiers GPX copiés`);
   } else {
     console.log("[synchroDesc] tous les fichiers GPX sont présents sur le téléphone");
+  }
+};
+
+/**
+ * Fonction principale de la synchronisation descendante.
+ * Exécute les fonctions dans l'ordre suivant :
+ *  - Si le fichier 'excursions.json' n'existe pas, on le copie.
+ *  - On met à jour le fichier 'excursions.json'.
+ *  - Si le dossier 'GPX' n'existe pas, on le crée et on copie les fichiers.
+ *  - Sinon, on vérifie les fichiers présents et on copie les fichiers manquants.
+ *
+ *  À exécuter au lancement de l'application et/ou toutes les X heures.
+ *
+ *  @param debug {TDebugMode} Niveau de debug.
+ *
+ *  @returns {Promise<boolean>} True si la synchronisation s'est bien passée, false sinon.
+ */
+export const synchroDescendante = async (debug?: TDebugMode): Promise<boolean> => {
+  try {
+    // On vérifie si le fichier 'excursions.json' existe
+    const excursionsJsonExist = await excursionsJsonExists();
+
+    // Si le fichier 'excursions.json' n'existe pas, on le copie
+    if (!excursionsJsonExist) {
+      await downloadExcursionsJson();
+    }
+
+    // On met à jour le fichier 'excursions.json'
+    await updateExcursionsJsonRequest(debug);
+
+    // On copie les fichiers GPX
+    await getAndCopyGPXFiles();
+
+    return true;
+  } catch (error) {
+    console.error(error);
+
+    return false;
   }
 };
 // END FUNCTIONS ======================================================================================== END FUNCTIONS
