@@ -17,9 +17,10 @@ import {
   ViewStyle,
   Dimensions,
   Image,
+  TouchableOpacity,
 } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
-import { Screen } from "app/components";
+import { AppStackScreenProps, T_flat_point } from "app/navigators";
+import { Screen, Text } from "app/components";
 import { spacing, colors } from "app/theme";
 
 // location
@@ -34,6 +35,8 @@ import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
 import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
+import { getUserLocation } from "app/utils/getUserLocation";
+
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
@@ -339,6 +342,45 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     };
   }, []);
 
+
+  const [coordinates, setCoordinates] = useState<Array<{ latitude: number; longitude: number }>>([]);
+  const [userLocation, setUserLocation] = useState(null);
+  const [region, setRegion] = useState(null);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const location = await getUserLocation();
+      setUserLocation(location);
+    };
+
+    fetchLocation();
+  }, []);
+
+  const simulateUserMovement = () => {
+    // Déplacez les coordonnées de l'utilisateur selon vos besoins.
+    if (userLocation) {
+      const newLatitude = userLocation.latitude + 0.0005;
+      const newLongitude = userLocation.longitude + 0.0001;
+
+      // Mettez à jour les coordonnées de la position de l'utilisateur.
+      setUserLocation({ latitude: newLatitude, longitude: newLongitude });
+
+      // Mettez à jour la région de la carte pour suivre la nouvelle position.
+      setRegion({
+        latitude: newLatitude,
+        longitude: newLongitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+
+      // Ajoutez les nouvelles coordonnées à la liste des coordonnées.
+      setCoordinates([...coordinates, { latitude: newLatitude, longitude: newLongitude }]);
+    }
+    else {
+      console.log("Position user pas encore recup")
+    }
+
+  };
   const { width, height } = Dimensions.get("window");
 
   const ASPECT_RATIO = width / height;
@@ -351,9 +393,15 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   return (
     <Screen style={$container} safeAreaEdges={["bottom"]}>
+      <TouchableOpacity style={{ height: 200 }} onPress={simulateUserMovement}>
+        <Text>Simuler le déplacement</Text>
+      </TouchableOpacity>
       <View style={styles.container}>
         <View style={styles.mapContainer}>
           <MapView
+            region={region}
+            // followsUserLocation
+            // onRegionChange={(newRegion) => setRegion(newRegion)}
             mapType={Platform.OS === "android" ? "none" : "standard"}
             ref={mapRef}
             style={{
@@ -362,22 +410,22 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
               ...styles.map,
             }}
-            initialRegion={{
-              latitude: _props.startLocation?.latitude ?? LATITUDE,
-              longitude: _props.startLocation?.longitude ?? LONGITUDE,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            }}
-            initialCamera={{
-              center: {
-                latitude: _props.startLocation?.latitude ?? LATITUDE,
-                longitude: _props.startLocation?.longitude ?? LONGITUDE,
-              },
-              pitch: 0,
-              heading: 0,
-              altitude: 6000,
-              zoom: 5,
-            }}
+            // initialRegion={{
+            //   latitude: _props.startLocation?.latitude ?? LATITUDE,
+            //   longitude: _props.startLocation?.longitude ?? LONGITUDE,
+            //   latitudeDelta: LATITUDE_DELTA,
+            //   longitudeDelta: LONGITUDE_DELTA,
+            // }}
+            // initialCamera={{
+            //   center: {
+            //     latitude: _props.startLocation?.latitude ?? LATITUDE,
+            //     longitude: _props.startLocation?.longitude ?? LONGITUDE,
+            //   },
+            //   pitch: 0,
+            //   heading: 0,
+            //   altitude: 6000,
+            //   zoom: 5,
+            // }}
             onMoveShouldSetResponder={handleMapMoves}
             showsBuildings={true}
             showsCompass={true}
@@ -387,9 +435,16 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             showsUserLocation={true}
             zoomControlEnabled={false}
             zoomEnabled={true}
-            minZoomLevel={12} // Niveau de zoom minimum
+          // minZoomLevel={12} // Niveau de zoom minimum
           // maxZoomLevel={15} // Niveau de zoom maximum
           >
+            {/* Marqueur pour la position actuelle */}
+            {userLocation && (
+              <Marker coordinate={{ latitude: userLocation.latitude, longitude: userLocation.longitude }} />
+            )}
+            {/* Polyline pour tracer le trajet */}
+            <Polyline coordinates={coordinates} strokeColor="green" strokeWidth={3} />
+
             <UrlTile
               urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
               tileSize={256}
