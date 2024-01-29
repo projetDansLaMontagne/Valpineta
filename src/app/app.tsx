@@ -42,6 +42,7 @@ import { ToastProvider } from "react-native-toast-notifications";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { View } from "react-native";
 import { set } from "date-fns";
+import { is } from "date-fns/locale";
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
 
@@ -75,24 +76,33 @@ interface AppProps {
  */
 function App(props: AppProps) {
   const [isConnected, setIsConnected] = useState(false);
-  const { synchroMontanteStore } = useStores();
+  const { synchroMontanteStore, parametres } = useStores();
 
   const checkConnection = async () => {
     const state = await NetInfo.fetch();
     setIsConnected(state.isConnected);
   };
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      checkConnection();
-      isConnected &&
-        synchroMontanteStore.getSignalementsCount() > 0 &&
-        envoieBaseDeDonnees(synchroMontanteStore.getSignalements(), synchroMontanteStore) &&
-        alertSynchroEffectuee();
-    }, 1000*60*2);
+  // useEffect(() => {
+  //   const setupInterval = async () => {
+  //     const intervalId = setInterval(async () => {
+  //       await checkConnection();
+  //       let envoiResult = false;
 
-    return () => clearInterval(intervalId);
-  }, []);
+  //       if (isConnected && synchroMontanteStore.getSignalementsCount() > 0) {
+  //         envoiResult = await envoieBaseDeDonnees(synchroMontanteStore.getSignalements(), synchroMontanteStore);
+          
+  //         if (envoiResult) {
+  //           alertSynchroEffectuee(parametres.langues);
+  //         }
+  //       }
+  //     }, 10000);
+  
+  //     return () => clearInterval(intervalId);
+  //   };
+  
+  //   setupInterval();
+  // }, [isConnected]);
 
   const { hideSplashScreen } = props;
   const {

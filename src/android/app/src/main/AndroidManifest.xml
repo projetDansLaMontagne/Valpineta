@@ -1,11 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-<<<<<<< HEAD
       <uses-permission android:name="android.permission.CAMERA" />
-=======
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
->>>>>>> main
 
     <queries>
       <intent>
@@ -21,6 +18,7 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/BootTheme"
+      android:supportsRtl="true"
     >
         <meta-data
             android:name="com.google.android.geo.API_KEY"

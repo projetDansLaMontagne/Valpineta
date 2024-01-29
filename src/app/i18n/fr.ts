@@ -79,6 +79,9 @@ const fr = {
       francais: "Français",
       espagnol: "Espagnol",
     },
+    choisirSynchro:{
+      titre: "Fréquence de synchronisation",
+    }
   },
   pageFiltres: {
     tri: {
