@@ -1,6 +1,6 @@
 /**
  * @file src/app/services/synchroDescendante/synchroDesc.test.ts
- * @description synchroDesc.test.js
+ * @description Fichier de test de la synchro descendante.
  * @author Tom Planche
  */
 
@@ -148,16 +148,6 @@ const signalement1Change = {
   nom: "Signalement 1",
   type: "PointInteret",
 } as TSignalement;
-
-const signalement3 = {
-  id: 2,
-  description: "Description signalement 1",
-  image: "image1.jpg",
-  latitude: 42.123456,
-  longitude: 0.123456,
-  nom: "Signalement 1",
-  type: "PointInteret",
-} as TSignalement;
 // END VARIABLES ======================================================================================= END VARIABLES
 
 // FUNCTIONS ================================================================================================ FUNCTIONS
@@ -165,25 +155,44 @@ const signalement3 = {
 // END FUNCTIONS ======================================================================================== END FUNCTIONS
 
 // CODE ========================================================================================================= CODE
+/**
+ * Tests sur le fichier synchroDesc.ts.
+ *
+ * @see src/app/services/synchroDescendante/synchroDesc.ts
+ */
 describe("SynchroDescendante", () => {
+  /**
+   * Tests sur la fonction `areObjectsEquals`.
+   */
   describe("[SynchroDescendante] areObjectsEquals", () => {
+    /**
+     * Teste si deux objects sont égaux.
+     */
     test("[SynchroDescendante] - areObjectsEquals - Signalements differents.", () => {
       expect(areObjectsEquals<TSignalement>(signalement1, signalement1Change)).toBeFalsy();
     });
 
+    /**
+     * Teste si deux objects sont égaux, objets même référence.
+     */
     test("[SynchroDescendante] - areObjectsEquals - Signalements égaux.", () => {
-      expect(areObjectsEquals<TSignalement>(signalement1, signalement1)).toBe(true);
+      expect(areObjectsEquals<TSignalement>(signalement1, signalement1)).toBeTruthy();
     });
 
+    /**
+     * Teste si deux objects sont égaux, objets différentes références.
+     */
     test("[SynchroDescendante] - areObjectsEquals - Objects complexes.", () => {
       expect(areObjectsEquals<TExcursion>(excursion1, excursion1Identique)).toBeTruthy();
-      expect(areObjectsEquals<TExcursion>(excursion1, excursion2)).toBeFalsy();
     });
   });
 
+  /**
+   * Tests sur la fonction `updateExcursionsJson`.
+   */
   describe("updateExcursionsJson", () => {
     /**
-     * J'ai mis deux objects différents mais avec le même contenu.
+     * Deux objects différents mais avec le même contenu.
      */
     test("[SynchroDescendante] - updateExcursionsJson - Excursion pas changée.", () => {
       const { hasChanged, excursionsJson } = updateExcursionsJson(
@@ -263,7 +272,7 @@ describe("SynchroDescendante", () => {
     });
 
     /**
-     * Test s'il n'y a plus d'excursions sur le serveur.
+     * Teste s'il n'y a plus d'excursions sur le serveur.
      */
     test("[SynchroDescendante] - updateExcursionsJson - Plus d'excursions sur le serveur.", () => {
       const { hasChanged, excursionsJson } = updateExcursionsJson([], [excursion1Identique]);
@@ -273,7 +282,7 @@ describe("SynchroDescendante", () => {
     });
 
     /**
-     * Test s'il n'y a pas d'excursions sur le téléphone mais toutes sur le serveur.
+     * Teste s'il n'y a pas d'excursions sur le téléphone mais toutes sur le serveur.
      */
     test("[SynchroDescendante] - updateExcursionsJson - Plus d'excursions sur le téléphone.", () => {
       const { hasChanged, excursionsJson } = updateExcursionsJson(

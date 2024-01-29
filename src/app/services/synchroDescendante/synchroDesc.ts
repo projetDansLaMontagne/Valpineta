@@ -17,27 +17,14 @@
  *
  * Ce que j'attends de l'API:
  *   - GPX:
- *     - API qui prend un fichier GPX en paramètre et qui renvoie le MD5 du fichier.
- *     - Je lui envoie la liste des fichiers GPX que j'ai sur le téléphone.
- *       - Si un fichier est présent sur le téléphone mais pas sur le serveur, je le supprime ?
- *       - Si un fichier est présent sur le serveur mais pas sur le téléphone, je le DL.
- *       - Si un fichier est présent sur le téléphone et sur le serveur, je vérifie la date de modification.
- *    - `excursions.json`:
- *     - Je lui envoie la liste des excursions que j'ai sur le téléphone et leur signalements.
- *     - Si une excursion est présente sur le téléphone mais pas sur le serveur, je la supprime ?
- *     - Si une excursion est présente sur le serveur mais pas sur le téléphone, je la DL.
+ *     - API qui prend un fichier en paramètre et qui renvoie le MD5 du fichier afin de
+ *     vérifier si le téléchargement s'est bien passé.
  *
- *     Pour chaque excursion, je vérifie les signalements.
- *
- * TODO | Afin de vérifier l'intégrité d'un DL d'un fichier, `FileSystem.downloadAsync` propose l'option `md5`,
- * TODO | qui permet de récupérer le MD5 (hash) du fichier téléchargé. Il faut donc que l'API nous renvoie le
- * TODO | MD5 du fichier.
- *
- * ! REMARQUE
- * Pour le moment, je compare chaque excursion et chaque signalement. Nous n'avons pas côté API
+ * ! REMARQUES
+ * - Pour le moment, je compare chaque excursion et chaque signalement. Nous n'avons pas côté API
  * de fonction qui permet de récupérer les excursions modifiées depuis une date donnée.
- *
- * DL des fichiers LOOONG mais fonctionnel.
+ *    -> Je pourrait MD5 chaque excursion et les comparer avec ceux du téléphone.
+ * - DL des fichiers LOOONG mais fonctionnel.
  *
  * @author Tom Planche
  */
@@ -53,6 +40,10 @@ import { TExcursion, TLanguageContent, TPoint, TSignalement } from "../../naviga
 //   md5: string;
 // };
 
+/**
+ * Niveau de debug.
+ * Ne sert que pour dev.
+ */
 export enum TDebugMode {
   LOW = 0,
   MEDIUM,
@@ -77,6 +68,14 @@ export const API_EXCURSIONS_MD5_URL = `${BASE_URL}excursions?isMd5=true`;
 // END VARIABLES ======================================================================================= END VARIABLES
 
 // FUNCTIONS ================================================================================================ FUNCTIONS
+/**
+ * Compare (récurssivement) deux objets.
+ *
+ * @param signalement1 {TExcursion | TSignalement | TPoint | TLanguageContent<"fr" | "es">} - Premier objet à comparer.
+ * @param signalement2 {TExcursion | TSignalement | TPoint | TLanguageContent<"fr" | "es">} - Deuxième objet à comparer.
+ *
+ * @returns {boolean} - True si les deux objets sont égaux, false sinon.
+ */
 export const areObjectsEquals = <
   T extends TExcursion | TSignalement | TPoint | TLanguageContent<"fr" | "es">,
 >(
@@ -91,7 +90,7 @@ export const areObjectsEquals = <
   }
 
   for (const key of keys1) {
-    // if the key is an object, we compare the objects
+    // Si la valeur est un objet, on compare récurssivement
     if (typeof signalement1[key] === "object") {
       return areObjectsEquals(signalement1[key], signalement2[key]);
     } else {
@@ -105,7 +104,7 @@ export const areObjectsEquals = <
 };
 
 /**
- * Vérifie si le fichier 'excursions.json' existe.
+ * Vérifie si le fichier 'excursions.json' existe sur le téléphone.
  *
  * @returns {Promise<boolean>}
  */
@@ -216,6 +215,8 @@ export const updateExcursionsJsonRequest = async (debug?: TDebugMode): Promise<v
  * @param excursionsServer {Array<TExcursion>} Excursions présentes sur le serveur.
  * @param excursionsJson {Array<TExcursion>} Excursions présentes sur le téléphone.
  * @param debug {boolean} Affiche des logs dans la console.
+ *
+ * @returns {boolean} True si le fichier 'excursions.json' a été modifié, false sinon.
  */
 export const updateExcursionsJson = (
   excursionsServer: Array<TExcursion>,
