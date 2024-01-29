@@ -111,7 +111,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     const swipeUpDown = () => {
       if (swipeUpDownRef) {
-        console.log(`[DetailsExcursionScreen - useEffect] aled`);
         swipeUpDownRef.current.showMini();
       } else {
         console.error("swipeUpDownRef.current is null");
@@ -132,13 +131,11 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             lat: excursion.signalements[i].latitude,
             lon: excursion.signalements[i].longitude,
           };
-          // console.log("Excusrion Signalement", excursion.signalements[i])
-          // console.log("coordSignalement DetailExcursion Screen", coordSignalement);
-          // console.log("coordUser DetailExcursion Screen", coordUser);
+
           const distance = distanceEntrePoints(coordUser, coordSignalement);
           if (distance < 0.03) {
-
-            // toast.show(
+            console.warn("aurait du afficher un popup")
+            // toast.show(  //PROBLEME AVEC LE TOAST
             //   excursion.signalements[i].nom,
             //   {
             //     type: "signalement",
@@ -152,7 +149,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             // )
           }
         }
-        console.log("coordUser", coordUser);
       }
     }
       , [userLocation]);

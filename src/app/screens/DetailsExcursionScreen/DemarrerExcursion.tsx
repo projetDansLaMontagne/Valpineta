@@ -32,19 +32,22 @@ export function DemarrerExcursion(props: DemarrerExcursionProps) {
         lon: excursion.track[0].lon,
     };
 
-    const distanceDepartExcursion = distanceEntrePoints(coordUser, coordDepartExcursion);
+    let distanceDepartExcursion
 
-    if (distanceDepartExcursion < 0.05) {
-        return (
-            <>
-                <Button
-                    style={[$buttonCommencer]}
-                    textStyle={{ color: colors.palette.blanc, fontSize: 22, fontWeight: "bold", justifyContent: "center" }}
-                    text="Commencer"
-                    onPress={() => setIsSuiviTrack(!isSuiviTrack)}
-                />
-            </>
-        )
+    if (userLocation && coordDepartExcursion) {
+        distanceDepartExcursion = distanceEntrePoints(coordUser, coordDepartExcursion);
+        if (distanceDepartExcursion < 0.05) {
+            return (
+                <>
+                    <Button
+                        style={[$buttonCommencer]}
+                        textStyle={{ color: colors.palette.blanc, fontSize: 22, fontWeight: "bold", justifyContent: "center" }}
+                        text="Commencer"
+                        onPress={() => setIsSuiviTrack(!isSuiviTrack)}
+                    />
+                </>
+            )
+        }
     }
 };
 
