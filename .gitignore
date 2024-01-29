@@ -88,6 +88,7 @@ package-lock.json
 # ASSETS
 src/assets/Tiles
 src/assets/tracks
+src/assets/JSON/excursions.json
 .commitignore
 commit_message.md
 src/node_modules
