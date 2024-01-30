@@ -23,8 +23,8 @@ interface TSignalement {
   nom: string;
   description: string;
   image: Image;
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lon: number;
 }
 
 export interface InfosExcursionProps {
@@ -144,8 +144,8 @@ export function InfosExcursion(props: InfosExcursionProps) {
                       {signalements.map((signalement, index) => {
                         // Calculate the distance for each warning
                         const coordSignalement: T_Point = {
-                          lat: signalement.latitude,
-                          lon: signalement.longitude,
+                          lat: signalement.lat,
+                          lon: signalement.lon,
                           /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
                           alt: 0,
                           dist: 0,

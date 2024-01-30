@@ -193,7 +193,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   // Initialisation des excursions
   useEffect(() => {
     try {
-      setAllExcursions(require("/assets/JSON/excursions.json"));
+      setAllExcursions(require("assets/JSON/excursions.json"));
     } catch (error) {
       throw new Error("Erreur lors du chargement du fichier JSON : " + error);
     }
@@ -236,13 +236,15 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           <Text tx="excursions.absenceResultats" />
         ) : (
           <ScrollView style={styles.scrollContainer}>
-            {excursionsFiltreesBarre.map((excursion, i) => (
-              <CarteExcursion
-                key={i}
-                excursion={excursion}
-                onPress={() => clicExcursion(excursion)}
-              />
-            ))}
+            {excursionsFiltreesBarre.map((excursion, i) =>
+              excursion.track ? (
+                <CarteExcursion
+                  key={i}
+                  excursion={excursion}
+                  onPress={() => clicExcursion(excursion)}
+                />
+              ) : null,
+            )}
           </ScrollView>
         ))}
     </Screen>

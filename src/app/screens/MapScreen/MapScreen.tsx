@@ -54,26 +54,9 @@ type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) =
 
 let COMPTEUR = 0;
 const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
+const cacheDirectory = `${fileSystem.cacheDirectory}cartes/OSM`;
 
 // Fonction(s)
-const copyFilesInBatch = async (filesToCopy, batchCount) => {
-  for (let i = 0; i < filesToCopy.length; i += batchCount) {
-    const batchFiles = filesToCopy.slice(i, i + batchCount);
-
-    // Copie des fichiers dans ce lot
-    await Promise.all(
-      batchFiles.map(async file => {
-        // Effectuer la copie du fichier ici avec FileSystem.copyAsync
-        // (Exemple: À adapter selon votre structure de fichier)
-        await fileSystem.copyAsync({
-          from: file.source,
-          to: file.destination,
-        });
-      }),
-    );
-  }
-};
-
 /**
  * Create the folder structure (recursively)
  *
@@ -99,21 +82,11 @@ const createFolderStruct = async (
 
         const assetsListUri = assetsList[COMPTEUR].localUri;
         COMPTEUR++;
-        // console.log(`downloaded ${COMPTEUR} files`)
 
-        // Copier les fichiers en lot en utilisant copyFilesInBatch
-        // Préparez la liste de fichiers à copier pour ce dossier
-        const filesToCopy = [
-          {
-            source: assetsListUri,
-            destination: `${folderDest}${fileFolder}/${fileName}`,
-          },
-          // ... autres fichiers à copier pour ce dossier
-        ];
-
-        // Copie par lot des fichiers
-        const batchCount = 10; // Nombre de fichiers par lot
-        await copyFilesInBatch(filesToCopy, batchCount);
+        await fileSystem.copyAsync({
+          from: assetsListUri,
+          to: `${folderDest}${fileFolder}/${fileName}`,
+        });
       } else {
         // Récursivement créer la structure des dossiers pour les sous-dossiers
         await createFolderStruct(folderStruct[folder], `${folderPath}/${folder}`, assetsList);
@@ -201,10 +174,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       console.log("[MapScreen] Permission to access location was denied");
     } else {
       console.log("[MapScreen] Permission ok");
-      // Vérifier si les tuiles sont déjà dl cartes/OSM/17/65682/48390.jpg
-      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/");
-      if (folderInfo.exists && folderInfo.isDirectory) {
-        console.log("[MapScreen] Tuiles déjà DL");
+      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
+      console.log("[MapScreen] folderInfo: ", folderInfo);
+      if (folderInfo.exists && !folderInfo.isDirectory) {
+        console.log("Tuiles déjà DL");
+        await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
       } else {
         // Supprimer le dossier
         console.log("[MapScreen] Suppression du dossier");
@@ -413,12 +387,21 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             showsUserLocation={true}
             zoomControlEnabled={false}
             zoomEnabled={true}
-            minZoomLevel={10} // Niveau de zoom minimum
+            minZoomLevel={12} // Niveau de zoom minimum
             maxZoomLevel={15} // Niveau de zoom maximum
           >
-            <UrlTile urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"} tileSize={256} />
+            <UrlTile
+              urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
+              tileSize={256}
+              // shouldReplaceMapContent={true}
+              style={{
+                zIndex: -1,
+                pointerEvents: "none",
+              }}
+            />
 
             {_props.children}
+
             {
               // Oier voulait toutes les excursions sur la carte
               // si on était pas dans la page détail excursion.
@@ -428,9 +411,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 excursions.map((excursion, index) => {
                   if (excursion.track) {
                     return (
-                      <>
+                      <React.Fragment key={index}>
                         <Polyline
-                          key={index}
                           coordinates={excursion.track.map(point => {
                             return {
                               latitude: point.lat,
@@ -439,17 +421,19 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                           })}
                           strokeColor={colors.palette.vert}
                           strokeWidth={5}
+                          style={{
+                            zIndex: 1000000,
+                          }}
                         />
 
                         <Marker
                           coordinate={
                             {
-                              latitude: excursion.track[0].lat,
-                              longitude: excursion.track[0].lon,
+                              latitude: excursion.track[0].lat ?? 0,
+                              longitude: excursion.track[0].lon ?? 0,
                             } as LatLng
                           }
                           title={excursion.fr.nom}
-                          key={index}
                           centerOffset={{ x: 0, y: -15 }}
                         >
                           <Image
@@ -461,7 +445,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                             }}
                           />
                         </Marker>
-                      </>
+                      </React.Fragment>
                     );
                   } else {
                     return null;
