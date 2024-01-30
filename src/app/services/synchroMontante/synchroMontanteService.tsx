@@ -4,7 +4,6 @@ import { api } from "../api";
 import { getGeneralApiProblem } from "../api/apiProblem";
 import * as ImageManipulator from "expo-image-manipulator";
 import { Alert } from "react-native";
-import { useStores } from "./../../models";
 
 export async function synchroMontante(
     titreSignalement: string,
@@ -20,14 +19,9 @@ export async function synchroMontante(
     try {
         const isConnected = await NetInfo.fetch().then(state => state.isConnected);
 
-        const imageRedimensionnee = await resizeImageFromBlob(photoSignalement);
-        const blob = await fetch(imageRedimensionnee).then(response => response.blob());
-        const base64data = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
+        // const imageRedimensionnee = await resizeImageFromBlob(photoSignalement);
+        const blob = await fetch(photoSignalement).then(response => response.blob());
+        const base64data = await blobToBase64(blob);
 
         if (
             !rechercheMemeSignalement(
@@ -153,6 +147,7 @@ export async function envoieBaseDeDonnees(
                 console.log(
                     "[SynchroMontanteService -> envoieBaseDeDonnees] Erreur lors de l'envoi des données : ",
                     getGeneralApiProblem(response),
+                    console.log(response),
                 );
                 return false;
             }
@@ -201,7 +196,7 @@ const resizeImageFromBlob = async (
     }
 };
 
-export const alertSynchroEffectuee = (langue:string) => {
+export const alertSynchroEffectuee = (langue: string) => {
     langue === "fr"
         ? Alert.alert("Synchronisation effectuée", "Les données ont bien été envoyées au serveur.", [
             { text: "OK" },
@@ -209,5 +204,12 @@ export const alertSynchroEffectuee = (langue:string) => {
         : Alert.alert("Sincronización realizada", "Los datos han sido enviados al servidor.", [
             { text: "OK" },
         ]);
-
 };
+
+function blobToBase64(blob): Promise<string> {
+    return new Promise((resolve, _) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.toString());
+        reader.readAsDataURL(blob);
+    });
+}
