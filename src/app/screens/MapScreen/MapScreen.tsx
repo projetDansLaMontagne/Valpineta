@@ -17,7 +17,6 @@ import {
   ViewStyle,
   Dimensions,
   Image,
-  TouchableOpacity,
 } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { Screen } from "app/components";
@@ -125,6 +124,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const [coordinates, setCoordinates] = useState<Array<{ latitude: number; longitude: number }>>([]);
 
   const [userLocation, setUserLocation] = useState(null);
+
+  const [estDemarre, setEstDemarre] = useState(false);
 
   // Ref(s)
   const intervalRef = useRef(null);
@@ -362,7 +363,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     if (userLocation) {
       console.log("setUserLocation", userLocation)
 
-      if (userLocation.latitude && userLocation.longitude) {
+      if (userLocation.latitude && userLocation.longitude && estDemarre) {
         console.log("setCoordinates")
         // Ajoutez les nouvelles coordonnées à la liste des coordonnées.
         setCoordinates([...coordinates, { latitude: userLocation.latitude, longitude: userLocation.longitude }]);
@@ -425,7 +426,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             maxZoomLevel={15} // Niveau de zoom maximum
           >
             {/* Polyline pour tracer le trajet */}
-            <Polyline coordinates={coordinates} strokeColor={colors.palette.vertAttenue} strokeWidth={5} />
+            <Polyline coordinates={coordinates} strokeColor={colors.palette.vertTresClair} strokeWidth={5} />
 
             <UrlTile
               urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
