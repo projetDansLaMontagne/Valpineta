@@ -1,6 +1,5 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
-import { remove } from "app/utils/storage";
 
 // Modèle pour représenter un signalement individuel
 const signalement = types.model({
@@ -35,9 +34,6 @@ export const SynchroMontanteModel = types
     addSignalement: (signalement: any) => {
       const etat = self.signalements.push(signalement);
       return etat;
-    },
-    removeSignalement: (index: number) => {
-      self.signalements.splice(index, 1);
     },
     removeAllSignalements: () => {
       self.signalements.clear();

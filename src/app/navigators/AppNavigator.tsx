@@ -109,11 +109,11 @@ type CarteStackParamList = {
   Carte: undefined;
   DetailsExcursion: undefined | { excursion: T_excursion };
   Description: { excursion: T_excursion };
+  NouveauSignalement: { type: "PointInteret" | "Avertissement" };
 };
 
 type ParametresStackParamList = {
   Parametres: undefined;
-  NouveauSignalement: { type: "PointInteret" | "Avertissement" };
 };
 
 export type AppStackParamList = {
@@ -232,6 +232,7 @@ const CarteStackScreen = () => (
     <CarteStack.Screen name="Carte" component={Screens.MapScreen} />
     <CarteStack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
     <CarteStack.Screen name="Description" component={Screens.DescriptionScreen} />
+    <CarteStack.Screen name="NouveauSignalement" component={Screens.NouveauSignalementScreen} />
   </CarteStack.Navigator>
 );
 
@@ -244,7 +245,5 @@ const ParametresStackScreen = () => (
     }}
   >
     <ParametresStack.Screen name="Parametres" component={Screens.ParametresScreen} />
-    <ParametresStack.Screen name="NouveauSignalement" component={Screens.NouveauSignalementScreen} />
-
   </ParametresStack.Navigator>
 );

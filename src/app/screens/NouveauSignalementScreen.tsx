@@ -1,5 +1,5 @@
 // Librairies
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
   TextStyle,
@@ -11,14 +11,14 @@ import {
   Alert,
   ActivityIndicator,
   TouchableOpacity,
+  ImageStyle,
 } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
-import { Button, TextField } from "app/components";
+import { Button } from "app/components";
 import * as ImagePicker from "expo-image-picker";
-import { RootStore, SynchroMontanteStore, useStores } from "app/models";
+import { SynchroMontanteStore, useStores } from "app/models";
 import { synchroMontante } from "app/services/synchroMontante/synchroMontanteService";
-import NetInfo from "@react-native-community/netinfo";
 import { goBack } from "app/navigators";
 import {useActionSheet } from "@expo/react-native-action-sheet";
 // Composants
@@ -34,11 +34,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const { parametres, synchroMontanteStore } = useStores();
 
     //type de signalement
-    let type = "";
+    let type = "" as string;
     if (props.route.params) {
       type = props.route.params.type;
     } else {
-      throw new Error("Type de signalement non défini");
+      throw new Error("[NouveauSignalementScreen] Type de signalement non défini");
     }
 
     // Variables
@@ -55,11 +55,15 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [descriptionError, setDescriptionError] = useState(false);
     const [photoError, setPhotoError] = useState(false);
 
-    const [status, setStatus] = useState("");
+    //Variables pour le loader
     const [isLoading, setIsLoading] = useState(false);
 
+    // ActionSheet
     const { showActionSheetWithOptions } = useActionSheet();
 
+    /**
+     * Fonction pour choisir entre prendre une photo ou choisir une photo dans la librairie
+     */
     const choixPhoto = () => {
       showActionSheetWithOptions(
         {
@@ -83,22 +87,16 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @function prendrePhoto
      */
     const prendrePhoto = async (): Promise<void> => {
-      // On vétifie si l'application a accès à la caméra
       if (cameraPermission) {
         let photo = await ImagePicker.launchCameraAsync();
-        // On vérifie si l'utilisateur a annulé la prise de photo
         if (!photo.canceled) {
           setPhotoSignalement(photo.assets[0].uri);
         }
       } else {
-        // On demande l'accès à la caméra
         const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
         if (cameraStatus.granted) {
-          // Si l'accès est accordé, on met la variable à true
           setCameraPermission(true);
-          // On ouvre la caméra
           let photo = await ImagePicker.launchCameraAsync();
-          // On vérifie si l'utilisateur a annulé la prise de photo
           if (!photo.canceled) {
             setPhotoSignalement(photo.assets[0].uri);
           }
@@ -113,22 +111,16 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @function choisirPhoto
      */
     const choisirPhoto = async (): Promise<void> => {
-      // On vérifie si l'application a accès à la librairie
       if (LibrairiesPermission) {
         let photo = await ImagePicker.launchImageLibraryAsync();
-        // On vérifie si l'utilisateur a annulé la prise de photo
         if (!photo.canceled) {
           setPhotoSignalement(photo.assets[0].uri);
         }
       } else {
-        // On demande l'accès à la librairie
         const LibrairiesStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        // Si l'accès est accordé, on met la variable à true
         if (LibrairiesStatus.granted) {
           setLibrairiesPermission(true);
-          // On ouvre la librairie
           let photo = await ImagePicker.launchImageLibraryAsync();
-          // On vérifie si l'utilisateur a annulé la prise de photo
           if (!photo.canceled) {
             setPhotoSignalement(photo.assets[0].uri);
           }
@@ -187,6 +179,10 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       return contientErreur;
     };   
 
+    /**
+     * fonction pour afficher une alerte en fonction du status
+     * @param status 
+     */
     const AlerteStatus = (status: string) => {
       if (status == "ajoute") {
         if (parametres.langues == "fr") {
@@ -302,15 +298,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       synchroMontanteStore: SynchroMontanteStore,
     ): Promise<void> => {
     
-      // Vérification des champs
       const contientErreur = verifSignalement(
         titreSignalement,
         descriptionSignalement,
         photoSignalement,
       );
     
-      // Si les champs sont corrects
-      let status = "";
+      let status = "" as string;
       try {
         if (!contientErreur) {
           setIsLoading(true);
@@ -419,11 +413,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
               <Button
                 style={$bouton}
                 tx="pageNouveauSignalement.boutons.valider"
-                onPress={() =>  envoyerSignalement(
+                onPress={() => 
+                  envoyerSignalement(
                     titreSignalement,
                     type,
                     descriptionSignalement,
                     photoSignalement,
+                    // WARNING A CHANGER AVEC LA LOCALISATION
                     42.666,
                     0.1034,
                     synchroMontanteStore,
@@ -438,7 +434,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
   },
 );
 
-// Styles
+/* -------------------------------------------------------------------------- */
+/*                                   STYLES                                   */
+/* -------------------------------------------------------------------------- */
 
 const { width } = Dimensions.get("window");
 
@@ -489,7 +487,7 @@ const $inputDescription: TextStyle = {
   height: 200,
 };
 
-const $image: TextStyle = {
+const $image: ImageStyle = {
   width: "100%",
   height: width,
   marginBottom: spacing.sm,

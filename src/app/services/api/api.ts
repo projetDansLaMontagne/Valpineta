@@ -36,7 +36,6 @@ export class Api {
       responseType: "arraybuffer",
       headers: {
         Accept: "application/json",
-        "Content-Type": "multipart/form-data",
       },
     });
   }

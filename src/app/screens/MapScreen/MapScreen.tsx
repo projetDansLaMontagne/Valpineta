@@ -34,6 +34,10 @@ import * as fileSystem from "expo-file-system";
 // import fichierJson from "assets/Tiles/tiles_struct.json";
 import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
+
+//navigation
+import { navigate } from "app/navigators";
+
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
@@ -272,8 +276,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     setGavePermission(true);
   };
 
-  const poiButtonOnPress = async () => {
-    console.log("[MapScreen] poiButtonOnPress()");
+  const ButtonOnPressAvertissement = async () => {
+      navigate("NouveauSignalement", { type: "Avertissement" });
+  };
+
+  const ButtonOnPressPointInteret = async () => {
+      navigate("NouveauSignalement", { type: "PointInteret" });
   };
 
   const toggleMenu = () => {
@@ -470,7 +478,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                       style={{
                         ...styles.actionsButtonContainer,
                       }}
-                      onPress={poiButtonOnPress}
+                      onPress={ButtonOnPressAvertissement}
                       icon={"eye"}
                       iconSize={spacing.lg}
                       iconColor={colors.palette.blanc}
@@ -480,6 +488,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                       style={{
                         ...styles.actionsButtonContainer,
                       }}
+                      onPress={ButtonOnPressPointInteret}
                       icon="exclamation-circle"
                       iconSize={spacing.lg}
                       iconColor={colors.palette.blanc}

@@ -1,15 +1,13 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC } from "react";
 import { observer } from "mobx-react-lite";
-import { ViewStyle, TextStyle, Dimensions, View, TouchableOpacity, TouchableHighlight } from "react-native";
+import { ViewStyle, TextStyle, Dimensions, View, TouchableOpacity } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Screen, Text, Button } from "app/components";
+import { Screen, Text } from "app/components";
 import { colors, spacing } from "app/theme";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useStores } from "app/models";
-import I18n, { t } from "i18n-js";
-import { navigate } from "app/navigators";
+import I18n from "i18n-js";
 import Dropdown from 'react-native-input-select';
-import { te } from "date-fns/locale";
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> { }
 const { width, height } = Dimensions.get("window");
@@ -61,9 +59,6 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           dropdownContainerStyle={$dropdownContainerStyle}
         />
       </View>
-      <Button text="Navigation vers nouveau signalement" onPress={() => {
-        navigate("NouveauSignalement", { type: "Avertissement" });
-      }} />
     </Screen>
   );
 });
