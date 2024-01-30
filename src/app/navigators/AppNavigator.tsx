@@ -113,6 +113,7 @@ type CarteStackParamList = {
 
 type ParametresStackParamList = {
   Parametres: undefined;
+  NouveauSignalement: { type: "PointInteret" | "Avertissement" };
 };
 
 export type AppStackParamList = {
@@ -243,5 +244,7 @@ const ParametresStackScreen = () => (
     }}
   >
     <ParametresStack.Screen name="Parametres" component={Screens.ParametresScreen} />
+    <ParametresStack.Screen name="NouveauSignalement" component={Screens.NouveauSignalementScreen} />
+
   </ParametresStack.Navigator>
 );

@@ -62,12 +62,8 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         />
       </View>
       <Button text="Navigation vers nouveau signalement" onPress={() => {
-        navigate("Stack", {
-          screen: "NouveauSignalement",
-          params: { type: "Avertissement" },
-        });
-      }
-      } />
+        navigate("NouveauSignalement", { type: "Avertissement" });
+      }} />
     </Screen>
   );
 });

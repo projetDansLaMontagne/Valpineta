@@ -29,9 +29,9 @@ import MapButton from "./MapButton";
 import { Asset } from "expo-asset";
 
 import * as fileSystem from "expo-file-system";
-import TilesRequire from "app/services/importAssets/tilesRequire";
+// import TilesRequire from "app/services/importAssets/tilesRequire";
 
-import fichierJson from "assets/Tiles/tiles_struct.json";
+// import fichierJson from "assets/Tiles/tiles_struct.json";
 import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
 // variables
