@@ -361,18 +361,13 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   useEffect(() => {
     if (userLocation) {
-      console.log("setUserLocation", userLocation)
-
       if (userLocation.latitude && userLocation.longitude && estDemarre) {
-        console.log("setCoordinates")
         // Ajoutez les nouvelles coordonnées à la liste des coordonnées.
         setCoordinates([...coordinates, { latitude: userLocation.latitude, longitude: userLocation.longitude }]);
       };
     }
 
   }, [userLocation]);
-
-
 
   const { width, height } = Dimensions.get("window");
 

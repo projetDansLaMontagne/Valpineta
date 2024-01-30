@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions, ImageStyle } from "react-native";
+import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions, ImageStyle, Modal } from "react-native";
 import { AppStackScreenProps, TPoint, TSignalement, T_flat_point } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Screen, Button } from "app/components";
@@ -18,7 +18,6 @@ import { MapScreen } from "app/screens/MapScreen";
 import { SuiviTrack } from "./SuiviTrack";
 import { Erreur } from "./Erreur";
 import { DemarrerExcursion } from "./DemarrerExcursion";
-import { ToastProvider, useToast } from "react-native-toast-notifications";
 import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 
 
@@ -69,6 +68,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [startPoint, setStartPoint] = useState<LatLng>();
     const [isSuiviTrack, setIsSuiviTrack] = useState(false);
     const [estEntier, setEstEntier] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [signalementPopup, setSignalementPopup] = useState(null);
 
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
     const footerHeight = useBottomTabBarHeight();
@@ -117,8 +118,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }
     };
 
-    const toast = useToast();
-    //utilsier useEffect pour déclancher le toast lorsqu'on est a moins de 5 mètre d'un signalement
+    //utilsier useEffect pour déclancher le popup lorsqu'on est a moins de 5 mètre d'un signalement
     useEffect(() => {
       if (userLocation) {
         const coordUser: T_flat_point = {
@@ -134,19 +134,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
           const distance = distanceEntrePoints(coordUser, coordSignalement);
           if (distance < 0.03) {
-            console.warn("aurait du afficher un popup")
-            // toast.show(  //PROBLEME AVEC LE TOAST
-            //   excursion.signalements[i].nom,
-            //   {
-            //     type: "signalement",
-            //     data: {
-            //       type: excursion.signalements[i].type,
-            //       description: excursion.signalements[i].description,
-            //       image: excursion.signalements[i].image,
-            //     },
-            //     duration: 20000,
-            //   }
-            // )
+            setModalVisible(true)
+            setSignalementPopup(excursion.signalements[i])
           }
         }
       }
@@ -156,65 +145,66 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
-      <ToastProvider placement="top"
-        renderType={{
-          signalement: (toast) => (
-            toaster(toast, estEntier, setEstEntier)
-          ),
-        }}>
-        <View style={$container}>
-          <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-            <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-          </TouchableOpacity>
-          <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
-            <Image
-              style={{ tintColor: colors.bouton }}
-              source={require("assets/icons/back.png")}
-            />
-          </TouchableOpacity>
-
-          {allPoints && startPoint && (
-            /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
-            <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
-              <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
-
-              {startMiddleAndEndHandler(
-                excursion.track,
-                excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
-              )}
-
-              {signalementsHandler(excursion.signalements)}
-            </MapScreen>
+      <View style={$container}>
+        <Modal
+          animationType="slide"
+          visible={modalVisible}
+          transparent={true}
+        >
+          {modalVisible && (
+            AffichePopup(signalementPopup, setModalVisible, estEntier, setEstEntier)
           )}
+        </Modal>
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+          <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
+        </TouchableOpacity>
+        <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
+          <Image
+            style={{ tintColor: colors.bouton }}
+            source={require("assets/icons/back.png")}
+          />
+        </TouchableOpacity>
 
-          {isSuiviTrack ? (
-            <SuiviTrack
-              excursion={excursion}
-              navigation={navigation}
-              setStartPoint={setStartPoint}
-            />
-          ) : (
-            <SwipeUpDown
-              itemMini={itemMini()}
-              itemFull={itemFull(
-                excursion,
-                navigation,
-                containerInfoAffiche,
-                setcontainerInfoAffiche,
-                isAllSignalements,
-                setIsAllSignalements,
-                userLocation,
-                footerHeight,
-                changeStartPoint,
-              )}
-              animation="easeInEaseOut"
-              swipeHeight={30 + footerHeight}
-              disableSwipeIcon={true}
-              ref={swipeUpDownRef}
-            />
-          )}
-        </View>
-      </ToastProvider>
+        {allPoints && startPoint && (
+          /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
+          <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
+            <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
+
+            {startMiddleAndEndHandler(
+              excursion.track,
+              excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
+            )}
+
+            {signalementsHandler(excursion.signalements)}
+          </MapScreen>
+        )}
+
+        {isSuiviTrack ? (
+          <SuiviTrack
+            excursion={excursion}
+            navigation={navigation}
+            setStartPoint={setStartPoint}
+          />
+        ) : (
+          <SwipeUpDown
+            itemMini={itemMini()}
+            itemFull={itemFull(
+              excursion,
+              navigation,
+              containerInfoAffiche,
+              setcontainerInfoAffiche,
+              isAllSignalements,
+              setIsAllSignalements,
+              userLocation,
+              footerHeight,
+            )}
+            animation="easeInEaseOut"
+            swipeHeight={30 + footerHeight}
+            disableSwipeIcon={true}
+            ref={swipeUpDownRef}
+          />
+        )}
+      </View>
     ) : (
       //sinon on affiche une 
       <Erreur navigation={navigation} />
@@ -479,28 +469,37 @@ const signalementsHandler = (signalements: TSignalement[]) => {
   );
 };
 
-function toaster(toast, estEntier, setEstEntier) {
+function AffichePopup(signalement, setModalVisible, estEntier, setEstEntier) {
   return (
     <View style={$containerSignalement}>
       <View style={$containerTitrePopup}>
-        <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
-        <Text weight="bold" size="xl" style={$titreSignalement}>{toast.message}</Text>
-        <Image tintColor={toast.data.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={toast.data.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
+        <Image tintColor={signalement.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={signalement.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
+        <Text weight="bold" size="xl" style={$titreSignalement}>{signalement.nom}</Text>
+        <Image tintColor={signalement.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={signalement.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
       </View>
       {estEntier ?
         <View style={$containerImageDesc}>
-          <Image source={{ uri: `data:image/png;base64,${toast.data.image}` }} style={$imageStyle} />
-          <Text style={$descriptionSignalement}>{toast.data.description}</Text>
+          <Image source={{ uri: `data:image/png;base64,${signalement.image}` }} style={$imageStyle} />
+          <Text style={[$descriptionSignalement, {
+            padding: spacing.md,
+            flex: 1,
+          }]}>{signalement.description}</Text>
         </View>
         :
-        <Text style={$descriptionSignalement}>{toast.data.description}</Text>}
+        <Text style={$descriptionSignalement}>{signalement.description}</Text>}
 
       <View style={$containerBoutons}>
         <Button
           style={[$bouton, { backgroundColor: colors.bouton }]}
           textStyle={$texteBouton}
           tx="detailsExcursion.popup.present"
-        // onPress={() => }
+          onPress={() => setModalVisible(false)}
+        />
+        <Button
+          style={[$bouton, { backgroundColor: colors.palette.rouge }]}
+          textStyle={$texteBouton}
+          tx="detailsExcursion.popup.absent"
+          onPress={() => setModalVisible(false)}
         />
         <Button
           style={[$bouton, { backgroundColor: colors.palette.orange }]}
@@ -616,6 +615,7 @@ const $souligneInfosAvis: ViewStyle = {
 /* ------------------------------- Style PopUp ------------------------------ */
 
 const $containerSignalement: ViewStyle = {
+  marginTop: spacing.xl,
   backgroundColor: colors.palette.blanc,
   padding: 10,
   borderRadius: 20,
@@ -650,10 +650,8 @@ const $imageStyle: ImageStyle = {
 }
 
 const $descriptionSignalement: TextStyle = {
-  padding: spacing.sm,
   textAlign: "center",
   color: "black",
-  flex: 1,
 }
 
 const $containerBoutons: ViewStyle = {

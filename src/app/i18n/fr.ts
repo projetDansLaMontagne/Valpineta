@@ -70,6 +70,7 @@ const fr = {
     },
     popup: {
       present: "Présent",
+      absent: "Absent",
       voirPlus: "Voir plus",
       voirMoins: "Voir moins",
     },

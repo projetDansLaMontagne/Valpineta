@@ -69,6 +69,7 @@ const es = {
     },
     popup: {
       present: "Siempre presente",
+      absent: "Ausente",
       voirPlus: "Ver más",
       voirMoins: "Ver menos",
     },
