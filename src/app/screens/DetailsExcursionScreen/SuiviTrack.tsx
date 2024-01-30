@@ -23,10 +23,11 @@ export interface SuiviTrackProps {
   navigation: any;
   // setIsSuiviTrack: React.Dispatch<React.SetStateAction<boolean>>;
   setStartPoint: React.Dispatch<React.SetStateAction<any>>;
+  setExcursionTerminee
 }
 
 export function SuiviTrack(props: SuiviTrackProps) {
-  const { excursion, navigation, setStartPoint } = props;
+  const { excursion, navigation, setStartPoint, setExcursionTerminee } = props;
 
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
@@ -127,7 +128,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
               tintColor={colors.bouton}
               source={chronoRunning ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { resetChrono() }}>
+          <TouchableOpacity onPress={() => { resetChrono(); setExcursionTerminee(true) }}>
             <Image style={$boutonPauseArret} source={require("assets/icons/arret.png")} />
           </TouchableOpacity>
         </View>

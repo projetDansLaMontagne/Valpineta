@@ -20,6 +20,7 @@ import { Erreur } from "./Erreur";
 import { DemarrerExcursion } from "./DemarrerExcursion";
 import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 import { PopupSignalement } from "./PopupSignalement";
+import { ExcursionTerminee } from "./ExcursionTerminee";
 
 
 const { width, height } = Dimensions.get("window");
@@ -69,8 +70,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [startPoint, setStartPoint] = useState<LatLng>();
     const [isSuiviTrack, setIsSuiviTrack] = useState(false);
     const [estEntier, setEstEntier] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalSignalementVisible, setModalSignalementVisible] = useState(false);
     const [signalementPopup, setSignalementPopup] = useState(null);
+    const [modalExcursionTermineeVisible, setModalExcursionTermineeVisible] = useState(false);
+    const [excursionTerminee, setExcursionTerminee] = useState(false); // A REMPLACER PAR L ETAT DE NICO
 
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
     const footerHeight = useBottomTabBarHeight();
@@ -81,10 +84,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         longitude: point.lon,
       } as LatLng),
     );
-
-    const changeStartPoint = (point: LatLng) => {
-      setStartPoint(point);
-    };
 
     // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
     useEffect(() => {
@@ -135,7 +134,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
           const distance = distanceEntrePoints(coordUser, coordSignalement);
           if (distance < 0.03) {
-            setModalVisible(true)
+            setModalSignalementVisible(true)
             setSignalementPopup(excursion.signalements[i])
           }
         }
@@ -143,19 +142,27 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     }
       , [userLocation]);
 
+    useEffect(() => {
+      if (excursionTerminee) {
+        console.log("excursionTerminee", excursionTerminee)
+        setModalExcursionTermineeVisible(true)
+      }
+    }
+      , [excursionTerminee]);
+
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <View style={$container}>
-        <Modal
-          animationType="slide"
-          visible={modalVisible}
-          transparent={true}
-        >
-          {modalVisible && (
-            <PopupSignalement signalement={signalementPopup} setModalVisible={setModalVisible} estEntier={estEntier} setEstEntier={setEstEntier} />
-          )}
-        </Modal>
+
+        {modalSignalementVisible && (
+          <PopupSignalement signalement={signalementPopup} modalSignalementVisible={modalSignalementVisible} setModalSignalementVisible={setModalSignalementVisible} estEntier={estEntier} setEstEntier={setEstEntier} />
+        )}
+
+        {modalExcursionTermineeVisible && (
+          <ExcursionTerminee modalExcursionTermineeVisible={modalExcursionTermineeVisible} setModalExcursionTermineeVisible={setModalExcursionTermineeVisible} />
+        )}
+
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>
@@ -185,6 +192,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             excursion={excursion}
             navigation={navigation}
             setStartPoint={setStartPoint}
+            setExcursionTerminee={setExcursionTerminee}
           />
         ) : (
           <SwipeUpDown
