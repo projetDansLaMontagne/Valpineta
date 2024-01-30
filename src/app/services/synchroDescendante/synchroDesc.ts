@@ -25,6 +25,13 @@
  * de fonction qui permet de récupérer les excursions modifiées depuis une date donnée.
  *    -> Je pourrait MD5 chaque excursion et les comparer avec ceux du téléphone.
  * - DL des fichiers LOOONG mais fonctionnel.
+ * - Lors du DL des GPX, on a un fichier '.gpx' ?
+ *
+ *
+ * ! CONSIGNES
+ * `synchroDescendante` peut prendre 2 callbacks en paramètre:
+ *  - callbackTiles: Fonction qui prend deux paramètres: le nombre de tuiles téléchargées et le nombre de tuiles à télécharger.
+ *  - callbackToGetNumberOfFiles: Fonction qui prend deux paramètres: le nombre de fichiers GPX téléchargés et le nombre de fichiers GPX à télécharger.
  *
  * @author Tom Planche
  */
@@ -40,6 +47,8 @@ import { TExcursion, TLanguageContent, TPoint, TSignalement } from "../../naviga
 //   md5: string;
 // };
 
+type TCallbackToGetNumberOfFiles = (filesDownloaded: number, filesToDl: number) => void;
+export type TCallbackStep = (step: number, totalSteps: number) => void;
 /**
  * Niveau de debug.
  * Ne sert que pour dev.
@@ -210,7 +219,7 @@ export const updateExcursionsJsonRequest = async (debug?: TDebugMode): Promise<v
   const { hasChanged, excursionsJson: excursionsJsonUpdated } = updateExcursionsJson(
     excursionsServer,
     excursionsJson,
-    debug === TDebugMode.HIGH,
+    debug,
   );
 
   if (hasChanged) {
@@ -240,7 +249,7 @@ export const updateExcursionsJsonRequest = async (debug?: TDebugMode): Promise<v
 export const updateExcursionsJson = (
   excursionsServer: Array<TExcursion>,
   excursionsJson: Array<TExcursion>,
-  debug?: boolean,
+  debug?: TDebugMode,
 ): {
   hasChanged: boolean;
   excursionsJson: Array<TExcursion>;
@@ -248,7 +257,7 @@ export const updateExcursionsJson = (
   let hasChanged = false;
 
   if (excursionsServer.length === 0) {
-    console.log("[synchroDesc] pas d'excursions sur le serveur");
+    debug >= 1 && console.log("[synchroDesc] pas d'excursions sur le serveur");
     return {
       hasChanged: true,
       excursionsJson: [],
@@ -369,9 +378,13 @@ const dlFile = async (file: `${string}.gpx`): Promise<void> => {
  *
  * À exécuter au lancement de l'application mais après `downloadExcursionsJson`.
  *
+ * @param callbackToGetNumberOfFiles {Function} Fonction qui renvoie le nombre de fichiers GPX présents sur le téléphone.
+ *
  * @returns {Promise<void>}
  */
-export const getAndCopyGPXFiles = async (): Promise<void> => {
+export const getAndCopyGPXFiles = async (
+  callbackToGetNumberOfFiles?: TCallbackToGetNumberOfFiles,
+): Promise<void> => {
   // On vérifie si le dossier 'GPX' existe
   const GPXFolder = await FileSystem.getInfoAsync(GPX_FOLDER);
   // Si le dossier 'GPX' n'existe pas, on le crée
@@ -393,10 +406,15 @@ export const getAndCopyGPXFiles = async (): Promise<void> => {
   const missingFiles = GPXFiles.filter(file => !files.includes(file));
   console.log("[synchroDesc] fichiers GPX manquants -> ", missingFiles.length);
 
+  let filesDownloaded = 0;
+
   if (missingFiles.length > 0) {
     for (const file of missingFiles) {
       console.log("[synchroDesc] copie du fichier -> ", file);
       await dlFile(file);
+
+      callbackToGetNumberOfFiles &&
+        callbackToGetNumberOfFiles(++filesDownloaded, missingFiles.length);
     }
 
     console.log(`[synchroDesc] ${missingFiles.length} fichiers GPX copiés`);
@@ -415,11 +433,17 @@ export const getAndCopyGPXFiles = async (): Promise<void> => {
  *
  *  À exécuter au lancement de l'application et/ou toutes les X heures.
  *
- *  @param debug {TDebugMode} Niveau de debug.
+ * @param callbackTiles {Function} Fonction qui renvoie le nombre de tuiles téléchargées.
+ * @param callbackToGetNumberOfFiles {Function} Fonction qui renvoie le nombre de fichiers GPX présents sur le téléphone.
+ * @param debug {TDebugMode} Niveau de debug.
  *
- *  @returns {Promise<boolean>} True si la synchronisation s'est bien passée, false sinon.
+ * @returns {Promise<boolean>} True si la synchronisation s'est bien passée, false sinon.
  */
-export const synchroDescendante = async (debug?: TDebugMode): Promise<boolean> => {
+export const synchroDescendante = async (
+  callbackTiles?: TCallbackStep,
+  callbackToGetNumberOfFiles?: TCallbackToGetNumberOfFiles,
+  debug?: TDebugMode,
+): Promise<boolean> => {
   try {
     // On vérifie si le fichier 'excursions.json' existe
     const excursionsJsonExist = await excursionsJsonExists();
@@ -433,7 +457,7 @@ export const synchroDescendante = async (debug?: TDebugMode): Promise<boolean> =
     await updateExcursionsJsonRequest(debug);
 
     // On copie les fichiers GPX
-    await getAndCopyGPXFiles();
+    await getAndCopyGPXFiles(callbackToGetNumberOfFiles);
 
     return true;
   } catch (error) {

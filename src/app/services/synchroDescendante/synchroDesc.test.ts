@@ -8,6 +8,7 @@
 import { TExcursion, TPoint, TSignalement } from "../../navigators";
 import { describe } from "jest-circus";
 import { areObjectsEquals, updateExcursionsJson } from "./synchroDesc";
+import { expect, test } from "@jest/globals";
 // END IMPORTS ==========================================================================================   END IMPORTS
 
 // VARIABLES ================================================================================================ VARIABLE
