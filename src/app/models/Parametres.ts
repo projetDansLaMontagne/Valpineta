@@ -1,4 +1,4 @@
-import { Instance, SnapshotIn, SnapshotOut, onPatch, types } from "mobx-state-tree";
+import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import I18n from "i18n-js";
 import { reaction } from "mobx";
@@ -10,19 +10,19 @@ export const ParametresModel = types
   .model("Parametres")
   .props({
     langues: types.optional(types.string, "fr"),
-    tempsSynchro : types.optional(types.number, 1)
+    intervalSynchro : types.optional(types.number, 1)
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions(self => ({
-    setLangues: (langues: string) => {
+    setLangue: (langues: string) => {
       if (langues !== self.langues) {
         self.langues = langues;
       }
     },
-    setTempsSynchro: (tempsSynchro: number) => {
-      if (tempsSynchro !== self.tempsSynchro) {
-        self.tempsSynchro = tempsSynchro;
+    setIntervalSynchro: (tempsSynchro: number) => {
+      if (tempsSynchro !== self.intervalSynchro) {
+        self.intervalSynchro = tempsSynchro;
       }
     },
     afterCreate() {

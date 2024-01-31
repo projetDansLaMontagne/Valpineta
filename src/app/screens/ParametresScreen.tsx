@@ -6,7 +6,6 @@ import { Screen, Text } from "app/components";
 import { colors, spacing } from "app/theme";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useStores } from "app/models";
-import I18n from "i18n-js";
 import Dropdown from 'react-native-input-select';
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> { }
@@ -29,8 +28,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           style={$containerBoutons}
           onPress={() => {
             const nouvelleLangue = parametres.langues === "fr" ? "es" : "fr";
-            parametres.setLangues(nouvelleLangue);
-            I18n.locale = nouvelleLangue;
+            parametres.setLangue(nouvelleLangue);
           }}
         >
           <View
@@ -52,8 +50,8 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
             { label: '12h', value: 12 },
             { label: '24h', value: 24 },
           ]}
-          selectedValue={parametres.tempsSynchro}
-          onValueChange={(value) => parametres.setTempsSynchro(value)}
+          selectedValue={parametres.intervalSynchro}
+          onValueChange={(value) => parametres.setIntervalSynchro(value)}
           primaryColor={colors.palette.vert}
           dropdownStyle={$pickerSynchro}
           dropdownContainerStyle={$dropdownContainerStyle}

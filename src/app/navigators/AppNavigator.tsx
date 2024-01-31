@@ -68,13 +68,16 @@ export type TFiltres = {
   difficultesTechniques: number[];
   difficultesOrientation: number[];
 };
+
+export type TTypeSignalement = "PointInteret" | "Avertissement";
+
 export type TSignalement = {
   description: string;
   image: string;
   lat: number;
   lon: number;
   nom: string;
-  type: "PointInteret" | "Avertissement";
+  type: TTypeSignalement;
 };
 export type T_infoLangue = {
   nom: string;
@@ -109,7 +112,7 @@ type CarteStackParamList = {
   Carte: undefined;
   DetailsExcursion: undefined | { excursion: T_excursion };
   Description: { excursion: T_excursion };
-  NouveauSignalement: { type: "PointInteret" | "Avertissement" };
+  NouveauSignalement: { type: TTypeSignalement };
 };
 
 type ParametresStackParamList = {

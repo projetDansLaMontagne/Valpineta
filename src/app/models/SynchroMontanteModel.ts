@@ -22,18 +22,8 @@ export const SynchroMontanteModel = types
   .actions(withSetPropAction)
   .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions((self) => ({
-    getSignalements: () => {
-      return self.signalements;
-    },
-    getSignalement: (index: number) => {
-      return self.signalements[index];
-    },
-    getSignalementsCount: () => {
-      return self.signalements.length;
-    },
     addSignalement: (signalement: any) => {
-      const etat = self.signalements.push(signalement);
-      return etat;
+      self.signalements.push(signalement);
     },
     removeAllSignalements: () => {
       self.signalements.clear();

@@ -24,7 +24,6 @@ export async function synchroMontante(
     try {
         const isConnected = await NetInfo.fetch().then(state => state.isConnected);
 
-        // const imageRedimensionnee = await resizeImageFromBlob(photoSignalement);
         const blob = await fetch(photoSignalement).then(response => response.blob());
         const base64data = await blobToBase64(blob);
 
@@ -55,7 +54,6 @@ export async function synchroMontante(
                     synchroMontanteStore.signalements,
                     synchroMontanteStore,
                 );
-                // const sendStatus = "envoye"
 
                 if (sendStatus) {
                     status = "envoye";
@@ -88,40 +86,26 @@ export async function envoieBaseDeDonnees(
 ): Promise<boolean> {
     const post_id = 2049;
 
-    console.log("[SynchroMontanteService -> envoieBaseDeDonnees]", signalements);
-
     try {
-        if (synchroMontanteStore.getSignalementsCount() > 0) {
+        if (synchroMontanteStore.signalements.length > 0) {
             console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Envoi des données");
-
-            const test = JSON.stringify([
-                {
-                    nom: "test 10:47",
-                    type: "Avertissement",
-                    description: "description",
-                    image:"test",
-                    lat: 0,
-                    lon: 0,
-                },
-            ]);
-
-            console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Données à envoyer : ", test);
 
             const response = await api.apisauce.post(
                 "set-signalement",
                 {
-                    signalements: test,
+                    signalements: signalements,
                     post_id: post_id,
                 },
                 {
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                        "Content-Type": "application/json",
                     },
                 },
             );
 
             if (response.ok) {
                 console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Données envoyées");
+                console.log(response);
                 // Supprimer les signalements
                 synchroMontanteStore.removeAllSignalements();
                 return true;
@@ -129,8 +113,6 @@ export async function envoieBaseDeDonnees(
                 console.log(
                     "[SynchroMontanteService -> envoieBaseDeDonnees] Erreur lors de l'envoi des données : ",
                     getGeneralApiProblem(response),
-                    console.log(response.status),
-                    console.log(response),
                 );
                 return false;
             }
@@ -202,48 +184,13 @@ function rechercheMemeSignalement(
     return memeSignalement;
 }
 
-
-// /**
-//  *
-//  * @param uri
-//  * @param maxWidth par défaut 800
-//  * @param maxHeight par défaut 600
-//  * @param quality par défaut 0.1
-//  * @returns uri de l'image redimensionnée
-//  */
-// const resizeImageFromBlob = async (
-//     uri: string,
-//     maxWidth: number = 800,
-//     maxHeight: number = 600,
-//     quality: number = 1,
-// ) => {
-//     try {
-//         const resizedImage = await ImageManipulator.manipulateAsync(
-//             uri,
-//             [{ resize: { width: maxWidth, height: maxHeight } }],
-//             { format: ImageManipulator.SaveFormat.JPEG, compress: quality },
-//         );
-
-//         // Retourne le chemin de la nouvelle image redimensionnée
-//         return resizedImage.uri;
-//     } catch (error) {
-//         console.error(
-//             "[SynchroMontanteService -> resizeImageFromBlob ] Erreur lors du redimensionnement de l'image :",
-//             error,
-//         );
-//         return null;
-//     }
-// };
-
 /**
  * Transforme un blob en base64
  * @param blob 
  * @returns blob en base64
  */
-function blobToBase64(blob:Blob ): Promise<string> {
-    return new Promise((resolve, _) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.toString());
-        reader.readAsDataURL(blob);
-    });
+async function blobToBase64(blob:Blob ): Promise<string> {
+    const reader = new FileReader();
+    await reader.readAsDataURL(blob);
+    return reader.result.toString()
 }

@@ -1,6 +1,6 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree";
 import { ParametresModel } from "./Parametres";
-import { SynchroMontanteModel } from "./SynchroMontanteStore";
+import { SynchroMontanteModel } from "./SynchroMontanteModel";
 
 /**
  * A RootStore model.

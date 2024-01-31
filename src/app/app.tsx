@@ -78,25 +78,22 @@ function App(props: AppProps) {
   const [isConnected, setIsConnected] = useState(false);
   const { synchroMontanteStore, parametres } = useStores();
 
-  const checkConnection = async () => {
-    const state = await NetInfo.fetch();
-    setIsConnected(state.isConnected);
-  };
-
+  // Verifie la connexion avec l'interval défini dans les paramètres et s'il y a des signalements à envoyer
   useEffect(() => {
     const setupInterval = async () => {
       const intervalId = setInterval(async () => {
-        await checkConnection();
+        const state = await NetInfo.fetch();
+        setIsConnected(state.isConnected);
         let envoiResult = false;
 
-        if (isConnected && synchroMontanteStore.getSignalementsCount() > 0) {
-          envoiResult = await envoieBaseDeDonnees(synchroMontanteStore.getSignalements(), synchroMontanteStore);
+        if (isConnected && synchroMontanteStore.signalements.length > 0) {
+          envoiResult = await envoieBaseDeDonnees(synchroMontanteStore.signalements, synchroMontanteStore);
           
           if (envoiResult) {
             alertSynchroEffectuee(parametres.langues);
           }
         }
-      }, parametres.tempsSynchro * 3600000);
+      }, parametres.intervalSynchro * 3600000);
   
       return () => clearInterval(intervalId);
     };
