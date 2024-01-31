@@ -1,15 +1,16 @@
 import { Text } from "app/components";
-import React, { useState } from 'react';
-import { Alert, Modal, StyleSheet, Pressable, View } from 'react-native';
+import { colors, spacing } from "app/theme";
+import { Modal, StyleSheet, View, TouchableOpacity } from 'react-native';
 
 
 export interface ExcursionTermineeProps {
+    navigation: any;
     modalExcursionTermineeVisible: boolean;
     setModalExcursionTermineeVisible: (modalExcursionTermineeVisible: boolean) => void;
 }
 
 export function ExcursionTerminee(props: ExcursionTermineeProps) {
-    const { modalExcursionTermineeVisible, setModalExcursionTermineeVisible } = props;
+    const { navigation, modalExcursionTermineeVisible, setModalExcursionTermineeVisible } = props;
 
     return (
         <Modal
@@ -19,12 +20,20 @@ export function ExcursionTerminee(props: ExcursionTermineeProps) {
         >
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>
-                    <Text style={styles.modalText}>Hello World!</Text>
-                    <Pressable
-                        style={[styles.button, styles.buttonClose]}
-                        onPress={() => setModalExcursionTermineeVisible(!modalExcursionTermineeVisible)}>
-                        <Text style={styles.textStyle}>Hide Modal</Text>
-                    </Pressable>
+                    <Text style={styles.modalTitle} tx="detailsExcursion.popup.excursionTerminee.felicitations" size="xl" weight="bold" />
+                    <Text style={styles.modalText} tx="detailsExcursion.popup.excursionTerminee.message" size="lg" />
+                    <View style={styles.containerBouton}>
+                        <TouchableOpacity
+                            style={[styles.button, { opacity: 0.7 }]}
+                            onPress={() => setModalExcursionTermineeVisible(!modalExcursionTermineeVisible)}>
+                            <Text style={styles.textStyle} tx="detailsExcursion.popup.excursionTerminee.fermer" size="sm" />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => { setModalExcursionTermineeVisible(!modalExcursionTermineeVisible); navigation.navigate("Carte") }}>
+                            <Text style={styles.textStyle} tx="detailsExcursion.popup.excursionTerminee.accueil" size="sm" />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </Modal>
@@ -37,13 +46,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 22,
+        marginBottom: spacing.xxxl,
     },
     modalView: {
-        margin: 20,
+        margin: spacing.xl,
         backgroundColor: 'white',
         borderRadius: 20,
-        padding: 35,
+        padding: 20,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
@@ -56,22 +65,39 @@ const styles = StyleSheet.create({
     },
     button: {
         borderRadius: 20,
-        padding: 10,
+        padding: spacing.xs,
+        paddingHorizontal: spacing.lg,
         elevation: 2,
-    },
-    buttonOpen: {
-        backgroundColor: '#F194FF',
-    },
-    buttonClose: {
-        backgroundColor: '#2196F3',
+        lineHeight: 20,
+        backgroundColor: colors.palette.vert,
+        shadowColor: colors.palette.noir,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.32,
+        shadowRadius: 2.22,
     },
     textStyle: {
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
+        lineHeight: 20,
+    },
+    modalTitle: {
+        marginBottom: 0,
+        textAlign: 'center',
+        paddingHorizontal: spacing.md,
     },
     modalText: {
-        marginBottom: 15,
+        marginBottom: 10,
         textAlign: 'center',
+        paddingHorizontal: spacing.md,
+        lineHeight: 24,
     },
+    containerBouton: {
+        flexDirection: "row",
+        justifyContent: "space-evenly",
+        width: "100%",
+    }
 });

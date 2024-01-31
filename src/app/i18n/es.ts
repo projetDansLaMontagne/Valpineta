@@ -68,10 +68,18 @@ const es = {
       message: "Se produjo un error. Por favor, inténtalo de nuevo.",
     },
     popup: {
-      present: "Siempre presente",
-      absent: "Ausente",
-      voirPlus: "Ver más",
-      voirMoins: "Ver menos",
+      signalement: {
+        present: "Siempre presente",
+        absent: "Ausente",
+        voirPlus: "Ver más",
+        voirMoins: "Ver menos",
+      },
+      excursionTerminee: {
+        felicitations: "¡Felicidades!",
+        message: "Has completado esta excursión",
+        acceuil: "Página de inicio",
+        fermer: "Cerrar",
+      },
     },
   },
   suiviTrack: {

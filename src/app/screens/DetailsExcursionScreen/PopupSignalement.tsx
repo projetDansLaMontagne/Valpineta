@@ -3,6 +3,9 @@ import { colors } from "app/theme";
 import { spacing } from "app/theme/spacing";
 import { ImageStyle, TextStyle, View, ViewStyle, Image, Modal } from "react-native";
 import { Text, Button } from "app/components";
+import { Dimensions } from 'react-native';
+
+const { height } = Dimensions.get('window');
 
 export interface PopupSignalementProps {
     signalement: TSignalement;
@@ -42,19 +45,19 @@ export function PopupSignalement(props: PopupSignalementProps) {
                     <Button
                         style={[$bouton, { backgroundColor: colors.bouton }]}
                         textStyle={$texteBouton}
-                        tx="detailsExcursion.popup.present"
+                        tx="detailsExcursion.popup.signalement.present"
                         onPress={() => setModalSignalementVisible(false)}
                     />
                     <Button
                         style={[$bouton, { backgroundColor: colors.palette.rouge }]}
                         textStyle={$texteBouton}
-                        tx="detailsExcursion.popup.absent"
+                        tx="detailsExcursion.popup.signalement.absent"
                         onPress={() => setModalSignalementVisible(false)}
                     />
                     <Button
                         style={[$bouton, { backgroundColor: colors.palette.orange }]}
                         textStyle={$texteBouton}
-                        tx={estEntier ? "detailsExcursion.popup.voirMoins" : "detailsExcursion.popup.voirPlus"}
+                        tx={estEntier ? "detailsExcursion.popup.signalement.voirMoins" : "detailsExcursion.popup.signalement.voirPlus"}
                         onPress={() => setEstEntier(!estEntier)}
                     />
                     {/* <View>
@@ -72,7 +75,7 @@ export function PopupSignalement(props: PopupSignalementProps) {
 /* ------------------------------- Style PopUp ------------------------------ */
 
 const $containerSignalement: ViewStyle = {
-    marginTop: spacing.xl,
+    marginTop: height / 7,
     backgroundColor: colors.palette.blanc,
     padding: 10,
     borderRadius: 20,

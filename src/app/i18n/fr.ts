@@ -69,10 +69,18 @@ const fr = {
       message: "Une erreur est survenue, veuillez réessayer",
     },
     popup: {
-      present: "Présent",
-      absent: "Absent",
-      voirPlus: "Voir plus",
-      voirMoins: "Voir moins",
+      signalement: {
+        present: "Présent",
+        absent: "Absent",
+        voirPlus: "Voir plus",
+        voirMoins: "Voir moins",
+      },
+      excursionTerminee: {
+        felicitations: "Félicitations !",
+        message: "Vous venez de terminer cette excursion",
+        accueil: "Accueil",
+        fermer: "Fermer",
+      },
     },
   },
   suiviTrack: {

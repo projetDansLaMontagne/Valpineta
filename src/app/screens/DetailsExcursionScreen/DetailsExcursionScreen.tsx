@@ -160,7 +160,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         )}
 
         {modalExcursionTermineeVisible && (
-          <ExcursionTerminee modalExcursionTermineeVisible={modalExcursionTermineeVisible} setModalExcursionTermineeVisible={setModalExcursionTermineeVisible} />
+          <ExcursionTerminee navigation={navigation} modalExcursionTermineeVisible={modalExcursionTermineeVisible} setModalExcursionTermineeVisible={setModalExcursionTermineeVisible} />
         )}
 
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>

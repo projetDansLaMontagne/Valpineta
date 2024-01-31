@@ -122,7 +122,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
     return (
       <View style={isMini ? $containerPetit : $containerGrand}>
         <View style={$containerBoutonChrono}>
-          <TouchableOpacity onPress={() => { toggleChrono() }}>
+          <TouchableOpacity onPress={() => { toggleChrono(); setExcursionTerminee(false) }}>
             <Image
               style={$boutonPauseArret}
               tintColor={colors.bouton}
