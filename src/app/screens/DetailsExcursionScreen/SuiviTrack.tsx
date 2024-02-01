@@ -103,7 +103,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
 
       if (!isNaN(distanceNumber) && avancement < distanceNumber) {
         setAvancement(prevAvancement => {
-          const newAvancement = prevAvancement + 0.02;
+          const newAvancement = prevAvancement + 0.01; // A modifier par la distance parcourue par l'utilisateur
           return newAvancement;
         });
 
@@ -112,7 +112,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
           return newProgress;
         });
       }
-    }, 2000);
+    }, 500);
 
     // Nettoyer l'intervalle lorsqu'un composant est démonté
     return () => clearInterval(intervalId);
@@ -223,8 +223,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
             <View style={$containerTextVariable}>
               <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
               <Text size="xs" weight="bold">{avancement.toFixed(2)} km</Text>
-              {/* <Text size="xs" weight="bold"> 0 km</Text> */}
-              {/*A remplacer par la distance parcourue"*/}
+              {/*A remplacer par la distance parcourue par l'utilisateur*/}
             </View>
             <View style={$containerTextVariable}>
               <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
