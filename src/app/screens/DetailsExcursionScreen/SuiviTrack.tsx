@@ -16,10 +16,11 @@ import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Erreur } from "./Erreur";
 import { ListeSignalements } from "./ListeSignalements";
+import { TExcursion } from "./DetailsExcursionScreen";
 const { width, height } = Dimensions.get("window");
 
 export interface SuiviTrackProps {
-  excursion: Record<string, unknown>;
+  excursion: TExcursion;
   navigation: any;
   // setIsSuiviTrack: React.Dispatch<React.SetStateAction<boolean>>;
   setStartPoint: React.Dispatch<React.SetStateAction<any>>;
@@ -40,6 +41,8 @@ export function SuiviTrack(props: SuiviTrackProps) {
   const [chronoRunning, setChronoRunning] = useState(false);
   const [chronoTime, setChronoTime] = useState(0);
   const swipeUpDownRef = useRef();
+  const [avancement, setAvancement] = useState(0);
+
 
   function showMini() {
     if (swipeUpDownRef.current)
@@ -91,6 +94,28 @@ export function SuiviTrack(props: SuiviTrackProps) {
     fetchLocation();
   }, []);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      // Convertir la distance en nombre
+      const distanceNumber = parseFloat(excursion.distance);
+
+      if (!isNaN(distanceNumber) && avancement < distanceNumber) {
+        setAvancement(prevAvancement => {
+          const newAvancement = prevAvancement + 0.20;
+          return newAvancement;
+        });
+
+        setProgress(prevProgress => {
+          const newProgress = (avancement / distanceNumber) * 100;
+          return newProgress;
+        });
+      }
+    }, 2000);
+
+    // Nettoyer l'intervalle lorsqu'un composant est démonté
+    return () => clearInterval(intervalId);
+  }, [progress, avancement, excursion.distance]);
+
   return excursion ? (
     <SwipeUpDown
       ref={swipeUpDownRef}
@@ -108,15 +133,9 @@ export function SuiviTrack(props: SuiviTrackProps) {
 
   //Fonction principale
   function item(isMini) {
-    const increaseProgress = () => {
-      if (progress < 100) { // 100 a remplacer par la valeur max de la barre de progression ( la distance totale de l'excursion)
-        setProgress(progress + 2); // Augmente la valeur de progression de 2 (à ajuster en fonction de la distance parcourue) 
-      }
-    };
-
     let distance = 0;
     if (excursion !== undefined) {
-      distance = excursion.distance as number;
+      distance = parseInt(excursion.distance);
     }
 
     return (
@@ -162,7 +181,9 @@ export function SuiviTrack(props: SuiviTrackProps) {
         <View style={$listeDistances}>
           <View style={$containerTextVariable}>
             <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
-            <Text size="xs" weight="bold"> 0 km</Text>
+            <Text size="xs" weight="bold">{avancement.toFixed(2)} km</Text>
+            {/* <Text size="xs" weight="bold"> 0 km</Text> */}
+            {/*A remplacer par la distance parcourue"*/}
           </View>
           <View style={$containerTextVariable}>
             <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
@@ -468,7 +489,7 @@ const $containerProgress: ViewStyle = {
 };
 
 const $progressBar: ViewStyle = {
-  width: "90%", // Ajustez la largeur de la barre de progression selon vos besoins
+  width: "85%", // Ajustez la largeur de la barre de progression selon vos besoins
   height: 10, // Ajustez la hauteur de la barre de progression selon vos besoins
   backgroundColor: "#F5F5F5", // Couleur de fond de la barre de progression
   borderRadius: 10,

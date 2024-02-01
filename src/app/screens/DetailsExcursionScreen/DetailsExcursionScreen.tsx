@@ -63,7 +63,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props;
     const excursion = route.params?.excursion;
-
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
@@ -258,7 +257,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             setStartPoint={setStartPoint}
             swipeDown={swipeUpDown}
             style={$containerGrand}
-            swipeDown={showMini}
           />
         );
       }
