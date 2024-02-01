@@ -17,6 +17,8 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Erreur } from "./Erreur";
 import { ListeSignalements } from "./ListeSignalements";
 import { TExcursion } from "./DetailsExcursionScreen";
+import { recupDistance } from "app/utils/recupDistance";
+import { T_flat_point } from "app/navigators";
 const { width, height } = Dimensions.get("window");
 
 export interface SuiviTrackProps {
@@ -101,7 +103,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
 
       if (!isNaN(distanceNumber) && avancement < distanceNumber) {
         setAvancement(prevAvancement => {
-          const newAvancement = prevAvancement + 0.20;
+          const newAvancement = prevAvancement + 0.02;
           return newAvancement;
         });
 
@@ -133,11 +135,6 @@ export function SuiviTrack(props: SuiviTrackProps) {
 
   //Fonction principale
   function item(isMini) {
-    let distance = 0;
-    if (excursion !== undefined) {
-      distance = parseInt(excursion.distance);
-    }
-
     return (
       <View style={isMini ? $containerPetit : $containerGrand}>
         <View style={$containerBoutonChrono}>
@@ -168,26 +165,71 @@ export function SuiviTrack(props: SuiviTrackProps) {
             <Text style={$texteInfo}> {deniveleDescendu.toFixed()} m</Text>
           </View>
         </View>
-        <View>
-          <View style={$containerProgress}>
-            <View style={$progressBar}>
-              <View style={{ ...$progressBarFill, width: `${progress}%` }} />
-            </View>
-            <View style={{ ...$fleche, left: `${progress / 1.14}%` }}>
-              <Image style={$iconeFleche} source={require("assets/icons/fleche.png")} />
+        <View style={{ bottom: spacing.xs }}>
+          <View>
+            <View style={$containerProgress}>
+              {excursion.signalements && (
+                //pour chaque signalement, en fonction de son type on affiche une icone differente
+                excursion.signalements.map((signalement, index) => {
+                  let icone;
+                  if (signalement.type == "PointInteret") {
+                    icone = require("assets/icons/view.png");
+                  } else {
+                    icone = require("assets/icons/attentionV2.png");
+                  }
+
+                  const coordonnesSignalement: T_flat_point = {
+                    lat: signalement.latitude,
+                    lon: signalement.longitude,
+                  };
+
+                  const positionPercentage = (recupDistance(coordonnesSignalement, excursion.track) / parseFloat(excursion.distance)) * 100;
+                  return (
+                    <View key={index} style={{ position: 'absolute', left: `${positionPercentage}%`, bottom: spacing.xs }}>
+                      <Image
+                        source={require("assets/icons/pinFull.png")}
+                        style={{
+                          width: 33,
+                          height: 33,
+                          tintColor:
+                            signalement.type == "PointInteret"
+                              ? colors.palette.vert
+                              : colors.palette.rouge,
+                        }} />
+                      <Image
+                        source={icone}
+                        style={{
+                          width: 18,
+                          height: 18,
+                          top: 4,
+                          left: 7.2,
+                          position: 'absolute',
+                          tintColor: colors.palette.blanc,
+                        }}
+                      />
+                    </View>
+                  );
+                })
+              )}
+              <View style={$progressBar}>
+                <View style={{ ...$progressBarFill, width: `${progress}%` }} />
+              </View>
+              <View style={{ ...$fleche, left: `${progress / 1.14}%` }}>
+                <Image style={$iconeFleche} source={require("assets/icons/fleche.png")} />
+              </View>
             </View>
           </View>
-        </View>
-        <View style={$listeDistances}>
-          <View style={$containerTextVariable}>
-            <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
-            <Text size="xs" weight="bold">{avancement.toFixed(2)} km</Text>
-            {/* <Text size="xs" weight="bold"> 0 km</Text> */}
-            {/*A remplacer par la distance parcourue"*/}
-          </View>
-          <View style={$containerTextVariable}>
-            <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
-            <Text size="xs" weight="bold">{distance} km</Text>
+          <View style={$listeDistances}>
+            <View style={$containerTextVariable}>
+              <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
+              <Text size="xs" weight="bold">{avancement.toFixed(2)} km</Text>
+              {/* <Text size="xs" weight="bold"> 0 km</Text> */}
+              {/*A remplacer par la distance parcourue"*/}
+            </View>
+            <View style={$containerTextVariable}>
+              <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
+              <Text size="xs" weight="bold">{excursion.distance} km</Text>
+            </View>
           </View>
         </View>
         {isMini ? null :
@@ -443,7 +485,6 @@ const $containerBoutonChrono: ViewStyle = {
 };
 
 const $containerBouton: ViewStyle = {
-  marginTop: spacing.md,
   flexDirection: "row",
   justifyContent: "space-around",
   alignItems: "center",
@@ -451,15 +492,14 @@ const $containerBouton: ViewStyle = {
 
 const $boutonPauseArret: ImageStyle = {
   tintColor: colors.palette.rouge,
-  width: 55,
-  height: 55,
+  width: 50,
+  height: 50,
 };
 
 const $listeDescription: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-around",
   alignItems: "center",
-  padding: spacing.xxs,
 };
 
 const $icone: ImageStyle = {
@@ -484,7 +524,7 @@ const $containerTextVariable: ViewStyle = {
 
 /* Styles pour la barre de progression */
 const $containerProgress: ViewStyle = {
-  marginTop: spacing.sm,
+  marginTop: spacing.xxl,
   alignItems: "center",
 };
 
