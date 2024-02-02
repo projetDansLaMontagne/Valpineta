@@ -30,7 +30,7 @@
  *
  * ! CONSIGNES
  * `synchroDescendante` peut prendre 2 callbacks en paramètre:
- *  - callbackTiles: Fonction qui prend deux paramètres: le nombre de tuiles téléchargées et le nombre de tuiles à télécharger.
+ *  - callbackStep: Fonction qui renvoie l'étape actuelle et le nombre d'étapes total.
  *  - callbackToGetNumberOfFiles: Fonction qui prend deux paramètres: le nombre de fichiers GPX téléchargés et le nombre de fichiers GPX à télécharger.
  *
  * @author Tom Planche
@@ -47,7 +47,7 @@ import { TExcursion, TLanguageContent, TPoint, TSignalement } from "../../naviga
 //   md5: string;
 // };
 
-type TCallbackToGetNumberOfFiles = (filesDownloaded: number, filesToDl: number) => void;
+export type TCallbackToGetNumberOfFiles = (filesDownloaded: number, filesToDl: number) => void;
 export type TCallbackStep = (step: number, totalSteps: number) => void;
 /**
  * Niveau de debug.
@@ -421,6 +421,9 @@ export const getAndCopyGPXFiles = async (
   } else {
     console.log("[synchroDesc] tous les fichiers GPX sont présents sur le téléphone");
   }
+
+  // Suppression du dossier temporaire
+  await FileSystem.deleteAsync(GPX_TEMP_FOLDER);
 };
 
 /**
@@ -433,18 +436,19 @@ export const getAndCopyGPXFiles = async (
  *
  *  À exécuter au lancement de l'application et/ou toutes les X heures.
  *
- * @param callbackTiles {Function} Fonction qui renvoie le nombre de tuiles téléchargées.
+ * @param callbackStep {Function} Fonction qui renvoie le nombre de tuiles téléchargées.
  * @param callbackToGetNumberOfFiles {Function} Fonction qui renvoie le nombre de fichiers GPX présents sur le téléphone.
  * @param debug {TDebugMode} Niveau de debug.
  *
  * @returns {Promise<boolean>} True si la synchronisation s'est bien passée, false sinon.
  */
 export const synchroDescendante = async (
-  callbackTiles?: TCallbackStep,
+  callbackStep?: TCallbackStep,
   callbackToGetNumberOfFiles?: TCallbackToGetNumberOfFiles,
   debug?: TDebugMode,
 ): Promise<boolean> => {
   try {
+    callbackStep && callbackStep(1, 3);
     // On vérifie si le fichier 'excursions.json' existe
     const excursionsJsonExist = await excursionsJsonExists();
 
@@ -453,8 +457,12 @@ export const synchroDescendante = async (
       await downloadExcursionsJson();
     }
 
+    callbackStep && callbackStep(2, 3);
+
     // On met à jour le fichier 'excursions.json'
     await updateExcursionsJsonRequest(debug);
+
+    callbackStep && callbackStep(3, 3);
 
     // On copie les fichiers GPX
     await getAndCopyGPXFiles(callbackToGetNumberOfFiles);

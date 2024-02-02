@@ -34,12 +34,9 @@ import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import {
-  downloadExcursionsJson,
-  excursionsJsonExists,
-  getAndCopyGPXFiles,
-  getExcursionsJsonFromDevice,
-  TDebugMode,
-  updateExcursionsJsonRequest,
+  synchroDescendante,
+  TCallbackStep,
+  TCallbackToGetNumberOfFiles,
 } from "../../services/synchroDescendante/synchroDesc";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
@@ -100,18 +97,6 @@ const createFolderStruct = async (
       }
     }
   }
-};
-
-/**
- * Récupère la liste de toutes les excursions grâce au fichier JSON.
- * Fichier dont le chemin est `EXCURSIONS_FILE_DEST`.
- * @see src/app/services/synchroDescendante/syncroDesc.ts
- * @returns {Promise<Array<TExcursion>>} The list of all the tracks
- */
-const getAllTracks = async (): Promise<Array<TExcursion>> => {
-  return await getExcursionsJsonFromDevice().then((excursions: Array<TExcursion>) => {
-    return excursions;
-  });
 };
 
 // Component(s)
@@ -222,9 +207,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
    */
   const getLocationAsync = async (debug?: boolean): Promise<void> => {
     if (debug) {
-      console.log(`[[MapScreen]] getLocationAsync()`);
+      console.log(`[MapScreen] getLocationAsync()`);
       console.log(
-        `[[MapScreen]] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`,
+        `[MapScreen] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`,
       );
     }
 
@@ -243,9 +228,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       },
       location => {
         if (debug) {
-          console.log(`[[MapScreen]] watchPositionAsync()`);
-          console.log(`[[MapScreen]] location.coords.latitude: ${location.coords.latitude}`);
-          console.log(`[[MapScreen]] location.coords.longitude: ${location.coords.longitude}`);
+          console.log(`[MapScreen] watchPositionAsync()`);
+          console.log(`[MapScreen] location.coords.latitude: ${location.coords.latitude}`);
+          console.log(`[MapScreen] location.coords.longitude: ${location.coords.longitude}`);
         }
         setLocation(location);
       },
@@ -322,7 +307,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [_props.startLocation]);
 
   useEffect(() => {
-    console.log(`[[MapScreen]] followUserLocation: ${followUserLocation}`);
+    console.log(`[MapScreen] followUserLocation: ${followUserLocation}`);
 
     if (followUserLocation) {
       getLocationAsync(true)
@@ -339,35 +324,28 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     }
   }, [excursions]);
 
+  /**
+   *  ! TESTS
+   */
+  const coStepStatus: TCallbackStep = (compteur, total) => {
+    console.log(`[MapScreen] étape ${compteur} / ${total}`);
+  };
+
+  const coGPXStatus: TCallbackToGetNumberOfFiles = (filesDownloaded, filesToDl) => {
+    console.log(`[synchroDesc] fichiers GPX copiés: ${filesDownloaded} / ${filesToDl}`);
+  };
+  /**
+   * ! FIN TESTS
+   */
+
   useEffect(() => {
-    downloadTiles().then(() => {
+    downloadTiles(true).then(() => {
       console.log("[MapScreen] PAGE CHARGEE");
-
-      console.log(`[MapScreen] Vérification de l'existence de excursions.json`);
-      excursionsJsonExists()
-        .then((fileExists: boolean) => {
-          if (fileExists) {
-            console.log("[MapScreen] excursions.json existe");
-          } else {
-            console.log("[MapScreen] excursions.json n'existe pas. Création du fichier.");
-            downloadExcursionsJson()
-              .then(() => console.log("[MapScreen] excursions.json copié"))
-              .catch(() => console.log("[MapScreen] excursions.json n'a pas pu être copié"));
-          }
-        })
-        .catch(() => console.log("[MapScreen] excursions.json n'existe pas"))
-        .finally(async () => {
-          if (!_props.isInDetailExcursion) {
-            setExcursions(await getAllTracks());
-          }
-
-          // TESTS
-          await updateExcursionsJsonRequest(TDebugMode.MEDIUM);
-          // FIN TESTS
-        });
     });
 
-    getAndCopyGPXFiles(); // ! pas de `.then()` car on ne veut pas attendre la fin de la copie des fichiers GPX
+    synchroDescendante(coStepStatus, coGPXStatus).then(() => {
+      console.log("[MapScreen] synchroDescendante() ok");
+    });
 
     return () => {
       removeLocationSubscription();
