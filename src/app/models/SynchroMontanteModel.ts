@@ -1,5 +1,5 @@
-import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
-import { withSetPropAction } from "./helpers/withSetPropAction"
+import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
+import { withSetPropAction } from "./helpers/withSetPropAction";
 
 // Modèle pour représenter un signalement individuel
 const signalement = types.model({
@@ -20,17 +20,19 @@ export const SynchroMontanteModel = types
     signalements: types.optional(types.array(signalement), []),
   })
   .actions(withSetPropAction)
-  .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
-  .actions((self) => ({
-    addSignalement: (signalement: any) => {
+  .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
+  .actions(self => ({
+    addSignalement: (signalement: any) : boolean => {
+      const oldLength = self.signalements.length;
       self.signalements.push(signalement);
+      return self.signalements.length > oldLength;
     },
     removeAllSignalements: () => {
       self.signalements.clear();
     },
-  })) // eslint-disable-line @typescript-eslint/no-unused-vars
+  })); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> { }
-export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> { }
-export interface SynchroMontanteSnapshotIn extends SnapshotIn<typeof SynchroMontanteModel> { }
-export const createSynchroMontanteDefaultModel = () => types.optional(SynchroMontanteModel, {})
+export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> {}
+export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> {}
+export interface SynchroMontanteSnapshotIn extends SnapshotIn<typeof SynchroMontanteModel> {}
+export const createSynchroMontanteDefaultModel = () => types.optional(SynchroMontanteModel, {});

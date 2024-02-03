@@ -5,67 +5,79 @@ import NetInfo from "@react-native-community/netinfo";
 import { SynchroMontanteStore } from "app/models";
 
 //Api
-import { api } from "../api";
-import { getGeneralApiProblem } from "../api/apiProblem";
+import { api } from "./api";
+import { getGeneralApiProblem } from "./api/apiProblem";
+import { translate } from "i18n-js";
+
+//Type
+import { TSignalement, TTypeSignalement } from "app/navigators";
 
 /* --------------------------- FONCTIONS EXPORTEES -------------------------- */
 
-export async function synchroMontante(
-    titreSignalement: string,
-    type: string,
-    descriptionSignalement: string,
-    photoSignalement: string,
-    lat: number,
-    lon: number,
+/**
+ * Permet de synchroniser les données avec la base de données
+ * Synchronisation montante
+ * @param titreSignalement
+ * @param type
+ * @param descriptionSignalement
+ * @param photoSignalement
+ * @param lat
+ * @param lon
+ * @param synchroMontanteStore
+ * @returns Promise<string>
+ */
+export async function synchroMontanteSignalement(
+    signalementAEnvoyer: TSignalement,
     synchroMontanteStore: SynchroMontanteStore,
-): Promise<string> {
-    let status = "";
+): Promise<"envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur"> {
+    let status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur";
 
     try {
+        //Vérifie si l'appareil est connecté à internet
         const isConnected = await NetInfo.fetch().then(state => state.isConnected);
 
-        const blob = await fetch(photoSignalement).then(response => response.blob());
-        const base64data = await blobToBase64(blob);
+        //Convertir l'image url en base64
+        const blob = await fetch(signalementAEnvoyer.image).then(response => response.blob());
+        signalementAEnvoyer.image = await blobToBase64(blob);
 
+        //Vérifie si le signalement existe déjà dans le store
         if (
             !rechercheMemeSignalement(
-                titreSignalement,
-                type,
-                descriptionSignalement,
-                base64data,
-                lat,
-                lon,
+                signalementAEnvoyer.nom,
+                signalementAEnvoyer.type,
+                signalementAEnvoyer.description,
+                signalementAEnvoyer.image,
+                signalementAEnvoyer.lat,
+                signalementAEnvoyer.lon,
                 synchroMontanteStore,
             )
         ) {
-            const newSignalement = {
-                nom: titreSignalement,
-                type: type,
-                description: descriptionSignalement,
-                image : base64data,
-                lat: lat,
-                lon: lon,
-            };
+            //Ajoute le signalement formaté dans le store
+            const signalementAjoute = synchroMontanteStore.addSignalement(signalementAEnvoyer);
 
-            synchroMontanteStore.addSignalement(newSignalement);
-
-            if (isConnected) {
-                const sendStatus = await envoieBaseDeDonnees(
+            //Envoi des données si l'appareil est connecté
+            if (isConnected && signalementAjoute) {
+                const sendStatus = await envoieBaseDeDonneesSignalement(
                     synchroMontanteStore.signalements,
                     synchroMontanteStore,
                 );
-
                 if (sendStatus) {
-                    status = "envoye";
+                    status = "envoyeEnBdd";
                 } else {
                     status = "erreur";
                 }
             } else {
-                status = "ajoute";
+                if (signalementAjoute) {
+                    status = "ajouteEnLocal";
+                } else {
+                    status = "erreur";
+                }
             }
         } else {
-            status = "existe";
+            status = "dejaExistant";
         }
+
+        //Gestion des erreurs
     } catch (error) {
         console.error("[SynchroMontanteService -> synchroMontante] Erreur :", error);
         status = "erreur";
@@ -75,21 +87,24 @@ export async function synchroMontante(
 }
 
 /**
- *
+ *  Envoie les données au serveur
  * @param signalement
  * @param synchroMontanteStore
  * @returns Promise<boolean>
  */
-export async function envoieBaseDeDonnees(
-    signalements: any,
+export async function envoieBaseDeDonneesSignalement(
+    signalements: Array<TSignalement>,
     synchroMontanteStore: SynchroMontanteStore,
 ): Promise<boolean> {
+    //Id du post A CHANGER
     const post_id = 2049;
 
     try {
+        //Vérifie si des signalements sont présents dans le store
         if (synchroMontanteStore.signalements.length > 0) {
             console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Envoi des données");
 
+            //Envoi des données
             const response = await api.apisauce.post(
                 "set-signalement",
                 {
@@ -105,13 +120,13 @@ export async function envoieBaseDeDonnees(
 
             if (response.ok) {
                 console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Données envoyées");
-                console.log(response);
-                // Supprimer les signalements
+                // Supprimer les signalements du store
                 synchroMontanteStore.removeAllSignalements();
                 return true;
             } else {
                 console.log(
                     "[SynchroMontanteService -> envoieBaseDeDonnees] Erreur lors de l'envoi des données : ",
+                    //Récupère le problème
                     getGeneralApiProblem(response),
                 );
                 return false;
@@ -120,6 +135,7 @@ export async function envoieBaseDeDonnees(
             console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Aucun signalement à envoyer.");
             return false;
         }
+        //Gestion des erreurs
     } catch (error) {
         console.error(
             "[SynchroMontanteService -> envoieBaseDeDonnees] Erreur lors de l'envoi des données :",
@@ -131,17 +147,14 @@ export async function envoieBaseDeDonnees(
 
 /**
  * Affiche une alerte pour indiquer que la synchronisation a bien été effectuée
- * @param langue 
  * @returns
  */
-export const alertSynchroEffectuee = (langue: string) => {
-    langue === "fr"
-        ? Alert.alert("Synchronisation effectuée", "Les données ont bien été envoyées au serveur.", [
-            { text: "OK" },
-        ])
-        : Alert.alert("Sincronización realizada", "Los datos han sido enviados al servidor.", [
-            { text: "OK" },
-        ]);
+export const alertSynchroEffectuee = () => {
+    Alert.alert(
+        translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
+        translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
+        [{ text: "OK" }],
+    );
 };
 
 /* ---------------------- FONCTIONS INTERNES AU SERVICE --------------------- */
@@ -159,14 +172,14 @@ export const alertSynchroEffectuee = (langue: string) => {
  */
 function rechercheMemeSignalement(
     titreSignalement: string,
-    type: string,
+    type: TTypeSignalement,
     descriptionSignalement: string,
     photoSignalement: string,
     lat: number,
     lon: number,
     synchroMontanteStore: SynchroMontanteStore,
 ): boolean {
-    let memeSignalement = false;
+    let memeSignalement: boolean = false;
 
     synchroMontanteStore.signalements.forEach(signalement => {
         if (
@@ -186,11 +199,22 @@ function rechercheMemeSignalement(
 
 /**
  * Transforme un blob en base64
- * @param blob 
+ * @param blob
  * @returns blob en base64
  */
-async function blobToBase64(blob:Blob ): Promise<string> {
-    const reader = new FileReader();
-    await reader.readAsDataURL(blob);
-    return reader.result.toString()
+async function blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            if (typeof reader.result === "string") {
+                resolve(reader.result);
+            } else {
+                reject(new Error("[SynchroMontanteService -> blobToBase64 ]Conversion Blob vers Base64 a échoué."));
+            }
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
 }

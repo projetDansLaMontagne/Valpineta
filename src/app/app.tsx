@@ -19,7 +19,7 @@ if (__DEV__) {
 import "./i18n";
 import "./utils/ignoreWarnings";
 import { useFonts } from "expo-font";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as Linking from "expo-linking";
 import { useInitialRootStore, useStores } from "./models";
@@ -28,21 +28,16 @@ import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary";
 import * as storage from "./utils/storage";
 import { customFontsToLoad } from "./theme";
 import Config from "./config";
-import { colors } from "./theme";
 
 // Import pour la synchro
 import NetInfo from "@react-native-community/netinfo";
 import {
-  envoieBaseDeDonnees,
+  envoieBaseDeDonneesSignalement,
   alertSynchroEffectuee,
-} from "./services/synchroMontante/synchroMontanteService";
-import { ToastProvider } from "react-native-toast-notifications";
+} from "./services/synchroMontanteService";
 
 //Import pour l'ui de l'ActionSheet
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import { View } from "react-native";
-import { set } from "date-fns";
-import { is } from "date-fns/locale";
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
 
@@ -75,22 +70,24 @@ interface AppProps {
  * This is the root component of our app.
  */
 function App(props: AppProps) {
-  const [isConnected, setIsConnected] = useState(false);
+  let isConnected = false;
   const { synchroMontanteStore, parametres } = useStores();
 
   // Verifie la connexion avec l'interval défini dans les paramètres et s'il y a des signalements à envoyer
   useEffect(() => {
     const setupInterval = async () => {
       const intervalId = setInterval(async () => {
-        const state = await NetInfo.fetch();
-        setIsConnected(state.isConnected);
-        let envoiResult = false;
 
+        // Vérifie la connexion
+        const state = await NetInfo.fetch();
+        isConnected = state.isConnected;
+
+        let envoiResult = false;
         if (isConnected && synchroMontanteStore.signalements.length > 0) {
-          envoiResult = await envoieBaseDeDonnees(synchroMontanteStore.signalements, synchroMontanteStore);
+          envoiResult = await envoieBaseDeDonneesSignalement(synchroMontanteStore.signalements, synchroMontanteStore);
           
           if (envoiResult) {
-            alertSynchroEffectuee(parametres.langues);
+            alertSynchroEffectuee();
           }
         }
       }, parametres.intervalSynchro * 3600000);

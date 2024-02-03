@@ -13,16 +13,19 @@ import {
   TouchableOpacity,
   ImageStyle,
 } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps, TTypeSignalement, TSignalement } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { Button } from "app/components";
 import * as ImagePicker from "expo-image-picker";
 import { SynchroMontanteStore, useStores } from "app/models";
-import { synchroMontante } from "app/services/synchroMontante/synchroMontanteService";
+import { synchroMontanteSignalement } from "app/services/synchroMontanteService";
 import { goBack } from "app/navigators";
 import {useActionSheet } from "@expo/react-native-action-sheet";
+import { translate } from "app/i18n";
 // Composants
 import { Screen, Text } from "app/components";
+import { set } from "date-fns";
+//Type
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: "Avertissement" | "PointInteret";
@@ -31,10 +34,10 @@ interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSign
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
     // Stores
-    const { parametres, synchroMontanteStore } = useStores();
+    const { synchroMontanteStore } = useStores();
 
     //type de signalement
-    let type = "" as string;
+    let type : TTypeSignalement;
     if (props.route.params) {
       type = props.route.params.type;
     } else {
@@ -67,7 +70,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const choixPhoto = () => {
       showActionSheetWithOptions(
         {
-          options: parametres.langues == "fr" ? ["Prendre une photo", "Choisir une photo", "Annuler"] : ["Tomar una foto", "Elegir una foto", "Cancelar"],
+          options: [translate("pageNouveauSignalement.actionSheet.prendrePhoto"), translate("pageNouveauSignalement.actionSheet.choisirPhoto"), translate("pageNouveauSignalement.actionSheet.annuler")],
           cancelButtonIndex: 2,
         },
         buttonIndex => {
@@ -183,102 +186,48 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * fonction pour afficher une alerte en fonction du status
      * @param status 
      */
-    const AlerteStatus = (status: string) => {
-      if (status == "ajoute") {
-        if (parametres.langues == "fr") {
+    const AlerteStatus = (status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur"  | "mauvaisFormat") => {
+      if (status == "ajouteEnLocal") {
           Alert.alert(
-            "Ajout réussi",
+            translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
             "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
             [
-              { text: "Ajouter un autre" },
-              { text: "Retour", onPress: () => props.navigation.goBack() },
+              { text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.ajoute") },
+              { text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.retour"), onPress: () => props.navigation.goBack() },
             ],
             { cancelable: false },
           );
-        } else {
-          Alert.alert(
-            "Añadido con éxito",
-            "Su informe ha sido agregado a la memoria, se enviará cuando esté conectado a Internet",
-            [{ text: "Añadir otro" }, { text: "Volver", onPress: () => props.navigation.goBack() }],
-            { cancelable: false },
-          );
-        }
-      } else if (status == "existe") {
-        if (parametres.langues == "fr") {
-          Alert.alert(
-            "Signalement déjà existant",
-            "Ce signalement existe déjà en base de données, veuillez en choisir un autre",
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
-        } else {
-          Alert.alert(
-            "Informe ya existente",
-            "Este informe ya existe en la base de datos, elija otro",
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
-        }
-      } else if (status == "format") {
-        if (parametres.langues == "fr") {
-          Alert.alert(
-            "Format incorrect",
-            "Veuillez vérifier que les champs sont correctement remplis",
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
-        } else {
-          Alert.alert(
-            "Formato incorrecto",
-            "Verifique que los campos estén completados correctamente",
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
-        }
-      } else if (status == "envoye") {
-        if (parametres.langues == "fr") {
-          Alert.alert(
-            "Signalement envoyé",
-            "Votre signalement a bien été envoyé en base de données",
-            [
-              { text: "Ajouter un autre" },
-              { text: "Retour", onPress: () => props.navigation.goBack() },
-            ],
-            { cancelable: false },
-          );
-        } else {
-          Alert.alert(
-            "Informe enviado",
-            "Su informe ha sido enviado a la base de datos",
-            [
-              { text: "Añadir otro" },
-              { text: "Volver", onPress: () => props.navigation.goBack() },
-            ],
-            { cancelable: false },
-          );
-        }
-      } else if (status == "erreurBDD") {
-        if (parametres.langues == "fr") {
-          Alert.alert(
-            "Erreur",
-            "Une erreur est survenue lors de l'envoi du signalement en base de données",
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
-        } else {
-          Alert.alert(
-            "Error",
-            "Se produjo un error al enviar el informe a la base de datos",
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
-        }
+      } else if (status == "dejaExistant") {
+        Alert.alert(
+          translate("pageNouveauSignalement.alerte.dejaExistant.titre"),
+          translate("pageNouveauSignalement.alerte.dejaExistant.message"),
+          [{ text: "OK" }],
+          { cancelable: false },
+        );
+      } else if (status == "mauvaisFormat") {
+        Alert.alert(
+          translate("pageNouveauSignalement.alerte.mauvaisFormat.titre"),
+          translate("pageNouveauSignalement.alerte.mauvaisFormat.message"),
+          [{ text: "OK" }],
+          { cancelable: false },
+        );
+      } else if (status == "envoyeEnBdd") {
+        Alert.alert(
+          translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
+          translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
+          [
+            { text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.ajoute") },
+            { text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.retour"), onPress: () => props.navigation.goBack() },
+          ],
+          { cancelable: false },
+        );
       } else {
-        if (parametres.langues == "fr") {
-          Alert.alert("Erreur", "Une erreur est survenue", [{ text: "OK" }], { cancelable: false });
-        } else {
-          Alert.alert("Error", "Se produjo un error", [{ text: "OK" }], { cancelable: false });
-        }
+        Alert.alert(
+          translate("pageNouveauSignalement.alerte.erreur.titre"),
+          translate("pageNouveauSignalement.alerte.erreur.message"),
+          [{ text: "OK" }],
+          { cancelable: false },
+        );
       }
     };
 
@@ -290,7 +239,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      */
     const envoyerSignalement = async (
       titreSignalement: string,
-      type: string,
+      type: TTypeSignalement,
       descriptionSignalement: string,
       photoSignalement: string,
       lat: number,
@@ -303,28 +252,37 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         descriptionSignalement,
         photoSignalement,
       );
+
+      const signalementAEnvoyer:TSignalement = {
+        nom: titreSignalement,
+        type: type,
+        description: descriptionSignalement,
+        image: photoSignalement,
+        lat: lat,
+        lon: lon,
+      };
     
-      let status = "" as string;
+      let status : "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
       try {
         if (!contientErreur) {
           setIsLoading(true);
-          status = await synchroMontante(
-            titreSignalement,
-            type,
-            descriptionSignalement,
-            photoSignalement,
-            lat,
-            lon,
+          status = await synchroMontanteSignalement(
+            signalementAEnvoyer,
             synchroMontanteStore,
           );
         } else {
-          status = "format";
+          status = "mauvaisFormat";
         }
       } catch (error) {
         console.error("[NouveauSignalementScreen -> envoyerSignalement] Erreur :", error);
         status = "erreur"; 
       } finally {
         setIsLoading(false);
+        if (status == "ajouteEnLocal" || status == "envoyeEnBdd"){
+          setTitreSignalement("");
+          setDescriptionSignalement("");
+          setPhotoSignalement(undefined);
+        }
         AlerteStatus(status);
       }
     };
@@ -361,7 +319,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
               />
             )}
             <TextInput
-              placeholder={parametres.langues == "fr" ? "Insérez un titre" : "Insertar un título"}
+              placeholder={translate("pageNouveauSignalement.placeholderTitre")}
               placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
               onChangeText={setTitreSignalement}
               value={titreSignalement}
@@ -381,7 +339,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             )}
             <TextInput
               placeholder={
-                parametres.langues == "fr" ? "Insérez une description" : "Insertar una descripción"
+                translate("pageNouveauSignalement.placeholderDescription")
               }
               placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
               onChangeText={setDescriptionSignalement}

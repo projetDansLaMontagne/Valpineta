@@ -277,11 +277,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     setGavePermission(true);
   };
 
-  const ButtonOnPressAvertissement = async () => {
+  const ButtonOnPressAvertissement = () => {
       navigation.navigate("CarteStack", { screen: "NouveauSignalement", params: { type: "Avertissement" } });
   };
 
-  const ButtonOnPressPointInteret = async () => {
+  const ButtonOnPressPointInteret = () => {
       navigation.navigate("CarteStack", { screen: "NouveauSignalement", params: { type: "PointInteret" }});
   };
 

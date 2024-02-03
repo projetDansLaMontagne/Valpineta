@@ -27,7 +27,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         <TouchableOpacity
           style={$containerBoutons}
           onPress={() => {
-            const nouvelleLangue = parametres.langues === "fr" ? "es" : "fr";
+            const nouvelleLangue : "fr"|"es" = parametres.langues === "fr" ? "es" : "fr";
             parametres.setLangue(nouvelleLangue);
           }}
         >
@@ -44,14 +44,13 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           <Text style={$texteParametre} tx={"parametres.choisirSynchro.titre"} size="sm" />
         </View>
         <Dropdown
-          placeholder={parametres.langues === "fr" ? "Choisir" : "Elegir"}
           options={[
             { label: '1h', value: 1 },
             { label: '12h', value: 12 },
             { label: '24h', value: 24 },
           ]}
           selectedValue={parametres.intervalSynchro}
-          onValueChange={(value) => parametres.setIntervalSynchro(value)}
+          onValueChange={(value: "fr" | "es") => parametres.setIntervalSynchro(value)}
           primaryColor={colors.palette.vert}
           dropdownStyle={$pickerSynchro}
           dropdownContainerStyle={$dropdownContainerStyle}

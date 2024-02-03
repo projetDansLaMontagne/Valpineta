@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 <key>NSCameraUsageDescription</key>
-    <string>$(PRODUCT_NAME) utilise la caméra pour vous permettre d'envoyer une photo de profilusing a camera to enable you to upload pictures for profil.</string>
+    <string>$(PRODUCT_NAME) utilise la caméra pour vous permettre d'envoyer un signalement</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>$(PRODUCT_NAME) needs your authorization to enable you to upload pictures for profil.</string>
+    <string>$(PRODUCT_NAME) utilise votre bibliothèque de photos pour vous permettre d'envoyer un signalement</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>$(PRODUCT_NAME) needs your authorization to enable you to upload pictures for profil.</string>
+    <string>$(PRODUCT_NAME) utilise votre bibliothèque de photos pour vous permettre d'envoyer un signalement</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>

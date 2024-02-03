@@ -40,7 +40,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.valpineta.app"
+      "bundleIdentifier": "com.valpineta.app",
+      "NSCameraUsageDescription": "This app uses the camera to take photos and videos."
     },
     "web": {
       "favicon": "./assets/images/logo.jpg"
