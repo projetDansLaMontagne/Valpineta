@@ -78,9 +78,9 @@ const es = {
       francais: "Francés",
       espagnol: "Español",
     },
-    choisirSynchro:{
+    choisirSynchro: {
       titre: "Frecuencia de sincronización",
-    }
+    },
   },
   pageFiltres: {
     tri: {
@@ -118,41 +118,42 @@ const es = {
       photo: "Añadir una foto",
       valider: "Validar",
     },
-    actionSheet : {
+    actionSheet: {
       prendrePhoto: "Tomar una foto",
       choisirPhoto: "Elegir una foto",
       annuler: "Cancelar",
     },
-    alerte:{
-      ajouteEnLocal:{
+    alerte: {
+      ajouteEnLocal: {
         titre: "Añadido localmente",
-        message: "Su informe ha sido añadido localmente. Será enviado a los servidores la próxima vez que se sincronice.",
+        message:
+          "Su informe ha sido añadido localmente. Será enviado a los servidores la próxima vez que se sincronice.",
         boutons: {
-          ajoute:"Añado otro",
-          retour:"Volver a la carta",
-        }
+          ajoute: "Añado otro",
+          retour: "Volver a la carta",
+        },
       },
-      dejaExistant:{
+      dejaExistant: {
         titre: "Informe ya existente",
         message: "Ya ha informado de este lugar",
       },
-      mauvaisFormat:{
+      mauvaisFormat: {
         titre: "Formato incorrecto",
         message: "Verifique que los campos estén completados correctamente",
       },
-      envoyeEnBdd:{
+      envoyeEnBdd: {
         titre: "Enviado a la base de datos",
         message: "Su informe ha sido enviado a la base de datos",
-        boutons:{
-          ajoute:"Añado otro",
-          retour:"Volver a la carta",
-        }
+        boutons: {
+          ajoute: "Añado otro",
+          retour: "Volver a la carta",
+        },
       },
-      synchroEffectuee:{
+      synchroEffectuee: {
         titre: "Sincronización realizada",
         message: "Se ha realizado la sincronización",
       },
-      erreur:{
+      erreur: {
         titre: "Error",
         message: "Se produjo un error. Por favor, inténtalo de nuevo.",
       },
@@ -162,10 +163,9 @@ const es = {
         "El título debe contener entre 5 y 50 caracteres y no debe contener caracteres especiales",
       description:
         "La descripción debe contener entre 5 y 500 caracteres y no debe contener caracteres especiales",
-      photo:
-        "La foto debe tener un tamaño inferior a 5 MB y debe estar en formato JPG, JPEG o PNG",
+      photo: "Por favor agrega una foto",
     },
   },
-}
+};
 
 export default es;

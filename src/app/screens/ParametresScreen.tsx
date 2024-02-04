@@ -6,9 +6,9 @@ import { Screen, Text } from "app/components";
 import { colors, spacing } from "app/theme";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useStores } from "app/models";
-import Dropdown from 'react-native-input-select';
+import Dropdown from "react-native-input-select";
 
-interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> { }
+interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window");
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
@@ -27,7 +27,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         <TouchableOpacity
           style={$containerBoutons}
           onPress={() => {
-            const nouvelleLangue : "fr"|"es" = parametres.langues === "fr" ? "es" : "fr";
+            const nouvelleLangue: "fr" | "es" = parametres.langues === "fr" ? "es" : "fr";
             parametres.setLangue(nouvelleLangue);
           }}
         >
@@ -45,12 +45,12 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         </View>
         <Dropdown
           options={[
-            { label: '1h', value: 1 },
-            { label: '12h', value: 12 },
-            { label: '24h', value: 24 },
+            { label: "1h", value: 1 },
+            { label: "12h", value: 12 },
+            { label: "24h", value: 24 },
           ]}
           selectedValue={parametres.intervalSynchro}
-          onValueChange={(value: "fr" | "es") => parametres.setIntervalSynchro(value)}
+          onValueChange={(value: number) => parametres.setIntervalSynchro(value)}
           primaryColor={colors.palette.vert}
           dropdownStyle={$pickerSynchro}
           dropdownContainerStyle={$dropdownContainerStyle}
@@ -59,6 +59,10 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
     </Screen>
   );
 });
+
+/* -------------------------------------------------------------------------- */
+/*                                   STYLES                                   */
+/* -------------------------------------------------------------------------- */
 
 const $titre: TextStyle = {
   marginTop: spacing.lg,
@@ -114,7 +118,7 @@ const $texteBouton: TextStyle = {
 };
 
 const $pickerSynchro: ViewStyle = {
-  marginTop:20,
+  marginTop: 20,
   backgroundColor: colors.fond,
   width: width / 3,
   borderColor: colors.palette.vert,

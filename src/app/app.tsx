@@ -32,7 +32,7 @@ import Config from "./config";
 // Import pour la synchro
 import NetInfo from "@react-native-community/netinfo";
 import {
-  envoieBaseDeDonneesSignalement,
+  envoieBaseDeDonneesSignalements,
   alertSynchroEffectuee,
 } from "./services/synchroMontanteService";
 
@@ -86,7 +86,7 @@ function App(props: AppProps) {
 
         let envoiResult = false;
         if (isConnected && synchroMontanteStore.signalements.length > 0) {
-          envoiResult = await envoieBaseDeDonneesSignalement(synchroMontanteStore.signalements, synchroMontanteStore);
+          envoiResult = await envoieBaseDeDonneesSignalements(synchroMontanteStore.signalements, synchroMontanteStore);
           
           if (envoiResult) {
             alertSynchroEffectuee();

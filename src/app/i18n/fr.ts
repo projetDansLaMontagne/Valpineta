@@ -76,9 +76,9 @@ const fr = {
       francais: "Français",
       espagnol: "Espagnol",
     },
-    choisirSynchro:{
+    choisirSynchro: {
       titre: "Fréquence de synchronisation",
-    }
+    },
   },
   pageFiltres: {
     tri: {
@@ -116,50 +116,53 @@ const fr = {
       photo: "Ajouter une photo",
       valider: "Valider",
     },
-    actionSheet : {
+    actionSheet: {
       prendrePhoto: "Prendre une photo",
       choisirPhoto: "Choisir une photo",
       annuler: "Annuler",
     },
-    alerte:{
-      ajouteEnLocal:{
-        titre:"Ajout réussi",
-        message:"Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
-        boutons:{
-          ajoute:"Ajouter un autre",
-          retour:"Retour à la carte"
-        }
+    alerte: {
+      ajouteEnLocal: {
+        titre: "Ajout réussi",
+        message:
+          "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
+        boutons: {
+          ajoute: "Ajouter un autre",
+          retour: "Retour à la carte",
+        },
       },
-      dejaExistant:{
-        titre:"Signalement déjà existant",
-        message:"Un signalement similaire existe déjà à cet endroit",
-
+      dejaExistant: {
+        titre: "Signalement déjà existant",
+        message: "Un signalement similaire existe déjà à cet endroit",
       },
-      mauvaisFormat:{
-        titre:"Mauvais format",
-        message:"Veuillez vérifier que les champs sont correctement remplis",
+      mauvaisFormat: {
+        titre: "Mauvais format",
+        message: "Veuillez vérifier que les champs sont correctement remplis",
       },
-      envoyeEnBdd:{
-        titre:"Signalement envoyé",
-        message:"Votre signalement a bien été envoyé",
-        boutons:{
-          ajoute:"Ajouter un autre",
-          retour:"Retour à la carte"
-        }
+      envoyeEnBdd: {
+        titre: "Signalement envoyé",
+        message: "Votre signalement a bien été envoyé",
+        boutons: {
+          ajoute: "Ajouter un autre",
+          retour: "Retour à la carte",
+        },
       },
-      synchroEffectuee:{
-        titre:"Synchronisation effectuée",
-        message:"La synchronisation montante a bien été effectuée et vos signalements ont bien été envoyés",
+      synchroEffectuee: {
+        titre: "Synchronisation effectuée",
+        message:
+          "La synchronisation montante a bien été effectuée et vos signalements ont bien été envoyés",
       },
-      erreur:{
-        titre:"Erreur",
-        message:"Une erreur est survenue, veuillez réessayer"
-      }
+      erreur: {
+        titre: "Erreur",
+        message: "Une erreur est survenue, veuillez réessayer",
+      },
     },
     erreur: {
-      titre: "Le titre doit contenir entre 3 et 50 caractères et ne doit pas contenir de caractères spéciaux",
-      description: "La description doit contenir entre 10 et 1000 caractères et ne doit pas contenir de caractères spéciaux",
-      photo: "Veuillez ajouter une photo dans un des formats : jpg, jpeg, png, gif avec une taille maximum de 5 mo",
+      titre:
+        "Le titre doit contenir entre 3 et 50 caractères et ne doit pas contenir de caractères spéciaux",
+      description:
+        "La description doit contenir entre 10 et 1000 caractères et ne doit pas contenir de caractères spéciaux",
+      photo: "Veuillez ajouter une photo",
     },
   },
 };

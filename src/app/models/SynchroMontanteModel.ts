@@ -20,9 +20,9 @@ export const SynchroMontanteModel = types
     signalements: types.optional(types.array(signalement), []),
   })
   .actions(withSetPropAction)
-  .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
+  .views(self => ({})) 
   .actions(self => ({
-    addSignalement: (signalement: any) : boolean => {
+    addSignalement: (signalement: any): boolean => {
       const oldLength = self.signalements.length;
       self.signalements.push(signalement);
       return self.signalements.length > oldLength;
@@ -30,7 +30,7 @@ export const SynchroMontanteModel = types
     removeAllSignalements: () => {
       self.signalements.clear();
     },
-  })); // eslint-disable-line @typescript-eslint/no-unused-vars
+  }));
 
 export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> {}
 export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> {}

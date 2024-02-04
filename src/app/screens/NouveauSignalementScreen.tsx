@@ -20,15 +20,13 @@ import * as ImagePicker from "expo-image-picker";
 import { SynchroMontanteStore, useStores } from "app/models";
 import { synchroMontanteSignalement } from "app/services/synchroMontanteService";
 import { goBack } from "app/navigators";
-import {useActionSheet } from "@expo/react-native-action-sheet";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
 // Composants
 import { Screen, Text } from "app/components";
-import { set } from "date-fns";
-//Type
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
-  type: "Avertissement" | "PointInteret";
+  type: TTypeSignalement;
 }
 
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
@@ -37,7 +35,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const { synchroMontanteStore } = useStores();
 
     //type de signalement
-    let type : TTypeSignalement;
+    let type: TTypeSignalement;
     if (props.route.params) {
       type = props.route.params.type;
     } else {
@@ -65,12 +63,16 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const { showActionSheetWithOptions } = useActionSheet();
 
     /**
-     * Fonction pour choisir entre prendre une photo ou choisir une photo dans la librairie
+     * Fonction pour choisir entre prendre une photo ou choisir une photo utilisant l'actionSheet
      */
     const choixPhoto = () => {
       showActionSheetWithOptions(
         {
-          options: [translate("pageNouveauSignalement.actionSheet.prendrePhoto"), translate("pageNouveauSignalement.actionSheet.choisirPhoto"), translate("pageNouveauSignalement.actionSheet.annuler")],
+          options: [
+            translate("pageNouveauSignalement.actionSheet.prendrePhoto"),
+            translate("pageNouveauSignalement.actionSheet.choisirPhoto"),
+            translate("pageNouveauSignalement.actionSheet.annuler"),
+          ],
           cancelButtonIndex: 2,
         },
         buttonIndex => {
@@ -84,18 +86,21 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     };
 
     /**
-     * Fonction pour prendre une photo avec la caméra
+     * Fonction pour prendre une photo avec la caméra si la permission est accordée sinon demande la permission
      * @returns {void}
      * @async
      * @function prendrePhoto
      */
     const prendrePhoto = async (): Promise<void> => {
+      //Si la permission est déjà accordée
       if (cameraPermission) {
         let photo = await ImagePicker.launchCameraAsync();
         if (!photo.canceled) {
           setPhotoSignalement(photo.assets[0].uri);
         }
-      } else {
+      }
+      // Si la permission n'est pas accordée, demande la permission
+      else {
         const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
         if (cameraStatus.granted) {
           setCameraPermission(true);
@@ -114,12 +119,15 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @function choisirPhoto
      */
     const choisirPhoto = async (): Promise<void> => {
+      //Si la permission est déjà accordée
       if (LibrairiesPermission) {
         let photo = await ImagePicker.launchImageLibraryAsync();
         if (!photo.canceled) {
           setPhotoSignalement(photo.assets[0].uri);
         }
-      } else {
+      }
+      // Si la permission n'est pas accordée, demande la permission
+      else {
         const LibrairiesStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (LibrairiesStatus.granted) {
           setLibrairiesPermission(true);
@@ -141,7 +149,6 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       descriptionSignalement: string,
       photoSignalement: string,
     ): boolean => {
-
       let contientErreur = false;
       // Regex pour vérifier si les champs sont corrects et contiennent uniquement des caractères autorisés
       const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*-+,.:;"]+$/;
@@ -180,23 +187,28 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         setPhotoError(false);
       }
       return contientErreur;
-    };   
+    };
 
     /**
-     * fonction pour afficher une alerte en fonction du status
-     * @param status 
+     * fonction pour afficher une alerte en fonction du status de fin de l'envoi du signalement
+     * @param status
      */
-    const AlerteStatus = (status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur"  | "mauvaisFormat") => {
+    const AlerteStatus = (
+      status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat",
+    ) => {
       if (status == "ajouteEnLocal") {
-          Alert.alert(
-            translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
-            "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
-            [
-              { text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.ajoute") },
-              { text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.retour"), onPress: () => props.navigation.goBack() },
-            ],
-            { cancelable: false },
-          );
+        Alert.alert(
+          translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
+          "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
+          [
+            { text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.ajoute") },
+            {
+              text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.retour"),
+              onPress: () => props.navigation.goBack(),
+            },
+          ],
+          { cancelable: false },
+        );
       } else if (status == "dejaExistant") {
         Alert.alert(
           translate("pageNouveauSignalement.alerte.dejaExistant.titre"),
@@ -217,7 +229,10 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
           [
             { text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.ajoute") },
-            { text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.retour"), onPress: () => props.navigation.goBack() },
+            {
+              text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.retour"),
+              onPress: () => props.navigation.goBack(),
+            },
           ],
           { cancelable: false },
         );
@@ -246,14 +261,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       lon: number,
       synchroMontanteStore: SynchroMontanteStore,
     ): Promise<void> => {
-    
       const contientErreur = verifSignalement(
         titreSignalement,
         descriptionSignalement,
         photoSignalement,
       );
 
-      const signalementAEnvoyer:TSignalement = {
+      const signalementAEnvoyer: TSignalement = {
         nom: titreSignalement,
         type: type,
         description: descriptionSignalement,
@@ -261,24 +275,21 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         lat: lat,
         lon: lon,
       };
-    
-      let status : "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
+
+      let status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
       try {
         if (!contientErreur) {
           setIsLoading(true);
-          status = await synchroMontanteSignalement(
-            signalementAEnvoyer,
-            synchroMontanteStore,
-          );
+          status = await synchroMontanteSignalement(signalementAEnvoyer, synchroMontanteStore);
         } else {
           status = "mauvaisFormat";
         }
       } catch (error) {
         console.error("[NouveauSignalementScreen -> envoyerSignalement] Erreur :", error);
-        status = "erreur"; 
+        status = "erreur";
       } finally {
         setIsLoading(false);
-        if (status == "ajouteEnLocal" || status == "envoyeEnBdd"){
+        if (status == "ajouteEnLocal" || status == "envoyeEnBdd") {
           setTitreSignalement("");
           setDescriptionSignalement("");
           setPhotoSignalement(undefined);
@@ -286,108 +297,101 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         AlerteStatus(status);
       }
     };
-    
 
     return isLoading ? (
       <Screen style={$containerLoader} preset="fixed" safeAreaEdges={["top", "bottom"]}>
         <ActivityIndicator size="large" color={colors.palette.vert} />
       </Screen>
     ) : (
-        <View style={$view}>
-          <TouchableOpacity style={$boutonRetour} onPress={() => goBack()}>
-            <Image
-              style={{ tintColor: colors.bouton }}
-              source={require("../../assets/icons/back.png")}
-            />
-          </TouchableOpacity>
-          <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
+      <View style={$view}>
+        <TouchableOpacity style={$boutonRetour} onPress={() => goBack()}>
+          <Image
+            style={{ tintColor: colors.bouton }}
+            source={require("../../assets/icons/back.png")}
+          />
+        </TouchableOpacity>
+        <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
+          <Text
+            style={$h1}
+            tx={
+              type === "Avertissement"
+                ? "pageNouveauSignalement.titreAvertissement"
+                : "pageNouveauSignalement.titrePointInteret"
+            }
+            size="xxl"
+          />
+          <Text text="Col de la marmotte" size="lg" />
+          {titreError && (
             <Text
-              style={$h1}
-              tx={
-                type === "Avertissement"
-                  ? "pageNouveauSignalement.titreAvertissement"
-                  : "pageNouveauSignalement.titrePointInteret"
-              }
-              size="xxl"
+              tx="pageNouveauSignalement.erreur.titre"
+              size="xs"
+              style={{ color: colors.palette.rouge }}
             />
-            <Text text="Col de la marmotte" size="lg" />
-            {titreError && (
-              <Text
-                tx="pageNouveauSignalement.erreur.titre"
-                size="xs"
-                style={{ color: colors.palette.rouge }}
-              />
+          )}
+          <TextInput
+            placeholder={translate("pageNouveauSignalement.placeholderTitre")}
+            placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
+            onChangeText={setTitreSignalement}
+            value={titreSignalement}
+            style={[
+              { ...$inputTitre },
+              titreError
+                ? { borderColor: colors.palette.rouge }
+                : { borderColor: colors.palette.vert },
+            ]}
+          />
+          {descriptionError && (
+            <Text
+              tx="pageNouveauSignalement.erreur.description"
+              size="xs"
+              style={{ color: colors.palette.rouge }}
+            />
+          )}
+          <TextInput
+            placeholder={translate("pageNouveauSignalement.placeholderDescription")}
+            placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
+            onChangeText={setDescriptionSignalement}
+            multiline={true}
+            value={descriptionSignalement}
+            style={[
+              { ...$inputDescription },
+              descriptionError
+                ? { borderColor: colors.palette.rouge }
+                : { borderColor: colors.palette.vert },
+            ]}
+          />
+          <View>
+            {photoError && !photoSignalement && (
+              <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
             )}
-            <TextInput
-              placeholder={translate("pageNouveauSignalement.placeholderTitre")}
-              placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
-              onChangeText={setTitreSignalement}
-              value={titreSignalement}
-              style={[
-                { ...$inputTitre },
-                titreError
-                  ? { borderColor: colors.palette.rouge }
-                  : { borderColor: colors.palette.vert },
-              ]}
-            />
-            {descriptionError && (
-              <Text
-                tx="pageNouveauSignalement.erreur.description"
-                size="xs"
-                style={{ color: colors.palette.rouge }}
+            {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}
+            <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
+              <Image
+                style={{ tintColor: colors.palette.vert }}
+                source={require("../../assets/icons/camera.png")}
               />
-            )}
-            <TextInput
-              placeholder={
-                translate("pageNouveauSignalement.placeholderDescription")
+              <Text tx="pageNouveauSignalement.boutons.photo" size="xs" style={$textBoutonPhoto} />
+            </TouchableOpacity>
+            <Button
+              style={$bouton}
+              tx="pageNouveauSignalement.boutons.valider"
+              onPress={() =>
+                envoyerSignalement(
+                  titreSignalement,
+                  type,
+                  descriptionSignalement,
+                  photoSignalement,
+                  // WARNING A CHANGER AVEC LA LOCALISATION REELLE DE L'UTILISATEUR
+                  42.666,
+                  0.1034,
+                  synchroMontanteStore,
+                )
               }
-              placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
-              onChangeText={setDescriptionSignalement}
-              multiline={true}
-              value={descriptionSignalement}
-              style={[
-                { ...$inputDescription },
-                descriptionError
-                  ? { borderColor: colors.palette.rouge }
-                  : { borderColor: colors.palette.vert },
-              ]}
+              textStyle={$textBouton}
             />
-            <View>
-              {photoError && !photoSignalement && (
-                <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
-              )}
-              {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}
-                <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
-                  <Image
-                    style={{ tintColor: colors.palette.vert }}
-                    source={require("../../assets/icons/camera.png")}
-                  />
-                  <Text
-                    tx="pageNouveauSignalement.boutons.photo"
-                    size="xs"
-                    style={$textBoutonPhoto}
-                  />
-                </TouchableOpacity>
-              <Button
-                style={$bouton}
-                tx="pageNouveauSignalement.boutons.valider"
-                onPress={() => 
-                  envoyerSignalement(
-                    titreSignalement,
-                    type,
-                    descriptionSignalement,
-                    photoSignalement,
-                    // WARNING A CHANGER AVEC LA LOCALISATION
-                    42.666,
-                    0.1034,
-                    synchroMontanteStore,
-                  )
-                }
-                textStyle={$textBouton}
-              />
-            </View>
-          </Screen>
-        </View>
+          </View>
+        </Screen>
+      </View>
     );
   },
 );
