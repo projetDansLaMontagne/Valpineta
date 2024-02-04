@@ -66,6 +66,8 @@ interface AppProps {
   hideSplashScreen: () => Promise<void>;
 }
 
+const HEURE_EN_MILLISECONDES = 3600000;
+
 /**
  * This is the root component of our app.
  */
@@ -90,7 +92,7 @@ function App(props: AppProps) {
             alertSynchroEffectuee();
           }
         }
-      }, parametres.intervalSynchro * 3600000);
+      }, parametres.intervalSynchro * HEURE_EN_MILLISECONDES);
   
       return () => clearInterval(intervalId);
     };
