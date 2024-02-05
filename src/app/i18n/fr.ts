@@ -122,6 +122,10 @@ const fr = {
       annuler: "Annuler",
     },
     alerte: {
+      permissions:{
+        titre : "Permissions",
+        message: "Veuillez autoriser l'accès à la caméra et à la galerie pour ajouter une photo",
+      },
       ajouteEnLocal: {
         titre: "Ajout réussi",
         message:

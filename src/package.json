@@ -58,10 +58,12 @@
     "expo-localization": "~14.3.0",
     "expo-location": "~16.1.0",
     "expo-media-library": "^15.6.0",
+    "expo-modules-core": "~1.5.12",
     "expo-sharing": "~11.5.0",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "i18n-js": "3.9.2",
+    "js-md5": "^0.8.3",
     "mobx": "6.6.0",
     "mobx-react-lite": "3.4.0",
     "mobx-state-tree": "5.1.5",
@@ -85,8 +87,7 @@
     "react-native-vector-icons": "^10.0.1",
     "reactotron-mst": "3.1.4",
     "reactotron-react-js": "^3.3.7",
-    "reactotron-react-native": "5.0.3",
-    "expo-modules-core": "~1.5.12"
+    "reactotron-react-native": "5.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

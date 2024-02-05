@@ -8,6 +8,7 @@ import { SynchroMontanteStore } from "app/models";
 import { api } from "./api";
 import { getGeneralApiProblem } from "./api/apiProblem";
 import { translate } from "i18n-js";
+import { md5 } from "js-md5";
 
 //Type
 import { TSignalement, TTypeSignalement } from "app/navigators";
@@ -103,8 +104,10 @@ export async function envoieBaseDeDonneesSignalements(
       const response = await api.apisauce.post(
         "set-signalement",
         {
-          signalements: signalements,
+          signalements: JSON.stringify(signalements),
           post_id: post_id,
+          // en cours de développement avec Robin 
+          md5: md5(JSON.stringify(signalements)),
         },
         {
           headers: {

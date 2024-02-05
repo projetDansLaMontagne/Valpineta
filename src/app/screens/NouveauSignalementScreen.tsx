@@ -20,7 +20,7 @@ import * as ImagePicker from "expo-image-picker";
 import { SynchroMontanteStore, useStores } from "app/models";
 import { synchroMontanteSignalement } from "app/services/synchroMontanteService";
 import { goBack } from "app/navigators";
-import { useActionSheet } from "@expo/react-native-action-sheet";
+import { ActionSheetOptions, useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
 // Composants
 import { Screen, Text } from "app/components";
@@ -48,13 +48,14 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [photoSignalement, setPhotoSignalement] = useState(undefined);
 
     //Variables de permissions
-    const [cameraPermission, setCameraPermission] = useState(false);
-    const [LibrairiesPermission, setLibrairiesPermission] = useState(null);
+    const [cameraPermission, setCameraPermission] = ImagePicker.useCameraPermissions();
+    const [LibrairiesPermission, setLibrairiesPermission] =
+      ImagePicker.useMediaLibraryPermissions();
 
     //Variables d'erreurs
-    const [titreError, setTitreError] = useState(false);
-    const [descriptionError, setDescriptionError] = useState(false);
-    const [photoError, setPhotoError] = useState(false);
+    const [titreErreur, setTitreErreur] = useState(false);
+    const [descriptionErreur, setDescriptionErreur] = useState(false);
+    const [photoErreur, setPhotoErreur] = useState(false);
 
     //Variables pour le loader
     const [isLoading, setIsLoading] = useState(false);
@@ -63,26 +64,46 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const { showActionSheetWithOptions } = useActionSheet();
 
     /**
-     * Fonction pour choisir entre prendre une photo ou choisir une photo utilisant l'actionSheet
+     * Fonction qui aguille l'utilisateur pour ajouter une photo à son signalement 
      */
     const choixPhoto = () => {
-      showActionSheetWithOptions(
-        {
-          options: [
-            translate("pageNouveauSignalement.actionSheet.prendrePhoto"),
-            translate("pageNouveauSignalement.actionSheet.choisirPhoto"),
-            translate("pageNouveauSignalement.actionSheet.annuler"),
-          ],
-          cancelButtonIndex: 2,
-        },
-        buttonIndex => {
-          if (buttonIndex === 0) {
-            prendrePhoto();
-          } else if (buttonIndex === 1) {
-            choisirPhoto();
-          }
-        },
-      );
+      //Si les permissions pour la caméra et la librairie sont accordées
+      if (cameraPermission.granted && LibrairiesPermission.granted) {
+        showActionSheetWithOptions(
+          {
+            options: [
+              translate("pageNouveauSignalement.actionSheet.prendrePhoto"),
+              translate("pageNouveauSignalement.actionSheet.choisirPhoto"),
+              translate("pageNouveauSignalement.actionSheet.annuler"),
+            ],
+            cancelButtonIndex: 2,
+          },
+          buttonIndex => {
+            if (buttonIndex === 0) {
+              prendrePhoto();
+            } else if (buttonIndex === 1) {
+              choisirPhoto();
+            }
+          },
+        );
+      } 
+      //Si uniquement la permission pour la caméra est accordée
+      else if (cameraPermission.granted) {
+        prendrePhoto();
+      } 
+      //Si uniquement la permission pour la librairie est accordée
+
+      else if (LibrairiesPermission.granted) {
+        choisirPhoto();
+      } 
+      //Si aucune des permissions n'est accordée affiche une alerte
+      else {
+        Alert.alert(
+          translate("pageNouveauSignalement.alerte.permissions.titre"),
+          translate("pageNouveauSignalement.alerte.permissions.message"),
+          [{ text: "OK" }],
+        );
+      }
     };
 
     /**
@@ -92,23 +113,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @function prendrePhoto
      */
     const prendrePhoto = async (): Promise<void> => {
-      //Si la permission est déjà accordée
-      if (cameraPermission) {
-        let photo = await ImagePicker.launchCameraAsync();
-        if (!photo.canceled) {
-          setPhotoSignalement(photo.assets[0].uri);
-        }
-      }
-      // Si la permission n'est pas accordée, demande la permission
-      else {
-        const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-        if (cameraStatus.granted) {
-          setCameraPermission(true);
-          let photo = await ImagePicker.launchCameraAsync();
-          if (!photo.canceled) {
-            setPhotoSignalement(photo.assets[0].uri);
-          }
-        }
+      let photo = await ImagePicker.launchCameraAsync();
+      if (!photo.canceled) {
+        setPhotoSignalement(photo.assets[0].uri);
       }
     };
 
@@ -119,28 +126,17 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @function choisirPhoto
      */
     const choisirPhoto = async (): Promise<void> => {
-      //Si la permission est déjà accordée
-      if (LibrairiesPermission) {
-        let photo = await ImagePicker.launchImageLibraryAsync();
-        if (!photo.canceled) {
-          setPhotoSignalement(photo.assets[0].uri);
-        }
-      }
-      // Si la permission n'est pas accordée, demande la permission
-      else {
-        const LibrairiesStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (LibrairiesStatus.granted) {
-          setLibrairiesPermission(true);
-          let photo = await ImagePicker.launchImageLibraryAsync();
-          if (!photo.canceled) {
-            setPhotoSignalement(photo.assets[0].uri);
-          }
-        }
+      let photo = await ImagePicker.launchImageLibraryAsync();
+      if (!photo.canceled) {
+        setPhotoSignalement(photo.assets[0].uri);
       }
     };
 
     /**
      * Fonction pour envoyer le signalement en base de données et vérification des champs
+     * @param titreSignalement
+     * @param descriptionSignalement
+     * @param photoSignalement
      * @returns {void}
      * @function envoyerSignalement
      */
@@ -160,10 +156,10 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         titreSignalement.length < 3 ||
         titreSignalement.length > 50
       ) {
-        setTitreError(true);
+        setTitreErreur(true);
         contientErreur = true;
       } else {
-        setTitreError(false);
+        setTitreErreur(false);
       }
 
       // Vérification de la description
@@ -173,18 +169,18 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         descriptionSignalement.length < 10 ||
         descriptionSignalement.length > 1000
       ) {
-        setDescriptionError(true);
+        setDescriptionErreur(true);
         contientErreur = true;
       } else {
-        setDescriptionError(false);
+        setDescriptionErreur(false);
       }
 
       // Vérification de la photo
       if (photoSignalement === undefined || photoSignalement === null) {
-        setPhotoError(true);
+        setPhotoErreur(true);
         contientErreur = true;
       } else {
-        setPhotoError(false);
+        setPhotoErreur(false);
       }
       return contientErreur;
     };
@@ -277,25 +273,19 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       };
 
       let status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
-      try {
-        if (!contientErreur) {
-          setIsLoading(true);
-          status = await synchroMontanteSignalement(signalementAEnvoyer, synchroMontanteStore);
-        } else {
-          status = "mauvaisFormat";
-        }
-      } catch (error) {
-        console.error("[NouveauSignalementScreen -> envoyerSignalement] Erreur :", error);
-        status = "erreur";
-      } finally {
-        setIsLoading(false);
-        if (status == "ajouteEnLocal" || status == "envoyeEnBdd") {
-          setTitreSignalement("");
-          setDescriptionSignalement("");
-          setPhotoSignalement(undefined);
-        }
-        AlerteStatus(status);
+      if (!contientErreur) {
+        setIsLoading(true);
+        status = await synchroMontanteSignalement(signalementAEnvoyer, synchroMontanteStore);
+      } else {
+        status = "mauvaisFormat";
       }
+      setIsLoading(false);
+      if (status == "ajouteEnLocal" || status == "envoyeEnBdd") {
+        setTitreSignalement("");
+        setDescriptionSignalement("");
+        setPhotoSignalement(undefined);
+      }
+      AlerteStatus(status);
     };
 
     return isLoading ? (
@@ -321,7 +311,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             size="xxl"
           />
           <Text text="Col de la marmotte" size="lg" />
-          {titreError && (
+          {titreErreur && (
             <Text
               tx="pageNouveauSignalement.erreur.titre"
               size="xs"
@@ -330,17 +320,17 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           )}
           <TextInput
             placeholder={translate("pageNouveauSignalement.placeholderTitre")}
-            placeholderTextColor={titreError ? colors.palette.rouge : colors.text}
+            placeholderTextColor={titreErreur ? colors.palette.rouge : colors.text}
             onChangeText={setTitreSignalement}
             value={titreSignalement}
             style={[
               { ...$inputTitre },
-              titreError
+              titreErreur
                 ? { borderColor: colors.palette.rouge }
                 : { borderColor: colors.palette.vert },
             ]}
           />
-          {descriptionError && (
+          {descriptionErreur && (
             <Text
               tx="pageNouveauSignalement.erreur.description"
               size="xs"
@@ -349,19 +339,19 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           )}
           <TextInput
             placeholder={translate("pageNouveauSignalement.placeholderDescription")}
-            placeholderTextColor={descriptionError ? colors.palette.rouge : colors.text}
+            placeholderTextColor={descriptionErreur ? colors.palette.rouge : colors.text}
             onChangeText={setDescriptionSignalement}
             multiline={true}
             value={descriptionSignalement}
             style={[
               { ...$inputDescription },
-              descriptionError
+              descriptionErreur
                 ? { borderColor: colors.palette.rouge }
                 : { borderColor: colors.palette.vert },
             ]}
           />
           <View>
-            {photoError && !photoSignalement && (
+            {photoErreur && !photoSignalement && (
               <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
             )}
             {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}

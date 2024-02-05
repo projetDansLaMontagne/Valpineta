@@ -7,5 +7,5 @@
  */
 export default {
   API_URL: "https://www.valpineta.eu/wp-json/api-wp/",
-  API_TIMEOUT: 10000, // 10 seconds
+  API_TIMEOUT: 100000, // 10 seconds
 };
