@@ -124,8 +124,7 @@ const es = {
     alerte: {
       permissions: {
         titre: "Permisos",
-        message:
-          "Para tomar una foto, es necesario que la aplicación tenga acceso a la cámara",
+        message: "Para tomar una foto, es necesario que la aplicación tenga acceso a la cámara",
       },
       ajouteEnLocal: {
         titre: "Añadido localmente",

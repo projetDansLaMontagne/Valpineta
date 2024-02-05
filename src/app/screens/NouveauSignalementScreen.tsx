@@ -18,9 +18,9 @@ import { colors, spacing } from "app/theme";
 import { Button } from "app/components";
 import * as ImagePicker from "expo-image-picker";
 import { SynchroMontanteStore, useStores } from "app/models";
-import { synchroMontanteSignalement } from "app/services/synchroMontanteService";
+import { TStatus, synchroMontanteSignalement } from "app/services/synchroMontanteService";
 import { goBack } from "app/navigators";
-import { ActionSheetOptions, useActionSheet } from "@expo/react-native-action-sheet";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
 // Composants
 import { Screen, Text } from "app/components";
@@ -190,7 +190,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @param status
      */
     const AlerteStatus = (
-      status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat",
+      status: TStatus,
     ) => {
       if (status == "ajouteEnLocal") {
         Alert.alert(
@@ -272,7 +272,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         lon: lon,
       };
 
-      let status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
+      let status: TStatus;
       if (!contientErreur) {
         setIsLoading(true);
         status = await synchroMontanteSignalement(signalementAEnvoyer, synchroMontanteStore);

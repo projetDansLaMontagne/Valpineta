@@ -12,6 +12,7 @@ import { md5 } from "js-md5";
 
 //Type
 import { TSignalement, TTypeSignalement } from "app/navigators";
+export type TStatus = "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
 
 /* --------------------------- FONCTIONS EXPORTEES -------------------------- */
 
@@ -25,8 +26,8 @@ import { TSignalement, TTypeSignalement } from "app/navigators";
 export async function synchroMontanteSignalement(
   signalementAEnvoyer: TSignalement,
   synchroMontanteStore: SynchroMontanteStore,
-): Promise<"envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur"> {
-  let status: "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur";
+): Promise<TStatus> {
+  let status:TStatus;
 
   try {
     //Vérifie si l'appareil est connecté à internet
