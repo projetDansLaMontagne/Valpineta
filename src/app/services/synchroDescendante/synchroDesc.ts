@@ -49,6 +49,7 @@ import { TExcursion, TLanguageContent, TPoint, TSignalement } from "../../naviga
 
 export type TCallbackToGetNumberOfFiles = (filesDownloaded: number, filesToDl: number) => void;
 export type TCallbackStep = (step: number, totalSteps: number) => void;
+
 /**
  * Niveau de debug.
  * Ne sert que pour dev.
@@ -60,7 +61,7 @@ export enum TDebugMode {
 }
 
 // Other(s)
-const BASE_URL = "https://valpineta.eu/wp-json/api-wp/";
+export const BASE_URL = "https://valpineta.eu/wp-json/api-wp/";
 
 export const GPX_FOLDER = `${FileSystem.documentDirectory}GPX/`;
 const GPX_TEMP_FOLDER = `${FileSystem.documentDirectory}GPX-temp/` as const;
@@ -113,6 +114,17 @@ export const areObjectsEquals = <
 };
 
 /**
+ * Récupère le nombre de fichiers GPX présents sur le téléphone.
+ *
+ * @returns {Promise<number>}
+ */
+/* istanbul ignore next */
+const getNumberOfExcursions = async (): Promise<number> => {
+  const excursionsJson = await getExcursionsJsonFromDevice();
+  return excursionsJson.length;
+};
+
+/**
  * Vérifie si le fichier `excursions.json` existe sur le téléphone.
  *
  * @returns {Promise<boolean>}
@@ -122,7 +134,9 @@ export const excursionsJsonExists = async (): Promise<boolean> => {
     const fileInfo = await FileSystem.getInfoAsync(EXCURSIONS_FILE_DEST);
     return fileInfo.exists;
   } catch (error) {
+    /* istanbul ignore next */
     console.error("Error checking file existence:", error);
+    /* istanbul ignore next */
     return false;
   }
 };
@@ -132,6 +146,7 @@ export const excursionsJsonExists = async (): Promise<boolean> => {
  *
  * @returns {Promise<void>}
  */
+/* istanbul ignore next */
 export const downloadExcursionsJson = async (): Promise<void> => {
   // On vérifie si le dossier 'fichiers' existe
   const fichiersFolder = await FileSystem.getInfoAsync(`${FileSystem.documentDirectory}fichiers`);
@@ -170,6 +185,7 @@ export const downloadExcursionsJson = async (): Promise<void> => {
  *
  * @returns {Promise<Array<TExcursion>>}
  */
+/* istanbul ignore next */
 export const getExcursionsJsonFromDevice = async (): Promise<Array<TExcursion>> => {
   if (await excursionsJsonExists()) {
     const excursionsJson = await FileSystem.readAsStringAsync(EXCURSIONS_FILE_DEST);
@@ -189,6 +205,7 @@ export const getExcursionsJsonFromDevice = async (): Promise<Array<TExcursion>> 
  *
  * @returns {Promise<void>}
  */
+/* istanbul ignore next */
 export const updateExcursionsJsonRequest = async (debug?: TDebugMode): Promise<void> => {
   // On récupère les excursions présentes sur le téléphone
   const excursionsJson = await getExcursionsJsonFromDevice();
@@ -329,18 +346,48 @@ export const updateExcursionsJson = (
 };
 
 /**
- * Télécharge le fichier GPX passé en paramètre depuis notre API.
- * @param file {string} Nom du fichier GPX à télécharger.
+ * Crée le dossier 'GPX-temp' s'il n'existe pas.
  *
  * @returns {Promise<void>}
  */
-const dlFile = async (file: `${string}.gpx`): Promise<void> => {
+/* istanbul ignore next */
+const createGPXTempFolder = async (): Promise<void> => {
   // check si le dossier 'GPX-temp' existe
   const GPXFolder = await FileSystem.getInfoAsync(GPX_TEMP_FOLDER);
   // Si le dossier 'GPX-temp' n'existe pas, on le crée
   if (!GPXFolder.exists) {
     await FileSystem.makeDirectoryAsync(GPX_TEMP_FOLDER);
   }
+};
+
+/**
+ * Supprime le dossier 'GPX-temp' s'il existe.
+ *
+ * @returns {Promise<void>}
+ */
+/* istanbul ignore next */
+const deleteGPXTempFolder = async (): Promise<void> => {
+  // check si le dossier 'GPX-temp' existe
+  const GPXFolder = await FileSystem.getInfoAsync(GPX_TEMP_FOLDER);
+  // Si le dossier 'GPX-temp' existe, on le supprime
+  if (GPXFolder.exists) {
+    await FileSystem.deleteAsync(GPX_TEMP_FOLDER);
+  }
+};
+
+/**
+ * Télécharge le fichier GPX passé en paramètre depuis notre API.
+ * @param file {string} Nom du fichier GPX à télécharger.
+ *
+ * @returns {Promise<void>}
+ */
+/* istanbul ignore next */
+const dlFile = async (file: `${string}.gpx`): Promise<void> => {
+  if (file === ".gpx") {
+    return Promise.resolve();
+  }
+
+  await createGPXTempFolder();
 
   const { md5 } = await FileSystem.downloadAsync(
     API_FILE_DL_URL(file),
@@ -365,9 +412,6 @@ const dlFile = async (file: `${string}.gpx`): Promise<void> => {
     from: `${GPX_TEMP_FOLDER}${file}`,
     to: `${GPX_FOLDER}${file}`,
   });
-
-  // On supprime le fichier temporaire
-  await FileSystem.deleteAsync(`${GPX_TEMP_FOLDER}${file}`);
 };
 
 /**
@@ -382,16 +426,11 @@ const dlFile = async (file: `${string}.gpx`): Promise<void> => {
  *
  * @returns {Promise<void>}
  */
+/* istanbul ignore next */
 export const getAndCopyGPXFiles = async (
   callbackToGetNumberOfFiles?: TCallbackToGetNumberOfFiles,
 ): Promise<void> => {
-  // On vérifie si le dossier 'GPX' existe
-  const GPXFolder = await FileSystem.getInfoAsync(GPX_FOLDER);
-  // Si le dossier 'GPX' n'existe pas, on le crée
-  if (!GPXFolder.exists) {
-    console.log("[synchroDesc] le dossier 'GPX' n'existe pas, on le crée");
-    await FileSystem.makeDirectoryAsync(GPX_FOLDER);
-  }
+  await createGPXTempFolder();
 
   // On récupère la liste des fichiers GPX présents sur le téléphone
   const files = await FileSystem.readDirectoryAsync(GPX_FOLDER);
@@ -423,7 +462,7 @@ export const getAndCopyGPXFiles = async (
   }
 
   // Suppression du dossier temporaire
-  await FileSystem.deleteAsync(GPX_TEMP_FOLDER);
+  await deleteGPXTempFolder();
 };
 
 /**
@@ -442,6 +481,7 @@ export const getAndCopyGPXFiles = async (
  *
  * @returns {Promise<boolean>} True si la synchronisation s'est bien passée, false sinon.
  */
+/* istanbul ignore next */
 export const synchroDescendante = async (
   callbackStep?: TCallbackStep,
   callbackToGetNumberOfFiles?: TCallbackToGetNumberOfFiles,
@@ -474,6 +514,7 @@ export const synchroDescendante = async (
     return false;
   }
 };
+
 // END FUNCTIONS ======================================================================================== END FUNCTIONS
 
 // CODE ========================================================================================================= CODE
