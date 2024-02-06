@@ -267,19 +267,20 @@ export function SuiviTrack(props: SuiviTrackProps) {
                   : { left: width / 2 },
               ]}
             ></View>
-            {containerInfoAffiche
-              ? descritpion(excursion, altitudeActuelle)
-              :
-              <ListeSignalements
-                excursion={excursion}
-                footerHeight={footerHeight}
-                style={$containerSignalements}
-                userLocation={userLocation}
-                distanceDepuisUser={true}
-                setStartPoint={setStartPoint}
-                swipeDown={showMini}
-              />
-            }
+            {containerInfoAffiche ? descritpion(excursion, altitudeActuelle) : (
+              userLocation !== undefined && userLocation !== null && (
+                <ListeSignalements
+                  excursion={excursion}
+                  footerHeight={footerHeight}
+                  style={$containerSignalements}
+                  userLocation={userLocation}
+                  distanceDepuisUser={true}
+                  setStartPoint={setStartPoint}
+                  swipeDown={showMini}
+                />
+              )
+            )}
+
           </View>
         }
       </View >

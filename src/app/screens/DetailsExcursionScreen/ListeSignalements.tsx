@@ -18,7 +18,6 @@ export interface ListeSignalementsProps {
   swipeDown: () => void;
   style: ViewStyle;
   distanceDepuisUser?: boolean;
-  swipeDown?: () => void;
 }
 
 export function ListeSignalements(props: ListeSignalementsProps) {
