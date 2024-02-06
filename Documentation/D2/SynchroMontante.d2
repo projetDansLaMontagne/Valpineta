@@ -1,0 +1,19 @@
+serveur Valpineta:{
+    icon:https://icons.terrastruct.com/essentials%2F112-server.svg
+}
+Application Valpineta{
+    label.near: top-left
+}
+Application Valpineta.Services
+Application Valpineta.Stores
+Application Valpineta.View 
+
+Application Valpineta.View.NouveauSignalementScreen -> Application Valpineta.Stores.SynchroMontante: Ajout d'un signalement
+Application Valpineta.Stores.SynchroMontante -> Application Valpineta.Services.SynchroMontanteServiceSignalement : si l'utilisateur est connecté
+Application Valpineta.Services.SynchroMontanteServiceSignalement -> serveur Valpineta : signalements envoyés
+serveur Valpineta -> Application Valpineta.Services.SynchroMontanteServiceSignalement : réponse du serveur
+Application Valpineta.Services.SynchroMontanteServiceSignalement -> Application Valpineta.View.NouveauSignalementScreen: Informer l'utilisateur
+
+Application Valpineta.Stores.SynchroMontante -> Application Valpineta.View.NouveauSignalementScreen : non connecté
+(Application Valpineta.Stores.SynchroMontante -> Application Valpineta.View.NouveauSignalementScreen)[0].style.stroke:red
+
