@@ -9,6 +9,7 @@ const signalement = types.model({
   image: types.string,
   lat: types.number,
   lon: types.number,
+  post_id: types.number,
 });
 
 /**

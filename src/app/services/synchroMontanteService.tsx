@@ -11,7 +11,7 @@ import { translate } from "i18n-js";
 import { md5 } from "js-md5";
 
 //Type
-import { TSignalement, TTypeSignalement } from "app/navigators";
+import { TSignalement } from "app/navigators";
 export type TStatus = "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
 
 /* --------------------------- FONCTIONS EXPORTEES -------------------------- */
@@ -40,12 +40,7 @@ export async function synchroMontanteSignalement(
     //Vérifie si le signalement existe déjà dans le store
     if (
       !rechercheMemeSignalement(
-        signalementAEnvoyer.nom,
-        signalementAEnvoyer.type,
-        signalementAEnvoyer.description,
-        signalementAEnvoyer.image,
-        signalementAEnvoyer.lat,
-        signalementAEnvoyer.lon,
+        signalementAEnvoyer,
         synchroMontanteStore,
       )
     ) {
@@ -93,9 +88,6 @@ export async function envoieBaseDeDonneesSignalements(
   signalements: Array<TSignalement>,
   synchroMontanteStore: SynchroMontanteStore,
 ): Promise<boolean> {
-  //Id du post A CHANGER
-  const post_id = 2049;
-
   try {
     //Vérifie si des signalements sont présents dans le store
     if (synchroMontanteStore.signalements.length > 0) {
@@ -106,7 +98,6 @@ export async function envoieBaseDeDonneesSignalements(
         "set-signalement",
         {
           signalements: JSON.stringify(signalements),
-          post_id: post_id,
           // en cours de développement avec Robin 
           md5: md5(JSON.stringify(signalements)),
         },
@@ -160,34 +151,19 @@ export const alertSynchroEffectuee = () => {
 
 /**
  * Recherche si un signalement existe déjà dans la liste des signalements dans le store
- * @param titreSignalement
- * @param type
- * @param descriptionSignalement
- * @param photoSignalement
- * @param lat
- * @param lon
+ * @param signalementAEnvoyer
  * @param synchroMontanteStore
  * @returns
  */
 function rechercheMemeSignalement(
-  titreSignalement: string,
-  type: TTypeSignalement,
-  descriptionSignalement: string,
-  photoSignalement: string,
-  lat: number,
-  lon: number,
+  signalementAChercher: TSignalement,
   synchroMontanteStore: SynchroMontanteStore,
 ): boolean {
   let memeSignalement: boolean = false;
 
   synchroMontanteStore.signalements.forEach(signalement => {
     if (
-      signalement.nom === titreSignalement &&
-      signalement.type === type &&
-      signalement.description === descriptionSignalement &&
-      signalement.image === photoSignalement &&
-      signalement.lat === lat &&
-      signalement.lon === lon
+      signalementAChercher === signalement
     ) {
       memeSignalement = true;
     }

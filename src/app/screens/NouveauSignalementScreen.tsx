@@ -255,6 +255,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       photoSignalement: string,
       lat: number,
       lon: number,
+      post_id: number,
       synchroMontanteStore: SynchroMontanteStore,
     ): Promise<void> => {
       const contientErreur = verifSignalement(
@@ -270,6 +271,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         image: photoSignalement,
         lat: lat,
         lon: lon,
+        post_id: post_id,
       };
 
       let status: TStatus;
@@ -374,6 +376,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
                   // WARNING A CHANGER AVEC LA LOCALISATION REELLE DE L'UTILISATEUR
                   42.666,
                   0.1034,
+                  2049,
                   synchroMontanteStore,
                 )
               }

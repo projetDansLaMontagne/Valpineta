@@ -77,6 +77,7 @@ export type TSignalement = {
   lon: number;
   nom: string;
   type: TTypeSignalement;
+  post_id: number;
 };
 export type T_infoLangue = {
   nom: string;
