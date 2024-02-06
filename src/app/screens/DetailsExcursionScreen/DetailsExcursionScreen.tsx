@@ -154,11 +154,11 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     return excursion ? (
       <View style={$container}>
 
-        {modalSignalementVisible && (
+        {modalSignalementVisible && isSuiviTrack && (
           <PopupSignalement signalement={signalementPopup} modalSignalementVisible={modalSignalementVisible} setModalSignalementVisible={setModalSignalementVisible} estEntier={estEntier} setEstEntier={setEstEntier} />
         )}
 
-        {modalExcursionTermineeVisible && (
+        {modalExcursionTermineeVisible && isSuiviTrack && (
           <ExcursionTerminee navigation={navigation} modalExcursionTermineeVisible={modalExcursionTermineeVisible} setModalExcursionTermineeVisible={setModalExcursionTermineeVisible} />
         )}
 
