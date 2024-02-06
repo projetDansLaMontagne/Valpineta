@@ -27,7 +27,7 @@ export function PopupSignalement(props: PopupSignalementProps) {
             <View style={$containerSignalement}>
                 <View style={$containerTitrePopup}>
                     <Image tintColor={signalement.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={signalement.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
-                    <Text weight="bold" size="xl" style={$titreSignalement}>{signalement.nom}</Text>
+                    <View style={{ width: "80%" }}><Text weight="bold" size="xl" style={$titreSignalement}>{signalement.nom}</Text></View>
                     <Image tintColor={signalement.type == "PointInteret" ? colors.palette.vert : colors.palette.rouge} source={signalement.type == "PointInteret" ? require("assets/icons/view.png") : require("assets/icons/attentionV2.png")} style={$iconeStyle} />
                 </View>
                 {estEntier ?
@@ -86,13 +86,15 @@ const $containerSignalement: ViewStyle = {
 const $containerTitrePopup: ViewStyle = {
     flexDirection: "row",
     alignSelf: "center",
-    marginBottom: spacing.sm
+    marginBottom: spacing.sm,
+    width: "100%"
 }
 
 const $titreSignalement: TextStyle = {
     color: "black",
     paddingLeft: spacing.sm,
-    paddingRight: spacing.sm
+    paddingRight: spacing.sm,
+    textAlign: "center",
 }
 
 const $iconeStyle: ImageStyle = {
