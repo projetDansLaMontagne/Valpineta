@@ -36,7 +36,7 @@ import {
   alertSynchroEffectuee,
 } from "./services/synchroMontanteService";
 
-//Import pour l'ui de l'ActionSheet
+// Import pour l'ui de l'ActionSheet
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
@@ -73,32 +73,32 @@ const HEURE_EN_MILLISECONDES = 3600000;
  */
 function App(props: AppProps) {
   let isConnected = false;
+  let intervalId: NodeJS.Timeout;
+
   const { synchroMontanteStore, parametres } = useStores();
 
   // Verifie la connexion avec l'interval défini dans les paramètres et s'il y a des signalements à envoyer
   useEffect(() => {
-    const setupInterval = async () => {
-      const intervalId = setInterval(async () => {
+    intervalId = setInterval(async () => {
+      // Vérifie la connexion
+      const state = await NetInfo.fetch();
+      isConnected = state.isConnected;
 
-        // Vérifie la connexion
-        const state = await NetInfo.fetch();
-        isConnected = state.isConnected;
+      let envoiResult = false;
+      if (isConnected && synchroMontanteStore.signalements.length > 0) {
+        envoiResult = await envoieBaseDeDonneesSignalements(
+          synchroMontanteStore.signalements,
+          synchroMontanteStore,
+        );
 
-        let envoiResult = false;
-        if (isConnected && synchroMontanteStore.signalements.length > 0) {
-          envoiResult = await envoieBaseDeDonneesSignalements(synchroMontanteStore.signalements, synchroMontanteStore);
-          
-          if (envoiResult) {
-            alertSynchroEffectuee();
-          }
+        if (envoiResult) {
+          alertSynchroEffectuee();
         }
-      }, parametres.intervalSynchro * HEURE_EN_MILLISECONDES);
-  
-      return () => clearInterval(intervalId);
-    };
-  
-    setupInterval();
-  }, [isConnected]);
+      }
+    }, parametres.intervalSynchro * HEURE_EN_MILLISECONDES);
+
+    return () => clearInterval(intervalId);
+  }, [parametres.intervalSynchro]);
 
   const { hideSplashScreen } = props;
   const {
