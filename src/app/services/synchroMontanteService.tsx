@@ -151,7 +151,7 @@ export const alertSynchroEffectuee = () => {
 
 /**
  * Recherche si un signalement existe déjà dans la liste des signalements dans le store
- * @param signalementAEnvoyer
+ * @param signalementAChercher
  * @param synchroMontanteStore
  * @returns
  */

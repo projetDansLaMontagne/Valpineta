@@ -13,17 +13,15 @@ import {
   TouchableOpacity,
   ImageStyle,
 } from "react-native";
-import { AppStackScreenProps, TTypeSignalement, TSignalement } from "app/navigators";
+import { AppStackScreenProps, TTypeSignalement, TSignalement,goBack } from "app/navigators";
 import { colors, spacing } from "app/theme";
-import { Button } from "app/components";
 import * as ImagePicker from "expo-image-picker";
 import { SynchroMontanteStore, useStores } from "app/models";
 import { TStatus, synchroMontanteSignalement } from "app/services/synchroMontanteService";
-import { goBack } from "app/navigators";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
 // Composants
-import { Screen, Text } from "app/components";
+import { Button, Screen, Text } from "app/components";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: TTypeSignalement;
@@ -48,8 +46,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [photoSignalement, setPhotoSignalement] = useState(undefined);
 
     //Variables de permissions
-    const [cameraPermission, setCameraPermission] = ImagePicker.useCameraPermissions();
-    const [LibrairiesPermission, setLibrairiesPermission] =
+    const [cameraPermission, requestPermissionCamera ] = ImagePicker.useCameraPermissions();
+    const [LibrairiesPermission, requestPermissionLibrairies ] =
       ImagePicker.useMediaLibraryPermissions();
 
     //Variables d'erreurs
@@ -113,7 +111,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @function prendrePhoto
      */
     const prendrePhoto = async (): Promise<void> => {
-      let photo = await ImagePicker.launchCameraAsync();
+      const photo = await ImagePicker.launchCameraAsync();
       if (!photo.canceled) {
         setPhotoSignalement(photo.assets[0].uri);
       }
@@ -126,7 +124,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * @function choisirPhoto
      */
     const choisirPhoto = async (): Promise<void> => {
-      let photo = await ImagePicker.launchImageLibraryAsync();
+      const photo = await ImagePicker.launchImageLibraryAsync();
       if (!photo.canceled) {
         setPhotoSignalement(photo.assets[0].uri);
       }
@@ -192,7 +190,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const AlerteStatus = (
       status: TStatus,
     ) => {
-      if (status == "ajouteEnLocal") {
+      if (status === "ajouteEnLocal") {
         Alert.alert(
           translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
           "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
@@ -205,21 +203,21 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           ],
           { cancelable: false },
         );
-      } else if (status == "dejaExistant") {
+      } else if (status === "dejaExistant") {
         Alert.alert(
           translate("pageNouveauSignalement.alerte.dejaExistant.titre"),
           translate("pageNouveauSignalement.alerte.dejaExistant.message"),
           [{ text: "OK" }],
           { cancelable: false },
         );
-      } else if (status == "mauvaisFormat") {
+      } else if (status === "mauvaisFormat") {
         Alert.alert(
           translate("pageNouveauSignalement.alerte.mauvaisFormat.titre"),
           translate("pageNouveauSignalement.alerte.mauvaisFormat.message"),
           [{ text: "OK" }],
           { cancelable: false },
         );
-      } else if (status == "envoyeEnBdd") {
+      } else if (status === "envoyeEnBdd") {
         Alert.alert(
           translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
           translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
@@ -266,12 +264,12 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 
       const signalementAEnvoyer: TSignalement = {
         nom: titreSignalement,
-        type: type,
+        type,
         description: descriptionSignalement,
         image: photoSignalement,
-        lat: lat,
-        lon: lon,
-        post_id: post_id,
+        lat,
+        lon,
+        post_id,
       };
 
       let status: TStatus;
@@ -282,7 +280,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         status = "mauvaisFormat";
       }
       setIsLoading(false);
-      if (status == "ajouteEnLocal" || status == "envoyeEnBdd") {
+      if (status === "ajouteEnLocal" || status === "envoyeEnBdd") {
         setTitreSignalement("");
         setDescriptionSignalement("");
         setPhotoSignalement(undefined);
