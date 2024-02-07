@@ -119,7 +119,7 @@ export const areObjectsEquals = <
  * @returns {Promise<number>}
  */
 /* istanbul ignore next */
-const getNumberOfExcursions = async (): Promise<number> => {
+export const getNumberOfExcursions = async (): Promise<number> => {
   const excursionsJson = await getExcursionsJsonFromDevice();
   return excursionsJson.length;
 };
@@ -187,14 +187,16 @@ export const downloadExcursionsJson = async (): Promise<void> => {
  */
 /* istanbul ignore next */
 export const getExcursionsJsonFromDevice = async (): Promise<Array<TExcursion>> => {
-  if (await excursionsJsonExists()) {
-    const excursionsJson = await FileSystem.readAsStringAsync(EXCURSIONS_FILE_DEST);
-    return JSON.parse(excursionsJson);
+  try {
+    if (await excursionsJsonExists()) {
+      const excursionsJson = await FileSystem.readAsStringAsync(EXCURSIONS_FILE_DEST);
+      return JSON.parse(excursionsJson);
+    }
+  } catch (error) {
+    console.error("Error reading file:", error);
   }
 
-  throw new Error(
-    "Le fichier 'excursions.json' n'existe pas. Pensez à lancer la fonction 'downloadExcursionsJson'.",
-  );
+  return [] as Array<TExcursion>;
 };
 
 /**
@@ -288,8 +290,8 @@ export const updateExcursionsJson = (
       excursion => excursion.postId === excursionJson.postId,
     );
 
-    debug && console.log(`[synchroDesc] excursionJson.postId -> ${excursionJson.postId}`);
-    debug && console.log(`[synchroDesc] excursionServer.postId -> ${excursionServer?.postId}`);
+    debug > 2 && console.log(`[synchroDesc] excursionJson.postId -> ${excursionJson.postId}`);
+    debug > 2 && console.log(`[synchroDesc] excursionServer.postId -> ${excursionServer?.postId}`);
 
     // Si l'excursion n'est pas présente sur le serveur
     if (!excursionServer) {
@@ -400,11 +402,14 @@ const dlFile = async (file: `${string}.gpx`): Promise<void> => {
   // On récupère le MD5 du fichier sur le serveur
   const md5API = await fetch(API_FILE_MD5_URL(file)).then(res => res.json() as Promise<string>);
 
+  console.log(`[synchroDesc] MD5 du fichier ${file} -> `, md5);
+  console.log(`[synchroDesc] MD5 du fichier ${file} sur le serveur -> `, md5API);
+
   // On compare les deux MD5 pour savoir si le téléchargement s'est bien passé.
   if (md5 !== md5API) {
     // Suppression du fichier temporaire
     await FileSystem.deleteAsync(`${GPX_TEMP_FOLDER}${file}`);
-    throw new Error(`Erreur lors du téléchargement du fichier '${file}'.`);
+    throw new Error(`Erreur lors du téléchargement du fichier '${file}'. Les MD5 sont différents.`);
   }
 
   // On copie le fichier dans le dossier 'GPX'
@@ -440,17 +445,24 @@ export const getAndCopyGPXFiles = async (
   // Ces fichiers sont stockés dans le fichier 'excursions.json'.
   const excursionsJson = await getExcursionsJsonFromDevice();
   const GPXFiles = excursionsJson.map(excursion => excursion.nomTrackGpx as `${string}.gpx`);
+  console.log("[synchroDesc] fichiers GPX présents sur le serveur -> ", GPXFiles.length);
 
   // On copie les fichiers manquants
   const missingFiles = GPXFiles.filter(file => !files.includes(file));
   console.log("[synchroDesc] fichiers GPX manquants -> ", missingFiles.length);
 
-  let filesDownloaded = 0;
+  callbackToGetNumberOfFiles &&
+    callbackToGetNumberOfFiles(files.length - missingFiles.length, GPXFiles.length);
 
+  let filesDownloaded = 0;
   if (missingFiles.length > 0) {
     for (const file of missingFiles) {
       console.log("[synchroDesc] copie du fichier -> ", file);
-      await dlFile(file);
+      try {
+        await dlFile(file);
+      } catch (error) {
+        console.error(error);
+      }
 
       callbackToGetNumberOfFiles &&
         callbackToGetNumberOfFiles(++filesDownloaded, missingFiles.length);
@@ -488,24 +500,28 @@ export const synchroDescendante = async (
   debug?: TDebugMode,
 ): Promise<boolean> => {
   try {
-    callbackStep && callbackStep(1, 3);
     // On vérifie si le fichier 'excursions.json' existe
     const excursionsJsonExist = await excursionsJsonExists();
+    callbackStep && callbackStep(1, 3);
 
     // Si le fichier 'excursions.json' n'existe pas, on le copie
     if (!excursionsJsonExist) {
       await downloadExcursionsJson();
     }
 
-    callbackStep && callbackStep(2, 3);
-
     // On met à jour le fichier 'excursions.json'
     await updateExcursionsJsonRequest(debug);
 
-    callbackStep && callbackStep(3, 3);
+    callbackStep && callbackStep(2, 3);
 
     // On copie les fichiers GPX
-    await getAndCopyGPXFiles(callbackToGetNumberOfFiles);
+    try {
+      await getAndCopyGPXFiles(callbackToGetNumberOfFiles);
+      callbackStep && callbackStep(3, 3);
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
 
     return true;
   } catch (error) {
