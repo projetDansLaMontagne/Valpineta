@@ -11,34 +11,35 @@ const T_point = types.model({
   alt: types.number,
 });
 
-const typesExcursion = ["nonDemarree", "enCours", "enPause", "terminee"] as const;
-type T_EtatExcursion = (typeof typesExcursion)[number];
+type T_EtatExcursion = "nonDemarree" | "enCours" | "enPause" | "terminee";
+const BACKGROUND_LOCATION_TASK_NAME = "background-location-task"; // Static sinon boucle entre suiviExcursion.ts et app.tsx
 
+/* ------------------------------- PRIMITIVES ------------------------------- */
 function changementEtatPossible(oldEtat: T_EtatExcursion, newEtat: T_EtatExcursion) {
   var possible = false;
 
   // Matrice des changements d'état possibles notee sur papier
   switch (oldEtat) {
-    case typesExcursion[0]:
-      if (newEtat === typesExcursion[1]) {
+    case "nonDemarree":
+      if (newEtat === "enCours") {
         possible = true;
       }
       break;
 
-    case typesExcursion[1]:
-      if (newEtat === typesExcursion[2] || newEtat === typesExcursion[3]) {
+    case "enCours":
+      if (newEtat === "enPause" || newEtat === "terminee") {
         possible = true;
       }
       break;
 
-    case typesExcursion[2]:
-      if (newEtat === typesExcursion[1] || newEtat === typesExcursion[3]) {
+    case "enPause":
+      if (newEtat === "enCours" || newEtat === "terminee") {
         possible = true;
       }
       break;
 
-    case typesExcursion[3]:
-      if (newEtat === typesExcursion[0]) {
+    case "terminee":
+      if (newEtat === "nonDemarree") {
         possible = true;
       }
       break;
@@ -50,8 +51,6 @@ function changementEtatPossible(oldEtat: T_EtatExcursion, newEtat: T_EtatExcursi
 
   return possible;
 }
-
-const LOCATION_TASK_NAME = "background-location-task";
 
 /**
  * Model description here for TypeScript hints.
@@ -68,60 +67,36 @@ export const SuiviExcursionModel = types
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions(self => ({
     afterCreate() {
-      autorun(() => {
-        switch (self.etat) {
-          case "nonDemarree":
-            this.setTrackReel([]);
-            console.log("Reinitialisation du track reel");
-            break;
-          case "enCours":
-            this.startSuiviTrackReel();
-            break;
-          case "enPause":
-            this.stopSuiviTrackReel();
-            break;
-          case "terminee":
-            this.stopSuiviTrackReel();
-            console.log("Enregistrement du track reel");
-            break;
+      reaction(
+        () => self.etat,
+        etat => {
+          switch (etat) {
+            case "nonDemarree":
+              this.setTrackReel([]);
+              console.log("Reinitialisation du track reel");
+              break;
+            case "enCours":
+              this.startSuiviTrackReel();
+              break;
+            case "enPause":
+              this.stopSuiviTrackReel();
+              break;
+            case "terminee":
+              this.stopSuiviTrackReel();
+              console.log("Enregistrement du track reel");
+              break;
 
-          default:
-            console.log("[ERREUR] Etat excursion inconnu");
-            break;
-        }
-      });
+            default:
+              console.log("[ERREUR] Etat excursion inconnu");
+              break;
+          }
+        },
+      );
     },
     async startSuiviTrackReel() {
       console.log("Démarrage du suivi");
 
-      /** @todo repetition (faut créer un contexte) */
-      const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
-      if (foregroundStatus !== "granted") {
-        console.log("Permission de localisation refusée");
-        return;
-      }
-      const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-      if (backgroundStatus !== "granted") {
-        console.log("Permission de localisation refusée");
-        return;
-      }
-
-      TaskManager.defineTask(LOCATION_TASK_NAME, ({ data: { locations }, error }) => {
-        if (error) {
-          console.error(error);
-          return;
-        }
-        console.log("Received new locations in background", locations);
-        // Traitez les mises à jour de localisation ici.
-        // Par exemple, enregistrez-les dans un état ou envoyez-les à un serveur.
-      });
-
-      Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.BestForNavigation,
-        timeInterval: 5000,
-      });
-      console.log("Suivi en arrière-plan démarré");
-
+      
       // const subscription = await Location.watchPositionAsync(
       //   {
       //     /**@todo parametres a definri avec bruyere */
@@ -139,12 +114,11 @@ export const SuiviExcursionModel = types
 
       // this.setLocationSubscription(subscription);
     },
-    stopSuiviTrackReel() {
+    async stopSuiviTrackReel() {
       // if (self.locationSubscription) {
       //   self.locationSubscription.remove();
       //   this.setLocationSubscription(null);
       // }
-      Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
       console.log("Arrêt du suivi");
     },
 
