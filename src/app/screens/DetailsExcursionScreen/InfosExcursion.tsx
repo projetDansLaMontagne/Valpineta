@@ -141,38 +141,57 @@ export function InfosExcursion(props: InfosExcursionProps) {
                 <ScrollView horizontal>
                   <TouchableWithoutFeedback>
                     <View style={$scrollLine}>
-                      {signalements.map((signalement, index) => {
-                        // Calculate the distance for each warning
-                        const coordSignalement: T_Point = {
-                          lat: signalement.latitude,
-                          lon: signalement.longitude,
-                          /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
-                          alt: 0,
-                          dist: 0,
-                          pos: 0,
-                        };
-                        const distanceSignalement = userLocation
-                          ? recupDistance(coordSignalement, props.excursion.track)
-                          : 0;
-                        const carteType =
-                          signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+                      {/* Trier les signalements en fonction de leur distance par rapport à l'utilisateur */}
+                      {signalements
+                        .slice() // Pour créer une copie du tableau afin de ne pas modifier l'original
+                        .sort((a, b) => {
+                          // Fonction pour calculer la distance d'un signalement par rapport à la position de l'utilisateur
+                          const calculerDistanceSignalement = (signalement) => {
+                            const coordSignalement: T_Point = {
+                              lat: signalement.latitude,
+                              lon: signalement.longitude,
+                              /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
+                              alt: 0,
+                              dist: 0,
+                              pos: 0,
+                            };
+                            return userLocation ? recupDistance(coordSignalement, props.excursion.track) : 0;
+                          };
 
-                        return (
-                          <View key={index}>
-                            <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                              <CarteSignalement
-                                type={carteType}
-                                details={false}
-                                nomSignalement={signalement.nom}
-                                distanceDuDepart={`${distanceSignalement}`}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                        );
-                      })}
+                          const distanceA = calculerDistanceSignalement(a);
+                          const distanceB = calculerDistanceSignalement(b);
+                          return distanceA - distanceB;
+                        })
+                        .map((signalement, index) => {
+                          // Calcul de la distance pour chaque signalement
+                          const coordSignalement: T_Point = {
+                            lat: signalement.latitude,
+                            lon: signalement.longitude,
+                            /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
+                            alt: 0,
+                            dist: 0,
+                            pos: 0,
+                          };
+                          const distanceSignalement = userLocation ? recupDistance(coordSignalement, props.excursion.track) : 0;
+                          const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+
+                          return (
+                            <View key={index}>
+                              <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                                <CarteSignalement
+                                  type={carteType}
+                                  details={false}
+                                  nomSignalement={signalement.nom}
+                                  distanceDuDepart={`${distanceSignalement}`}
+                                />
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        })}
                     </View>
                   </TouchableWithoutFeedback>
                 </ScrollView>
+
               </>
             )}
           </View>

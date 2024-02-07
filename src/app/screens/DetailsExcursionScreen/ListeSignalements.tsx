@@ -19,45 +19,44 @@ export interface ListeSignalementsProps {
   style: ViewStyle;
   distanceDepuisUser?: boolean;
 }
-
 export function ListeSignalements(props: ListeSignalementsProps) {
+  // Fonction pour calculer la distance d'un signalement par rapport à la position de l'utilisateur
+  const calculerDistanceSignalement = (signalement) => {
+    // Déclaration des coordonnées à l'intérieur de la fonction
+    const coordSignalement: T_flat_point = {
+      lat: signalement.latitude,
+      lon: signalement.longitude,
+    };
+    const coordUser: T_flat_point = {
+      lat: props.userLocation?.latitude,
+      lon: props.userLocation?.longitude,
+    };
+
+    if (props.distanceDepuisUser) {
+      const distanceDepartPointLePlusProcheSignalement = recupDistance(coordSignalement, props.excursion.track);
+      const distanceDepartPointLePlusProcheUtilisateur = recupDistance(coordUser, props.excursion.track);
+      let distanceSignalement = distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur;
+      return distanceSignalement < 0 ? Infinity : distanceSignalement;
+    } else {
+      return props.userLocation ? recupDistance(coordSignalement, props.excursion.track) : Infinity;
+    }
+  };
+
+  // Trier les signalements en fonction de leur distance par rapport à l'utilisateur
+  const signalementsTriés = [...props.excursion.signalements].sort((a, b) => {
+    const distanceA = calculerDistanceSignalement(a);
+    const distanceB = calculerDistanceSignalement(b);
+    return distanceA - distanceB;
+  });
+
   return (
     <View style={props.style}>
       <ScrollView>
         <TouchableWithoutFeedback>
           <View style={$containerSignalements}>
-            {props?.excursion?.signalements?.map((signalement, index) => {
-              // Calcule de la distance pour chaque avertissement
-              const coordSignalement: T_flat_point = {
-                lat: signalement.latitude,
-                lon: signalement.longitude,
-              };
-
-              let distanceSignalement;
-
-              if (props.distanceDepuisUser) {
-                const coordUser: T_flat_point = {
-                  lat: props.userLocation?.latitude,
-                  lon: props.userLocation?.longitude,
-                };
-
-                let distanceDepartPointLePlusProcheSignalement = recupDistance(coordSignalement, props.excursion.track);
-
-                let distanceDepartPointLePlusProcheUtilisateur = recupDistance(coordUser, props.excursion.track);
-
-                distanceSignalement = (distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur).toFixed(2); //distance entre le point le plus proche de l'utilisateur et le point le plus proche du signalement
-
-                if (Number(distanceSignalement) < 0) {
-                  distanceSignalement = "depassé                                    ";
-                }
-              }
-              else {
-                distanceSignalement = props.userLocation
-                  ? recupDistance(coordSignalement, props.excursion.track)
-                  : 0;
-              }
-              const carteType =
-                signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+            {signalementsTriés.map((signalement, index) => {
+              const carteType = signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
+              const distanceSignalement = calculerDistanceSignalement(signalement).toFixed(2);
               return (
                 <View key={index}>
                   <CarteSignalement
@@ -68,8 +67,6 @@ export function ListeSignalements(props: ListeSignalementsProps) {
                     description={signalement.description}
                     imageSignalement={signalement.image}
                     onPress={() => {
-                      // go to the signalement on the map
-                      // setIsAllSignalements(false);
                       props.setStartPoint &&
                         props.setStartPoint({
                           latitude: signalement.latitude,
@@ -85,13 +82,15 @@ export function ListeSignalements(props: ListeSignalementsProps) {
         </TouchableWithoutFeedback>
       </ScrollView>
 
-      {props.setIsAllSignalements ? <View>
-        <Button
-          style={[$sortirDetailSignalement, { bottom: props.footerHeight }]}
-          tx="detailsExcursion.boutons.retourInformations"
-          onPress={() => props.setIsAllSignalements(false)}
-        />
-      </View> : null}
+      {props.setIsAllSignalements ? (
+        <View>
+          <Button
+            style={[$sortirDetailSignalement, { bottom: props.footerHeight }]}
+            tx="detailsExcursion.boutons.retourInformations"
+            onPress={() => props.setIsAllSignalements(false)}
+          />
+        </View>
+      ) : null}
     </View>
   );
 }

@@ -103,7 +103,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
 
       if (!isNaN(distanceNumber) && avancement < distanceNumber) {
         setAvancement(prevAvancement => {
-          const newAvancement = prevAvancement + 0.01; // A modifier par la distance parcourue par l'utilisateur
+          const newAvancement = prevAvancement + 0.005; // A modifier par la distance parcourue par l'utilisateur
           return newAvancement;
         });
 
