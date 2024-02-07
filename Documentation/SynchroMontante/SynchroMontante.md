@@ -3,9 +3,9 @@
 
 La synchronisation montante des données fonctionne sur 3 étapes dans l'application Valpineta.
 
-##NouveauSignalementView
+##NouveauSignalementScreen
 
-Dans cette view, l'utilisateur peut remplir des champs necessaires à l'envoie du signalement comme le titre, la description, et ajouter une image 
+Dans cette Screen, l'utilisateur peut remplir des champs necessaires à l'envoie du signalement comme le titre, la description, et ajouter une image 
 
 Pour pouvoir ajouter une photo, nous avons besoin de la permission de l'utilisateur d'utiliser l'appareil photo ainsi que sa librairie. En fonction de ces autorisations, la fonction choisirPhoto afin un actionSheet, appèle la fonction prendrePhoto() ou bien ajouterPhoto()
 
@@ -16,4 +16,4 @@ Une fois le signalement crée, il est ajouté dans un store, ici SynchroMontante
 
 ##Sercive
 Le service regroupe toutes les fonctions permetant d'envoyer en base de données un signalement. Dans le fichier synchroMontanteService nous avons plusieurs fonctions atomiques et une englobant tous les autres. Cette fonction globale SynchroMontanteSignalement est appelée par NouveauSignalementScreen lorsque le signalement est validé par vérifSignalement. Ensuite, l'image est transformée en base64, puis on vérifie si le signalement existe déjà dans le store, si ça n'est pas le cas, on l'ajoute dans le store. Ensuite on vérifie si l'application est connecté et dans ce cas le signalement est envoyé en base de données. 
-Une fois le signalement envoyé, le serveur renvoie une réponse qui sera traité par le service, puis le service renvera un status à la view, qui affichera une alerte correspondante au status. 
+Une fois le signalement envoyé, le serveur renvoie une réponse qui sera traité par le service, puis le service renvera un status à la Screen, qui affichera une alerte correspondante au status. 
