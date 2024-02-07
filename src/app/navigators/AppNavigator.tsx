@@ -57,6 +57,7 @@ export interface TPoint {
   lat: number; // Latitude
   lon: number; // Longitude
   pos: number; // Denivele positif
+  title?: string;
 }
 export type TFiltres = {
   critereTri: string;
@@ -69,6 +70,7 @@ export type TFiltres = {
   difficultesOrientation: number[];
 };
 export type TSignalement = {
+  id: number;
   description: string;
   image: string;
   latitude: number;
@@ -82,22 +84,28 @@ export type T_infoLangue = {
   typeParcours: string;
 };
 
-export type T_excursion = {
-  denivele: number;
+type TLanguage = "fr" | "es";
+type TTypeParcoursEs = "Ida" | "Ida y Vuelta" | "Circular";
+type TTypeParcoursFr = "Aller simple" | "Aller-retour" | "Boucle";
+export type TLanguageContent<T extends TLanguage> = {
+  nom: string;
   description: string;
-  difficulteOrientation: number;
-  difficulteTechnique: number;
-  distance: number;
-  duree: { h: number; m: number };
-  nomTrackGpx: string;
+  typeParcours: T extends "fr" ? TTypeParcoursFr : TTypeParcoursEs;
+};
+export type TExcursion = {
+  [key in TLanguage]: TLanguageContent<key>;
+} & {
+  denivele: string;
+  difficulteOrientation: string;
+  difficulteTechnique: string;
+  distance: string;
+  duree: string;
   vallee: string;
-
-  es?: T_infoLangue;
-  fr?: T_infoLangue;
-
-  signalements: TSignalement[];
-  track: TPoint[];
-} & Partial<T_infoLangue>;
+  postId: number;
+  signalements: Array<TSignalement>;
+  nomTrackGpx: string;
+  track: Array<TPoint>;
+};
 
 // TYPES STACKS
 type ExcursionStackParamList = {
@@ -107,8 +115,8 @@ type ExcursionStackParamList = {
 
 type CarteStackParamList = {
   Carte: undefined;
-  DetailsExcursion: undefined | { excursion: T_excursion };
-  Description: { excursion: T_excursion };
+  DetailsExcursion: undefined | { excursion: TExcursion };
+  Description: { excursion: TExcursion };
 };
 
 type ParametresStackParamList = {

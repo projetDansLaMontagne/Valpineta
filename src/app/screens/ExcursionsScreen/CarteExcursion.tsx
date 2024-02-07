@@ -6,12 +6,12 @@ import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import { colors, spacing } from "app/theme";
 import { Text } from "app/components/Text";
 import { GraphiqueDenivele } from "app/components/GraphiqueDenivele";
-import { T_excursion } from "app/navigators";
+import { TExcursion } from "app/navigators";
 
 /**@warning L absence de parametre n est pas geree */
 
 interface CarteExcursionProps extends TouchableOpacityProps {
-  excursion: T_excursion;
+  excursion: TExcursion;
   onPress?: () => void;
 }
 

@@ -10,17 +10,17 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
   Animated,
-  View,
-  StyleSheet,
-  GestureResponderEvent,
-  Platform,
-  ViewStyle,
   Dimensions,
+  GestureResponderEvent,
   Image,
+  Platform,
+  StyleSheet,
+  View,
+  ViewStyle,
 } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps, TExcursion, TPoint } from "app/navigators";
 import { Screen } from "app/components";
-import { spacing, colors } from "app/theme";
+import { colors, spacing } from "app/theme";
 
 // location
 import * as Location from "expo-location";
@@ -32,8 +32,12 @@ import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
 
 import fichierJson from "assets/Tiles/tiles_struct.json";
-import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
+import {
+  synchroDescendante,
+  TCallbackStep,
+  TCallbackToGetNumberOfFiles,
+} from "../../services/synchroDescendante/synchroDesc";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
@@ -54,26 +58,9 @@ type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) =
 
 let COMPTEUR = 0;
 const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
+const cacheDirectory = `${fileSystem.cacheDirectory}cartes/OSM`;
 
 // Fonction(s)
-const copyFilesInBatch = async (filesToCopy, batchCount) => {
-  for (let i = 0; i < filesToCopy.length; i += batchCount) {
-    const batchFiles = filesToCopy.slice(i, i + batchCount);
-
-    // Copie des fichiers dans ce lot
-    await Promise.all(
-      batchFiles.map(async file => {
-        // Effectuer la copie du fichier ici avec FileSystem.copyAsync
-        // (Exemple: À adapter selon votre structure de fichier)
-        await fileSystem.copyAsync({
-          from: file.source,
-          to: file.destination,
-        });
-      }),
-    );
-  }
-};
-
 /**
  * Create the folder structure (recursively)
  *
@@ -99,36 +86,17 @@ const createFolderStruct = async (
 
         const assetsListUri = assetsList[COMPTEUR].localUri;
         COMPTEUR++;
-        // console.log(`downloaded ${COMPTEUR} files`)
 
-        // Copier les fichiers en lot en utilisant copyFilesInBatch
-        // Préparez la liste de fichiers à copier pour ce dossier
-        const filesToCopy = [
-          {
-            source: assetsListUri,
-            destination: `${folderDest}${fileFolder}/${fileName}`,
-          },
-          // ... autres fichiers à copier pour ce dossier
-        ];
-
-        // Copie par lot des fichiers
-        const batchCount = 10; // Nombre de fichiers par lot
-        await copyFilesInBatch(filesToCopy, batchCount);
+        await fileSystem.copyAsync({
+          from: assetsListUri,
+          to: `${folderDest}${fileFolder}/${fileName}`,
+        });
       } else {
         // Récursivement créer la structure des dossiers pour les sous-dossiers
         await createFolderStruct(folderStruct[folder], `${folderPath}/${folder}`, assetsList);
       }
     }
   }
-};
-
-/**
- * Get all the tracks of the `src/assets/JSON/excursions.json` file.
- *
- * @returns {Promise<TExcursion[]>} The list of all the tracks
- */
-const getAllTracks = (): TExcursion[] => {
-  return require("assets/JSON/excursions.json") as TExcursion[];
 };
 
 // Component(s)
@@ -144,7 +112,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
-  const [excursions, setExcursions] = useState<TExcursion[]>(undefined);
+  const [excursions, setExcursions] = useState<Array<TExcursion>>(undefined);
 
   // Ref(s)
   const intervalRef = useRef(null);
@@ -153,7 +121,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const mapRef = useRef<MapView>(null);
 
   // buttons
-  /**@warning la navigation doit se faire avec props.navigation avec Ignite */
+  /**
+   * @warning la navigation doit se faire avec props.navigation avec Ignite
+   * */
   const followLocationButtonRef = useRef(null);
   const toggleBtnMenuRef = useRef(null);
   const addPOIBtnRef = useRef(null);
@@ -194,20 +164,21 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     }
   };
 
-  const downloadTiles = async () => {
+  const downloadTiles = async (debug?: boolean) => {
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
       console.log("[MapScreen] Permission to access location was denied");
     } else {
-      console.log("[MapScreen] Permission ok");
-      // Vérifier si les tuiles sont déjà dl cartes/OSM/17/65682/48390.jpg
-      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/");
-      if (folderInfo.exists && folderInfo.isDirectory) {
-        console.log("[MapScreen] Tuiles déjà DL");
+      debug && console.log("[MapScreen] Permission ok");
+      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
+      debug && console.log("[MapScreen] folderInfo: ", folderInfo);
+      if (folderInfo.exists && !folderInfo.isDirectory) {
+        debug && console.log("Tuiles déjà DL");
+        await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
       } else {
         // Supprimer le dossier
-        console.log("[MapScreen] Suppression du dossier");
+        debug && console.log("[MapScreen] Suppression du dossier");
         await fileSystem.deleteAsync(folderDest, { idempotent: true });
 
         const assets = await TilesRequire();
@@ -236,9 +207,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
    */
   const getLocationAsync = async (debug?: boolean): Promise<void> => {
     if (debug) {
-      console.log(`[[MapScreen]] getLocationAsync()`);
+      console.log(`[MapScreen] getLocationAsync()`);
       console.log(
-        `[[MapScreen]] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`,
+        `[MapScreen] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`,
       );
     }
 
@@ -257,9 +228,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       },
       location => {
         if (debug) {
-          console.log(`[[MapScreen]] watchPositionAsync()`);
-          console.log(`[[MapScreen]] location.coords.latitude: ${location.coords.latitude}`);
-          console.log(`[[MapScreen]] location.coords.longitude: ${location.coords.longitude}`);
+          console.log(`[MapScreen] watchPositionAsync()`);
+          console.log(`[MapScreen] location.coords.latitude: ${location.coords.latitude}`);
+          console.log(`[MapScreen] location.coords.longitude: ${location.coords.longitude}`);
         }
         setLocation(location);
       },
@@ -336,7 +307,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [_props.startLocation]);
 
   useEffect(() => {
-    console.log(`[[MapScreen]] followUserLocation: ${followUserLocation}`);
+    console.log(`[MapScreen] followUserLocation: ${followUserLocation}`);
 
     if (followUserLocation) {
       getLocationAsync(true)
@@ -353,12 +324,28 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     }
   }, [excursions]);
 
-  useEffect(() => {
-    downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
+  /**
+   *  ! TESTS
+   */
+  const coStepStatus: TCallbackStep = (compteur, total) => {
+    console.log(`[MapScreen] étape ${compteur} / ${total}`);
+  };
 
-    if (!_props.isInDetailExcursion) {
-      setExcursions(getAllTracks());
-    }
+  const coGPXStatus: TCallbackToGetNumberOfFiles = (filesDownloaded, filesToDl) => {
+    console.log(`[synchroDesc] fichiers GPX copiés: ${filesDownloaded} / ${filesToDl}`);
+  };
+  /**
+   * ! FIN TESTS
+   */
+
+  useEffect(() => {
+    downloadTiles(true).then(() => {
+      console.log("[MapScreen] PAGE CHARGEE");
+    });
+
+    synchroDescendante(coStepStatus, coGPXStatus).then(() => {
+      console.log("[MapScreen] synchroDescendante() ok");
+    });
 
     return () => {
       removeLocationSubscription();
@@ -413,12 +400,21 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             showsUserLocation={true}
             zoomControlEnabled={false}
             zoomEnabled={true}
-            minZoomLevel={10} // Niveau de zoom minimum
+            minZoomLevel={12} // Niveau de zoom minimum
             maxZoomLevel={15} // Niveau de zoom maximum
           >
-            <UrlTile urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"} tileSize={256} />
+            <UrlTile
+              urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
+              tileSize={256}
+              // shouldReplaceMapContent={true}
+              style={{
+                zIndex: -1,
+                pointerEvents: "none",
+              }}
+            />
 
             {_props.children}
+
             {
               // Oier voulait toutes les excursions sur la carte
               // si on était pas dans la page détail excursion.
@@ -428,10 +424,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 excursions.map((excursion, index) => {
                   if (excursion.track) {
                     return (
-                      <>
+                      <React.Fragment key={index}>
                         <Polyline
-                          key={index}
-                          coordinates={excursion.track.map(point => {
+                          coordinates={excursion.track.map((point: TPoint) => {
                             return {
                               latitude: point.lat,
                               longitude: point.lon,
@@ -439,17 +434,19 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                           })}
                           strokeColor={colors.palette.vert}
                           strokeWidth={5}
+                          style={{
+                            zIndex: 1000000,
+                          }}
                         />
 
                         <Marker
                           coordinate={
                             {
-                              latitude: excursion.track[0].lat,
-                              longitude: excursion.track[0].lon,
+                              latitude: excursion.track[0].lat ?? 0,
+                              longitude: excursion.track[0].lon ?? 0,
                             } as LatLng
                           }
                           title={excursion.fr.nom}
-                          key={index}
                           centerOffset={{ x: 0, y: -15 }}
                         >
                           <Image
@@ -461,7 +458,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                             }}
                           />
                         </Marker>
-                      </>
+                      </React.Fragment>
                     );
                   } else {
                     return null;

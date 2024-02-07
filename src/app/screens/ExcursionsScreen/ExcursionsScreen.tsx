@@ -10,11 +10,12 @@ import {
   TouchableOpacity,
   Keyboard,
 } from "react-native";
-import { AppStackScreenProps, T_excursion, TFiltres, T_valeurs_filtres } from "app/navigators";
+import { AppStackScreenProps, TExcursion, TFiltres, T_valeurs_filtres } from "app/navigators";
 import { Screen, Text } from "app/components";
 import { CarteExcursion } from "./CarteExcursion";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
+import { getExcursionsJsonFromDevice } from "../../services/synchroDescendante/synchroDesc";
 
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
 
@@ -32,13 +33,13 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Cette fonction doit etre executee systematiquement lors de la synchro descendante
    * Recupere les valeurs max et les intervalles de chaque filtre (valeurs max, types de parcours, vallees)
    */
-  const calculValeursFiltres = (excursions: T_excursion[]): T_valeurs_filtres => {
+  const calculValeursFiltres = (excursions: TExcursion[]): T_valeurs_filtres => {
     // Parcourt de chaque excursion pour connaitre les maximas
     let distanceMax = 0;
     let dureeMax = 0;
     let deniveleMax = 0;
-    let typesParcours = [];
-    let vallees = [];
+    const typesParcours = [];
+    const vallees = [];
     let difficulteTechniqueMax = 0;
     let difficulteOrientationMax = 0;
 
@@ -75,13 +76,13 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     });
 
     return {
-      distanceMax: distanceMax,
-      dureeMax: dureeMax,
-      deniveleMax: deniveleMax,
-      typesParcours: typesParcours,
-      vallees: vallees,
-      difficulteTechniqueMax: difficulteTechniqueMax,
-      difficulteOrientationMax: difficulteOrientationMax,
+      distanceMax,
+      dureeMax,
+      deniveleMax,
+      typesParcours,
+      vallees,
+      difficulteTechniqueMax,
+      difficulteOrientationMax,
     };
   };
 
@@ -90,7 +91,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Tri et filtre des excursions avec les filtres
    * Doit etre effectué a chaque modification des filtres
    */
-  function filtrageParametre(excursions: T_excursion[], filtres: TFiltres) {
+  function filtrageParametre(excursions: TExcursion[], filtres: TFiltres) {
     const nomsTypesParcours =
       parametres.langues == "fr"
         ? ["Aller simple", "Aller/retour", "Circuit"]
@@ -133,7 +134,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   /**
    * Filtre les excursions contenant le texte de la barre de recherche
    */
-  function filtrageBarre(excursionsAFiltrer: T_excursion[], recherche: string) {
+  function filtrageBarre(excursionsAFiltrer: TExcursion[], recherche: string) {
     // Filtre de la barre de recherche
     return excursionsAFiltrer.filter(excursion =>
       excursion.nom.toLowerCase().includes(recherche?.toLowerCase()),
@@ -141,7 +142,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   }
 
   // Applique la langue aux excursions
-  function applicationLangue(excursions: T_excursion[]) {
+  function applicationLangue(excursions: TExcursion[]) {
     const langue = parametres.langues;
 
     return excursions.map(excursion => {
@@ -166,15 +167,15 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   }
 
   /* --------------------------------- STATES --------------------------------- */
-  const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
+  const [allExcursions, setAllExcursions] = useState<TExcursion[]>(undefined);
   const [saisieBarre, setSaisieBarre] = useState<string>("");
 
-  const excursionsTraduites = useMemo<T_excursion[]>(
+  const excursionsTraduites = useMemo<TExcursion[]>(
     () => allExcursions && applicationLangue(allExcursions),
     [allExcursions, parametres.langues],
   );
 
-  const excursionsFiltreesParams = useMemo<T_excursion[]>(
+  const excursionsFiltreesParams = useMemo<TExcursion[]>(
     () =>
       excursionsTraduites && filtres
         ? filtrageParametre(excursionsTraduites, filtres)
@@ -192,15 +193,20 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   // Initialisation des excursions
   useEffect(() => {
+    const getExcursions = async () => {
+      const excursions = await getExcursionsJsonFromDevice();
+      setAllExcursions(excursions);
+    };
+
     try {
-      setAllExcursions(require("/assets/JSON/excursions.json"));
+      getExcursions().then(() => console.log("Excursions chargées"));
     } catch (error) {
       throw new Error("Erreur lors du chargement du fichier JSON : " + error);
     }
   }, []);
 
   /* ------------------------------- CALL BACKS ------------------------------- */
-  const clicExcursion = (excursion: T_excursion) => {
+  const clicExcursion = (excursion: TExcursion) => {
     props.navigation.navigate("CarteStack", {
       screen: "DetailsExcursion",
       params: { excursion },
@@ -236,13 +242,15 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           <Text tx="excursions.absenceResultats" />
         ) : (
           <ScrollView style={styles.scrollContainer}>
-            {excursionsFiltreesBarre.map((excursion, i) => (
-              <CarteExcursion
-                key={i}
-                excursion={excursion}
-                onPress={() => clicExcursion(excursion)}
-              />
-            ))}
+            {excursionsFiltreesBarre.map((excursion, i) =>
+              excursion.track ? (
+                <CarteExcursion
+                  key={i}
+                  excursion={excursion}
+                  onPress={() => clicExcursion(excursion)}
+                />
+              ) : null,
+            )}
           </ScrollView>
         ))}
     </Screen>
@@ -255,43 +263,43 @@ const $root: ViewStyle = {
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    marginBottom: 30,
-    height: "100%",
+  barreRecherche: {
+    flex: 1,
+    paddingLeft: 20,
   },
+  iconeFiltre: {
+    height: 30,
+    width: 30,
+  },
+
+  scrollContainer: {
+    height: "100%",
+    marginBottom: 30,
+  },
+
   searchBox: {
-    display: "flex",
-    flexDirection: "row",
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 20,
-    height: 50,
-    color: colors.palette.noir,
     backgroundColor: colors.palette.grisClair,
-    shadowColor: colors.palette.noir,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    borderWidth: 1,
+    color: colors.palette.noir,
+    display: "flex",
+    elevation: 3,
+    flexDirection: "row",
+    height: 50,
     justifyContent: "space-between",
+    shadowColor: colors.palette.noir,
     shadowOffset: {
       width: 0,
       height: 1,
     },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
-    elevation: 3,
   },
-
-  barreRecherche: {
-    flex: 1,
-    paddingLeft: 20,
-  },
-
   valleeIcone: {
-    height: "100%",
-    paddingHorizontal: 20,
-    justifyContent: "center",
     alignItems: "center",
-  },
-  iconeFiltre: {
-    width: 30,
-    height: 30,
+    height: "100%",
+    justifyContent: "center",
+    paddingHorizontal: 20,
   },
 });

@@ -1,14 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import {
-  View,
-  SafeAreaView,
-  ViewStyle,
-  TouchableOpacity,
-  Image,
-  TextStyle,
-  Dimensions,
-} from "react-native";
+import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
 import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Screen } from "app/components";
@@ -33,31 +25,6 @@ export interface Coordonnees {
   alt: number;
   dist: number;
 }
-export interface T_Point extends TPoint {
-  title?: string;
-}
-type T_Language = "fr" | "es";
-type T_TypeParcoursEs = "Ida" | "Ida y Vuelta" | "Circular";
-type T_TypeParcoursFr = "Aller simple" | "Aller-retour" | "Boucle";
-type T_LanguageContent<T extends T_Language> = {
-  nom: string;
-  description: string;
-  typeParcours: T extends "fr" ? T_TypeParcoursFr : T_TypeParcoursEs;
-};
-export type TExcursion = {
-  [key in T_Language]: T_LanguageContent<key>;
-} & {
-  denivele: string;
-  difficulteOrientation: string;
-  difficulteTechnique: string;
-  distance: string;
-  duree: string;
-  vallee: string;
-  postId: number;
-  signalements: TSignalement[];
-  nomTrackGpx: string;
-  track: T_Point[];
-};
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
@@ -72,7 +39,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
     const footerHeight = useBottomTabBarHeight();
     const allPoints = excursion.track.map(
-      (point: T_Point) =>
+      (point: TPoint) =>
         ({
           latitude: point.lat,
           longitude: point.lon,
@@ -122,9 +89,18 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * ! FIN NON FONCTIONNEL
      */
 
+    const swipeUpDown = () => {
+      if (swipeUpDownRef) {
+        console.log(`[DetailsExcursionScreen - useEffect] aled`);
+        swipeUpDownRef.current.showMini();
+      } else {
+        console.error("swipeUpDownRef.current is null");
+      }
+    };
+
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
-      <SafeAreaView style={$container}>
+      <View style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>
@@ -161,9 +137,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           disableSwipeIcon={true}
           ref={swipeUpDownRef}
         />
-      </SafeAreaView>
+      </View>
     ) : (
-      //sinon on affiche une erreur
       <Screen preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
@@ -199,7 +174,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       setIsAllSignalements: React.Dispatch<any>,
       userLocation: Array<number>,
       footerHeight: number,
-      changeStartPoint?: (point: LatLng) => void,
     ) {
       let nomExcursion = "";
       if (excursion !== undefined) {
@@ -213,6 +187,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             setIsAllSignalements={setIsAllSignalements}
             footerHeight={footerHeight}
             setStartPoint={setStartPoint}
+            swipeDown={swipeUpDown}
             style={$containerGrand}
           />
         );
@@ -283,13 +258,13 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
  * Un parcours en aller-retour a un point d'arrivée.
  * Tous les parcours ont un point de départ et un point de milieu.
  *
- * @param track {T_Point[]} - le fichier gpx de l'excursion
+ * @param track {TPoint[]} - le fichier gpx de l'excursion
  * @param typeParcours {"Ida" | "Ida y Vuelta" | "Circular"} - le type de parcours
  *
  * @returns les points de départ, milieu et fin de l'excursion
  */
 const startMiddleAndEndHandler = (
-  track: T_Point[],
+  track: TPoint[],
   typeParcours: "Ida" | "Ida y Vuelta" | "Circular",
 ) => {
   // Point d'arrivée
@@ -301,7 +276,7 @@ const startMiddleAndEndHandler = (
     ...track[track.length - 1],
     title: "Arrivée",
   };
-  let points: T_Point[];
+  let points: TPoint[];
 
   // Calcul du point du milieu
   // Si c'est un aller-retour, le parcours étant symétrique,
@@ -339,8 +314,8 @@ const startMiddleAndEndHandler = (
     return (
       <Marker
         coordinate={{
-          latitude: point.lat,
-          longitude: point.lon,
+          latitude: point.lat ?? 0,
+          longitude: point.lon ?? 0,
         }}
         key={index}
         // Si l'array de points ne contient que 2 points,
@@ -402,8 +377,8 @@ const signalementsHandler = (signalements: TSignalement[]) => {
         return (
           <Marker
             coordinate={{
-              latitude: signalement.latitude,
-              longitude: signalement.longitude,
+              latitude: signalement.latitude ?? 0,
+              longitude: signalement.longitude ?? 0,
             }}
             // key={point.dist}
             key={index}
@@ -461,7 +436,7 @@ const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
-  backgroundColor: colors.erreur,
+  backgroundColor: colors.fond,
 };
 
 //Style de itemMini
