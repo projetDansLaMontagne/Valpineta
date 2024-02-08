@@ -154,7 +154,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
                               <CarteSignalement
                                 type={carteType}
                                 details={false}
-                                nomSignalement={signalement.nom}
+                                nomSignalement={signalement.titre}
                                 distanceDuDepart={`${distanceSignalement}`}
                               />
                             </TouchableOpacity>

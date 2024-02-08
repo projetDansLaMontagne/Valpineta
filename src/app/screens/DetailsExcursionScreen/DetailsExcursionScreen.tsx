@@ -409,7 +409,7 @@ const signalementsHandler = (signalements: T_Signalement[]) => {
             key={index}
             // Si l'array de points ne contient que 2 points,
             // on est sur un aller simple, le deuxième point est donc l'arrivée
-            title={signalement.nom}
+            title={signalement.titre}
             // pinColor={iconColor}
             style={{
               zIndex: 999,

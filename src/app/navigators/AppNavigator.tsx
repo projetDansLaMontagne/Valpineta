@@ -75,7 +75,7 @@ export type T_Signalement = {
   image: string;
   lat: number;
   lon: number;
-  nom: string;
+  titre: string;
   type: T_TypeSignalement;
   post_id: number;
 };

@@ -3,7 +3,7 @@ import { withSetPropAction } from "./helpers/withSetPropAction";
 
 // Modèle pour représenter un signalement individuel
 const signalement = types.model({
-  nom: types.string,
+  titre: types.string,
   type: types.union(types.literal("Avertissement"), types.literal("PointInteret")),
   description: types.string,
   image: types.string,

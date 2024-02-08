@@ -13,10 +13,10 @@ import {
   TouchableOpacity,
   ImageStyle,
 } from "react-native";
-import { AppStackScreenProps, T_TypeSignalement, T_Signalement, goBack } from "app/navigators";
+import { AppStackScreenProps, T_TypeSignalement, T_Signalement } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import * as ImagePicker from "expo-image-picker";
-import { SynchroMontanteStore, useStores } from "app/models";
+import { useStores } from "app/models";
 import { TStatus, synchroMontanteSignalement } from "app/services/synchroMontanteService";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
@@ -30,32 +30,25 @@ interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSign
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
     // Stores
-    const { synchroMontante: synchroMontanteStore } = useStores();
+    const { synchroMontante } = useStores();
 
     //type de signalement
-    let type: T_TypeSignalement;
-    if (props.route.params) {
-      type = props.route.params.type;
-    } else {
+    var type = props.route.params?.type;
+    if (type === undefined) {
       throw new Error("[NouveauSignalementScreen] Type de signalement non défini");
     }
 
-    // Variables
-    const [titreSignalement, setTitreSignalement] = useState("");
-    const [descriptionSignalement, setDescriptionSignalement] = useState("");
-    const [photoSignalement, setPhotoSignalement] = useState(undefined);
+    // Saisies
+    const [titre, setTitre] = useState("");
+    const [description, setDescription] = useState("");
+    const [image, setImage] = useState(undefined);
 
-    //Variables de permissions
-    const [cameraPermission, requestPermissionCamera] = ImagePicker.useCameraPermissions();
-    const [LibrairiesPermission, requestPermissionLibrairies] =
-      ImagePicker.useMediaLibraryPermissions();
-
-    //Variables d'erreurs
+    // Erreurs
     const [titreErreur, setTitreErreur] = useState(false);
     const [descriptionErreur, setDescriptionErreur] = useState(false);
     const [photoErreur, setPhotoErreur] = useState(false);
 
-    //Variables pour le loader
+    // Loader
     const [isLoading, setIsLoading] = useState(false);
 
     // ActionSheet
@@ -65,224 +58,166 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * Fonction qui aguille l'utilisateur pour ajouter une photo à son signalement
      */
     const choixPhoto = () => {
-      //Si les permissions pour la caméra et la librairie sont accordées
-      if (cameraPermission.granted && LibrairiesPermission.granted) {
-        showActionSheetWithOptions(
-          {
-            options: [
-              translate("pageNouveauSignalement.actionSheet.prendrePhoto"),
-              translate("pageNouveauSignalement.actionSheet.choisirPhoto"),
-              translate("pageNouveauSignalement.actionSheet.annuler"),
-            ],
-            cancelButtonIndex: 2,
-          },
-          buttonIndex => {
-            if (buttonIndex === 0) {
-              prendrePhoto();
-            } else if (buttonIndex === 1) {
-              choisirPhoto();
-            }
-          },
-        );
-      }
-      //Si uniquement la permission pour la caméra est accordée
-      else if (cameraPermission.granted) {
-        prendrePhoto();
-      }
-      //Si uniquement la permission pour la librairie est accordée
-      else if (LibrairiesPermission.granted) {
-        choisirPhoto();
-      }
-      //Si aucune des permissions n'est accordée affiche une alerte
-      else {
-        Alert.alert(
-          translate("pageNouveauSignalement.alerte.permissions.titre"),
-          translate("pageNouveauSignalement.alerte.permissions.message"),
-          [{ text: "OK" }],
-        );
-      }
+      showActionSheetWithOptions(
+        {
+          options: [
+            translate("pageNouveauSignalement.actionSheet.prendrePhoto"),
+            translate("pageNouveauSignalement.actionSheet.choisirPhoto"),
+            translate("pageNouveauSignalement.actionSheet.annuler"),
+          ],
+          cancelButtonIndex: 2,
+        },
+        buttonIndex => {
+          if (buttonIndex === 0) {
+            prendrePhoto();
+          } else if (buttonIndex === 1) {
+            choisirImage();
+          }
+        },
+      );
     };
 
     /**
      * Fonction pour prendre une photo avec la caméra si la permission est accordée sinon demande la permission
-     * @returns {void}
-     * @async
-     * @function prendrePhoto
      */
     const prendrePhoto = async (): Promise<void> => {
-      const photo = await ImagePicker.launchCameraAsync();
-      if (!photo.canceled) {
-        setPhotoSignalement(photo.assets[0].uri);
+      const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (cameraPermission.granted) {
+        const photo = await ImagePicker.launchCameraAsync();
+        if (!photo.canceled) {
+          setImage(photo.assets[0].uri);
+        }
       }
     };
 
     /**
      * Fonction pour choisir une photo dans la librairie
-     * @returns {void}
-     * @async
-     * @function choisirPhoto
      */
-    const choisirPhoto = async (): Promise<void> => {
-      const photo = await ImagePicker.launchImageLibraryAsync();
-      if (!photo.canceled) {
-        setPhotoSignalement(photo.assets[0].uri);
+    const choisirImage = async (): Promise<void> => {
+      const mediaPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (mediaPermission.granted) {
+        const photo = await ImagePicker.launchImageLibraryAsync();
+        if (!photo.canceled) {
+          setImage(photo.assets[0].uri);
+        }
       }
     };
 
     /**
-     * Fonction pour envoyer le signalement en base de données et vérification des champs
-     * @param titreSignalement
-     * @param descriptionSignalement
-     * @param photoSignalement
-     * @returns {void}
-     * @function envoyerSignalement
+     * Indique si les informations du signalement sont correctes (tailles de champs, caractères autorisés et photo OK)
      */
-    const verifSignalement = (
-      titreSignalement: string,
-      descriptionSignalement: string,
-      photoSignalement: string,
-    ): boolean => {
-      let contientErreur = false;
+    const verifSaisies = (): boolean => {
+      let saisieBonne = true;
+
       // Regex pour vérifier si les champs sont corrects et contiennent uniquement des caractères autorisés
       const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*-+,.:;"]+$/;
 
       // Vérification du titre
-      if (
-        titreSignalement === "" ||
-        !regex.test(titreSignalement) ||
-        titreSignalement.length < 3 ||
-        titreSignalement.length > 50
-      ) {
+      if (titre === "" || !regex.test(titre) || titre.length < 3 || titre.length > 50) {
         setTitreErreur(true);
-        contientErreur = true;
+        saisieBonne = false;
       } else {
         setTitreErreur(false);
       }
 
       // Vérification de la description
       if (
-        descriptionSignalement === "" ||
-        !regex.test(descriptionSignalement) ||
-        descriptionSignalement.length < 10 ||
-        descriptionSignalement.length > 1000
+        description === "" ||
+        !regex.test(description) ||
+        description.length < 10 ||
+        description.length > 1000
       ) {
         setDescriptionErreur(true);
-        contientErreur = true;
+        saisieBonne = false;
       } else {
         setDescriptionErreur(false);
       }
 
       // Vérification de la photo
-      if (photoSignalement === undefined || photoSignalement === null) {
+      if (!image) {
         setPhotoErreur(true);
-        contientErreur = true;
+        saisieBonne = false;
       } else {
         setPhotoErreur(false);
       }
-      return contientErreur;
+      return saisieBonne;
     };
 
     /**
      * fonction pour afficher une alerte en fonction du status de fin de l'envoi du signalement
-     * @param status
      */
     const AlerteStatus = (status: TStatus) => {
-      if (status === "ajouteEnLocal") {
-        Alert.alert(
-          translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
-          "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
-          [
-            { text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.ajoute") },
-            {
-              text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.retour"),
-              onPress: () => props.navigation.goBack(),
-            },
-          ],
-          { cancelable: false },
-        );
-      } else if (status === "dejaExistant") {
-        Alert.alert(
-          translate("pageNouveauSignalement.alerte.dejaExistant.titre"),
-          translate("pageNouveauSignalement.alerte.dejaExistant.message"),
-          [{ text: "OK" }],
-          { cancelable: false },
-        );
-      } else if (status === "mauvaisFormat") {
-        Alert.alert(
-          translate("pageNouveauSignalement.alerte.mauvaisFormat.titre"),
-          translate("pageNouveauSignalement.alerte.mauvaisFormat.message"),
-          [{ text: "OK" }],
-          { cancelable: false },
-        );
-      } else if (status === "envoyeEnBdd") {
-        Alert.alert(
-          translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
-          translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
-          [
-            { text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.ajoute") },
-            {
-              text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.retour"),
-              onPress: () => props.navigation.goBack(),
-            },
-          ],
-          { cancelable: false },
-        );
-      } else {
-        Alert.alert(
-          translate("pageNouveauSignalement.alerte.erreur.titre"),
-          translate("pageNouveauSignalement.alerte.erreur.message"),
-          [{ text: "OK" }],
-          { cancelable: false },
-        );
+      switch (status) {
+        case "ajouteEnLocal":
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
+            "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
+            [
+              { text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.ajoute") },
+              {
+                text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.retour"),
+                onPress: () => props.navigation.goBack(),
+              },
+            ],
+            { cancelable: false },
+          );
+          break;
+
+        case "dejaExistant":
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.dejaExistant.titre"),
+            translate("pageNouveauSignalement.alerte.dejaExistant.message"),
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+          break;
+
+        case "envoyeEnBdd":
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
+            translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
+            [
+              { text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.ajoute") },
+              {
+                text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.retour"),
+                onPress: () => props.navigation.goBack(),
+              },
+            ],
+            { cancelable: false },
+          );
+          break;
+
+        case "erreur":
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.erreur.titre"),
+            translate("pageNouveauSignalement.alerte.erreur.message"),
+            [{ text: "OK" }],
+            { cancelable: false },
+          );
+          break;
       }
     };
 
     /**
      * Fonction pour envoyer le signalement en base de données
-     * @returns {void}
-     * @async
-     * @function envoyerSignalement
      */
-    const envoyerSignalement = async (
-      titreSignalement: string,
-      type: T_TypeSignalement,
-      descriptionSignalement: string,
-      photoSignalement: string,
-      lat: number,
-      lon: number,
-      post_id: number,
-      synchroMontanteStore: SynchroMontanteStore,
-    ): Promise<void> => {
-      const contientErreur = verifSignalement(
-        titreSignalement,
-        descriptionSignalement,
-        photoSignalement,
-      );
+    const envoyerSignalement = async (signalement: T_Signalement): Promise<void> => {
+      const signalementValide = verifSaisies();
 
-      const signalementAEnvoyer: T_Signalement = {
-        nom: titreSignalement,
-        type,
-        description: descriptionSignalement,
-        image: photoSignalement,
-        lat,
-        lon,
-        post_id,
-      };
-
-      let status: TStatus;
-      if (!contientErreur) {
+      if (signalementValide) {
         setIsLoading(true);
-        status = await synchroMontanteSignalement(signalementAEnvoyer, synchroMontanteStore);
-      } else {
-        status = "mauvaisFormat";
+        const status = await synchroMontanteSignalement(signalement, synchroMontante);
+        setIsLoading(false);
+
+        if (status === "ajouteEnLocal" || status === "envoyeEnBdd") {
+          setTitre("");
+          setDescription("");
+          setImage(undefined);
+        }
+        AlerteStatus(status);
       }
-      setIsLoading(false);
-      if (status === "ajouteEnLocal" || status === "envoyeEnBdd") {
-        setTitreSignalement("");
-        setDescriptionSignalement("");
-        setPhotoSignalement(undefined);
-      }
-      AlerteStatus(status);
     };
 
     return isLoading ? (
@@ -291,7 +226,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
       </Screen>
     ) : (
       <View style={$view}>
-        <TouchableOpacity style={$boutonRetour} onPress={() => goBack()}>
+        <TouchableOpacity style={$boutonRetour} onPress={() => props.navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
@@ -318,8 +253,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           <TextInput
             placeholder={translate("pageNouveauSignalement.placeholderTitre")}
             placeholderTextColor={titreErreur ? colors.palette.rouge : colors.text}
-            onChangeText={setTitreSignalement}
-            value={titreSignalement}
+            onChangeText={setTitre}
+            value={titre}
             style={[
               { ...$inputTitre },
               titreErreur
@@ -337,9 +272,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           <TextInput
             placeholder={translate("pageNouveauSignalement.placeholderDescription")}
             placeholderTextColor={descriptionErreur ? colors.palette.rouge : colors.text}
-            onChangeText={setDescriptionSignalement}
+            onChangeText={setDescription}
             multiline={true}
-            value={descriptionSignalement}
+            value={description}
             style={[
               { ...$inputDescription },
               descriptionErreur
@@ -348,10 +283,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             ]}
           />
           <View>
-            {photoErreur && !photoSignalement && (
+            {photoErreur && !image && (
               <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
             )}
-            {photoSignalement && <Image source={{ uri: photoSignalement }} style={$image} />}
             <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
               <Image
                 style={{ tintColor: colors.palette.vert }}
@@ -359,21 +293,21 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
               />
               <Text tx="pageNouveauSignalement.boutons.photo" size="xs" style={$textBoutonPhoto} />
             </TouchableOpacity>
+            {image && <Image source={{ uri: image }} style={$image} />}
             <Button
               style={$bouton}
               tx="pageNouveauSignalement.boutons.valider"
               onPress={() =>
-                envoyerSignalement(
-                  titreSignalement,
+                envoyerSignalement({
+                  titre,
                   type,
-                  descriptionSignalement,
-                  photoSignalement,
+                  description,
+                  image,
                   // WARNING A CHANGER AVEC LA LOCALISATION REELLE DE L'UTILISATEUR
-                  42.666,
-                  0.1034,
-                  2049,
-                  synchroMontanteStore,
-                )
+                  lat: 42.666,
+                  lon: 0.1034,
+                  post_id: 2049,
+                })
               }
               textStyle={$textBouton}
             />
