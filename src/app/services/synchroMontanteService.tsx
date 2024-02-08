@@ -11,7 +11,7 @@ import { translate } from "i18n-js";
 import { md5 } from "js-md5";
 
 //Type
-import { TSignalement } from "app/navigators";
+import { T_Signalement } from "app/navigators";
 export type TStatus = "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
 
 /* --------------------------- FONCTIONS EXPORTEES -------------------------- */
@@ -24,10 +24,10 @@ export type TStatus = "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur
  * @returns Promise<string>
  */
 export async function synchroMontanteSignalement(
-  signalementAEnvoyer: TSignalement,
+  signalementAEnvoyer: T_Signalement,
   synchroMontanteStore: SynchroMontanteStore,
 ): Promise<TStatus> {
-  let status:TStatus;
+  let status: TStatus;
 
   try {
     //Vérifie si l'appareil est connecté à internet
@@ -44,7 +44,7 @@ export async function synchroMontanteSignalement(
         synchroMontanteStore,
       )
     ) {
-      //Ajoute le signalement formaté dans le store
+       //Ajoute le signalement formaté dans le store
       const signalementAjoute = synchroMontanteStore.addSignalement(signalementAEnvoyer);
 
       //Envoi des données si l'appareil est connecté
@@ -85,7 +85,7 @@ export async function synchroMontanteSignalement(
  * @returns Promise<boolean>
  */
 export async function envoieBaseDeDonneesSignalements(
-  signalements: Array<TSignalement>,
+  signalements: Array<T_Signalement>,
   synchroMontanteStore: SynchroMontanteStore,
 ): Promise<boolean> {
   try {
@@ -98,7 +98,7 @@ export async function envoieBaseDeDonneesSignalements(
         "set-signalement",
         {
           signalements: JSON.stringify(signalements),
-          // en cours de développement avec Robin 
+          // en cours de développement avec Robin
           md5: md5(JSON.stringify(signalements)),
         },
         {
@@ -156,7 +156,7 @@ export const alertSynchroEffectuee = () => {
  * @returns
  */
 function rechercheMemeSignalement(
-  signalementAChercher: TSignalement,
+  signalementAChercher: T_Signalement,
   synchroMontanteStore: SynchroMontanteStore,
 ): boolean {
   let memeSignalement: boolean = false;

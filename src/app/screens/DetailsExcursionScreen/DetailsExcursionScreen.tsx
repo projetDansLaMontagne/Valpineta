@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
-import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
+import { AppStackScreenProps, TPoint, T_Signalement } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Screen } from "app/components";
 import { spacing, colors } from "app/theme";
@@ -46,7 +46,7 @@ export type TExcursion = {
   duree: string;
   vallee: string;
   postId: number;
-  signalements: TSignalement[];
+  signalements: T_Signalement[];
   nomTrackGpx: string;
   track: T_Point[];
 };
@@ -369,11 +369,11 @@ const startMiddleAndEndHandler = (
  * @function signalementsHandler
  * @description Affiche les signalements sur la carte.
  *
- * @param signalements {TSignalement[]} - les signalements de l'excursion
+ * @param signalements {T_Signalement[]} - les signalements de l'excursion
  *
  * @returns les signalements à afficher sur la carte.
  */
-const signalementsHandler = (signalements: TSignalement[]) => {
+const signalementsHandler = (signalements: T_Signalement[]) => {
   const binoculars: ImageSource = require("assets/icons/binoculars.png");
   const attention: ImageSource = require("assets/icons/attention.png");
 

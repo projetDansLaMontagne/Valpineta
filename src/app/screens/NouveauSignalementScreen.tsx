@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   ImageStyle,
 } from "react-native";
-import { AppStackScreenProps, TTypeSignalement, TSignalement,goBack } from "app/navigators";
+import { AppStackScreenProps, T_TypeSignalement, T_Signalement, goBack } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import * as ImagePicker from "expo-image-picker";
 import { SynchroMontanteStore, useStores } from "app/models";
@@ -24,7 +24,7 @@ import { translate } from "app/i18n";
 import { Button, Screen, Text } from "app/components";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
-  type: TTypeSignalement;
+  type: T_TypeSignalement;
 }
 
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
@@ -33,7 +33,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const { synchroMontanteStore } = useStores();
 
     //type de signalement
-    let type: TTypeSignalement;
+    let type: T_TypeSignalement;
     if (props.route.params) {
       type = props.route.params.type;
     } else {
@@ -46,8 +46,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const [photoSignalement, setPhotoSignalement] = useState(undefined);
 
     //Variables de permissions
-    const [cameraPermission, requestPermissionCamera ] = ImagePicker.useCameraPermissions();
-    const [LibrairiesPermission, requestPermissionLibrairies ] =
+    const [cameraPermission, requestPermissionCamera] = ImagePicker.useCameraPermissions();
+    const [LibrairiesPermission, requestPermissionLibrairies] =
       ImagePicker.useMediaLibraryPermissions();
 
     //Variables d'erreurs
@@ -62,7 +62,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const { showActionSheetWithOptions } = useActionSheet();
 
     /**
-     * Fonction qui aguille l'utilisateur pour ajouter une photo à son signalement 
+     * Fonction qui aguille l'utilisateur pour ajouter une photo à son signalement
      */
     const choixPhoto = () => {
       //Si les permissions pour la caméra et la librairie sont accordées
@@ -84,16 +84,15 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             }
           },
         );
-      } 
+      }
       //Si uniquement la permission pour la caméra est accordée
       else if (cameraPermission.granted) {
         prendrePhoto();
-      } 
+      }
       //Si uniquement la permission pour la librairie est accordée
-
       else if (LibrairiesPermission.granted) {
         choisirPhoto();
-      } 
+      }
       //Si aucune des permissions n'est accordée affiche une alerte
       else {
         Alert.alert(
@@ -187,9 +186,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * fonction pour afficher une alerte en fonction du status de fin de l'envoi du signalement
      * @param status
      */
-    const AlerteStatus = (
-      status: TStatus,
-    ) => {
+    const AlerteStatus = (status: TStatus) => {
       if (status === "ajouteEnLocal") {
         Alert.alert(
           translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
@@ -248,7 +245,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      */
     const envoyerSignalement = async (
       titreSignalement: string,
-      type: TTypeSignalement,
+      type: T_TypeSignalement,
       descriptionSignalement: string,
       photoSignalement: string,
       lat: number,
@@ -262,7 +259,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         photoSignalement,
       );
 
-      const signalementAEnvoyer: TSignalement = {
+      const signalementAEnvoyer: T_Signalement = {
         nom: titreSignalement,
         type,
         description: descriptionSignalement,

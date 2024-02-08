@@ -68,15 +68,15 @@ export type TFiltres = {
   difficultesOrientation: number[];
 };
 
-export type TTypeSignalement = "PointInteret" | "Avertissement";
+export type T_TypeSignalement = "PointInteret" | "Avertissement";
 
-export type TSignalement = {
+export type T_Signalement = {
   description: string;
   image: string;
   lat: number;
   lon: number;
   nom: string;
-  type: TTypeSignalement;
+  type: T_TypeSignalement;
   post_id: number;
 };
 export type T_infoLangue = {
@@ -98,7 +98,7 @@ export type T_excursion = {
   es?: T_infoLangue;
   fr?: T_infoLangue;
 
-  signalements: TSignalement[];
+  signalements: T_Signalement[];
   track: TPoint[];
 } & Partial<T_infoLangue>;
 
@@ -112,7 +112,7 @@ type CarteStackParamList = {
   Carte: undefined;
   DetailsExcursion: undefined | { excursion: T_excursion };
   Description: { excursion: T_excursion };
-  NouveauSignalement: { type: TTypeSignalement };
+  NouveauSignalement: { type: T_TypeSignalement };
 };
 
 type ParametresStackParamList = {
@@ -143,7 +143,7 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 /* -------------------------------------------------------------------------- */
 
 export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer>> { }
+  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme();
