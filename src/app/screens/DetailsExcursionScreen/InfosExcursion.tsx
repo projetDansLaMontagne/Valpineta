@@ -18,7 +18,6 @@ import { T_Point } from "app/screens/DetailsExcursionScreen/";
 import { T_Signalement } from "app/navigators";
 import { observer } from "mobx-react-lite";
 
-
 export interface InfosExcursionProps {
   excursion: Record<string, unknown>;
   navigation: any;

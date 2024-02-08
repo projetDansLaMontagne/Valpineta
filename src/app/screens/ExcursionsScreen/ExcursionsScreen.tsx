@@ -171,7 +171,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   const excursionsTraduites = useMemo<T_excursion[]>(
     () => allExcursions && applicationLangue(allExcursions),
-    [allExcursions, ],
+    [allExcursions],
   );
 
   const excursionsFiltreesParams = useMemo<T_excursion[]>(

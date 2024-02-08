@@ -38,13 +38,8 @@ export async function synchroMontanteSignalement(
     signalementAEnvoyer.image = await blobToBase64(blob);
 
     //Vérifie si le signalement existe déjà dans le store
-    if (
-      !rechercheMemeSignalement(
-        signalementAEnvoyer,
-        synchroMontanteStore,
-      )
-    ) {
-       //Ajoute le signalement formaté dans le store
+    if (!rechercheMemeSignalement(signalementAEnvoyer, synchroMontanteStore)) {
+      //Ajoute le signalement formaté dans le store
       const signalementAjoute = synchroMontanteStore.addSignalement(signalementAEnvoyer);
 
       //Envoi des données si l'appareil est connecté
@@ -162,9 +157,7 @@ function rechercheMemeSignalement(
   let memeSignalement: boolean = false;
 
   synchroMontanteStore.signalements.forEach(signalement => {
-    if (
-      signalementAChercher === signalement
-    ) {
+    if (signalementAChercher === signalement) {
       memeSignalement = true;
     }
   });

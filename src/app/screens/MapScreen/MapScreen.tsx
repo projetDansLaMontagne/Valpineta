@@ -35,7 +35,6 @@ import * as fileSystem from "expo-file-system";
 import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
 
-
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
@@ -278,11 +277,17 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   };
 
   const ButtonOnPressAvertissement = () => {
-      navigation.navigate("CarteStack", { screen: "NouveauSignalement", params: { type: "Avertissement" } });
+    navigation.navigate("CarteStack", {
+      screen: "NouveauSignalement",
+      params: { type: "Avertissement" },
+    });
   };
 
   const ButtonOnPressPointInteret = () => {
-      navigation.navigate("CarteStack", { screen: "NouveauSignalement", params: { type: "PointInteret" }});
+    navigation.navigate("CarteStack", {
+      screen: "NouveauSignalement",
+      params: { type: "PointInteret" },
+    });
   };
 
   const toggleMenu = () => {

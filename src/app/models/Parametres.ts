@@ -10,7 +10,7 @@ export const ParametresModel = types
   .model("Parametres")
   .props({
     langue: types.optional(types.string, "fr"),
-    intervalSynchro : types.optional(types.number, 1)
+    intervalSynchro: types.optional(types.number, 1),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -26,9 +26,9 @@ export const ParametresModel = types
         () => self.langue,
         langues => {
           I18n.locale = langues;
-        }
+        },
       );
-    }
+    },
   })); // eslint-disable-line @typescript-eslint/no-unused-vars
 
 export interface Parametres extends Instance<typeof ParametresModel> {}
