@@ -17,15 +17,9 @@
       "fallbackToCacheTimeout": 0
     },
     "jsEngine": "hermes",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "android": {
-      "permissions": [
-        "INTERNET",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ],
+      "permissions": ["INTERNET", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
       "package": "com.valpineta.app",
       "versionCode": 14,
       "adaptiveIcon": {
@@ -47,23 +41,14 @@
       "favicon": "./assets/images/logo.jpg"
     },
     "packagerOpts": {
-      "sourceExts": [
-        "js",
-        "json",
-        "ts",
-        "tsx",
-        "jsx, xml, gpx"
-      ]
+      "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
     },
     "plugins": [
       "expo-localization",
-      "expo-image-picker",
       [
-        "expo-media-library",
+        "expo-image-picker",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
-          "isAccessMediaLocationEnabled": "true"
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
     ]
