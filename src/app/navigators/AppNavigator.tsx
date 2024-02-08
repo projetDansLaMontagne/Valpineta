@@ -166,7 +166,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   // Force le rendu lorsque la langue change
   useEffect(() => {
     renderTrigger.forceRender();
-  }, [parametres.langues]);
+  }, [parametres.langue]);
 
   const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
     tabBarIcon: ({ color }) => (

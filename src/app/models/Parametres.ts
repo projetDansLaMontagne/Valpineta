@@ -9,25 +9,21 @@ import { reaction } from "mobx";
 export const ParametresModel = types
   .model("Parametres")
   .props({
-    langues: types.optional(types.string, "fr"),
+    langue: types.optional(types.string, "fr"),
     intervalSynchro : types.optional(types.number, 1)
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions(self => ({
     setLangue: (langues: string) => {
-      if (langues !== self.langues) {
-        self.langues = langues;
-      }
+      self.langue = langues;
     },
     setIntervalSynchro: (tempsSynchro: number) => {
-      if (tempsSynchro !== self.intervalSynchro) {
-        self.intervalSynchro = tempsSynchro;
-      }
+      self.intervalSynchro = tempsSynchro;
     },
     afterCreate() {
       reaction(
-        () => self.langues,
+        () => self.langue,
         langues => {
           I18n.locale = langues;
         }

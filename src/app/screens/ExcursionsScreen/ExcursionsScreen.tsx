@@ -92,7 +92,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    */
   function filtrageParametre(excursions: T_excursion[], filtres: TFiltres) {
     const nomsTypesParcours =
-      parametres.langues == "fr"
+      parametres.langue == "fr"
         ? ["Aller simple", "Aller/retour", "Circuit"]
         : ["Ida", "Ida y Vuelta", "Circular"];
 
@@ -142,7 +142,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   // Applique la langue aux excursions
   function applicationLangue(excursions: T_excursion[]) {
-    const langue = parametres.langues;
+    const langue = parametres.langue;
 
     return excursions.map(excursion => {
       if (langue === "fr") {
@@ -171,7 +171,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
 
   const excursionsTraduites = useMemo<T_excursion[]>(
     () => allExcursions && applicationLangue(allExcursions),
-    [allExcursions, parametres.langues],
+    [allExcursions, ],
   );
 
   const excursionsFiltreesParams = useMemo<T_excursion[]>(
@@ -212,7 +212,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       <View style={styles.searchBox}>
         <TextInput
           placeholder={
-            parametres.langues === "fr" ? "Rechercher une excursion" : "Buscar una excursión"
+            parametres.langue === "fr" ? "Rechercher une excursion" : "Buscar una excursión"
           }
           autoCorrect={false}
           placeholderTextColor={colors.palette.grisFonce}

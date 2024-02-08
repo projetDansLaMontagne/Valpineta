@@ -27,12 +27,12 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         <TouchableOpacity
           style={$containerBoutons}
           onPress={() => {
-            const nouvelleLangue: "fr" | "es" = parametres.langues === "fr" ? "es" : "fr";
+            const nouvelleLangue: "fr" | "es" = parametres.langue === "fr" ? "es" : "fr";
             parametres.setLangue(nouvelleLangue);
           }}
         >
           <View
-            style={[$souligneBouton, parametres.langues === "fr" ? { left: 0 } : { left: "50%" }]}
+            style={[$souligneBouton, parametres.langue === "fr" ? { left: 0 } : { left: "50%" }]}
           ></View>
           <Text style={$texteBouton} tx={"parametres.changerLangue.francais"} size="sm" />
           <Text style={$texteBouton} tx={"parametres.changerLangue.espagnol"} size="sm" />
