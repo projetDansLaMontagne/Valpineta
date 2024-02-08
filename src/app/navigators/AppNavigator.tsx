@@ -11,7 +11,7 @@ import {
   NavigatorScreenParams,
 } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack";
-import { observer, useLocalObservable } from "mobx-react-lite";
+import { observer } from "mobx-react-lite";
 import { ImageSourcePropType, useColorScheme, Image } from "react-native";
 import * as Screens from "app/screens";
 import Config from "../config";
@@ -153,20 +153,11 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   const parametresLogo = require("./../../assets/icons/parametres.png");
   useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
-  // Observable local pour forcer le rendu lorsqu'il change
-  const renderTrigger = useLocalObservable(() => ({
-    renderCount: 0,
-    forceRender: () => {
-      renderTrigger.renderCount += 1;
-    },
-  }));
-
+  /**
+   * @warning CODE REDONDANT mais sans cette partie le footer ne change pas de langue... raison inconnue
+   */
   const { parametres } = useStores();
-
-  // Force le rendu lorsque la langue change
-  useEffect(() => {
-    renderTrigger.forceRender();
-  }, [parametres.langue]);
+  useEffect(() => {}, [parametres.langue]);
 
   const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
     tabBarIcon: ({ color }) => (
