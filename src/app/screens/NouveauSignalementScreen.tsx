@@ -30,7 +30,7 @@ interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSign
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
     // Stores
-    const { synchroMontanteStore } = useStores();
+    const { synchroMontante: synchroMontanteStore } = useStores();
 
     //type de signalement
     let type: T_TypeSignalement;

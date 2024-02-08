@@ -7,7 +7,7 @@ import { SynchroMontanteModel } from "./SynchroMontante";
  */
 export const RootStoreModel = types.model("RootStore").props({
   parametres: types.optional(ParametresModel, {}),
-  synchroMontanteStore: types.optional(SynchroMontanteModel, {}),
+  synchroMontante: types.optional(SynchroMontanteModel, {}),
 });
 
 /**

@@ -75,7 +75,7 @@ function App(props: AppProps) {
   let isConnected = false;
   let intervalId: NodeJS.Timeout;
 
-  const { synchroMontanteStore, parametres } = useStores();
+  const { synchroMontante: synchroMontanteStore, parametres } = useStores();
 
   // Verifie la connexion avec l'interval défini dans les paramètres et s'il y a des signalements à envoyer
   useEffect(() => {
@@ -95,10 +95,10 @@ function App(props: AppProps) {
           alertSynchroEffectuee();
         }
       }
-    }, parametres.intervalSynchro * HEURE_EN_MILLISECONDES);
+    }, parametres.intervalleSynchro * HEURE_EN_MILLISECONDES);
 
     return () => clearInterval(intervalId);
-  }, [parametres.intervalSynchro]);
+  }, [parametres.intervalleSynchro]);
 
   const { hideSplashScreen } = props;
   const {
