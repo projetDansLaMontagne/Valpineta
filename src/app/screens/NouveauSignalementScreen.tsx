@@ -148,42 +148,27 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      */
     const AlerteStatus = (status: etatSynchro) => {
       switch (status) {
-        case etatSynchro.non_connecte:
-          Alert.alert(
-            translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
-            "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
-            [
-              { text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.ajoute") },
-              {
-                text: translate("pageNouveauSignalement.alerte.ajouteEnLocal.boutons.retour"),
-                onPress: () => props.navigation.goBack(),
-              },
-            ],
-            { cancelable: false },
-          );
+        case etatSynchro.bien_envoye:
+          Alert.alert("Reussite !", "Votre signalement a bien été enregistré", [], {
+            cancelable: true,
+          });
           break;
 
-        case etatSynchro.bien_envoye:
+        case etatSynchro.non_connecte:
           Alert.alert(
-            translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
-            translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
-            [
-              { text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.ajoute") },
-              {
-                text: translate("pageNouveauSignalement.alerte.envoyeEnBdd.boutons.retour"),
-                onPress: () => props.navigation.goBack(),
-              },
-            ],
-            { cancelable: false },
+            "Hors connexion",
+            "Votre signalement sera automatiquement enregistré lors de votre prochaine connexion (duree du cycle parametrable)",
+            [],
+            { cancelable: true },
           );
           break;
 
         case etatSynchro.erreur_serveur:
           Alert.alert(
-            translate("pageNouveauSignalement.alerte.erreur.titre"),
-            translate("pageNouveauSignalement.alerte.erreur.message"),
-            [{ text: "OK" }],
-            { cancelable: false },
+            "Erreur serveur",
+            "Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer plus tard.",
+            [],
+            { cancelable: true },
           );
           break;
       }
@@ -193,7 +178,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * Fonction pour envoyer le signalement en base de données
      */
     const envoyerSignalement = async (signalement: T_Signalement) => {
-      if (!saisiesValides()) {
+      if (saisiesValides()) {
         //Conversion de l'image url en base64
         const blob = await fetch(signalement.image).then(response => response.blob());
         signalement.image = await blobToBase64(blob);
@@ -203,11 +188,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         const status = await synchroMontante.tryToPushSignalement();
         setIsLoading(false);
 
-        // Reset des champs
-        setTitre("");
-        setDescription("");
-        setImage(undefined);
         AlerteStatus(status);
+        props.navigation.goBack();
       }
     };
 
