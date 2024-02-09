@@ -20,7 +20,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
 // Composants
 import { Button, Screen, Text } from "app/components";
-import { etatSynchro, useStores } from "app/models";
+import { EtatSynchro, useStores } from "app/models";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: T_TypeSignalement;
@@ -146,15 +146,15 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     /**
      * fonction pour afficher une alerte en fonction du status de fin de l'envoi du signalement
      */
-    const AlerteStatus = (status: etatSynchro) => {
+    const AlerteStatus = (status: EtatSynchro) => {
       switch (status) {
-        case etatSynchro.bien_envoye:
+        case EtatSynchro.bien_envoye:
           Alert.alert("Reussite !", "Votre signalement a bien été enregistré", [], {
             cancelable: true,
           });
           break;
 
-        case etatSynchro.non_connecte:
+        case EtatSynchro.non_connecte:
           Alert.alert(
             "Hors connexion",
             "Votre signalement sera automatiquement enregistré lors de votre prochaine connexion (duree du cycle parametrable)",
@@ -163,7 +163,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           );
           break;
 
-        case etatSynchro.erreur_serveur:
+        case EtatSynchro.erreur_serveur:
           Alert.alert(
             "Erreur serveur",
             "Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer plus tard.",

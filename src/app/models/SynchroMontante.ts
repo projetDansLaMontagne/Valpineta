@@ -20,10 +20,15 @@ const signalement = types.model({
   post_id: types.number,
 });
 const HEURE_EN_MILLISECONDES = 20000;
-export enum etatSynchro {
+export enum EtatSynchro {
   non_connecte,
   erreur_serveur,
   bien_envoye,
+}
+export enum IntervalleSynchro {
+  frequente = 1,
+  moyenne = 12,
+  lente = 24,
 }
 
 /**
@@ -80,7 +85,7 @@ export const SynchroMontanteModel = types
     /**
      * Tente de pousser les signalements vers le serveur
      */
-    async function tryToPushSignalements(): Promise<etatSynchro> {
+    async function tryToPushSignalements(): Promise<EtatSynchro> {
       // Vérifie la connexion
       const { isConnected } = await NetInfo.fetch();
 
@@ -101,18 +106,17 @@ export const SynchroMontanteModel = types
 
         if (response.ok) {
           removeAllSignalements();
-          return etatSynchro.bien_envoye;
+          return EtatSynchro.bien_envoye;
         } else {
           console.log(
             "[SYNCHRO MONTANTE] Erreur serveur lors de la synchronisation : ",
             getGeneralApiProblem(response),
           );
-          return etatSynchro.erreur_serveur;
+          return EtatSynchro.erreur_serveur;
         }
       }
-      return etatSynchro.non_connecte;
+      return EtatSynchro.non_connecte;
     }
-
 
     /* --------------------------------- SETTERS -------------------------------- */
     function addSignalement(signalement: T_Signalement) {
@@ -121,7 +125,7 @@ export const SynchroMontanteModel = types
     function removeAllSignalements() {
       self.signalements.clear();
     }
-    function setIntervalleSynchro(intervalle: number) {
+    function setIntervalleSynchro(intervalle: IntervalleSynchro) {
       self.intervalleSynchro = intervalle;
     }
 
