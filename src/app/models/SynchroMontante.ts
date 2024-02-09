@@ -17,7 +17,7 @@ const signalement = types.model({
   lon: types.number,
   post_id: types.number,
 });
-const HEURE_EN_MILLISECONDES = 3600000;
+const MINUTE_EN_MILLISECONDES = 60000;
 export enum EtatSynchro {
   non_connecte,
   erreur_serveur,
@@ -25,8 +25,8 @@ export enum EtatSynchro {
 }
 export enum IntervalleSynchro {
   frequente = 1,
-  moyenne = 12,
-  lente = 24,
+  moyenne = 5,
+  lente = 30,
 }
 
 /**
@@ -37,7 +37,7 @@ export const SynchroMontanteModel = types
   .props({
     signalements: types.optional(types.array(signalement), []),
     intervalId: types.maybeNull(types.union(types.number, types.frozen<null | NodeJS.Timeout>())),
-    intervalleSynchro: types.optional(types.number, 1),
+    intervalleSynchro: types.optional(types.number, IntervalleSynchro.frequente),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -68,7 +68,7 @@ export const SynchroMontanteModel = types
         if (self.signalements.length > 0) {
           tryToPushSignalements();
         }
-      }, self.intervalleSynchro * HEURE_EN_MILLISECONDES);
+      }, self.intervalleSynchro * MINUTE_EN_MILLISECONDES);
     }
     /**
      * Stoppe la boucle de synchronisation
@@ -130,7 +130,7 @@ export const SynchroMontanteModel = types
     return {
       afterCreate,
       beforeDestroy,
-      tryToPushSignalement: tryToPushSignalements,
+      tryToPushSignalements,
       addSignalement,
       removeAllSignalements,
       setIntervalleSynchro,
