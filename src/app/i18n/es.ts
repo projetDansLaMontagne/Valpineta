@@ -77,7 +77,10 @@ const es = {
       espagnol: "Español",
     },
     choisirSynchro: {
-      titre: "Frecuencia de sincronización",
+      titre: "Sincronización",
+      tresFrequente: "Muy frecuente",
+      moderee: "Moderadamente fréquente",
+      peuFrequente: "Poco fréquente",
     },
   },
   pageFiltres: {

@@ -7,6 +7,7 @@ import { colors, spacing } from "app/theme";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { IntervalleSynchro, useStores } from "app/models";
 import Dropdown from "react-native-input-select";
+import { translate } from "app/i18n";
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window");
@@ -45,9 +46,9 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         </View>
         <Dropdown
           options={[
-            { label: "Très frequente", value: IntervalleSynchro.TresFrequente },
-            { label: "Moyennement frequente", value: IntervalleSynchro.Moderee },
-            { label: "Peu frequente", value: IntervalleSynchro.PeuFrequente },
+            { label: translate("parametres.choisirSynchro.tresFrequente"), value: IntervalleSynchro.TresFrequente },
+            { label: translate("parametres.choisirSynchro.moderee"), value: IntervalleSynchro.Moderee },
+            { label: translate("parametres.choisirSynchro.peuFrequente"), value: IntervalleSynchro.PeuFrequente },
           ]}
           selectedValue={synchroMontante.intervalleSynchro}
           onValueChange={(value: IntervalleSynchro) => synchroMontante.setIntervalleSynchro(value)}
