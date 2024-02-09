@@ -202,6 +202,10 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const envoyerSignalement = async (signalement: T_Signalement): Promise<void> => {
       const signalementValide = verifSaisies();
 
+      //Conversion de l'image url en base64
+      const blob = await fetch(signalement.image).then(response => response.blob());
+      signalement.image = await blobToBase64(blob);
+
       if (signalementValide) {
         setIsLoading(true);
         const status = await synchroMontanteSignalement(signalement);
@@ -313,6 +317,32 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     );
   },
 );
+
+/**
+ * Transforme un blob en base64
+ * @param blob
+ * @returns blob en base64
+ */
+async function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+      } else {
+        reject(
+          new Error(
+            "[SynchroMontanteService -> blobToBase64 ]Conversion Blob vers Base64 a échoué.",
+          ),
+        );
+      }
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                   STYLES                                   */

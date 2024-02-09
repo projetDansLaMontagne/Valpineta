@@ -32,10 +32,6 @@ export async function synchroMontanteSignalement(
     //Vérifie si l'appareil est connecté à internet
     const isConnected = await NetInfo.fetch().then(state => state.isConnected);
 
-    //Convertir l'image url en base64
-    const blob = await fetch(signalementAEnvoyer.image).then(response => response.blob());
-    signalementAEnvoyer.image = await blobToBase64(blob);
-
     //Vérifie si le signalement existe déjà dans le store
     var memeSignalement = false;
 
@@ -142,30 +138,3 @@ export const alertSynchroEffectuee = () => {
     [{ text: "OK" }],
   );
 };
-
-/* ---------------------- FONCTIONS INTERNES AU SERVICE --------------------- */
-/**
- * Transforme un blob en base64
- * @param blob
- * @returns blob en base64
- */
-async function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result);
-      } else {
-        reject(
-          new Error(
-            "[SynchroMontanteService -> blobToBase64 ]Conversion Blob vers Base64 a échoué.",
-          ),
-        );
-      }
-    };
-
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
