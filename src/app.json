@@ -43,14 +43,6 @@
     "packagerOpts": {
       "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
     },
-    "plugins": [
-      "expo-localization",
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
-        }
-      ]
-    ]
+    "plugins": ["expo-localization", "expo-image-picker"]
   }
 }

@@ -80,6 +80,7 @@ export const SynchroMontanteModel = types
       // Vérifie la connexion
       const { isConnected } = await NetInfo.fetch();
 
+      console.log("[SYNCHRO MONTANTE] tentative");
       if (isConnected) {
         if (self.signalements.length > 0) {
           const success = pushSignalements();
