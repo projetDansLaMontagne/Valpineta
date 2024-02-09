@@ -10,7 +10,6 @@ import { api } from "app/services/api";
 import { getGeneralApiProblem } from "app/services/api/apiProblem";
 import { md5 } from "js-md5";
 
-
 const signalement = types.model({
   titre: types.string,
   type: types.union(types.literal("Avertissement"), types.literal("PointInteret")),
@@ -20,7 +19,7 @@ const signalement = types.model({
   lon: types.number,
   post_id: types.number,
 });
-const HEURE_EN_MILLISECONDES = 5000;
+const HEURE_EN_MILLISECONDES = 20000;
 export enum etatSynchro {
   non_connecte,
   erreur_serveur,
@@ -47,6 +46,8 @@ export const SynchroMontanteModel = types
       reaction(
         () => self.intervalleSynchro,
         _ => {
+          // On reinitalise la boucle de synchronisation avec la nouvelle intervalle
+          console.log("Reinitialisation de la boucle de synchronisation");
           stopChecking();
           startChecking();
         },
@@ -60,13 +61,9 @@ export const SynchroMontanteModel = types
      * Si oui, tente de les pousser vers le serveur
      */
     function startChecking() {
-      self.intervalId = setInterval(async () => {
+      self.intervalId = setInterval(() => {
         if (self.signalements.length > 0) {
-          tryToPushSignalements().then(status => {
-            if (status === etatSynchro.erreur_serveur) {
-              console.log("[SYNCHRO MONTANTE] Erreur serveur lors de la synchronisation");
-            }
-          });
+          tryToPushSignalements();
         }
       }, self.intervalleSynchro * HEURE_EN_MILLISECONDES);
     }
@@ -103,27 +100,19 @@ export const SynchroMontanteModel = types
         );
 
         if (response.ok) {
-          alertSynchroEffectuee();
           removeAllSignalements();
           return etatSynchro.bien_envoye;
         } else {
-          getGeneralApiProblem(response);
+          console.log(
+            "[SYNCHRO MONTANTE] Erreur serveur lors de la synchronisation : ",
+            getGeneralApiProblem(response),
+          );
           return etatSynchro.erreur_serveur;
         }
       }
       return etatSynchro.non_connecte;
     }
-    /**
-     * Affiche une alerte pour indiquer que la synchronisation a bien été effectuée
-     * @returns
-     */
-    function alertSynchroEffectuee() {
-      Alert.alert(
-        translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
-        translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
-        [{ text: "OK" }],
-      );
-    }
+
 
     /* --------------------------------- SETTERS -------------------------------- */
     function addSignalement(signalement: T_Signalement) {
