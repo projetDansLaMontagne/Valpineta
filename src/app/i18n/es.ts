@@ -78,9 +78,6 @@ const es = {
     },
     choisirSynchro: {
       titre: "Sincronización",
-      tresFrequente: "Muy frecuente",
-      moderee: "Moderadamente fréquente",
-      peuFrequente: "Poco fréquente",
     },
   },
   pageFiltres: {
@@ -113,7 +110,7 @@ const es = {
   pageNouveauSignalement: {
     titreAvertissement: "Nueva advertencia",
     titrePointInteret: "Nuevo punto de interés",
-    placeholderTitre: "Inserte un título",
+    placeholderNom: "Inserte un título",
     placeholderDescription: "Inserte una descripción",
     boutons: {
       photo: "Añadir una foto",

@@ -78,10 +78,7 @@ const fr = {
     },
     choisirSynchro: {
       titre: "Synchronisation",
-      tresFrequente: "Très fréquente",
-      moderee: "Moyennement fréquente",
-      peuFrequente: "Peu fréquente",
-    },
+    }
   },
   pageFiltres: {
     tri: {
@@ -113,7 +110,7 @@ const fr = {
   pageNouveauSignalement: {
     titreAvertissement: "Nouvel avertissement",
     titrePointInteret: "Nouveau point d'intérêt",
-    placeholderTitre: "Insérez un titre",
+    placeholderNom: "Insérez un titre",
     placeholderDescription: "Insérez une description",
     boutons: {
       photo: "Ajouter une photo",

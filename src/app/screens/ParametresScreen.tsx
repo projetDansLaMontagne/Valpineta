@@ -46,9 +46,9 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         </View>
         <Dropdown
           options={[
-            { label: translate("parametres.choisirSynchro.tresFrequente"), value: IntervalleSynchro.TresFrequente },
-            { label: translate("parametres.choisirSynchro.moderee"), value: IntervalleSynchro.Moderee },
-            { label: translate("parametres.choisirSynchro.peuFrequente"), value: IntervalleSynchro.PeuFrequente },
+            { label: '1 mins', value: IntervalleSynchro.TresFrequente },
+            { label: '5 mins', value: IntervalleSynchro.Moderee },
+            { label: '10 mins', value: IntervalleSynchro.PeuFrequente },
           ]}
           selectedValue={synchroMontante.intervalleSynchro}
           onValueChange={(value: IntervalleSynchro) => synchroMontante.setIntervalleSynchro(value)}

@@ -71,13 +71,13 @@ export type TFiltres = {
 export type T_TypeSignalement = "PointInteret" | "Avertissement";
 
 export type T_Signalement = {
+  nom: string;
   description: string;
   image: string;
   lat: number;
   lon: number;
-  titre: string;
   type: T_TypeSignalement;
-  post_id: number;
+  postId: number;
 };
 export type T_infoLangue = {
   nom: string;

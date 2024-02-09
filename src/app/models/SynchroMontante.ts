@@ -9,13 +9,13 @@ import { getGeneralApiProblem } from "app/services/api/apiProblem";
 import { md5 } from "js-md5";
 
 const signalement = types.model({
-  titre: types.string,
+  nom: types.string,
   type: types.union(types.literal("Avertissement"), types.literal("PointInteret")),
   description: types.string,
   image: types.string,
   lat: types.number,
   lon: types.number,
-  post_id: types.number,
+  postId: types.number,
 });
 const MINUTE_EN_MILLISECONDES = 60000;
 export enum EtatSynchro {
@@ -80,9 +80,9 @@ export const SynchroMontanteModel = types
       // Vérifie la connexion
       const { isConnected } = await NetInfo.fetch();
 
-      console.log("[SYNCHRO MONTANTE] tentative");
       if (isConnected) {
         if (self.signalements.length > 0) {
+          console.log("[SYNCHRO MONTANTE] tentative");
           const success = pushSignalements();
           if (success) {
             return EtatSynchro.BienEnvoye;

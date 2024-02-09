@@ -35,12 +35,12 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     }
 
     // Saisies
-    const [titre, setTitre] = useState("");
+    const [nom, setNom] = useState("");
     const [description, setDescription] = useState("");
     const [image, setImage] = useState(undefined);
 
     // Erreurs
-    const [titreErreur, setTitreErreur] = useState(false);
+    const [nomErreur, setNomErreur] = useState(false);
     const [descriptionErreur, setDescriptionErreur] = useState(false);
     const [photoErreur, setPhotoErreur] = useState(false);
 
@@ -106,18 +106,18 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     /**
      * Indique si les informations du signalement sont correctes (tailles de champs, caractères autorisés et photo OK)
      */
-    const saisiesValides = (titre: string, description: string, image: string): boolean => {
+    const saisiesValides = (nom: string, description: string, image: string): boolean => {
       let saisieBonne = true;
 
       // Regex pour vérifier si les champs sont corrects et contiennent uniquement des caractères autorisés
       const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*-+,.:;"]+$/;
 
-      // Vérification du titre
-      if (titre === "" || !regex.test(titre) || titre.length < 3 || titre.length > 50) {
-        setTitreErreur(true);
+      // Vérification du nom
+      if (nom === "" || !regex.test(nom) || nom.length < 3 || nom.length > 50) {
+        setNomErreur(true);
         saisieBonne = false;
       } else {
-        setTitreErreur(false);
+        setNomErreur(false);
       }
 
       // Vérification de la description
@@ -178,7 +178,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * Fonction pour envoyer le signalement en base de données
      */
     const envoyerSignalement = async (signalement: T_Signalement) => {
-      if (saisiesValides(signalement.titre, signalement.description, signalement.image)) {
+      if (saisiesValides(signalement.nom, signalement.description, signalement.image)) {
         //Conversion de l'image url en base64
         const blob = await fetch(signalement.image).then(response => response.blob());
         signalement.image = await blobToBase64(blob);
@@ -216,21 +216,21 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             size="xxl"
           />
           <Text text="Col de la marmotte" size="lg" />
-          {titreErreur && (
+          {nomErreur && (
             <Text
-              tx="pageNouveauSignalement.erreur.titre"
+              text="pageNouveauSignalement.erreur.titre"
               size="xs"
               style={{ color: colors.palette.rouge }}
             />
           )}
           <TextInput
-            placeholder={translate("pageNouveauSignalement.placeholderTitre")}
-            placeholderTextColor={titreErreur ? colors.palette.rouge : colors.text}
-            onChangeText={setTitre}
-            value={titre}
+            placeholder={translate("pageNouveauSignalement.placeholderNom")}
+            placeholderTextColor={nomErreur ? colors.palette.rouge : colors.text}
+            onChangeText={setNom}
+            value={nom}
             style={[
-              { ...$inputTitre },
-              titreErreur
+              { ...$inputnom },
+              nomErreur
                 ? { borderColor: colors.palette.rouge }
                 : { borderColor: colors.palette.vert },
             ]}
@@ -272,14 +272,14 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
               tx="pageNouveauSignalement.boutons.valider"
               onPress={() =>
                 envoyerSignalement({
-                  titre,
+                  nom,
                   type,
                   description,
                   image,
                   // WARNING A CHANGER AVEC LA LOCALISATION REELLE DE L'UTILISATEUR
                   lat: 42.666,
                   lon: 0.1034,
-                  post_id: 2049,
+                  postId: 2049,
                 })
               }
               textStyle={$textBouton}
@@ -357,7 +357,7 @@ const $h1: TextStyle = {
   marginBottom: spacing.sm,
 };
 
-const $inputTitre: TextStyle = {
+const $inputnom: TextStyle = {
   borderRadius: spacing.sm,
   padding: spacing.sm,
   borderWidth: 1,
@@ -366,7 +366,7 @@ const $inputTitre: TextStyle = {
 };
 
 const $inputDescription: TextStyle = {
-  ...$inputTitre,
+  ...$inputnom,
   height: 200,
 };
 
