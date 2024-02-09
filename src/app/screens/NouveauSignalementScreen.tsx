@@ -16,7 +16,6 @@ import {
 import { AppStackScreenProps, T_TypeSignalement, T_Signalement } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import * as ImagePicker from "expo-image-picker";
-import { useStores } from "app/models";
 import { TStatus, synchroMontanteSignalement } from "app/services/synchroMontanteService";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
@@ -29,9 +28,6 @@ interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSign
 
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
-    // Stores
-    const { synchroMontante } = useStores();
-
     //type de signalement
     var type = props.route.params?.type;
     if (type === undefined) {
@@ -208,7 +204,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 
       if (signalementValide) {
         setIsLoading(true);
-        const status = await synchroMontanteSignalement(signalement, synchroMontante);
+        const status = await synchroMontanteSignalement(signalement);
         setIsLoading(false);
 
         if (status === "ajouteEnLocal" || status === "envoyeEnBdd") {

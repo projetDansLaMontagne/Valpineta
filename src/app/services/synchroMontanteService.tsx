@@ -2,7 +2,7 @@ import { Alert } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 
 //Store
-import { SynchroMontanteStore } from "app/models";
+import { useStores, SynchroMontanteStore } from "app/models";
 
 //Api
 import { api } from "./api";
@@ -12,7 +12,7 @@ import { md5 } from "js-md5";
 
 //Type
 import { T_Signalement } from "app/navigators";
-export type TStatus = "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur" | "mauvaisFormat";
+export type TStatus = "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur";
 
 /* --------------------------- FONCTIONS EXPORTEES -------------------------- */
 
@@ -20,14 +20,13 @@ export type TStatus = "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur
  * Permet de synchroniser les données avec la base de données
  * Synchronisation montante
  * @param signalementAEnvoyer
- * @param synchroMontanteStore
  * @returns Promise<string>
  */
 export async function synchroMontanteSignalement(
   signalementAEnvoyer: T_Signalement,
-  synchroMontanteStore: SynchroMontanteStore,
 ): Promise<TStatus> {
   let status: TStatus;
+  const { synchroMontante } = useStores();
 
   try {
     //Vérifie si l'appareil est connecté à internet
@@ -38,27 +37,28 @@ export async function synchroMontanteSignalement(
     signalementAEnvoyer.image = await blobToBase64(blob);
 
     //Vérifie si le signalement existe déjà dans le store
-    if (!rechercheMemeSignalement(signalementAEnvoyer, synchroMontanteStore)) {
+    var memeSignalement = false;
+
+    synchroMontante.signalements.forEach(signalement => {
+      if (signalementAEnvoyer === signalement) {
+        memeSignalement = true;
+      }
+    });
+
+    if (!memeSignalement) {
       //Ajoute le signalement formaté dans le store
-      const signalementAjoute = synchroMontanteStore.addSignalement(signalementAEnvoyer);
+      synchroMontante.addSignalement(signalementAEnvoyer);
 
       //Envoi des données si l'appareil est connecté
-      if (isConnected && signalementAjoute) {
-        const sendStatus = await envoieBaseDeDonneesSignalements(
-          synchroMontanteStore.signalements,
-          synchroMontanteStore,
-        );
-        if (sendStatus) {
+      if (isConnected) {
+        const success = await envoieBaseDeDonneesSignalements(synchroMontante.signalements);
+        if (success) {
           status = "envoyeEnBdd";
         } else {
           status = "erreur";
         }
       } else {
-        if (signalementAjoute) {
-          status = "ajouteEnLocal";
-        } else {
-          status = "erreur";
-        }
+        status = "ajouteEnLocal";
       }
     } else {
       status = "dejaExistant";
@@ -76,16 +76,17 @@ export async function synchroMontanteSignalement(
 /**
  *  Envoie les signalements au serveur
  * @param signalements
- * @param synchroMontanteStore
+ * @param synchroMontante
  * @returns Promise<boolean>
  */
 export async function envoieBaseDeDonneesSignalements(
   signalements: Array<T_Signalement>,
-  synchroMontanteStore: SynchroMontanteStore,
 ): Promise<boolean> {
+  const { synchroMontante } = useStores();
+
   try {
     //Vérifie si des signalements sont présents dans le store
-    if (synchroMontanteStore.signalements.length > 0) {
+    if (synchroMontante.signalements.length > 0) {
       console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Envoi des données");
 
       //Envoi des données
@@ -106,7 +107,7 @@ export async function envoieBaseDeDonneesSignalements(
       if (response.ok) {
         console.log("[SynchroMontanteService -> envoieBaseDeDonnees] Données envoyées");
         // Supprimer les signalements du store
-        synchroMontanteStore.removeAllSignalements();
+        synchroMontante.removeAllSignalements();
         return true;
       } else {
         console.log(
@@ -143,28 +144,6 @@ export const alertSynchroEffectuee = () => {
 };
 
 /* ---------------------- FONCTIONS INTERNES AU SERVICE --------------------- */
-
-/**
- * Recherche si un signalement existe déjà dans la liste des signalements dans le store
- * @param signalementAChercher
- * @param synchroMontanteStore
- * @returns
- */
-function rechercheMemeSignalement(
-  signalementAChercher: T_Signalement,
-  synchroMontanteStore: SynchroMontanteStore,
-): boolean {
-  let memeSignalement: boolean = false;
-
-  synchroMontanteStore.signalements.forEach(signalement => {
-    if (signalementAChercher === signalement) {
-      memeSignalement = true;
-    }
-  });
-
-  return memeSignalement;
-}
-
 /**
  * Transforme un blob en base64
  * @param blob

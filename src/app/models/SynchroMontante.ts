@@ -1,5 +1,6 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
+import { T_Signalement } from "app/navigators";
 
 // Modèle pour représenter un signalement individuel
 const signalement = types.model({
@@ -23,10 +24,8 @@ export const SynchroMontanteModel = types
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions(self => ({
-    addSignalement: (signalement: any): boolean => {
-      const oldLength = self.signalements.length;
+    addSignalement: (signalement: T_Signalement) => {
       self.signalements.push(signalement);
-      return self.signalements.length > oldLength;
     },
     removeAllSignalements: () => {
       self.signalements.clear();

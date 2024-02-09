@@ -86,10 +86,7 @@ function App(props: AppProps) {
 
       let envoiResult = false;
       if (isConnected && synchroMontanteStore.signalements.length > 0) {
-        envoiResult = await envoieBaseDeDonneesSignalements(
-          synchroMontanteStore.signalements,
-          synchroMontanteStore,
-        );
+        envoiResult = await envoieBaseDeDonneesSignalements(synchroMontanteStore.signalements);
 
         if (envoiResult) {
           alertSynchroEffectuee();
