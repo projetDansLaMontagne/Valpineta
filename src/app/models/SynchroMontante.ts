@@ -2,6 +2,10 @@ import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import { T_Signalement } from "app/navigators";
 import NetInfo from "@react-native-community/netinfo";
+//Api
+import { api } from "app/services/api";
+import { getGeneralApiProblem } from "app/services/api/apiProblem";
+import { md5 } from "js-md5";
 
 // Import pour la synchro
 import {
@@ -19,7 +23,7 @@ const signalement = types.model({
   lon: types.number,
   post_id: types.number,
 });
-const HEURE_EN_MILLISECONDES = 3600000;
+const HEURE_EN_MILLISECONDES = 5000;
 enum etatSynchro {
   non_connecte,
   erreur_serveur,
@@ -86,14 +90,28 @@ export const SynchroMontanteModel = types
       const { isConnected } = await NetInfo.fetch();
 
       if (isConnected) {
-        const success = await envoieBaseDeDonneesSignalements(self.signalements);
+        const response = await api.apisauce.post(
+          "set-signalement",
+          {
+            signalements: JSON.stringify(self.signalements),
+            // en cours de développement avec Robin
+            md5: md5(JSON.stringify(self.signalements)),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
 
-        if (success) {
+        if (response.ok) {
           alertSynchroEffectuee();
           removeAllSignalements();
           return etatSynchro.bien_envoye;
+        } else {
+          getGeneralApiProblem(response);
+          return etatSynchro.erreur_serveur;
         }
-        return etatSynchro.erreur_serveur;
       }
       return etatSynchro.non_connecte;
     }
