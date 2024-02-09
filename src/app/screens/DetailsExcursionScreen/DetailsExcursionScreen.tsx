@@ -21,7 +21,7 @@ import { DemarrerExcursion } from "./DemarrerExcursion";
 import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 import { PopupSignalement } from "./PopupSignalement";
 import { ExcursionTerminee } from "./ExcursionTerminee";
-
+import { useStores } from "app/models";
 
 const { width, height } = Dimensions.get("window");
 
@@ -62,6 +62,7 @@ interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcurs
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props;
+    const { suiviExcursion } = useStores();
     const excursion = route.params?.excursion;
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
@@ -142,12 +143,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       , [userLocation]);
 
     useEffect(() => {
-      if (excursionTerminee) {
+      if (suiviExcursion.etat === "terminee") {
         console.log("excursionTerminee", excursionTerminee)
         setModalExcursionTermineeVisible(true)
       }
     }
-      , [excursionTerminee]);
+      , [suiviExcursion.etat]);
 
 
     // si excursion est défini, on affiche les informations de l'excursion
@@ -191,7 +192,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             excursion={excursion}
             navigation={navigation}
             setStartPoint={setStartPoint}
-            setExcursionTerminee={setExcursionTerminee}
           />
         ) : (
           <SwipeUpDown

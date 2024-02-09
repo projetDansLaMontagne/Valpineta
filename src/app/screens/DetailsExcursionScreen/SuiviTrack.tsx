@@ -19,18 +19,18 @@ import { ListeSignalements } from "./ListeSignalements";
 import { TExcursion } from "./DetailsExcursionScreen";
 import { recupDistance } from "app/utils/recupDistance";
 import { T_flat_point } from "app/navigators";
+import { useStores } from "app/models";
 const { width, height } = Dimensions.get("window");
 
 export interface SuiviTrackProps {
   excursion: TExcursion;
   navigation: any;
-  // setIsSuiviTrack: React.Dispatch<React.SetStateAction<boolean>>;
   setStartPoint: React.Dispatch<React.SetStateAction<any>>;
-  setExcursionTerminee
 }
 
 export function SuiviTrack(props: SuiviTrackProps) {
-  const { excursion, navigation, setStartPoint, setExcursionTerminee } = props;
+  const { excursion, navigation, setStartPoint } = props;
+  const { suiviExcursion } = useStores();
 
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
@@ -138,13 +138,13 @@ export function SuiviTrack(props: SuiviTrackProps) {
     return (
       <View style={isMini ? $containerPetit : $containerGrand}>
         <View style={$containerBoutonChrono}>
-          <TouchableOpacity onPress={() => { toggleChrono(); setExcursionTerminee(false) }}>
+          <TouchableOpacity onPress={() => { toggleChrono(); modifierEtatExcursion(); }}>
             <Image
               style={$boutonPauseArret}
               tintColor={colors.bouton}
               source={chronoRunning ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { resetChrono(); setExcursionTerminee(true) }}>
+          <TouchableOpacity onPress={() => { resetChrono(); suiviExcursion.setEtat("terminee") }}>
             <Image style={$boutonPauseArret} source={require("assets/icons/arret.png")} />
           </TouchableOpacity>
         </View>
@@ -349,7 +349,7 @@ function getUserLocationAndUpdate(setAltitudeActuelle, setDeniveleMonte, denivel
 function descritpion(excursion, altitudeActuelle) {
   let track = excursion.track;
   let altitudeMax = 0;
-  let altitudeMin = Infinity;
+  let altitudeMin = 0;
 
   if (track !== undefined) {
     track.forEach(element => {
@@ -436,6 +436,15 @@ function descritpion(excursion, altitudeActuelle) {
       </View>
     </View>
   );
+}
+
+function modifierEtatExcursion() {
+  if (suiviExcursion.etat === "enCours") {
+    suiviExcursion.setEtat("enPause");
+  }
+  if (suiviExcursion.etat === "enPause") {
+    suiviExcursion.setEtat("enCours");
+  }
 }
 
 /* --------------------------------- Styles --------------------------------- */
