@@ -106,7 +106,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     /**
      * Indique si les informations du signalement sont correctes (tailles de champs, caractères autorisés et photo OK)
      */
-    const saisiesValides = (): boolean => {
+    const saisiesValides = (titre: string, description: string, image: string): boolean => {
       let saisieBonne = true;
 
       // Regex pour vérifier si les champs sont corrects et contiennent uniquement des caractères autorisés
@@ -178,7 +178,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * Fonction pour envoyer le signalement en base de données
      */
     const envoyerSignalement = async (signalement: T_Signalement) => {
-      if (saisiesValides()) {
+      if (saisiesValides(signalement.titre, signalement.description, signalement.image)) {
         //Conversion de l'image url en base64
         const blob = await fetch(signalement.image).then(response => response.blob());
         signalement.image = await blobToBase64(blob);
