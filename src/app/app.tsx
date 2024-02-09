@@ -19,22 +19,15 @@ if (__DEV__) {
 import "./i18n";
 import "./utils/ignoreWarnings";
 import { useFonts } from "expo-font";
-import React, { useEffect } from "react";
+import React from "react";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as Linking from "expo-linking";
-import { useInitialRootStore, useStores } from "./models";
+import { useInitialRootStore } from "./models";
 import { AppNavigator, useNavigationPersistence } from "./navigators";
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary";
 import * as storage from "./utils/storage";
 import { customFontsToLoad } from "./theme";
 import Config from "./config";
-
-// Import pour la synchro
-import NetInfo from "@react-native-community/netinfo";
-import {
-  envoieBaseDeDonneesSignalements,
-  alertSynchroEffectuee,
-} from "./services/synchroMontanteService";
 
 // Import pour l'ui de l'ActionSheet
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
@@ -66,37 +59,10 @@ interface AppProps {
   hideSplashScreen: () => Promise<void>;
 }
 
-const HEURE_EN_MILLISECONDES = 3600000;
-
 /**
  * This is the root component of our app.
  */
 function App(props: AppProps) {
-  let isConnected = false;
-  let intervalId: NodeJS.Timeout;
-
-  const { synchroMontante: synchroMontanteStore, parametres } = useStores();
-
-  // Verifie la connexion avec l'interval défini dans les paramètres et s'il y a des signalements à envoyer
-  useEffect(() => {
-    intervalId = setInterval(async () => {
-      // Vérifie la connexion
-      const state = await NetInfo.fetch();
-      isConnected = state.isConnected;
-
-      let envoiResult = false;
-      if (isConnected && synchroMontanteStore.signalements.length > 0) {
-        envoiResult = await envoieBaseDeDonneesSignalements(synchroMontanteStore.signalements);
-
-        if (envoiResult) {
-          alertSynchroEffectuee();
-        }
-      }
-    }, parametres.intervalleSynchro * HEURE_EN_MILLISECONDES);
-
-    return () => clearInterval(intervalId);
-  }, [parametres.intervalleSynchro]);
-
   const { hideSplashScreen } = props;
   const {
     initialNavigationState,
