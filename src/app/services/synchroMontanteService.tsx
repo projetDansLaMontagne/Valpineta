@@ -1,8 +1,7 @@
 import { Alert } from "react-native";
-import NetInfo from "@react-native-community/netinfo";
 
 //Store
-import { useStores, SynchroMontanteStore } from "app/models";
+import { useStores } from "app/models";
 
 //Api
 import { api } from "./api";
@@ -14,60 +13,7 @@ import { md5 } from "js-md5";
 import { T_Signalement } from "app/navigators";
 export type TStatus = "envoyeEnBdd" | "ajouteEnLocal" | "dejaExistant" | "erreur";
 
-/* --------------------------- FONCTIONS EXPORTEES -------------------------- */
 
-/**
- * Permet de synchroniser les données avec la base de données
- * Synchronisation montante
- * @param signalementAEnvoyer
- * @returns Promise<string>
- */
-export async function synchroMontanteSignalement(
-  signalementAEnvoyer: T_Signalement,
-): Promise<TStatus> {
-  let status: TStatus;
-  const { synchroMontante } = useStores();
-
-  try {
-    //Vérifie si l'appareil est connecté à internet
-    const isConnected = await NetInfo.fetch().then(state => state.isConnected);
-
-    //Vérifie si le signalement existe déjà dans le store
-    var memeSignalement = false;
-
-    synchroMontante.signalements.forEach(signalement => {
-      if (signalementAEnvoyer === signalement) {
-        memeSignalement = true;
-      }
-    });
-
-    if (!memeSignalement) {
-      //Ajoute le signalement formaté dans le store
-      synchroMontante.addSignalement(signalementAEnvoyer);
-
-      //Envoi des données si l'appareil est connecté
-      if (isConnected) {
-        const success = await envoieBaseDeDonneesSignalements(synchroMontante.signalements);
-        if (success) {
-          status = "envoyeEnBdd";
-        } else {
-          status = "erreur";
-        }
-      } else {
-        status = "ajouteEnLocal";
-      }
-    } else {
-      status = "dejaExistant";
-    }
-
-    //Gestion des erreurs
-  } catch (error) {
-    console.error("[SynchroMontanteService -> synchroMontante] Erreur :", error);
-    status = "erreur";
-  }
-
-  return status;
-}
 
 /**
  *  Envoie les signalements au serveur

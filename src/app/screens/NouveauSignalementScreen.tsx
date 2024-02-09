@@ -21,6 +21,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
 // Composants
 import { Button, Screen, Text } from "app/components";
+import { useStores } from "app/models";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: T_TypeSignalement;
@@ -49,6 +50,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 
     // ActionSheet
     const { showActionSheetWithOptions } = useActionSheet();
+
+    const { synchroMontante } = useStores();
 
     /**
      * Fonction qui aguille l'utilisateur pour ajouter une photo à son signalement
@@ -104,7 +107,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     /**
      * Indique si les informations du signalement sont correctes (tailles de champs, caractères autorisés et photo OK)
      */
-    const verifSaisies = (): boolean => {
+    const saisiesValides = (): boolean => {
       let saisieBonne = true;
 
       // Regex pour vérifier si les champs sont corrects et contiennent uniquement des caractères autorisés
@@ -199,23 +202,21 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     /**
      * Fonction pour envoyer le signalement en base de données
      */
-    const envoyerSignalement = async (signalement: T_Signalement): Promise<void> => {
-      const signalementValide = verifSaisies();
+    const envoyerSignalement = async (signalement: T_Signalement) => {
+      if (!saisiesValides()) {
+        //Conversion de l'image url en base64
+        const blob = await fetch(signalement.image).then(response => response.blob());
+        signalement.image = await blobToBase64(blob);
 
-      //Conversion de l'image url en base64
-      const blob = await fetch(signalement.image).then(response => response.blob());
-      signalement.image = await blobToBase64(blob);
-
-      if (signalementValide) {
         setIsLoading(true);
-        const status = await synchroMontanteSignalement(signalement);
+        synchroMontante.addSignalement(signalement);
+        const status = await synchroMontante.tryToPushSignalement();
         setIsLoading(false);
 
-        if (status === "ajouteEnLocal" || status === "envoyeEnBdd") {
-          setTitre("");
-          setDescription("");
-          setImage(undefined);
-        }
+        // Reset des champs
+        setTitre("");
+        setDescription("");
+        setImage(undefined);
         AlerteStatus(status);
       }
     };

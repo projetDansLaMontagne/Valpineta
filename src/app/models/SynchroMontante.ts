@@ -10,7 +10,6 @@ import {
 } from "app/services/synchroMontanteService";
 import { reaction } from "mobx";
 
-// Modèle pour représenter un signalement individuel
 const signalement = types.model({
   titre: types.string,
   type: types.union(types.literal("Avertissement"), types.literal("PointInteret")),
@@ -21,6 +20,11 @@ const signalement = types.model({
   post_id: types.number,
 });
 const HEURE_EN_MILLISECONDES = 3600000;
+enum etatSynchro {
+  non_connecte,
+  erreur_serveur,
+  bien_envoye,
+}
 
 /**
  * Model description here for TypeScript hints.
@@ -57,7 +61,11 @@ export const SynchroMontanteModel = types
     function startChecking() {
       self.intervalId = setInterval(async () => {
         if (self.signalements.length > 0) {
-          tryPushSignalement(self.signalements);
+          tryToPushSignalements().then(status => {
+            if (status === etatSynchro.erreur_serveur) {
+              console.log("[SYNCHRO MONTANTE] Erreur serveur lors de la synchronisation");
+            }
+          });
         }
       }, self.intervalleSynchro * HEURE_EN_MILLISECONDES);
     }
@@ -71,20 +79,26 @@ export const SynchroMontanteModel = types
     }
 
     /**
-     * Pousse les informations de signalements vers le serveur
+     * Tente de pousser les signalements vers le serveur
      */
-    async function tryPushSignalement(signalements: T_Signalement[]) {
+    async function tryToPushSignalements(): Promise<etatSynchro> {
       // Vérifie la connexion
       const { isConnected } = await NetInfo.fetch();
 
       if (isConnected) {
-        const success = await envoieBaseDeDonneesSignalements(signalements);
+        const success = await envoieBaseDeDonneesSignalements(self.signalements);
 
         if (success) {
           alertSynchroEffectuee();
+          removeAllSignalements();
+          return etatSynchro.bien_envoye;
         }
+        return etatSynchro.erreur_serveur;
       }
+      return etatSynchro.non_connecte;
     }
+
+    /* --------------------------------- SETTERS -------------------------------- */
     function addSignalement(signalement: T_Signalement) {
       self.signalements.push(signalement);
     }
@@ -98,7 +112,7 @@ export const SynchroMontanteModel = types
     return {
       afterCreate,
       beforeDestroy,
-      tryPushSignalement,
+      tryToPushSignalement: tryToPushSignalements,
       addSignalement,
       removeAllSignalements,
       setIntervalleSynchro,
