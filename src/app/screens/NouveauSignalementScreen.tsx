@@ -185,7 +185,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
 
         setIsLoading(true);
         synchroMontante.addSignalement(signalement);
-        const status = await synchroMontante.tryToPushSignalements();
+        const status = await synchroMontante.tryToPush();
         setIsLoading(false);
 
         AlerteStatus(status);

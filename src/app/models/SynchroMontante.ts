@@ -19,6 +19,7 @@ const signalement = types.model({
 });
 const MINUTE_EN_MILLISECONDES = 60000;
 export enum EtatSynchro {
+  rien_a_envoyer,
   non_connecte,
   erreur_serveur,
   bien_envoye,
@@ -64,11 +65,7 @@ export const SynchroMontanteModel = types
      * Si oui, tente de les pousser vers le serveur
      */
     function startChecking() {
-      self.intervalId = setInterval(() => {
-        if (self.signalements.length > 0) {
-          tryToPushSignalements();
-        }
-      }, self.intervalleSynchro * MINUTE_EN_MILLISECONDES);
+      self.intervalId = setInterval(tryToPush, self.intervalleSynchro * MINUTE_EN_MILLISECONDES);
     }
     /**
      * Stoppe la boucle de synchronisation
@@ -79,41 +76,58 @@ export const SynchroMontanteModel = types
       }
     }
 
-    /* -------------------------------- METHODES -------------------------------- */
-    /**
-     * Tente de pousser les signalements vers le serveur
-     */
-    async function tryToPushSignalements(): Promise<EtatSynchro> {
+    const tryToPush = async (): Promise<EtatSynchro> => {
       // Vérifie la connexion
       const { isConnected } = await NetInfo.fetch();
 
       if (isConnected) {
-        const response = await api.apisauce.post(
-          "set-signalement",
-          {
-            signalements: JSON.stringify(self.signalements),
-            // en cours de développement avec Robin
-            md5: md5(JSON.stringify(self.signalements)),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-
-        if (response.ok) {
-          removeAllSignalements();
-          return EtatSynchro.bien_envoye;
-        } else {
-          console.log(
-            "[SYNCHRO MONTANTE] Erreur serveur lors de la synchronisation : ",
-            getGeneralApiProblem(response),
-          );
-          return EtatSynchro.erreur_serveur;
+        if (self.signalements.length > 0) {
+          const success = pushSignalements();
+          if (success) {
+            return EtatSynchro.bien_envoye;
+          } else {
+            return EtatSynchro.erreur_serveur;
+          }
         }
+
+        // AJOUTER ICI LA SYNCHRO DES AUTRES DONNEES
+
+        return EtatSynchro.rien_a_envoyer;
       }
       return EtatSynchro.non_connecte;
+    };
+
+    /* -------------------------------- METHODES -------------------------------- */
+    /**
+     * Primitive qui tente de pousser les signalements vers le serveur
+     * @prerequis etre connecte et avoir des signalements a pousser
+     * @returns booleen indiquant si la synchronisation a reussi
+     */
+    async function pushSignalements(): Promise<boolean> {
+      const response = await api.apisauce.post(
+        "set-signalement",
+        {
+          signalements: JSON.stringify(self.signalements),
+          // en cours de développement avec Robin
+          md5: md5(JSON.stringify(self.signalements)),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.ok) {
+        removeAllSignalements();
+      } else {
+        console.log(
+          "[SYNCHRO MONTANTE] Debug : Erreur serveur lors de la synchronisation : ",
+          getGeneralApiProblem(response),
+        );
+      }
+
+      return response.ok;
     }
 
     /* --------------------------------- SETTERS -------------------------------- */
@@ -130,7 +144,7 @@ export const SynchroMontanteModel = types
     return {
       afterCreate,
       beforeDestroy,
-      tryToPushSignalements,
+      tryToPush,
       addSignalement,
       removeAllSignalements,
       setIntervalleSynchro,
