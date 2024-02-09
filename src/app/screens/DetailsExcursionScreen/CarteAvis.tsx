@@ -37,20 +37,12 @@ export const CarteAvis = observer(function CarteAvis(props: CarteAvisProps) {
         {Array(nombreEtoiles)
           .fill(0)
           .map((item, index) => (
-            <Image
-              style={$icon}
-              key={index}
-              source={require("assets/icons/etoile_pleine.png")}
-            />
+            <Image style={$icon} key={index} source={require("assets/icons/etoile_pleine.png")} />
           ))}
         {Array(etoilesVides)
           .fill(0)
           .map((item, index) => (
-            <Image
-              style={$icon}
-              key={index}
-              source={require("assets/icons/etoile_vide.png")}
-            />
+            <Image style={$icon} key={index} source={require("assets/icons/etoile_vide.png")} />
           ))}
       </View>
       <Text style={$text}>{texteAvis}</Text>

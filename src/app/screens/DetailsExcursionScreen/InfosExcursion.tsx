@@ -15,17 +15,8 @@ import {
 import { Text, GraphiqueDenivele } from "app/components";
 /**@warning A SUPPRIMER ET DECALER DANS APPNAVIGATOR : */
 import { T_Point } from "app/screens/DetailsExcursionScreen/";
+import { T_Signalement } from "app/navigators";
 import { observer } from "mobx-react-lite";
-
-/**@warning SUPPRIMER CE TYPE et le mettre dans appNavigator */
-interface TSignalement {
-  type: string;
-  nom: string;
-  description: string;
-  image: Image;
-  latitude: number;
-  longitude: number;
-}
 
 export interface InfosExcursionProps {
   excursion: Record<string, unknown>;
@@ -42,7 +33,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
   let difficulteOrientation: number = 0;
   let difficulteTechnique: number = 0;
   let description: string = "";
-  let signalements: TSignalement[] = [];
+  let signalements: T_Signalement[] = [];
   if (
     excursion.duree !== undefined ||
     excursion.distance !== undefined ||
@@ -60,7 +51,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
     difficulteTechnique = excursion.difficulteTechnique as number;
     difficulteOrientation = excursion.difficulteOrientation as number;
     description = excursion.description as string;
-    signalements = excursion.signalements as TSignalement[];
+    signalements = excursion.signalements as T_Signalement[];
   }
 
   /**
@@ -144,8 +135,8 @@ export function InfosExcursion(props: InfosExcursionProps) {
                       {signalements.map((signalement, index) => {
                         // Calculate the distance for each warning
                         const coordSignalement: T_Point = {
-                          lat: signalement.latitude,
-                          lon: signalement.longitude,
+                          lat: signalement.lat,
+                          lon: signalement.lon,
                           /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
                           alt: 0,
                           dist: 0,
@@ -163,7 +154,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
                               <CarteSignalement
                                 type={carteType}
                                 details={false}
-                                nomSignalement={signalement.nom}
+                                nomSignalement={signalement.titre}
                                 distanceDuDepart={`${distanceSignalement}`}
                               />
                             </TouchableOpacity>

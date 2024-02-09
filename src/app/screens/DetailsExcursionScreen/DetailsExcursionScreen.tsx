@@ -1,15 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import {
-  View,
-  SafeAreaView,
-  ViewStyle,
-  TouchableOpacity,
-  Image,
-  TextStyle,
-  Dimensions,
-} from "react-native";
-import { AppStackScreenProps, TPoint, TSignalement } from "app/navigators";
+import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
+import { AppStackScreenProps, TPoint, T_Signalement } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Screen } from "app/components";
 import { spacing, colors } from "app/theme";
@@ -54,7 +46,7 @@ export type TExcursion = {
   duree: string;
   vallee: string;
   postId: number;
-  signalements: TSignalement[];
+  signalements: T_Signalement[];
   nomTrackGpx: string;
   track: T_Point[];
 };
@@ -122,9 +114,18 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * ! FIN NON FONCTIONNEL
      */
 
+    const swipeUpDown = () => {
+      if (swipeUpDownRef) {
+        console.log(`[DetailsExcursionScreen - useEffect] aled`);
+        swipeUpDownRef.current.showMini();
+      } else {
+        console.error("swipeUpDownRef.current is null");
+      }
+    };
+
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
-      <SafeAreaView style={$container}>
+      <View style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>
@@ -161,9 +162,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           disableSwipeIcon={true}
           ref={swipeUpDownRef}
         />
-      </SafeAreaView>
+      </View>
     ) : (
-      //sinon on affiche une erreur
       <Screen preset="fixed">
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
@@ -199,7 +199,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       setIsAllSignalements: React.Dispatch<any>,
       userLocation: Array<number>,
       footerHeight: number,
-      changeStartPoint?: (point: LatLng) => void,
     ) {
       let nomExcursion = "";
       if (excursion !== undefined) {
@@ -213,6 +212,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             setIsAllSignalements={setIsAllSignalements}
             footerHeight={footerHeight}
             setStartPoint={setStartPoint}
+            swipeDown={swipeUpDown}
             style={$containerGrand}
           />
         );
@@ -339,8 +339,8 @@ const startMiddleAndEndHandler = (
     return (
       <Marker
         coordinate={{
-          latitude: point.lat,
-          longitude: point.lon,
+          latitude: point.lat ?? 0,
+          longitude: point.lon ?? 0,
         }}
         key={index}
         // Si l'array de points ne contient que 2 points,
@@ -369,11 +369,11 @@ const startMiddleAndEndHandler = (
  * @function signalementsHandler
  * @description Affiche les signalements sur la carte.
  *
- * @param signalements {TSignalement[]} - les signalements de l'excursion
+ * @param signalements {T_Signalement[]} - les signalements de l'excursion
  *
  * @returns les signalements à afficher sur la carte.
  */
-const signalementsHandler = (signalements: TSignalement[]) => {
+const signalementsHandler = (signalements: T_Signalement[]) => {
   const binoculars: ImageSource = require("assets/icons/binoculars.png");
   const attention: ImageSource = require("assets/icons/attention.png");
 
@@ -402,14 +402,14 @@ const signalementsHandler = (signalements: TSignalement[]) => {
         return (
           <Marker
             coordinate={{
-              latitude: signalement.latitude,
-              longitude: signalement.longitude,
+              latitude: signalement.latitude ?? 0,
+              longitude: signalement.longitude ?? 0,
             }}
             // key={point.dist}
             key={index}
             // Si l'array de points ne contient que 2 points,
             // on est sur un aller simple, le deuxième point est donc l'arrivée
-            title={signalement.nom}
+            title={signalement.titre}
             // pinColor={iconColor}
             style={{
               zIndex: 999,
@@ -461,7 +461,7 @@ const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
-  backgroundColor: colors.erreur,
+  backgroundColor: colors.fond,
 };
 
 //Style de itemMini

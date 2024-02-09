@@ -1,6 +1,7 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import I18n from "i18n-js";
+import { reaction } from "mobx";
 
 /**
  * Model description here for TypeScript hints.
@@ -8,15 +9,21 @@ import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 export const ParametresModel = types
   .model("Parametres")
   .props({
-    langues: types.optional(types.string, "fr"),
+    langue: types.optional(types.string, "fr"),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions(self => ({
-    setLangues: (langues: string) => {
-      if (langues !== self.langues) {
-        self.langues = langues;
-      }
+    setLangue: (langues: "fr" | "es") => {
+      self.langue = langues;
+    },
+    afterCreate() {
+      reaction(
+        () => self.langue,
+        langues => {
+          I18n.locale = langues;
+        },
+      );
     },
   })); // eslint-disable-line @typescript-eslint/no-unused-vars
 

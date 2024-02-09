@@ -1,11 +1,13 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree";
 import { ParametresModel } from "./Parametres";
+import { SynchroMontanteModel } from "./SynchroMontante";
 
 /**
  * A RootStore model.
  */
 export const RootStoreModel = types.model("RootStore").props({
   parametres: types.optional(ParametresModel, {}),
+  synchroMontante: types.optional(SynchroMontanteModel, {}),
 });
 
 /**

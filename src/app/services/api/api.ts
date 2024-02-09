@@ -14,7 +14,7 @@ import type { ApiConfig } from "./api.types";
  */
 export const DEFAULT_API_CONFIG: ApiConfig = {
   url: Config.API_URL,
-  timeout: 10000,
+  timeout: Config.API_TIMEOUT,
 };
 
 /**
@@ -33,6 +33,7 @@ export class Api {
     this.apisauce = create({
       baseURL: this.config.url,
       timeout: this.config.timeout,
+      responseType: "arraybuffer",
       headers: {
         Accept: "application/json",
       },

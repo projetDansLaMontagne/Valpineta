@@ -45,7 +45,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
 
   const incrementDenivele = 200;
   const criteresTri =
-    parametres.langues == "fr"
+    parametres.langue == "fr"
       ? [
           { nom: "Distance", nomCle: "distance", logo: logoDistance },
           { nom: "Durée", nomCle: "duree", logo: logoDuree },
@@ -61,7 +61,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
           { nom: "Dificultad de orientación", nomCle: "difficulteOrientation", logo: logoDiffOri },
         ];
   const nomsTypesParcours =
-    parametres.langues == "fr"
+    parametres.langue == "fr"
       ? ["Aller simple", "Aller/retour", "Circuit"]
       : ["Ida", "Ida y Vuelta", "Circular"];
 

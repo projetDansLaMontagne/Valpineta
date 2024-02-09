@@ -16,6 +16,7 @@ export interface ListeSignalementsProps {
   userLocation;
   footerHeight;
   setStartPoint?: React.Dispatch<React.SetStateAction<LatLng>>;
+  swipeDown: () => void;
   style: ViewStyle;
 }
 
@@ -28,8 +29,8 @@ export function ListeSignalements(props: ListeSignalementsProps) {
             {props?.excursion?.signalements?.map((signalement, index) => {
               // Calcule de la distance pour chaque avertissement
               const coordSignalement: T_Point = {
-                lat: signalement.latitude,
-                lon: signalement.longitude,
+                lat: signalement.lat,
+                lon: signalement.lon,
                 /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
                 alt: 0,
                 dist: 0,
@@ -54,9 +55,11 @@ export function ListeSignalements(props: ListeSignalementsProps) {
                       // setIsAllSignalements(false);
                       props.setStartPoint &&
                         props.setStartPoint({
-                          latitude: signalement.latitude,
-                          longitude: signalement.longitude,
+                          latitude: signalement.lat,
+                          longitude: signalement.lon,
                         } as LatLng);
+
+                      props.swipeDown();
                     }}
                   />
                 </View>
