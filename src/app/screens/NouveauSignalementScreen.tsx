@@ -148,13 +148,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      */
     const AlerteStatus = (status: EtatSynchro) => {
       switch (status) {
-        case EtatSynchro.bien_envoye:
+        case EtatSynchro.BienEnvoye:
           Alert.alert("Reussite !", "Votre signalement a bien été enregistré", [], {
             cancelable: true,
           });
           break;
 
-        case EtatSynchro.non_connecte:
+        case EtatSynchro.NonConnecte:
           Alert.alert(
             "Hors connexion",
             "Votre signalement sera automatiquement enregistré lors de votre prochaine connexion (duree du cycle parametrable)",
@@ -163,7 +163,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           );
           break;
 
-        case EtatSynchro.erreur_serveur:
+        case EtatSynchro.ErreurServeur:
           Alert.alert(
             "Erreur serveur",
             "Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer plus tard.",

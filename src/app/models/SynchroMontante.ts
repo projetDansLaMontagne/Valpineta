@@ -19,15 +19,15 @@ const signalement = types.model({
 });
 const MINUTE_EN_MILLISECONDES = 60000;
 export enum EtatSynchro {
-  rien_a_envoyer,
-  non_connecte,
-  erreur_serveur,
-  bien_envoye,
+  RienAEnvoyer,
+  NonConnecte,
+  ErreurServeur,
+  BienEnvoye,
 }
 export enum IntervalleSynchro {
-  frequente = 1,
-  moyenne = 5,
-  lente = 30,
+  TresFrequente = 1,
+  Moderee = 5,
+  PeuFrequente = 30,
 }
 
 /**
@@ -38,7 +38,7 @@ export const SynchroMontanteModel = types
   .props({
     signalements: types.optional(types.array(signalement), []),
     intervalId: types.maybeNull(types.union(types.number, types.frozen<null | NodeJS.Timeout>())),
-    intervalleSynchro: types.optional(types.number, IntervalleSynchro.frequente),
+    intervalleSynchro: types.optional(types.number, IntervalleSynchro.TresFrequente),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -84,17 +84,17 @@ export const SynchroMontanteModel = types
         if (self.signalements.length > 0) {
           const success = pushSignalements();
           if (success) {
-            return EtatSynchro.bien_envoye;
+            return EtatSynchro.BienEnvoye;
           } else {
-            return EtatSynchro.erreur_serveur;
+            return EtatSynchro.ErreurServeur;
           }
         }
 
         // AJOUTER ICI LA SYNCHRO DES AUTRES DONNEES
 
-        return EtatSynchro.rien_a_envoyer;
+        return EtatSynchro.RienAEnvoyer;
       }
-      return EtatSynchro.non_connecte;
+      return EtatSynchro.NonConnecte;
     };
 
     /* -------------------------------- METHODES -------------------------------- */
