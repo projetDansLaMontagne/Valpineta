@@ -12,7 +12,7 @@ interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window");
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
-  const { parametres } = useStores();
+  const { parametres, synchroMontante } = useStores();
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
@@ -49,8 +49,8 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
             { label: "12h", value: 12 },
             { label: "24h", value: 24 },
           ]}
-          selectedValue={parametres.intervalSynchro}
-          onValueChange={(value: number) => parametres.setIntervalSynchro(value)}
+          selectedValue={synchroMontante.intervalleSynchro}
+          onValueChange={(value: number) => synchroMontante.setIntervalleSynchro(value)}
           primaryColor={colors.palette.vert}
           dropdownStyle={$pickerSynchro}
           dropdownContainerStyle={$dropdownContainerStyle}

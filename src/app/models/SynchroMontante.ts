@@ -8,6 +8,7 @@ import {
   envoieBaseDeDonneesSignalements,
   alertSynchroEffectuee,
 } from "app/services/synchroMontanteService";
+import { reaction } from "mobx";
 
 // Modèle pour représenter un signalement individuel
 const signalement = types.model({
@@ -37,6 +38,14 @@ export const SynchroMontanteModel = types
     /* ---------------------------------- DEMON --------------------------------- */
     function afterCreate() {
       startChecking();
+
+      reaction(
+        () => self.intervalleSynchro,
+        _ => {
+          stopChecking();
+          startChecking();
+        },
+      );
     }
     function beforeDestroy() {
       stopChecking();
@@ -82,6 +91,9 @@ export const SynchroMontanteModel = types
     function removeAllSignalements() {
       self.signalements.clear();
     }
+    function setIntervalleSynchro(intervalle: number) {
+      self.intervalleSynchro = intervalle;
+    }
 
     return {
       afterCreate,
@@ -89,6 +101,7 @@ export const SynchroMontanteModel = types
       tryPushSignalement,
       addSignalement,
       removeAllSignalements,
+      setIntervalleSynchro,
     };
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
 
