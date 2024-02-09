@@ -27,7 +27,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         <TouchableOpacity
           style={$containerBoutons}
           onPress={() => {
-            const nouvelleLangue: "fr" | "es" = parametres.langue === "fr" ? "es" : "fr";
+            const nouvelleLangue = parametres.langue === "fr" ? "es" : "fr";
             parametres.setLangue(nouvelleLangue);
           }}
         >

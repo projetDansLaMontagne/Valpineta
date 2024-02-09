@@ -2,8 +2,6 @@ import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import { T_Signalement } from "app/navigators";
 import NetInfo from "@react-native-community/netinfo";
-import { Alert } from "react-native";
-import { translate } from "i18n-js";
 import { reaction } from "mobx";
 //Api
 import { api } from "app/services/api";
@@ -19,7 +17,7 @@ const signalement = types.model({
   lon: types.number,
   post_id: types.number,
 });
-const HEURE_EN_MILLISECONDES = 20000;
+const HEURE_EN_MILLISECONDES = 3600000;
 export enum EtatSynchro {
   non_connecte,
   erreur_serveur,
