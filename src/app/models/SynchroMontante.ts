@@ -2,17 +2,14 @@ import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import { T_Signalement } from "app/navigators";
 import NetInfo from "@react-native-community/netinfo";
+import { Alert } from "react-native";
+import { translate } from "i18n-js";
+import { reaction } from "mobx";
 //Api
 import { api } from "app/services/api";
 import { getGeneralApiProblem } from "app/services/api/apiProblem";
 import { md5 } from "js-md5";
 
-// Import pour la synchro
-import {
-  envoieBaseDeDonneesSignalements,
-  alertSynchroEffectuee,
-} from "app/services/synchroMontanteService";
-import { reaction } from "mobx";
 
 const signalement = types.model({
   titre: types.string,
@@ -24,7 +21,7 @@ const signalement = types.model({
   post_id: types.number,
 });
 const HEURE_EN_MILLISECONDES = 5000;
-enum etatSynchro {
+export enum etatSynchro {
   non_connecte,
   erreur_serveur,
   bien_envoye,
@@ -82,6 +79,7 @@ export const SynchroMontanteModel = types
       }
     }
 
+    /* -------------------------------- METHODES -------------------------------- */
     /**
      * Tente de pousser les signalements vers le serveur
      */
@@ -114,6 +112,17 @@ export const SynchroMontanteModel = types
         }
       }
       return etatSynchro.non_connecte;
+    }
+    /**
+     * Affiche une alerte pour indiquer que la synchronisation a bien été effectuée
+     * @returns
+     */
+    function alertSynchroEffectuee() {
+      Alert.alert(
+        translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
+        translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
+        [{ text: "OK" }],
+      );
     }
 
     /* --------------------------------- SETTERS -------------------------------- */

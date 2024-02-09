@@ -16,12 +16,11 @@ import {
 import { AppStackScreenProps, T_TypeSignalement, T_Signalement } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import * as ImagePicker from "expo-image-picker";
-import { TStatus, synchroMontanteSignalement } from "app/services/synchroMontanteService";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
 // Composants
 import { Button, Screen, Text } from "app/components";
-import { useStores } from "app/models";
+import { etatSynchro, useStores } from "app/models";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: T_TypeSignalement;
@@ -147,9 +146,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     /**
      * fonction pour afficher une alerte en fonction du status de fin de l'envoi du signalement
      */
-    const AlerteStatus = (status: TStatus) => {
+    const AlerteStatus = (status: etatSynchro) => {
       switch (status) {
-        case "ajouteEnLocal":
+        case etatSynchro.non_connecte:
           Alert.alert(
             translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
             "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
@@ -164,16 +163,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           );
           break;
 
-        case "dejaExistant":
-          Alert.alert(
-            translate("pageNouveauSignalement.alerte.dejaExistant.titre"),
-            translate("pageNouveauSignalement.alerte.dejaExistant.message"),
-            [{ text: "OK" }],
-            { cancelable: false },
-          );
-          break;
-
-        case "envoyeEnBdd":
+        case etatSynchro.bien_envoye:
           Alert.alert(
             translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
             translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
@@ -188,7 +178,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           );
           break;
 
-        case "erreur":
+        case etatSynchro.erreur_serveur:
           Alert.alert(
             translate("pageNouveauSignalement.alerte.erreur.titre"),
             translate("pageNouveauSignalement.alerte.erreur.message"),
