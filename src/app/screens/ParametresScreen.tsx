@@ -2,7 +2,7 @@ import React, { FC, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { ViewStyle, TextStyle, Dimensions, View, TouchableOpacity } from "react-native";
 import { AppStackScreenProps } from "app/navigators";
-import { Screen, Text } from "app/components";
+import { Screen, Text, Button } from "app/components";
 import { colors, spacing } from "app/theme";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useStores } from "app/models";
@@ -12,7 +12,7 @@ interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window");
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
-  const { parametres } = useStores();
+  const { parametres, suiviExcursion } = useStores();
 
   useEffect(() => {
     parametres.setLangues(I18n.locale);
@@ -43,7 +43,26 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           <Text style={$texteBouton} tx={"parametres.changerLangue.espagnol"} size="sm" />
         </TouchableOpacity>
       </View>
-      <Text></Text>
+      <Text>{suiviExcursion.etat}</Text>
+
+      {suiviExcursion.etat === "enCours" && (
+        <>
+          <Button text="Mettre en pause" onPress={() => suiviExcursion.setEtat("enPause")} />
+          <Button text="Stopper" onPress={() => suiviExcursion.setEtat("terminee")} />
+        </>
+      )}
+      {suiviExcursion.etat === "enPause" && (
+        <>
+          <Button text="Reprendre" onPress={() => suiviExcursion.setEtat("enCours")} />
+          <Button text="Stopper" onPress={() => suiviExcursion.setEtat("terminee")} />
+        </>
+      )}
+      {suiviExcursion.etat === "terminee" && (
+        <Button text="Valider fin de rando" onPress={() => suiviExcursion.setEtat("nonDemarree")} />
+      )}
+      {suiviExcursion.etat === "nonDemarree" && (
+        <Button text="Demarrer rando" onPress={() => suiviExcursion.setEtat("enCours")} />
+      )}
     </Screen>
   );
 });
