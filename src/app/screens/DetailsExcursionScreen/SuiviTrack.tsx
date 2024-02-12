@@ -31,18 +31,17 @@ export interface SuiviTrackProps {
 export function SuiviTrack(props: SuiviTrackProps) {
   const { excursion, navigation, setStartPoint } = props;
   const { suiviExcursion } = useStores();
+  const footerHeight = useBottomTabBarHeight();
+  const swipeUpDownRef = useRef();
 
   const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
   const [altitudeActuelle, setAltitudeActuelle] = useState(0);
   const [deniveleMonte, setDeniveleMonte] = useState(0);
   const [deniveleDescendu, setDeniveleDescendu] = useState(0);
-
-  const footerHeight = useBottomTabBarHeight();
   const [progress, setProgress] = useState(0);
   const [chronoRunning, setChronoRunning] = useState(false);
   const [chronoTime, setChronoTime] = useState(0);
-  const swipeUpDownRef = useRef();
   const [avancement, setAvancement] = useState(0);
 
 
@@ -107,10 +106,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
           return newAvancement;
         });
 
-        setProgress(prevProgress => {
-          const newProgress = (avancement / distanceNumber) * 100;
-          return newProgress;
-        });
+        setProgress((avancement / distanceNumber) * 100);
       }
     }, 500);
 
@@ -138,13 +134,13 @@ export function SuiviTrack(props: SuiviTrackProps) {
     return (
       <View style={isMini ? $containerPetit : $containerGrand}>
         <View style={$containerBoutonChrono}>
-          <TouchableOpacity onPress={() => { toggleChrono(); modifierEtatExcursion(); }}>
+          <TouchableOpacity onPress={() => { toggleChrono(); modifierEtatExcursion(suiviExcursion); }}>
             <Image
               style={$boutonPauseArret}
               tintColor={colors.bouton}
               source={chronoRunning ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { resetChrono(); suiviExcursion.setEtat("terminee") }}>
+          <TouchableOpacity onPress={() => { resetChrono(); suiviExcursion.setEtat("terminee"); console.log(suiviExcursion.etat) }}>
             <Image style={$boutonPauseArret} source={require("assets/icons/arret.png")} />
           </TouchableOpacity>
         </View>
@@ -198,14 +194,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
                         }} />
                       <Image
                         source={icone}
-                        style={{
-                          width: 18,
-                          height: 18,
-                          top: 4,
-                          left: 7.2,
-                          position: 'absolute',
-                          tintColor: colors.palette.blanc,
-                        }}
+                        style={iconeStyle}
                       />
                     </View>
                   );
@@ -438,11 +427,12 @@ function descritpion(excursion, altitudeActuelle) {
   );
 }
 
-function modifierEtatExcursion() {
+function modifierEtatExcursion(suiviExcursion) {
+  console.log(suiviExcursion.etat);
   if (suiviExcursion.etat === "enCours") {
     suiviExcursion.setEtat("enPause");
   }
-  if (suiviExcursion.etat === "enPause") {
+  else {
     suiviExcursion.setEtat("enCours");
   }
 }
@@ -538,8 +528,8 @@ const $containerProgress: ViewStyle = {
 };
 
 const $progressBar: ViewStyle = {
-  width: "85%", // Ajustez la largeur de la barre de progression selon vos besoins
-  height: 10, // Ajustez la hauteur de la barre de progression selon vos besoins
+  width: "85%", // Ajuste la largeur de la barre de progression
+  height: 10, // Ajuste la hauteur de la barre de progression
   backgroundColor: "#F5F5F5", // Couleur de fond de la barre de progression
   borderRadius: 10,
   overflow: "hidden",
@@ -555,15 +545,15 @@ const $progressBarFill: ViewStyle = {
 /* Styles pour la flèche d'avancement */
 const $fleche: ViewStyle = {
   position: "absolute",
-  top: -5, // Ajustez la position verticale de la flèche par rapport à la barre de progression
-  width: "100%", // Ajustez la largeur pour qu'elle suive 90% de la page
+  top: -5, // Ajuste la position verticale de la flèche par rapport à la barre de progression
+  width: "100%", // Ajuste la largeur pour qu'elle suive 90% de la page
   justifyContent: "flex-start", // Pour aligner le texte au début de la vue parente
-  marginStart: "4%", // Ajustez la position horizontale de la flèche par rapport à la barre de progression
+  marginStart: "4%", // Ajuste la position horizontale de la flèche par rapport à la barre de progression
 };
 
 const $iconeFleche: ImageStyle = {
-  width: 20, // Ajustez la largeur de la flèche selon vos besoins
-  height: 20, // Ajustez la hauteur de la flèche selon vos besoins
+  width: 20, // Ajuste la largeur de la flèche selon vos besoins
+  height: 20, // Ajuste la hauteur de la flèche selon vos besoins
   tintColor: colors.palette.vert, // Couleur de la flèche
 };
 
@@ -653,3 +643,12 @@ const $blocAltitude: ViewStyle = {
   flexDirection: "row",
   paddingBottom: spacing.md,
 };
+
+const iconeStyle: ImageStyle = {
+  width: 18,
+  height: 18,
+  top: 4,
+  left: 7.2,
+  position: 'absolute',
+  tintColor: colors.palette.blanc
+}

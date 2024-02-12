@@ -73,7 +73,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [modalSignalementVisible, setModalSignalementVisible] = useState(false);
     const [signalementPopup, setSignalementPopup] = useState(null);
     const [modalExcursionTermineeVisible, setModalExcursionTermineeVisible] = useState(false);
-    const [excursionTerminee, setExcursionTerminee] = useState(false); // A REMPLACER PAR L ETAT DE NICO
 
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
     const footerHeight = useBottomTabBarHeight();
@@ -104,11 +103,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
       fetchLocation();
     }, []);
-
-    function showMini() {
-      if (swipeUpDownRef.current)
-        swipeUpDownRef.current.showMini();
-    }
 
     const swipeUpDown = () => {
       if (swipeUpDownRef) {
@@ -144,7 +138,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     useEffect(() => {
       if (suiviExcursion.etat === "terminee") {
-        console.log("excursionTerminee", excursionTerminee)
+        console.log("excursionTerminee")
         setModalExcursionTermineeVisible(true)
       }
     }
@@ -165,12 +159,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-        </TouchableOpacity>
-        <TouchableOpacity style={$boutonSuivi} onPress={() => setIsSuiviTrack(!isSuiviTrack)}>
-          <Image
-            style={{ tintColor: colors.bouton }}
-            source={require("assets/icons/back.png")}
-          />
         </TouchableOpacity>
 
         {allPoints && startPoint && (
