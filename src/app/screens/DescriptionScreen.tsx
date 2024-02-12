@@ -27,50 +27,31 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
 ) {
   const { route, navigation } = props;
   const { width: windowWidth } = useWindowDimensions();
+  const excursion = route.params?.excursion;
 
-  // Vérifier si "excursion" est défini
-  if (props?.route?.params?.excursion === undefined) {
-    return (
-      <Screen style={$container} preset="fixed">
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-          <Image
-            style={{ tintColor: colors.bouton }}
-            source={require("../../assets/icons/back.png")}
-          />
-        </TouchableOpacity>
+  return (
+    <Screen style={$container} preset="fixed">
+      <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+        <Image
+          style={{ tintColor: colors.bouton }}
+          source={require("../../assets/icons/back.png")}
+        />
+      </TouchableOpacity>
+      {excursion ? (
         <ScrollView style={$containerDescription}>
           <Text tx="detailsExcursion.erreur.titre" size="xxl" />
           <Text tx="detailsExcursion.erreur.message" style={$texteDescription} size="sm" />
         </ScrollView>
-      </Screen>
-    );
-  } else {
-    const { excursion } = route.params;
-    var nomExcursion = "";
-    var description = "";
-
-    if (excursion) {
-      nomExcursion = excursion.nom;
-      description = excursion.description;
-    }
-
-    return (
-      <Screen style={$container} preset="fixed">
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-          <Image
-            style={{ tintColor: colors.bouton }}
-            source={require("../../assets/icons/back.png")}
-          />
-        </TouchableOpacity>
+      ) : (
         <ScrollView style={$scrollDescription}>
           <View style={$containerDescription}>
-            <Text size="xxl">{nomExcursion}</Text>
-            <HTML source={{ html: description }} contentWidth={windowWidth} />
+            <Text size="xxl">{excursion.nom}</Text>
+            <HTML source={{ html: excursion.description ?? "" }} contentWidth={windowWidth} />
           </View>
         </ScrollView>
-      </Screen>
-    );
-  }
+      )}
+    </Screen>
+  );
 });
 
 const $boutonRetour: ViewStyle = {

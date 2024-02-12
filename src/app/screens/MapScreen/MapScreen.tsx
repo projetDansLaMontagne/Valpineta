@@ -101,7 +101,7 @@ const createFolderStruct = async (
  * @returns {Promise<TExcursion[]>} The list of all the tracks
  */
 const getAllTracks = (): TExcursion[] => {
-  return require("assets/JSON/excursions.json") as TExcursion[];
+  return require("assets/JSON/excursions.json") as TExcursion[]; /**@todo a mettre en contexte */
 };
 
 // Component(s)
@@ -184,7 +184,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
         console.log("[MapScreen] Suppression du dossier");
         await fileSystem.deleteAsync(folderDest, { idempotent: true });
 
-        const assets = await TilesRequire();
+        const assets = []; //await TilesRequire();
 
         await createFolderStruct(fichierJson, folderDest, assets);
       }
