@@ -60,11 +60,6 @@ export function PopupSignalement(props: PopupSignalementProps) {
                         tx={estEntier ? "detailsExcursion.popup.signalement.voirMoins" : "detailsExcursion.popup.signalement.voirPlus"}
                         onPress={() => setEstEntier(!estEntier)}
                     />
-                    {/* <View>
-                      <Text style={{ width: 100, textAlign: "center" }}>Toujours présent ?</Text>
-                      <Image source={require("assets/icons/aime.png")} tintColor={colors.bouton} style={[$iconeStyle, { width: 40, height: 40 }]} />
-                    </View>
-                    <Image source={require("assets/icons/deployer.png")} style={$iconeStyle} /> */}
                 </View>
             </View>
         </Modal>

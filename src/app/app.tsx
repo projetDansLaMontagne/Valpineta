@@ -26,7 +26,7 @@ import { useInitialRootStore } from "./models";
 import { AppNavigator, useNavigationPersistence } from "./navigators";
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary";
 import * as storage from "./utils/storage";
-import { customFontsToLoad, spacing, colors } from "./theme";
+import { customFontsToLoad } from "./theme";
 import Config from "./config";
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
@@ -95,7 +95,6 @@ function App(props: AppProps) {
   // otherwise, we're ready to render the app
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-
       <ErrorBoundary catchErrors={Config.catchErrors}>
         <AppNavigator
           linking={linking}
@@ -103,7 +102,7 @@ function App(props: AppProps) {
           onStateChange={onNavigationStateChange}
         />
       </ErrorBoundary>
-    </SafeAreaProvider >
+    </SafeAreaProvider>
   );
 }
 

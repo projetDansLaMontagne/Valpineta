@@ -9,7 +9,6 @@ import { T_flat_point } from "app/navigators";
 export const recupDistance = (point: T_flat_point, data: any) => {
   if (!point || !point.lat || !point.lon) {
     console.error("Coordonnées du signalement non valides");
-    console.log(point);
     return 0;
   }
 

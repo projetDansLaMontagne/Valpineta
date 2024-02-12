@@ -82,7 +82,7 @@ export function ListeSignalements(props: ListeSignalementsProps) {
         </TouchableWithoutFeedback>
       </ScrollView>
 
-      {props.setIsAllSignalements ? (
+      {props.setIsAllSignalements ? ( // Si on veux afficher le bouton pour retourner aux informations de l'excursion, on passe setIsAllSignalements en paramètre
         <View>
           <Button
             style={[$sortirDetailSignalement, { bottom: props.footerHeight }]}

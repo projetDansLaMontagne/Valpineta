@@ -138,7 +138,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
     useEffect(() => {
       if (suiviExcursion.etat === "terminee") {
-        console.log("excursionTerminee")
         setModalExcursionTermineeVisible(true)
       }
     }

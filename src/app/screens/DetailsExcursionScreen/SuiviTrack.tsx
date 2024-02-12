@@ -140,7 +140,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
               tintColor={colors.bouton}
               source={chronoRunning ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { resetChrono(); suiviExcursion.setEtat("terminee"); console.log(suiviExcursion.etat) }}>
+          <TouchableOpacity onPress={() => { resetChrono(); suiviExcursion.setEtat("terminee") }}>
             <Image style={$boutonPauseArret} source={require("assets/icons/arret.png")} />
           </TouchableOpacity>
         </View>
@@ -428,7 +428,6 @@ function descritpion(excursion, altitudeActuelle) {
 }
 
 function modifierEtatExcursion(suiviExcursion) {
-  console.log(suiviExcursion.etat);
   if (suiviExcursion.etat === "enCours") {
     suiviExcursion.setEtat("enPause");
   }
