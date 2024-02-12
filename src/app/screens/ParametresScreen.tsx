@@ -63,6 +63,14 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
       {suiviExcursion.etat === "nonDemarree" && (
         <Button text="Demarrer rando" onPress={() => suiviExcursion.setEtat("enCours")} />
       )}
+
+      {suiviExcursion.trackReel.map(point => (
+        <Text>
+          {new Date(point.timestamp).toLocaleTimeString()} {point.lat} {point.lon}
+        </Text>
+      ))}
+
+      {/* {suiviExcursion.} */}
     </Screen>
   );
 });

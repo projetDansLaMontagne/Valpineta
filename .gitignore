@@ -2,6 +2,7 @@
 #
 .DS_Store
 
+
 # Xcode
 #
 build/
@@ -91,3 +92,4 @@ src/assets/tracks
 .commitignore
 commit_message.md
 src/node_modules
+src/android
