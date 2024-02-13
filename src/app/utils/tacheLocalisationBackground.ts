@@ -1,32 +1,25 @@
-import { RootStore } from "app/models";
+import { SuiviExcursion } from "app/models/SuiviExcursion";
 import { TaskManagerError } from "expo-task-manager";
+import { distanceEntrePoints } from "./distanceEntrePoints";
+import { LocationObject } from "expo-location";
+import { T_flat_point } from "app/navigators";
 
-export interface T_task_loca {
-  coords: {
-    latitude: number;
-    longitude: number;
-    altitude: number | null;
-    accuracy: number;
-    altitudeAccuracy: number | null;
-    heading: number | null;
-    speed: number | null;
-  };
-  timestamp: number;
-}
-
+/**
+ * Remplit suiviExcursion.trackReel des reelles coordonnees parcourues
+ *
+ */
 export function tacheLocalisationBackground(
-  locations: T_task_loca[],
+  locations: LocationObject[],
   error: TaskManagerError,
-  rootStore: RootStore,
+  suiviExcursion: SuiviExcursion,
 ) {
-  const _debug = true;
-
   if (error) {
     console.error(error);
     return;
   }
+
   locations.forEach(location => {
-    rootStore.suiviExcursion.ajoutPointTrackReel({
+    suiviExcursion.ajoutPointTrackReel({
       lat: location.coords.latitude,
       lon: location.coords.longitude,
       alt: location.coords.altitude,

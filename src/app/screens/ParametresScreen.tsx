@@ -56,7 +56,10 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
       )}
       {suiviExcursion.etat === "enPause" && (
         <>
-          <Button text="Reprendre" onPress={() => suiviExcursion.setEtat({ newEtat: "enCours" })} />
+          <Button
+            text="Reprendre"
+            onPress={() => suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: [] })}
+          />
           <Button text="Stopper" onPress={() => suiviExcursion.setEtat({ newEtat: "terminee" })} />
         </>
       )}
@@ -69,17 +72,14 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
       {suiviExcursion.etat === "nonDemarree" && (
         <Button
           text="Demarrer rando"
-          onPress={() => suiviExcursion.setEtat({ newEtat: "enCours" })}
+          onPress={() => suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: [] })}
         />
       )}
-
-      {suiviExcursion.trackReel.map(point => (
-        <Text>
+      {suiviExcursion.trackReel.map((point, i) => (
+        <Text key={i}>
           {new Date(point.timestamp).toLocaleTimeString()} {point.lat} {point.lon}
         </Text>
       ))}
-
-      {/* {suiviExcursion.} */}
     </Screen>
   );
 });

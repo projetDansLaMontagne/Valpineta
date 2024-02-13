@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { RootStore, RootStoreModel } from "../RootStore";
 import { setupRootStore } from "./setupRootStore";
 import * as TaskManager from "expo-task-manager";
-import { T_task_loca, tacheLocalisationBackground } from "app/utils/tacheLocalisationBackground";
+import { LocationObject } from "expo-location";
+import { tacheLocalisationBackground } from "app/utils/tacheLocalisationBackground";
 
 /**
  * Create the initial (empty) global RootStore instance here.
@@ -62,9 +63,13 @@ export const useInitialRootStore = (callback: () => void | Promise<void>) => {
       _unsubscribe = unsubscribe;
 
       // setup background location task
-      TaskManager.defineTask("background-location-task", ({ data: locations, error }) => {
-        tacheLocalisationBackground(locations as T_task_loca[], error, rootStore);
-      });
+      TaskManager.defineTask("background-location-task", ({ data, error }) =>
+        tacheLocalisationBackground(
+          data.locations as LocationObject[],
+          error,
+          rootStore.suiviExcursion,
+        ),
+      );
 
       // reactotron integration with the MST root store (DEV only)
       if (__DEV__) {
