@@ -39,13 +39,24 @@
 // IMPORTS ===================================================================================================  IMPORTS
 import * as FileSystem from "expo-file-system";
 import { TExcursion, TLanguageContent, TPoint, TSignalement } from "../../navigators";
+import NetInfo from "@react-native-community/netinfo";
+import Config from "../../config";
 // END IMPORTS ==========================================================================================   END IMPORTS
 
 // VARIABLES ================================================================================================ VARIABLE
 // Type(s)
-// type TResAPIExcursionsMd5 = {
-//   md5: string;
-// };
+export enum ESynchroDescendanteStep {
+  DL_EXCURSIONS = 1,
+  MAJ_EXCURSIONS,
+  DL_GPX,
+  __LENGTH, // À laisser en dernier et ne pas utiliser.
+}
+
+export enum ESynchroDescendanteRes {
+  OK = 0,
+  KO,
+  NO_CONNEXION,
+}
 
 export type TCallbackToGetNumberOfFiles = (filesDownloaded: number, filesToDl: number) => void;
 export type TCallbackStep = (step: number, totalSteps: number) => void;
@@ -54,20 +65,21 @@ export type TCallbackStep = (step: number, totalSteps: number) => void;
  * Niveau de debug.
  * Ne sert que pour dev.
  */
-export enum TDebugMode {
+export enum EDebugMode {
   LOW = 0,
   MEDIUM,
   HIGH,
 }
 
 // Other(s)
-export const BASE_URL = "https://valpineta.eu/wp-json/api-wp/";
+export const BASE_URL = Config.API_URL;
+const DOCUMENTS_FOLDER = `${FileSystem.documentDirectory}` as const;
 
-export const GPX_FOLDER = `${FileSystem.documentDirectory}GPX/`;
-const GPX_TEMP_FOLDER = `${FileSystem.documentDirectory}GPX-temp/` as const;
+export const GPX_FOLDER = `${DOCUMENTS_FOLDER}GPX/`;
+const GPX_TEMP_FOLDER = `${DOCUMENTS_FOLDER}GPX-temp/` as const;
 
-export const EXCURSIONS_FILE_DEST = `${FileSystem.documentDirectory}fichiers/excursions.json`;
-const EXCURSIONS_TEMP_FILE_DEST = `${FileSystem.documentDirectory}fichiers/excursions-temp.json`;
+export const EXCURSIONS_FILE_DEST = `${DOCUMENTS_FOLDER}fichiers/excursions.json`;
+const EXCURSIONS_TEMP_FILE_DEST = `${DOCUMENTS_FOLDER}fichiers/excursions-temp.json`;
 
 export const API_FILE_DL_URL = (file: `${string}.gpx`) => `${BASE_URL}dl-file?file=tracks/${file}`;
 export const API_FILE_MD5_URL = (file: `${string}.gpx`) =>
@@ -149,10 +161,10 @@ export const excursionsJsonExists = async (): Promise<boolean> => {
 /* istanbul ignore next */
 export const downloadExcursionsJson = async (): Promise<void> => {
   // On vérifie si le dossier 'fichiers' existe
-  const fichiersFolder = await FileSystem.getInfoAsync(`${FileSystem.documentDirectory}fichiers`);
+  const fichiersFolder = await FileSystem.getInfoAsync(`${DOCUMENTS_FOLDER}fichiers`);
   // Si le dossier 'fichiers' n'existe pas, on le crée
   if (!fichiersFolder.exists) {
-    await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}fichiers`);
+    await FileSystem.makeDirectoryAsync(`${DOCUMENTS_FOLDER}fichiers`);
   }
 
   // On copie le fichier 'excursions.json' dans le dossier 'fichiers', s'il existe, on le remplace
@@ -208,7 +220,7 @@ export const getExcursionsJsonFromDevice = async (): Promise<Array<TExcursion>> 
  * @returns {Promise<void>}
  */
 /* istanbul ignore next */
-export const updateExcursionsJsonRequest = async (debug?: TDebugMode): Promise<void> => {
+export const updateExcursionsJsonRequest = async (debug?: EDebugMode): Promise<void> => {
   // On récupère les excursions présentes sur le téléphone
   const excursionsJson = await getExcursionsJsonFromDevice();
 
@@ -226,7 +238,7 @@ export const updateExcursionsJsonRequest = async (debug?: TDebugMode): Promise<v
     console.log(md5, md5API);
     throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
   } else {
-    debug >= TDebugMode.MEDIUM &&
+    debug >= EDebugMode.MEDIUM &&
       console.log("[synchroDesc] MD5 du fichier 'excursions.json' identiques");
   }
 
@@ -249,7 +261,7 @@ export const updateExcursionsJsonRequest = async (debug?: TDebugMode): Promise<v
     );
   }
 
-  debug >= TDebugMode.LOW && console.log(`[synchroDesc] ${FileSystem.documentDirectory}`);
+  debug >= EDebugMode.LOW && console.log(`[synchroDesc] ${DOCUMENTS_FOLDER}`);
 
   // On supprime le fichier 'excursions-temp.json'
   await FileSystem.deleteAsync(EXCURSIONS_TEMP_FILE_DEST);
@@ -268,7 +280,7 @@ export const updateExcursionsJsonRequest = async (debug?: TDebugMode): Promise<v
 export const updateExcursionsJson = (
   excursionsServer: Array<TExcursion>,
   excursionsJson: Array<TExcursion>,
-  debug?: TDebugMode,
+  debug?: EDebugMode,
 ): {
   hasChanged: boolean;
   excursionsJson: Array<TExcursion>;
@@ -278,7 +290,7 @@ export const updateExcursionsJson = (
   if (excursionsServer.length === 0) {
     debug >= 1 && console.log("[synchroDesc] pas d'excursions sur le serveur");
     return {
-      hasChanged: true,
+      hasChanged: excursionsJson.length > 0,
       excursionsJson: [],
     };
   }
@@ -290,8 +302,8 @@ export const updateExcursionsJson = (
       excursion => excursion.postId === excursionJson.postId,
     );
 
-    debug > 2 && console.log(`[synchroDesc] excursionJson.postId -> ${excursionJson.postId}`);
-    debug > 2 && console.log(`[synchroDesc] excursionServer.postId -> ${excursionServer?.postId}`);
+    debug >= 2 && console.log(`[synchroDesc] excursionJson.postId -> ${excursionJson.postId}`);
+    debug >= 2 && console.log(`[synchroDesc] excursionServer.postId -> ${excursionServer?.postId}`);
 
     // Si l'excursion n'est pas présente sur le serveur
     if (!excursionServer) {
@@ -384,7 +396,7 @@ const deleteGPXTempFolder = async (): Promise<void> => {
  * @returns {Promise<void>}
  */
 /* istanbul ignore next */
-const dlFile = async (file: `${string}.gpx`): Promise<void> => {
+const dlGPXFile = async (file: `${string}.gpx`): Promise<void> => {
   if (file === ".gpx") {
     return Promise.resolve();
   }
@@ -459,7 +471,7 @@ export const getAndCopyGPXFiles = async (
     for (const file of missingFiles) {
       console.log("[synchroDesc] copie du fichier -> ", file);
       try {
-        await dlFile(file);
+        await dlGPXFile(file);
       } catch (error) {
         console.error(error);
       }
@@ -477,6 +489,9 @@ export const getAndCopyGPXFiles = async (
   await deleteGPXTempFolder();
 };
 
+// END FUNCTIONS ======================================================================================== END FUNCTIONS
+
+// CODE ========================================================================================================= CODE
 /**
  * Fonction principale de la synchronisation descendante.
  * Exécute les fonctions dans l'ordre suivant :
@@ -489,7 +504,7 @@ export const getAndCopyGPXFiles = async (
  *
  * @param callbackStep {Function} Fonction qui renvoie le nombre de tuiles téléchargées.
  * @param callbackToGetNumberOfFiles {Function} Fonction qui renvoie le nombre de fichiers GPX présents sur le téléphone.
- * @param debug {TDebugMode} Niveau de debug.
+ * @param debug {EDebugMode} Niveau de debug.
  *
  * @returns {Promise<boolean>} True si la synchronisation s'est bien passée, false sinon.
  */
@@ -497,43 +512,43 @@ export const getAndCopyGPXFiles = async (
 export const synchroDescendante = async (
   callbackStep?: TCallbackStep,
   callbackToGetNumberOfFiles?: TCallbackToGetNumberOfFiles,
-  debug?: TDebugMode,
-): Promise<boolean> => {
+  debug?: EDebugMode,
+): Promise<ESynchroDescendanteRes> => {
+  const connexion = await NetInfo.fetch();
+
+  if (!connexion.isConnected) {
+    return ESynchroDescendanteRes.NO_CONNEXION;
+  }
+
   try {
     // On vérifie si le fichier 'excursions.json' existe
     const excursionsJsonExist = await excursionsJsonExists();
-    callbackStep && callbackStep(1, 3);
 
     // Si le fichier 'excursions.json' n'existe pas, on le copie
     if (!excursionsJsonExist) {
       await downloadExcursionsJson();
     }
+    callbackStep &&
+      callbackStep(ESynchroDescendanteStep.DL_EXCURSIONS, ESynchroDescendanteStep.__LENGTH - 1);
 
     // On met à jour le fichier 'excursions.json'
     await updateExcursionsJsonRequest(debug);
 
-    callbackStep && callbackStep(2, 3);
+    callbackStep &&
+      callbackStep(ESynchroDescendanteStep.MAJ_EXCURSIONS, ESynchroDescendanteStep.__LENGTH - 1);
 
     // On copie les fichiers GPX
-    try {
-      await getAndCopyGPXFiles(callbackToGetNumberOfFiles);
-      callbackStep && callbackStep(3, 3);
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
+    await getAndCopyGPXFiles(callbackToGetNumberOfFiles);
+    callbackStep &&
+      callbackStep(ESynchroDescendanteStep.DL_GPX, ESynchroDescendanteStep.__LENGTH - 1);
 
-    return true;
+    return ESynchroDescendanteRes.OK;
   } catch (error) {
     console.error(error);
 
-    return false;
+    return ESynchroDescendanteRes.KO;
   }
 };
-
-// END FUNCTIONS ======================================================================================== END FUNCTIONS
-
-// CODE ========================================================================================================= CODE
 
 // END CODE =======================================================================================  END COMPONENT
 

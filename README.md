@@ -19,3 +19,13 @@ Le [refuge de Pineta](https://www.valpineta.eu/fr/el-refugio/) et ses randonneur
 
 ## Pour installer les tuiles
 - Mettre le dossier `Tiles` dans `src/assets/` avec le fichier `tiles_struct.json` à l'intérieur.
+
+## Orga fichiers de l'application
+/
+├── cartes/
+│   └── OSM/
+│       └── Dossier contenant les tuiles OSM
+├── fichiers/
+│   └── `excursions.json`
+└── GPX/
+    └── Dossier contenant les tracés GPX

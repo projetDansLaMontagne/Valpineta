@@ -1,11 +1,76 @@
-serveur Valpineta: {
+direction: right
+
+Application Valpineta.FileSystem
+Application Valpineta.Services
+Application Valpineta.AutresScreensOuServices
+Application Valpineta.LoadingScreen
+Application Valpineta.WordPress
+
+Application Valpineta.FileSystem.fichiers
+Application Valpineta.FileSystem.fichiers.'excursions.json': {
+  shape: page
+  style.multiple: false
+}
+Application Valpineta.FileSystem.fichiers.'excursions-temp.json': {
+  style: {
+    stroke: "#53C0D8"
+    opacity: 0.75
+  }
+  shape: page
+  style.multiple: false
+}
+Application Valpineta.FileSystem.GPX
+Application Valpineta.FileSystem.GPXTemp
+Application Valpineta.FileSystem.GPXTemp: {
+  style: {
+    stroke: "#53C0D8"
+    opacity: 0.75
+    stroke-width: 1
+  }
+}
+
+Application Valpineta.Services.'synchroDescendante.ts'.getExcursionsJsonFromDevice <-> Application Valpineta.FileSystem.fichiers.'excursions.json'
+
+Application Valpineta.WordPress.API-WORDPRESS <- Application Valpineta.Services.'synchroDescendante.ts'.downloadExcursionsJson
+Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante -> Application Valpineta.Services.'synchroDescendante.ts'.downloadExcursionsJson
+Application Valpineta.Services.'synchroDescendante.ts'.downloadExcursionsJson -> Application Valpineta.FileSystem.fichiers.'excursions-temp.json'
+
+Application Valpineta.Services.'synchroDescendante.ts'.updateExcursionsJson -> Application Valpineta.FileSystem.fichiers.'excursions.json'
+
+Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante -> Application Valpineta.Services.'synchroDescendante.ts'.dlGPXFile
+Application Valpineta.WordPress.API-WORDPRESS <- Application Valpineta.Services.'synchroDescendante.ts'.dlGPXFile
+Application Valpineta.Services.'synchroDescendante.ts'.dlGPXFile -> Application Valpineta.FileSystem.GPXTemp
+
+# Application Valpineta.Services.'synchroDescendante.ts'.excursionsJsonExists -> Application Valpineta.FileSystem.fichiers
+
+Application Valpineta.AutresScreensOuServices <-> Application Valpineta.Services.'synchroDescendante.ts'.getExcursionsJsonFromDevice
+Application Valpineta.LoadingScreen <-> Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante
+Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante -> Application Valpineta.Services.'synchroDescendante.ts'.updateExcursionsJson
+Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante -> Application Valpineta.Services.'synchroDescendante.ts'.excursionsJsonExists
+
+Application Valpineta.WordPress.API-WORDPRESS: {
   icon: https://icons.terrastruct.com/essentials%2F112-server.svg
 }
-Application Valpineta
-Application Valpineta.Services
-Application Valpineta.Screen
 
-Application Valpineta.Screen -> Application Valpineta.Services.SynchroDescendante: Intervale définit.
+Application Valpineta.FileSystem.GPXTemp -> Application Valpineta.FileSystem.GPX: '[1]' {
+  style.animated: true
+}
 
-Application Valpineta.Services.SynchroDescendante <-> serveur Valpineta: Sous couvert de réseau
-(Application Valpineta.Services.SynchroDescendante <-> serveur Valpineta)[0].style.stroke: red
+Application Valpineta.FileSystem.fichiers.'excursions-temp.json' -> Application Valpineta.FileSystem.fichiers.'excursions.json': '[2]' {
+  style.animated: true
+}
+
+Légende: |md
+  # [1]
+  Afin de garantir la bonne copie des fichiers en cas de corruption (arrêt de la connexion ou mauvaise transmission),\
+  lors du téléchargement d'un fichier depuis l'API,
+  on le télécharge d'abord dans le dossier `GPXTemp`\
+  puis on vérifie sa signature MD5 avec le serveur, si elle est correcte, on le déplace dans le dossier `GPX`.\
+  Cela assure d'avoir des fichiers non corrompus.
+
+  # [2]
+  Même fonctionnement pour le fichier `excursions.json`.\
+  Étant le fichier le plus crucial pour notre application, on se doit de s'assurer de son intégrité.
+| {
+  near: bottom-center
+}

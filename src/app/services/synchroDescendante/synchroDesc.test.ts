@@ -12,6 +12,7 @@ import {
   API_FILE_MD5_URL,
   areObjectsEquals,
   BASE_URL,
+  EDebugMode,
   excursionsJsonExists,
   updateExcursionsJson,
 } from "./synchroDesc";
@@ -174,6 +175,8 @@ const signalement1Change = {
   nom: "Signalement 1",
   type: "PointInteret",
 } as TSignalement;
+
+const MAX_CODE_COVERAGE = true;
 // END VARIABLES ======================================================================================= END VARIABLES
 
 // FUNCTIONS ================================================================================================ FUNCTIONS
@@ -290,12 +293,28 @@ describe("SynchroDescendante", () => {
    */
   describe("updateExcursionsJson", () => {
     /**
+     * Teste dans le cas ou les deux tableaux sont vides.
+     * Cela ne devrait pas arriver.
+     */
+    test("[SynchroDescendante] - updateExcursionsJson - Tableaux vides.", () => {
+      const { hasChanged, excursionsJson } = updateExcursionsJson(
+        [],
+        [],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
+      );
+
+      expect(hasChanged).toBeFalsy();
+      expect(excursionsJson).toHaveLength(0);
+    });
+
+    /**
      * Deux objects différents mais avec le même contenu.
      */
     test("[SynchroDescendante] - updateExcursionsJson - Excursion pas changée.", () => {
       const { hasChanged, excursionsJson } = updateExcursionsJson(
         [excursion1],
         [excursion1Identique],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
       );
 
       expect(hasChanged).toBeFalsy();
@@ -308,7 +327,11 @@ describe("SynchroDescendante", () => {
      * Deux excursions différentes mais avec le même id.
      */
     test("[SynchroDescendante] - updateExcursionsJson - Excursion changée.", () => {
-      const { hasChanged, excursionsJson } = updateExcursionsJson([excursion1Change], [excursion1]);
+      const { hasChanged, excursionsJson } = updateExcursionsJson(
+        [excursion1Change],
+        [excursion1],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
+      );
 
       expect(hasChanged).toBeTruthy();
       expect(excursionsJson).toHaveLength(1);
@@ -319,7 +342,11 @@ describe("SynchroDescendante", () => {
      * Si une excursion est supprimée, elle doit être supprimée du fichier JSON.
      */
     test("[SynchroDescendante] - updateExcursionsJson - Excursion supprimée.", () => {
-      const { hasChanged, excursionsJson } = updateExcursionsJson([], [excursion1Identique]);
+      const { hasChanged, excursionsJson } = updateExcursionsJson(
+        [],
+        [excursion1Identique],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
+      );
 
       expect(hasChanged).toBeTruthy();
       expect(excursionsJson).toHaveLength(0);
@@ -332,6 +359,7 @@ describe("SynchroDescendante", () => {
       const { hasChanged, excursionsJson } = updateExcursionsJson(
         [excursion1Identique, excursion2],
         [excursion1Identique],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
       );
 
       expect(hasChanged).toBeTruthy();
@@ -347,6 +375,7 @@ describe("SynchroDescendante", () => {
       const { hasChanged, excursionsJson } = updateExcursionsJson(
         [excursion2, excursion3],
         [excursion1, excursion2],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
       );
 
       expect(hasChanged).toBeTruthy();
@@ -362,6 +391,7 @@ describe("SynchroDescendante", () => {
       const { hasChanged, excursionsJson } = updateExcursionsJson(
         [excursion1Identique, excursion1Change],
         [excursion1Identique],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
       );
 
       expect(hasChanged).toBeTruthy();
@@ -373,7 +403,11 @@ describe("SynchroDescendante", () => {
      * Teste s'il n'y a plus d'excursions sur le serveur.
      */
     test("[SynchroDescendante] - updateExcursionsJson - Plus d'excursions sur le serveur.", () => {
-      const { hasChanged, excursionsJson } = updateExcursionsJson([], [excursion1Identique]);
+      const { hasChanged, excursionsJson } = updateExcursionsJson(
+        [],
+        [excursion1Identique],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
+      );
 
       expect(hasChanged).toBeTruthy();
       expect(excursionsJson).toHaveLength(0);
@@ -386,6 +420,7 @@ describe("SynchroDescendante", () => {
       const { hasChanged, excursionsJson } = updateExcursionsJson(
         [excursion1, excursion2, excursion3],
         [],
+        MAX_CODE_COVERAGE ? EDebugMode.HIGH : EDebugMode.LOW,
       );
 
       expect(hasChanged).toBeTruthy();
