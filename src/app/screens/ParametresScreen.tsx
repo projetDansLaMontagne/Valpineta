@@ -47,21 +47,30 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
 
       {suiviExcursion.etat === "enCours" && (
         <>
-          <Button text="Mettre en pause" onPress={() => suiviExcursion.setEtat("enPause")} />
-          <Button text="Stopper" onPress={() => suiviExcursion.setEtat("terminee")} />
+          <Button
+            text="Mettre en pause"
+            onPress={() => suiviExcursion.setEtat({ newEtat: "enPause" })}
+          />
+          <Button text="Stopper" onPress={() => suiviExcursion.setEtat({ newEtat: "terminee" })} />
         </>
       )}
       {suiviExcursion.etat === "enPause" && (
         <>
-          <Button text="Reprendre" onPress={() => suiviExcursion.setEtat("enCours")} />
-          <Button text="Stopper" onPress={() => suiviExcursion.setEtat("terminee")} />
+          <Button text="Reprendre" onPress={() => suiviExcursion.setEtat({ newEtat: "enCours" })} />
+          <Button text="Stopper" onPress={() => suiviExcursion.setEtat({ newEtat: "terminee" })} />
         </>
       )}
       {suiviExcursion.etat === "terminee" && (
-        <Button text="Valider fin de rando" onPress={() => suiviExcursion.setEtat("nonDemarree")} />
+        <Button
+          text="Valider fin de rando"
+          onPress={() => suiviExcursion.setEtat({ newEtat: "nonDemarree" })}
+        />
       )}
       {suiviExcursion.etat === "nonDemarree" && (
-        <Button text="Demarrer rando" onPress={() => suiviExcursion.setEtat("enCours")} />
+        <Button
+          text="Demarrer rando"
+          onPress={() => suiviExcursion.setEtat({ newEtat: "enCours" })}
+        />
       )}
 
       {suiviExcursion.trackReel.map(point => (
