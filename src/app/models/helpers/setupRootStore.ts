@@ -28,6 +28,13 @@ export async function setupRootStore(rootStore: RootStore) {
   try {
     // load the last known state from AsyncStorage
     restoredState = ((await storage.load(ROOT_STATE_STORAGE_KEY)) ?? {}) as RootStoreSnapshot;
+
+    // Dans le cas d une fermeture brutale de l appli lors d une rando, on remet l excursion en pause
+    console.log("Etat recupere:", restoredState.suiviExcursion.etat);
+    if ((restoredState.suiviExcursion.etat = "enCours")) {
+      restoredState.suiviExcursion.etat = "enPause";
+    }
+
     applySnapshot(rootStore, restoredState);
   } catch (e) {
     // if there's any problems loading, then inform the dev what happened
