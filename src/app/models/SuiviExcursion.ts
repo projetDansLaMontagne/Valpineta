@@ -4,22 +4,25 @@ import * as Location from "expo-location";
 import { TPoint } from "app/navigators";
 import * as TaskManager from "expo-task-manager";
 
+// Types
 const T_point_GPX = types.model({
   lat: types.number,
   lon: types.number,
   alt: types.number,
   timestamp: types.number,
 });
-
 const T_point = types.model({
   lat: types.number,
   lon: types.number,
   alt: types.number,
   dist: types.number,
 });
-
 type T_EtatExcursion = "nonDemarree" | "enCours" | "enPause" | "terminee";
+
+// Constantes
 const BACKGROUND_LOCATION_TASK_NAME = "background-location-task"; // Static sinon boucle entre suiviExcursion.ts et app.tsx
+const ACCURACY = Location.Accuracy.Highest;
+const DISTANCE_INTERVAL = 5;
 
 /**
  * Model description here for TypeScript hints.
@@ -193,9 +196,9 @@ export const SuiviExcursionModel = types
       if (permissionsOK) {
         if ((await tacheEnCours()) === false) {
           await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME, {
-            accuracy: Location.Accuracy.Highest,
+            accuracy: ACCURACY,
             timeInterval: self.__DEV__ ? 1000 : undefined,
-            distanceInterval: self.__DEV__ ? undefined : 5,
+            distanceInterval: self.__DEV__ ? undefined : DISTANCE_INTERVAL,
 
             foregroundService: {
               notificationTitle: "Suivi de votre randonnées en cours",
