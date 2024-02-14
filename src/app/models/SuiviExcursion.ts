@@ -96,7 +96,7 @@ export const SuiviExcursionModel = types
       }
 
       /* ------------------------------ Verifications ----------------------------- */
-      var verificationsOK = false;
+      let verificationsOK = false;
       // etats possibles
       switch (self.etat) {
         case "nonDemarree":
@@ -122,7 +122,7 @@ export const SuiviExcursionModel = types
 
       /* -------------------------- Actions consecutives -------------------------- */
       if (verificationsOK) {
-        var aFonctionne: boolean;
+        let aFonctionne: boolean;
         switch (newEtat) {
           case "nonDemarree":
             self._setTrackReel([]);
