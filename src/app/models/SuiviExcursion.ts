@@ -96,32 +96,32 @@ export const SuiviExcursionModel = types
       }
 
       /* ------------------------------ Verifications ----------------------------- */
-      var preRequisOK = false;
+      var verificationsOK = false;
       // etats possibles
       switch (self.etat) {
         case "nonDemarree":
-          if (newEtat === "enCours") preRequisOK = true;
+          if (newEtat === "enCours") verificationsOK = true;
           break;
 
         case "enCours":
-          if (newEtat === "enPause" || newEtat === "terminee") preRequisOK = true;
+          if (newEtat === "enPause" || newEtat === "terminee") verificationsOK = true;
           break;
 
         case "enPause":
-          if (newEtat === "enCours" || newEtat === "terminee") preRequisOK = true;
+          if (newEtat === "enCours" || newEtat === "terminee") verificationsOK = true;
           break;
 
         case "terminee":
-          if (newEtat === "nonDemarree") preRequisOK = true;
+          if (newEtat === "nonDemarree") verificationsOK = true;
           break;
       }
       // params
       if (newEtat === "enCours" && !props.trackSuivi) {
-        preRequisOK = false;
+        verificationsOK = false;
       }
-      
+
       /* -------------------------- Actions consecutives -------------------------- */
-      if (preRequisOK) {
+      if (verificationsOK) {
         var aFonctionne: boolean;
         switch (newEtat) {
           case "nonDemarree":
