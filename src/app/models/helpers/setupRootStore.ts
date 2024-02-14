@@ -29,9 +29,11 @@ export async function setupRootStore(rootStore: RootStore) {
     // load the last known state from AsyncStorage
     restoredState = ((await storage.load(ROOT_STATE_STORAGE_KEY)) ?? {}) as RootStoreSnapshot;
 
-    // Dans le cas d une fermeture brutale de l appli lors d une rando, on remet l excursion en pause
-    console.log("Etat recupere:", restoredState.suiviExcursion.etat);
-    if ((restoredState.suiviExcursion.etat = "enCours")) {
+    // On verifie au redemarrage que la tache de fond est bien en cours si l'etat etait enCours
+    if (
+      restoredState.suiviExcursion.etat == "enCours" &&
+      (await rootStore.suiviExcursion.tacheEnCours()) === false
+    ) {
       restoredState.suiviExcursion.etat = "enPause";
     }
 

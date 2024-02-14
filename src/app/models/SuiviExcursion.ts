@@ -71,14 +71,9 @@ export const SuiviExcursionModel = types
      */
     setIPointCourant(value: number) {
       self.iPointCourant = value;
-    }
+    },
   }))
   .actions(self => {
-    function afterCreate() {
-      // On s assure qu il n y a pas de residus de tache de fond (d une potentielle fermeture brutale)
-      stopSuiviTrackReel();
-    }
-
     /* -------------------------------------------------------------------------- */
     /*                                   PUBLIC                                   */
     /* -------------------------------------------------------------------------- */
@@ -143,11 +138,11 @@ export const SuiviExcursionModel = types
             aFonctionne = await startBackgroundTask();
             break;
           case "enPause":
-            stopSuiviTrackReel();
+            stopBackgroundTask();
             aFonctionne = true;
             break;
           case "terminee":
-            stopSuiviTrackReel();
+            stopBackgroundTask();
             /**@todo sauvegarde du track reel*/
             /**@todo publication avis*/
             aFonctionne = true;
@@ -208,7 +203,7 @@ export const SuiviExcursionModel = types
             foregroundService: {
               notificationTitle: "Suivi de votre randonnées en cours",
               notificationBody:
-                "Ne fermez pas l'application ou vous perdrez votre suivi de randonnée.",
+                "Ne fermez pas l'application sinon vous ne pourrez plus être suivi.",
               killServiceOnDestroy: true,
             },
           });
@@ -233,15 +228,16 @@ export const SuiviExcursionModel = types
     /**
      * Methode privee pour arreter la tache de fond de suivi
      */
-    async function stopSuiviTrackReel() {
+    async function stopBackgroundTask() {
       if ((await tacheEnCours()) === true) {
         console.log("ARRET DE LA TACHE EN COURS");
         await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME);
       }
     }
 
-    return { afterCreate, setEtat, requestPermissions, ajoutPointTrackReel };
+    return { setEtat, requestPermissions, ajoutPointTrackReel, tacheEnCours };
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
+
 export interface SuiviExcursion extends Instance<typeof SuiviExcursionModel> {}
 export interface SuiviExcursionSnapshotOut extends SnapshotOut<typeof SuiviExcursionModel> {}
 export interface SuiviExcursionSnapshotIn extends SnapshotIn<typeof SuiviExcursionModel> {}
