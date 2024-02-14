@@ -49,28 +49,30 @@ export function tacheLocalisationBackground(
 
     const nextPointNearer = next && distanceEntrePoints(next, PX) < distanceEntrePoints(P, PX);
     const prevPointNearer = prev && distanceEntrePoints(prev, PX) < distanceEntrePoints(P, PX);
-    const isLost = next &&  next.dist - P.dist < distanceEntrePoints(P, PX);
+    const isLost = next && next.dist - P.dist < distanceEntrePoints(P, PX);
 
     if (nextPointNearer) {
       // Plus proche du point suivant
       suiviExcursion.setIPointCourant(suiviExcursion.iPointCourant + 1);
+      console.log("Point courant +1");
     } else if (prevPointNearer) {
       // Plus proche du point precedent
       suiviExcursion.setIPointCourant(suiviExcursion.iPointCourant - 1);
+      console.log("Point courant -1");
     } else if (isLost) {
       // Perte de suivi : relocalisation
       suiviExcursion.setIPointCourant(nearestPointIndex(trackSuivi, PX));
-
-      // Notif si point le plus proche trop ecarté
-      const distNearest = distanceEntrePoints(PX, trackSuivi[suiviExcursion.iPointCourant]);
-      if (distNearest > 30) {
-        /**@todo GERER LES NOTIFS */
-      }
+      console.log("Perdu : relocalisation au point ", suiviExcursion.iPointCourant);
     } else {
       // Pas de changement de point
       break;
     }
-    break;
+
+    // Si le point courant a change, on verifie si on est perdu (trop ecarte du point)
+    const distNearest = distanceEntrePoints(PX, trackSuivi[suiviExcursion.iPointCourant]);
+    if (distNearest > 30) {
+      /**@todo GERER LES NOTIFS */
+    }
   }
 }
 
