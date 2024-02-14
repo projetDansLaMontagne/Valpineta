@@ -47,14 +47,9 @@ export function tacheLocalisationBackground(
     const prev = isFirstPoint ? undefined : trackSuivi[iPointCourant - 1];
     const next = isLastPoint ? undefined : trackSuivi[iPointCourant + 1];
 
-    const distPPX = distanceEntrePoints(P, PX);
-    const distNextPX = next ? distanceEntrePoints(next, PX) : undefined;
-    const distPrevPX = prev ? distanceEntrePoints(prev, PX) : undefined;
-    const distPNext = next ? next.dist - P.dist : undefined;
-
-    const nextPointNearer = next && distNextPX < distPPX;
-    const prevPointNearer = prev && distPrevPX < distPPX;
-    const isLost = next && distPNext < distPPX;
+    const nextPointNearer = next && distanceEntrePoints(next, PX) < distanceEntrePoints(P, PX);
+    const prevPointNearer = prev && distanceEntrePoints(prev, PX) < distanceEntrePoints(P, PX);
+    const isLost = next &&  next.dist - P.dist < distanceEntrePoints(P, PX);
 
     if (nextPointNearer) {
       // Plus proche du point suivant
