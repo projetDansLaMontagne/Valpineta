@@ -17,15 +17,9 @@
       "fallbackToCacheTimeout": 0
     },
     "jsEngine": "hermes",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "android": {
-      "permissions": [
-        "INTERNET",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ],
+      "permissions": ["INTERNET", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
       "package": "com.valpineta.app",
       "versionCode": 14,
       "adaptiveIcon": {
@@ -40,22 +34,15 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.valpineta.app"
+      "bundleIdentifier": "com.valpineta.app",
+      "NSCameraUsageDescription": "This app uses the camera to take photos and videos."
     },
     "web": {
       "favicon": "./assets/images/logo.jpg"
     },
     "packagerOpts": {
-      "sourceExts": [
-        "js",
-        "json",
-        "ts",
-        "tsx",
-        "jsx, xml, gpx"
-      ]
+      "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
     },
-    "plugins": [
-      "expo-localization"
-    ]
+    "plugins": ["expo-localization", "expo-image-picker"]
   }
 }

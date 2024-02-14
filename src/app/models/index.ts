@@ -4,3 +4,4 @@ export * from "./helpers/useStores";
 export * from "./helpers/setupRootStore";
 export * from "./Parametres";
 export * from "./SuiviExcursion"
+export * from "./SynchroMontante";

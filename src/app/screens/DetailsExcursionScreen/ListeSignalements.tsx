@@ -69,8 +69,8 @@ export function ListeSignalements(props: ListeSignalementsProps) {
                     onPress={() => {
                       props.setStartPoint &&
                         props.setStartPoint({
-                          latitude: signalement.latitude,
-                          longitude: signalement.longitude,
+                          latitude: signalement.lat,
+                          longitude: signalement.lon,
                         } as LatLng);
                       props.swipeDown();
                     }}

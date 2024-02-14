@@ -29,6 +29,9 @@ import * as storage from "./utils/storage";
 import { customFontsToLoad } from "./theme";
 import Config from "./config";
 
+// Import pour l'ui de l'ActionSheet
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
 
 // Web linking configuration
@@ -92,16 +95,17 @@ function App(props: AppProps) {
     config,
   };
 
-  // otherwise, we're ready to render the app
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ErrorBoundary catchErrors={Config.catchErrors}>
-        <AppNavigator
-          linking={linking}
-          initialState={initialNavigationState}
-          onStateChange={onNavigationStateChange}
-        />
-      </ErrorBoundary>
+      <ActionSheetProvider>
+        <ErrorBoundary catchErrors={Config.catchErrors}>
+          <AppNavigator
+            linking={linking}
+            initialState={initialNavigationState}
+            onStateChange={onNavigationStateChange}
+          />
+        </ErrorBoundary>
+      </ActionSheetProvider>
     </SafeAreaProvider>
   );
 }

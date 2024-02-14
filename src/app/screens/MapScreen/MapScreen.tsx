@@ -29,9 +29,9 @@ import MapButton from "./MapButton";
 import { Asset } from "expo-asset";
 
 import * as fileSystem from "expo-file-system";
-import TilesRequire from "app/services/importAssets/tilesRequire";
+// import TilesRequire from "app/services/importAssets/tilesRequire";
 
-import fichierJson from "assets/Tiles/tiles_struct.json";
+// import fichierJson from "assets/Tiles/tiles_struct.json";
 import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import { getUserLocation } from "app/utils/getUserLocation";
@@ -108,6 +108,9 @@ const getAllTracks = (): TExcursion[] => {
 
 // Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
+  //Props
+  const { navigation } = _props;
+
   // Variables
   const userLocationIntervalMs = 1000; // ! mabye change this value
 
@@ -280,8 +283,18 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     setGavePermission(true);
   };
 
-  const poiButtonOnPress = async () => {
-    console.log("[MapScreen] poiButtonOnPress()");
+  const ButtonOnPressAvertissement = () => {
+    navigation.navigate("CarteStack", {
+      screen: "NouveauSignalement",
+      params: { type: "Avertissement" },
+    });
+  };
+
+  const ButtonOnPressPointInteret = () => {
+    navigation.navigate("CarteStack", {
+      screen: "NouveauSignalement",
+      params: { type: "PointInteret" },
+    });
   };
 
   const toggleMenu = () => {
@@ -503,7 +516,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                       style={{
                         ...styles.actionsButtonContainer,
                       }}
-                      onPress={poiButtonOnPress}
+                      onPress={ButtonOnPressAvertissement}
                       icon={"eye"}
                       iconSize={spacing.lg}
                       iconColor={colors.palette.blanc}
@@ -513,6 +526,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                       style={{
                         ...styles.actionsButtonContainer,
                       }}
+                      onPress={ButtonOnPressPointInteret}
                       icon="exclamation-circle"
                       iconSize={spacing.lg}
                       iconColor={colors.palette.blanc}

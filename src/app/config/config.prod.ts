@@ -6,5 +6,6 @@
  * https://reactnative.dev/docs/security#storing-sensitive-info
  */
 export default {
-  API_URL: "CHANGEME",
+  API_URL: "https://www.valpineta.eu/wp-json/api-wp/",
+  API_TIMEOUT: 100000, // 10 seconds
 };

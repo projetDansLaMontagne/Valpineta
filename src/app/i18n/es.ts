@@ -110,6 +110,9 @@ const es = {
       francais: "Francés",
       espagnol: "Español",
     },
+    choisirSynchro: {
+      titre: "Sincronización",
+    },
   },
   pageFiltres: {
     tri: {
@@ -136,6 +139,67 @@ const es = {
     },
     boutons: {
       valider: "Validar",
+    },
+  },
+  pageNouveauSignalement: {
+    titreAvertissement: "Nueva advertencia",
+    titrePointInteret: "Nuevo punto de interés",
+    placeholderNom: "Inserte un título",
+    placeholderDescription: "Inserte una descripción",
+    boutons: {
+      photo: "Añadir una foto",
+      valider: "Validar",
+    },
+    actionSheet: {
+      prendrePhoto: "Tomar una foto",
+      choisirPhoto: "Elegir una foto",
+      annuler: "Cancelar",
+    },
+    alerte: {
+      permissions: {
+        titre: "Permisos",
+        message: "Para tomar una foto, es necesario que la aplicación tenga acceso a la cámara",
+      },
+      ajouteEnLocal: {
+        titre: "Añadido localmente",
+        message:
+          "Su informe ha sido añadido localmente. Será enviado a los servidores la próxima vez que se sincronice.",
+        boutons: {
+          ajoute: "Añado otro",
+          retour: "Volver a la carta",
+        },
+      },
+      dejaExistant: {
+        titre: "Informe ya existente",
+        message: "Ya ha informado de este lugar",
+      },
+      mauvaisFormat: {
+        titre: "Formato incorrecto",
+        message: "Verifique que los campos estén completados correctamente",
+      },
+      envoyeEnBdd: {
+        titre: "Enviado a la base de datos",
+        message: "Su informe ha sido enviado a la base de datos",
+        boutons: {
+          ajoute: "Añado otro",
+          retour: "Volver a la carta",
+        },
+      },
+      synchroEffectuee: {
+        titre: "Sincronización realizada",
+        message: "Se ha realizado la sincronización",
+      },
+      erreur: {
+        titre: "Error",
+        message: "Se produjo un error. Por favor, inténtalo de nuevo.",
+      },
+    },
+    erreur: {
+      titre:
+        "El título debe contener entre 5 y 50 caracteres y no debe contener caracteres especiales",
+      description:
+        "La descripción debe contener entre 5 y 500 caracteres y no debe contener caracteres especiales",
+      photo: "Por favor agrega una foto",
     },
   },
 };

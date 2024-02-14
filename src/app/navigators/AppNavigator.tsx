@@ -21,7 +21,6 @@ import {
   createBottomTabNavigator,
   BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs";
-import I18n from "i18n-js";
 import { Text } from "app/components";
 
 import { useStores } from "app/models";
@@ -71,13 +70,17 @@ export type TFiltres = {
   difficultesTechniques: number[];
   difficultesOrientation: number[];
 };
-export type TSignalement = {
+
+export type T_TypeSignalement = "PointInteret" | "Avertissement";
+
+export type T_Signalement = {
+  nom: string;
   description: string;
   image: string;
-  latitude: number;
-  longitude: number;
-  nom: string;
-  type: "PointInteret" | "Avertissement";
+  lat: number;
+  lon: number;
+  type: T_TypeSignalement;
+  postId: number;
 };
 export type T_infoLangue = {
   nom: string;
@@ -98,7 +101,7 @@ export type T_excursion = {
   es?: T_infoLangue;
   fr?: T_infoLangue;
 
-  signalements: TSignalement[];
+  signalements: T_Signalement[];
   track: TPoint[];
 } & Partial<T_infoLangue>;
 
@@ -112,6 +115,7 @@ type CarteStackParamList = {
   Carte: undefined;
   DetailsExcursion: undefined | { excursion: T_excursion };
   Description: { excursion: T_excursion };
+  NouveauSignalement: { type: T_TypeSignalement };
 };
 
 type ParametresStackParamList = {
@@ -153,14 +157,10 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
   /**
-   * @warning CODE REDONDANT : parametres.langues est forcement modifié en meme temps que I18n
-   * (dans la page des parametres) donc ça sert à rien de faire dépendre l'un de l'autre
-   * MAIS sans cette partie le footer ne change pas de langue... raison inconnue
+   * @warning CODE REDONDANT mais sans cette partie le footer ne change pas de langue... raison inconnue
    */
   const { parametres } = useStores();
-  useEffect(() => {
-    I18n.locale = parametres.langues;
-  }, [parametres.langues]);
+  useEffect(() => {}, [parametres.langue]);
 
   const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
     tabBarIcon: ({ color }) => (
@@ -236,6 +236,7 @@ const CarteStackScreen = () => (
     <CarteStack.Screen name="Carte" component={Screens.MapScreen} />
     <CarteStack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
     <CarteStack.Screen name="Description" component={Screens.DescriptionScreen} />
+    <CarteStack.Screen name="NouveauSignalement" component={Screens.NouveauSignalementScreen} />
   </CarteStack.Navigator>
 );
 

@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions, ImageStyle, Modal } from "react-native";
-import { AppStackScreenProps, TPoint, TSignalement, T_flat_point } from "app/navigators";
+import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
+import { AppStackScreenProps, TPoint, T_Signalement, T_excursion, T_flat_point } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Screen, Button } from "app/components";
 import { spacing, colors } from "app/theme";
@@ -42,20 +42,6 @@ type T_LanguageContent<T extends T_Language> = {
   nom: string;
   description: string;
   typeParcours: T extends "fr" ? T_TypeParcoursFr : T_TypeParcoursEs;
-};
-export type TExcursion = {
-  [key in T_Language]: T_LanguageContent<key>;
-} & {
-  denivele: string;
-  difficulteOrientation: string;
-  difficulteTechnique: string;
-  distance: string;
-  duree: string;
-  vallee: string;
-  postId: number;
-  signalements: TSignalement[];
-  nomTrackGpx: string;
-  track: T_Point[];
 };
 
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> { }
@@ -122,8 +108,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
         for (let i = 0; i < excursion.signalements.length; i++) {
           const coordSignalement: T_flat_point = {
-            lat: excursion.signalements[i].latitude,
-            lon: excursion.signalements[i].longitude,
+            lat: excursion.signalements[i].lat,
+            lon: excursion.signalements[i].lon,
           };
 
           const distance = distanceEntrePoints(coordUser, coordSignalement);
@@ -143,6 +129,15 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     }
       , [suiviExcursion.etat]);
 
+
+    const swipeUpDown = () => {
+      if (swipeUpDownRef) {
+        console.log(`[DetailsExcursionScreen - useEffect] aled`);
+        swipeUpDownRef.current.showMini();
+      } else {
+        console.error("swipeUpDownRef.current is null");
+      }
+    };
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
@@ -197,12 +192,18 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             swipeHeight={30 + footerHeight}
             disableSwipeIcon={true}
             ref={swipeUpDownRef}
-          />
-        )}
+          />)}
       </View>
     ) : (
-      //sinon on affiche une 
-      <Erreur navigation={navigation} />
+      <Screen preset="fixed">
+        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+          <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
+        </TouchableOpacity>
+        <View style={$containerErreur}>
+          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
+          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
+        </View>
+      </Screen>
     );
 
     /**
@@ -221,7 +222,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
      * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
      */
     function itemFull(
-      excursion: Record<string, unknown>,
+      excursion: T_excursion,
       navigation: NativeStackNavigationProp<any>,
       containerInfoAffiche: boolean,
       setcontainerInfoAffiche: React.Dispatch<any>,
@@ -401,11 +402,11 @@ const startMiddleAndEndHandler = (
  * @function signalementsHandler
  * @description Affiche les signalements sur la carte.
  *
- * @param signalements {TSignalement[]} - les signalements de l'excursion
+ * @param signalements {T_Signalement[]} - les signalements de l'excursion
  *
  * @returns les signalements à afficher sur la carte.
  */
-const signalementsHandler = (signalements: TSignalement[]) => {
+const signalementsHandler = (signalements: T_Signalement[]) => {
   const binoculars: ImageSource = require("assets/icons/binoculars.png");
   const attention: ImageSource = require("assets/icons/attention.png");
 
@@ -434,8 +435,8 @@ const signalementsHandler = (signalements: TSignalement[]) => {
         return (
           <Marker
             coordinate={{
-              latitude: signalement.latitude ?? 0,
-              longitude: signalement.longitude ?? 0,
+              latitude: signalement.lat ?? 0,
+              longitude: signalement.lon ?? 0,
             }}
             // key={point.dist}
             key={index}
@@ -556,4 +557,16 @@ const $souligneInfosAvis: ViewStyle = {
   height: 2,
   width: width / 2.5,
   position: "relative",
+};
+
+/* ---------------------------- Style page erreur --------------------------- */
+
+const $containerErreur: ViewStyle = {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const $texteErreur: TextStyle = {
+  textAlign: "center",
 };
