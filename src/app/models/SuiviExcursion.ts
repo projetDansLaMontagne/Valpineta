@@ -97,7 +97,7 @@ export const SuiviExcursionModel = types
 
       /* ------------------------------ Verifications ----------------------------- */
       let verificationsOK = false;
-      // etats possibles
+      // changement d etat possible
       switch (self.etat) {
         case "nonDemarree":
           if (newEtat === "enCours") verificationsOK = true;
@@ -115,7 +115,7 @@ export const SuiviExcursionModel = types
           if (newEtat === "nonDemarree") verificationsOK = true;
           break;
       }
-      // params
+      // params : trackSuivi bien present
       if (newEtat === "enCours" && !props.trackSuivi) {
         verificationsOK = false;
       }
