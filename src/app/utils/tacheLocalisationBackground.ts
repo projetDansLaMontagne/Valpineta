@@ -4,9 +4,10 @@ import { distanceEntrePoints } from "./distanceEntrePoints";
 import { LocationObject } from "expo-location";
 import { T_flat_point } from "app/navigators";
 
+const RAYON_DEVIATION = 30; // Rayon autour du point a partir duquel on considere l utilisateur comme devie
+
 /**
  * Remplit suiviExcursion.trackReel des reelles coordonnees parcourues
- *
  */
 export function tacheLocalisationBackground(
   locations: LocationObject[],
@@ -54,15 +55,15 @@ export function tacheLocalisationBackground(
     if (nextPointNearer) {
       // Plus proche du point suivant
       suiviExcursion.setIPointCourant(suiviExcursion.iPointCourant + 1);
-      console.log("Point courant +1");
+      console.log("Point courant : ", iPointCourant, "+1");
     } else if (prevPointNearer) {
       // Plus proche du point precedent
       suiviExcursion.setIPointCourant(suiviExcursion.iPointCourant - 1);
-      console.log("Point courant -1");
+      console.log("Point courant : ", iPointCourant, "-1");
     } else if (isLost) {
       // Perte de suivi : relocalisation
       suiviExcursion.setIPointCourant(nearestPointIndex(trackSuivi, PX));
-      console.log("Perdu : relocalisation au point ", suiviExcursion.iPointCourant);
+      console.log("Relocalisation : ", iPointCourant, " devient ", suiviExcursion.iPointCourant);
     } else {
       // Pas de changement de point
       break;
@@ -70,7 +71,7 @@ export function tacheLocalisationBackground(
 
     // Si le point courant a change, on verifie si on est perdu (trop ecarte du point)
     const distNearest = distanceEntrePoints(PX, trackSuivi[suiviExcursion.iPointCourant]);
-    if (distNearest > 30) {
+    if (distNearest > RAYON_DEVIATION) {
       /**@todo GERER LES NOTIFS */
     }
   }
