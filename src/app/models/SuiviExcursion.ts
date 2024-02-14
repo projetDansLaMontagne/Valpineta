@@ -17,7 +17,7 @@ const T_point = types.model({
   alt: types.number,
   dist: types.number,
 });
-type T_EtatExcursion = "nonDemarree" | "enCours" | "enPause" | "terminee";
+type T_etat_excursion = "nonDemarree" | "enCours" | "enPause" | "terminee";
 
 // Constantes
 const BACKGROUND_LOCATION_TASK_NAME = "background-location-task"; // Static sinon boucle entre suiviExcursion.ts et app.tsx
@@ -45,7 +45,7 @@ export const SuiviExcursionModel = types
     /**
      * Setter prive pour l intermediaire switchState
      */
-    _setEtat(newEtat: T_EtatExcursion) {
+    _setEtat(newEtat: T_etat_excursion) {
       self.etat = newEtat;
     },
     /**
@@ -82,7 +82,7 @@ export const SuiviExcursionModel = types
           newEtat: "enCours";
           trackSuivi: Instance<typeof T_point>[];
         }
-      | { newEtat: Exclude<T_EtatExcursion, "enCours"> };
+      | { newEtat: Exclude<T_etat_excursion, "enCours"> };
     /**
      * Méthode pour changer l etat
      * @prerequis le nouvel etat doit etre possible
