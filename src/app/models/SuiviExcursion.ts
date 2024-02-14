@@ -66,6 +66,12 @@ export const SuiviExcursionModel = types
     _setPointCourant(value: number) {
       self.iPointCourant = value;
     },
+    /**
+     * Setter pour le point courant
+     */
+    setIPointCourant(value: number) {
+      self.iPointCourant = value;
+    }
   }))
   .actions(self => {
     function afterCreate() {
