@@ -85,7 +85,6 @@ export const SuiviExcursionModel = types
     /**
      * Méthode pour changer l etat
      * @prerequis le nouvel etat doit etre possible
-     * @param params parametres supplementaires telle que l excursion modele si on lance une nouvelle excursion
      */
     async function setEtat(props: switchStateParams): Promise<boolean> {
       console.log(self.etat, "-->", props.newEtat);
