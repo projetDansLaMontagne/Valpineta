@@ -7,6 +7,7 @@ import { reaction } from "mobx";
 import { api } from "app/services/api";
 import { getGeneralApiProblem } from "app/services/api/apiProblem";
 import { md5 } from "js-md5";
+import { ApiResponse } from "apisauce";
 
 const signalement = types.model({
   nom: types.string,
@@ -51,7 +52,6 @@ export const SynchroMontanteModel = types
         () => self.intervalleSynchro,
         _ => {
           // On reinitalise la boucle de synchronisation avec la nouvelle intervalle
-          console.log("Reinitialisation de la boucle de synchronisation");
           stopChecking();
           startChecking();
         },
@@ -83,7 +83,8 @@ export const SynchroMontanteModel = types
       if (isConnected) {
         if (self.signalements.length > 0) {
           console.log("[SYNCHRO MONTANTE] tentative");
-          const success = pushSignalements();
+          const response = await callApi(self.signalements);
+          const success = await pushSignalements(response);
           if (success) {
             return EtatSynchro.BienEnvoye;
           } else {
@@ -104,13 +105,30 @@ export const SynchroMontanteModel = types
      * @prerequis etre connecte et avoir des signalements a pousser
      * @returns booleen indiquant si la synchronisation a reussi
      */
-    async function pushSignalements(): Promise<boolean> {
+    async function pushSignalements( response: ApiResponse<any, any>): Promise<boolean> {
+      let success = false;
+      if (self.signalements.length === 0) {
+        success = false;
+      }
+
+      if (response.ok) {
+        removeAllSignalements();
+        success = true;
+      } else {
+        console.log(
+          "[SYNCHRO MONTANTE] Debug : Erreur serveur lors de la synchronisation : ",
+          getGeneralApiProblem(response),
+        );
+        success = false;
+      }
+      return success;
+    }
+
+    const callApi = async (signalements: T_Signalement[]) => {
       const response = await api.apisauce.post(
         "set-signalement",
         {
-          signalements: JSON.stringify(self.signalements),
-          // en cours de développement avec Robin
-          md5: md5(JSON.stringify(self.signalements)),
+          signalements: JSON.stringify(signalements),
         },
         {
           headers: {
@@ -118,18 +136,8 @@ export const SynchroMontanteModel = types
           },
         },
       );
-
-      if (response.ok) {
-        removeAllSignalements();
-      } else {
-        console.log(
-          "[SYNCHRO MONTANTE] Debug : Erreur serveur lors de la synchronisation : ",
-          getGeneralApiProblem(response),
-        );
-      }
-
-      return response.ok;
-    }
+      return response;
+    };
 
     /* --------------------------------- SETTERS -------------------------------- */
     function addSignalement(signalement: T_Signalement) {
@@ -139,12 +147,18 @@ export const SynchroMontanteModel = types
       self.signalements.clear();
     }
     function setIntervalleSynchro(intervalle: IntervalleSynchro) {
-      self.intervalleSynchro = intervalle;
+      if (intervalle in IntervalleSynchro) {
+        self.intervalleSynchro = intervalle;
+      } else {
+        self.intervalleSynchro = IntervalleSynchro.TresFrequente;
+      }
     }
 
     return {
       afterCreate,
       beforeDestroy,
+      pushSignalements,
+      callApi,
       tryToPush,
       addSignalement,
       removeAllSignalements,

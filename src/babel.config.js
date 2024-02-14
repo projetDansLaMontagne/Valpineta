@@ -24,7 +24,7 @@ const plugins = [
 
 /** @type {import('@babel/core').TransformOptions} */
 module.exports = {
-  presets: ["babel-preset-expo"],
+  presets: ["babel-preset-expo", "@babel/preset-typescript"],
   env: {
     production: {},
   },
