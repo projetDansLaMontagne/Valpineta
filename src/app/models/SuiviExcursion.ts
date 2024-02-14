@@ -92,11 +92,11 @@ export const SuiviExcursionModel = types
       const { newEtat } = props;
 
       /* ---------------------------------- Debug --------------------------------- */
-      if (self.__DEV__ && newEtat == "enCours") {
-        // En debug, on met un track personnalise pour pouvoir faire des tests
-        const track: TPoint[] = require("assets/tests_examples/excursions.json")[0].track;
-        props.trackSuivi = track as Instance<typeof T_point>[];
-      }
+      // if (self.__DEV__ && newEtat == "enCours") {
+      //   // En debug, on met un track personnalise pour pouvoir faire des tests
+      //   const track: TPoint[] = require("assets/tests_examples/track_test_tache_loca.json");
+      //   props.trackSuivi = track as Instance<typeof T_point>[];
+      // }
 
       /* ------------------------------ Verifications ----------------------------- */
       let verificationsOK = false;
