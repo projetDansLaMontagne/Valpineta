@@ -24,8 +24,8 @@ export function ListeSignalements(props: ListeSignalementsProps) {
   const calculerDistanceSignalement = (signalement) => {
     // Déclaration des coordonnées à l'intérieur de la fonction
     const coordSignalement: T_flat_point = {
-      lat: signalement.latitude,
-      lon: signalement.longitude,
+      lat: signalement.lat,
+      lon: signalement.lon,
     };
     const coordUser: T_flat_point = {
       lat: props.userLocation?.latitude,
@@ -36,7 +36,7 @@ export function ListeSignalements(props: ListeSignalementsProps) {
       const distanceDepartPointLePlusProcheSignalement = recupDistance(coordSignalement, props.excursion.track);
       const distanceDepartPointLePlusProcheUtilisateur = recupDistance(coordUser, props.excursion.track);
       let distanceSignalement = distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur;
-      return distanceSignalement < 0 ? Infinity : distanceSignalement;
+      return distanceSignalement < 0 ? "Infinity" : distanceSignalement;
     } else {
       return props.userLocation ? recupDistance(coordSignalement, props.excursion.track) : Infinity;
     }
@@ -46,7 +46,7 @@ export function ListeSignalements(props: ListeSignalementsProps) {
   const signalementsTriés = [...props.excursion.signalements].sort((a, b) => {
     const distanceA = calculerDistanceSignalement(a);
     const distanceB = calculerDistanceSignalement(b);
-    return distanceA - distanceB;
+    return Number(distanceA) - Number(distanceB);
   });
 
   return (

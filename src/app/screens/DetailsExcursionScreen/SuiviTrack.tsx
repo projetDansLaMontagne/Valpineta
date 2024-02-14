@@ -9,6 +9,7 @@ import {
   TextStyle,
   ImageStyle,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Text, GraphiqueDenivele } from "app/components";
 import { spacing, colors } from "app/theme";
@@ -16,14 +17,13 @@ import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Erreur } from "./Erreur";
 import { ListeSignalements } from "./ListeSignalements";
-import { TExcursion } from "./DetailsExcursionScreen";
 import { recupDistance } from "app/utils/recupDistance";
-import { T_flat_point } from "app/navigators";
+import { T_flat_point, T_excursion } from "app/navigators";
 import { useStores } from "app/models";
 const { width, height } = Dimensions.get("window");
 
 export interface SuiviTrackProps {
-  excursion: TExcursion;
+  excursion: T_excursion;
   navigation: any;
   setStartPoint: React.Dispatch<React.SetStateAction<any>>;
 }
@@ -98,7 +98,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
   useEffect(() => {
     const intervalId = setInterval(() => {
       // Convertir la distance en nombre
-      const distanceNumber = parseFloat(excursion.distance);
+      const distanceNumber = excursion.distance;
 
       if (!isNaN(distanceNumber) && avancement < distanceNumber) {
         setAvancement(prevAvancement => {
@@ -175,8 +175,8 @@ export function SuiviTrack(props: SuiviTrackProps) {
                   }
 
                   const coordonnesSignalement: T_flat_point = {
-                    lat: signalement.latitude,
-                    lon: signalement.longitude,
+                    lat: signalement.lat,
+                    lon: signalement.lon,
                   };
 
                   const positionPercentage = (recupDistance(coordonnesSignalement, excursion.track) / parseFloat(excursion.distance)) * 100;
@@ -256,8 +256,14 @@ export function SuiviTrack(props: SuiviTrackProps) {
                   : { left: width / 2 },
               ]}
             ></View>
-            {containerInfoAffiche ? descritpion(excursion, altitudeActuelle) : (
-              userLocation !== undefined && userLocation !== null && (
+            {containerInfoAffiche ? (
+              descritpion(excursion, altitudeActuelle)
+            ) : (
+              userLocation == null ? (
+                <View style={$containerLoader}>
+                  <ActivityIndicator size="large" color={colors.palette.vert} />
+                </View>
+              ) : (
                 <ListeSignalements
                   excursion={excursion}
                   footerHeight={footerHeight}
@@ -268,7 +274,9 @@ export function SuiviTrack(props: SuiviTrackProps) {
                   swipeDown={showMini}
                 />
               )
-            )}
+            )
+            }
+
 
           </View>
         }
@@ -651,3 +659,7 @@ const iconeStyle: ImageStyle = {
   position: 'absolute',
   tintColor: colors.palette.blanc
 }
+
+const $containerLoader: ViewStyle = {
+  top: height / 7,
+};

@@ -44,6 +44,21 @@ type T_LanguageContent<T extends T_Language> = {
   typeParcours: T extends "fr" ? T_TypeParcoursFr : T_TypeParcoursEs;
 };
 
+export type TExcursion = {
+  [key in T_Language]: T_LanguageContent<key>;
+} & {
+  denivele: string;
+  difficulteOrientation: string;
+  difficulteTechnique: string;
+  distance: string;
+  duree: string;
+  vallee: string;
+  postId: number;
+  signalements: T_Signalement[];
+  nomTrackGpx: string;
+  track: T_Point[];
+};
+
 interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> { }
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
@@ -128,16 +143,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }
     }
       , [suiviExcursion.etat]);
-
-
-    const swipeUpDown = () => {
-      if (swipeUpDownRef) {
-        console.log(`[DetailsExcursionScreen - useEffect] aled`);
-        swipeUpDownRef.current.showMini();
-      } else {
-        console.error("swipeUpDownRef.current is null");
-      }
-    };
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (

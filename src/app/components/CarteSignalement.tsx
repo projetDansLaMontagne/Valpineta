@@ -79,7 +79,6 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
       (isConnected && type === "pointInteret") ||
       (type === "avertissement" && imageSignalement)
     ) {
-      console.log("imageSignalement : " + imageSignalement);
       return (
         <View style={styles.container}>
           <Image
