@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { ApiResponse } from "apisauce";
 
 export type GeneralApiProblem =

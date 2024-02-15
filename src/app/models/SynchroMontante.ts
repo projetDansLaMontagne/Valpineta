@@ -1,4 +1,12 @@
-import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
+/**
+ * Fichier de model pour la synchronisation montante
+ * @module app/models/SynchroMontante
+ * @authors Cesat Oier, Delahaie Nicolas
+ * @version 2.0
+ * @date 2024-02-15
+ * @see https://mobx-state-tree.js.org/API/#array // utilisation des array avec mobx-state-tree
+ */
+import { Instance, SnapshotIn, SnapshotOut, types, unprotect } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import { T_Signalement } from "app/navigators";
 import NetInfo from "@react-native-community/netinfo";
@@ -6,7 +14,6 @@ import { reaction } from "mobx";
 //Api
 import { api } from "app/services/api";
 import { getGeneralApiProblem } from "app/services/api/apiProblem";
-import { md5 } from "js-md5";
 import { ApiResponse } from "apisauce";
 
 const signalement = types.model({
@@ -18,7 +25,7 @@ const signalement = types.model({
   lon: types.number,
   postId: types.number,
 });
-const MINUTE_EN_MILLISECONDES = 60000;
+// const MINUTE_EN_MILLISECONDES = 60000;
 export enum EtatSynchro {
   RienAEnvoyer,
   NonConnecte,
@@ -31,6 +38,10 @@ export enum IntervalleSynchro {
   PeuFrequente = 30,
 }
 
+
+
+// let intervalId: NodeJS.Timeout | null = null;
+
 /**
  * Model description here for TypeScript hints.
  */
@@ -38,62 +49,59 @@ export const SynchroMontanteModel = types
   .model("SynchroMontante")
   .props({
     signalements: types.optional(types.array(signalement), []),
-    intervalId: types.maybeNull(types.union(types.number, types.frozen<null | NodeJS.Timeout>())),
+    // intervalId: types.maybeNull(types.union(types.number, types.frozen<null | NodeJS.Timeout>())),
     intervalleSynchro: types.optional(types.number, IntervalleSynchro.TresFrequente),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions(self => {
     /* ---------------------------------- DEMON --------------------------------- */
-    function afterCreate() {
-      startChecking();
+    // function afterCreate() {
+    //   startChecking();
 
-      reaction(
-        () => self.intervalleSynchro,
-        _ => {
-          // On reinitalise la boucle de synchronisation avec la nouvelle intervalle
-          stopChecking();
-          startChecking();
-        },
-      );
-    }
-    function beforeDestroy() {
-      stopChecking();
-    }
-    /**
-     * Regarde si des elements sont en attente de synchronisation
-     * Si oui, tente de les pousser vers le serveur
-     */
-    function startChecking() {
-      self.intervalId = setInterval(tryToPush, self.intervalleSynchro * MINUTE_EN_MILLISECONDES);
-    }
-    /**
-     * Stoppe la boucle de synchronisation
-     */
-    function stopChecking() {
-      if (self.intervalId) {
-        clearInterval(self.intervalId);
-      }
-    }
+    //   reaction(
+    //     () => self.intervalleSynchro,
+    //     _ => {
+    //       // On reinitalise la boucle de synchronisation avec la nouvelle intervalle
+    //       if (intervalId) {
+    //         clearInterval(intervalId);
+    //       }
+    //       startChecking();
+    //     },
+    //   );
+    // }
+    // function beforeDestroy() {
+    //   clearInterval(intervalId);
+    // }
+    // /**
+    //  * Regarde si des elements sont en attente de synchronisation
+    //  * Si oui, tente de les pousser vers le serveur
+    //  */
+    // async function startChecking() {
+    //   const { isConnected } = await NetInfo.fetch();
+    //   intervalId = setInterval(() => tryToPush(true), self.intervalleSynchro * MINUTE_EN_MILLISECONDES);
+    // }
+    // /**
+    //  * Stoppe la boucle de synchronisation
+    //  */
+    // function stopChecking() {
+    //   if (self.intervalId) {
+    //     clearInterval(self.intervalId);
+    //   }
+    // }
 
-    const tryToPush = async (): Promise<EtatSynchro> => {
-      // Vérifie la connexion
-      const { isConnected } = await NetInfo.fetch();
-
+    const tryToPush = async (isConnected:boolean, signalements : T_Signalement[]): Promise<EtatSynchro> => {
       if (isConnected) {
-        if (self.signalements.length > 0) {
-          console.log("[SYNCHRO MONTANTE] tentative");
-          const response = await callApi(self.signalements);
-          const success = await pushSignalements(response);
+        if (signalements.length > 0) {
+          const response = await callApi(signalements);
+          console.log("tryToPush");
+          const success = await traiterResultat(response);
           if (success) {
             return EtatSynchro.BienEnvoye;
           } else {
             return EtatSynchro.ErreurServeur;
           }
         }
-
-        // AJOUTER ICI LA SYNCHRO DES AUTRES DONNEES
-
         return EtatSynchro.RienAEnvoyer;
       }
       return EtatSynchro.NonConnecte;
@@ -105,23 +113,19 @@ export const SynchroMontanteModel = types
      * @prerequis etre connecte et avoir des signalements a pousser
      * @returns booleen indiquant si la synchronisation a reussi
      */
-    async function pushSignalements( response: ApiResponse<any, any>): Promise<boolean> {
-      let success = false;
-      if (self.signalements.length === 0) {
-        success = false;
-      }
-
-      if (response.ok) {
-        removeAllSignalements();
-        success = true;
+    async function traiterResultat(response: ApiResponse<any, any>): Promise<boolean> {
+      if( response ){
+        if (response.ok) {
+          removeAllSignalements();
+          console.log("response");
+          return true;
+        } else {
+          getGeneralApiProblem(response);
+          return false;
+        }
       } else {
-        console.log(
-          "[SYNCHRO MONTANTE] Debug : Erreur serveur lors de la synchronisation : ",
-          getGeneralApiProblem(response),
-        );
-        success = false;
+        return false;
       }
-      return success;
     }
 
     const callApi = async (signalements: T_Signalement[]) => {
@@ -155,9 +159,9 @@ export const SynchroMontanteModel = types
     }
 
     return {
-      afterCreate,
-      beforeDestroy,
-      pushSignalements,
+      // afterCreate,
+      // beforeDestroy,
+      traiterResultat,
       callApi,
       tryToPush,
       addSignalement,

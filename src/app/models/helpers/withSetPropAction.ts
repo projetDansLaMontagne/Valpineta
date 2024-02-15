@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { IStateTreeNode, SnapshotIn } from "mobx-state-tree";
 
 /**

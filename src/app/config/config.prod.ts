@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 /**
  * These are configuration settings for the production environment.
  *

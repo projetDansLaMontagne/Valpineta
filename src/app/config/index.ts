@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 /**
  * This file imports configuration objects from either the config.dev.js file
  * or the config.prod.js file depending on whether we are in __DEV__ or not.
