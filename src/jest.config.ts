@@ -6,6 +6,7 @@ const config: Config = {
   displayName: "Tests Valpineta",
   notify: true,
   notifyMode: "always",
+  setupFiles: ["<rootDir>/test/setup.ts"],
 };
 
 export default config;

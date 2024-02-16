@@ -6,7 +6,7 @@
  * @date 2024-02-15
  * @see https://mobx-state-tree.js.org/API/#array // utilisation des array avec mobx-state-tree
  */
-import { Instance, SnapshotIn, SnapshotOut, types, unprotect } from "mobx-state-tree";
+import { Instance, SnapshotIn, SnapshotOut, types, unprotect, isProtected } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import { T_Signalement } from "app/navigators";
 import NetInfo from "@react-native-community/netinfo";
@@ -25,7 +25,7 @@ const signalement = types.model({
   lon: types.number,
   postId: types.number,
 });
-// const MINUTE_EN_MILLISECONDES = 60000;
+const MINUTE_EN_MILLISECONDES = 60000;
 export enum EtatSynchro {
   RienAEnvoyer,
   NonConnecte,
@@ -38,9 +38,7 @@ export enum IntervalleSynchro {
   PeuFrequente = 30,
 }
 
-
-
-// let intervalId: NodeJS.Timeout | null = null;
+export let intervalId: NodeJS.Timeout | null = null;
 
 /**
  * Model description here for TypeScript hints.
@@ -56,45 +54,50 @@ export const SynchroMontanteModel = types
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions(self => {
     /* ---------------------------------- DEMON --------------------------------- */
-    // function afterCreate() {
-    //   startChecking();
-
-    //   reaction(
-    //     () => self.intervalleSynchro,
-    //     _ => {
-    //       // On reinitalise la boucle de synchronisation avec la nouvelle intervalle
-    //       if (intervalId) {
-    //         clearInterval(intervalId);
-    //       }
-    //       startChecking();
-    //     },
-    //   );
-    // }
-    // function beforeDestroy() {
-    //   clearInterval(intervalId);
-    // }
-    // /**
-    //  * Regarde si des elements sont en attente de synchronisation
-    //  * Si oui, tente de les pousser vers le serveur
-    //  */
-    // async function startChecking() {
-    //   const { isConnected } = await NetInfo.fetch();
-    //   intervalId = setInterval(() => tryToPush(true), self.intervalleSynchro * MINUTE_EN_MILLISECONDES);
-    // }
-    // /**
-    //  * Stoppe la boucle de synchronisation
-    //  */
+    function afterCreate() {
+      startChecking();
+      unprotect(self);
+      reaction(
+        () => self.intervalleSynchro,
+        _ => {
+          // On reinitalise la boucle de synchronisation avec la nouvelle intervalle
+          if (intervalId) {
+            clearInterval(intervalId);
+          }
+          startChecking();
+        },
+      );
+    }
+    function beforeDestroy() {
+      clearInterval(intervalId);
+    }
+    /**
+     * Regarde si des elements sont en attente de synchronisation
+     * Si oui, tente de les pousser vers le serveur
+     */
+    async function startChecking() {
+      const { isConnected } = await NetInfo.fetch();
+      intervalId = setInterval(
+        () => tryToPush(isConnected, self.signalements),
+        self.intervalleSynchro * MINUTE_EN_MILLISECONDES,
+      );
+    }
+    /**
+     * Stoppe la boucle de synchronisation
+     */
     // function stopChecking() {
     //   if (self.intervalId) {
     //     clearInterval(self.intervalId);
     //   }
     // }
 
-    const tryToPush = async (isConnected:boolean, signalements : T_Signalement[]): Promise<EtatSynchro> => {
+    const tryToPush = async (
+      isConnected: boolean,
+      signalements: T_Signalement[],
+    ): Promise<EtatSynchro> => {
       if (isConnected) {
         if (signalements.length > 0) {
           const response = await callApi(signalements);
-          console.log("tryToPush");
           const success = await traiterResultat(response);
           if (success) {
             return EtatSynchro.BienEnvoye;
@@ -114,10 +117,9 @@ export const SynchroMontanteModel = types
      * @returns booleen indiquant si la synchronisation a reussi
      */
     async function traiterResultat(response: ApiResponse<any, any>): Promise<boolean> {
-      if( response ){
+      if (response) {
         if (response.ok) {
           removeAllSignalements();
-          console.log("response");
           return true;
         } else {
           getGeneralApiProblem(response);
@@ -159,8 +161,8 @@ export const SynchroMontanteModel = types
     }
 
     return {
-      // afterCreate,
-      // beforeDestroy,
+      afterCreate,
+      beforeDestroy,
       traiterResultat,
       callApi,
       tryToPush,

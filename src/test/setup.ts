@@ -1,6 +1,7 @@
 // we always make sure 'react-native' gets included first
 import * as ReactNative from "react-native"
 import mockFile from "./mockFile"
+import mockRNCNetInfo from '@react-native-community/netinfo/jest/netinfo-mock.js';
 
 // libraries to mock
 jest.doMock("react-native", () => {
@@ -26,6 +27,9 @@ jest.doMock("react-native", () => {
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
 )
+
+jest.mock('@react-native-community/netinfo', () => mockRNCNetInfo);
+
 
 jest.mock("i18n-js", () => ({
   currentLocale: () => "en",
