@@ -183,7 +183,7 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
 
     setStepsArray(stepsArray);
 
-    trySyncho();
+    trySyncho(); // flemme de le await ou de `then` dans le useEffect
   }, []);
 
   useEffect(() => {
@@ -195,20 +195,20 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
       setStepsArray(
         stepsArray.map((etape, index) => {
           if (index === step) {
+            // étape actuelle, on la passe à terminée
             return { ...etape, isDone: true };
           }
           return etape;
         }),
       );
     } else {
+      // on passe toutes les étapes à non terminées
       setStepsArray(
         stepsArray.map(etape => {
           return { ...etape, isDone: false };
         }),
       );
     }
-
-    console.log(`[LoadingScreen -----] step: ${step}`);
   }, [step]);
 
   useEffect(() => {
@@ -218,9 +218,13 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
     if (totalGPX > 0) {
       setStepsArray(
         stepsArray.map((etape, index) => {
+          // pas propre, mais on sait que c'est l'étape 3 -> GPX
+          // peut-être qu'on devrait regex le titre mais flemme pour le moment
           if (index === 2) {
+            // on met à jour l'objectif
             return { ...etape, goal: totalGPX };
           }
+          // sinon on ne fait rien
           return etape;
         }),
       );
@@ -231,7 +235,9 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
     if (dlGPX > 0) {
       setStepsArray(
         stepsArray.map((etape, index) => {
+          // meme chose qu'au dessus
           if (index === 2) {
+            // on met à jour l'étape (fichier gpx téléchargé) actuelle
             return { ...etape, isLoading: true, currentStep: dlGPX };
           }
           return etape;
@@ -243,11 +249,13 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
   useEffect(() => {
     switch (synchroDescRes) {
       case ESynchroDescendanteRes.KO:
+        // si erreurn on réessaye
         if (synchoTries < 3) {
           setTimeout(() => {
             retrySynchro();
           }, 3000);
         } else {
+          // pas sur de cette ligne
           setSynchroDescRes(ESynchroDescendanteRes.KO);
         }
 
