@@ -103,6 +103,9 @@ const es = {
       total: "Total :",
     },
   },
+  listeSignalements: {
+    signalementDepasse: "Superado"
+  },
   parametres: {
     titre: "Ajustes",
     changerLangue: {

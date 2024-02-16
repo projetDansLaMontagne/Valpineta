@@ -1,3 +1,4 @@
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Text } from "app/components";
 import { useStores } from "app/models";
 import { colors, spacing } from "app/theme";
@@ -5,7 +6,7 @@ import { Modal, StyleSheet, View, TouchableOpacity } from 'react-native';
 
 
 export interface ExcursionTermineeProps {
-    navigation: any;
+    navigation: NativeStackNavigationProp<any>;
     modalExcursionTermineeVisible: boolean;
     setModalExcursionTermineeVisible: (modalExcursionTermineeVisible: boolean) => void;
 }

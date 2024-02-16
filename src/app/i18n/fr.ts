@@ -104,6 +104,9 @@ const fr = {
       total: "Total : ",
     },
   },
+  listeSignalements: {
+    signalementDepasse: "Dépassé"
+  },
   parametres: {
     titre: "Paramètres",
     changerLangue: {

@@ -11,11 +11,10 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import { Text, GraphiqueDenivele } from "app/components";
+import { Text, GraphiqueDenivele, Erreur } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { Erreur } from "./Erreur";
 import { ListeSignalements } from "./ListeSignalements";
 import { recupDistance } from "app/utils/recupDistance";
 import { T_flat_point, T_excursion } from "app/navigators";

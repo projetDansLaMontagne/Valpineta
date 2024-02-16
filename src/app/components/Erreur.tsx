@@ -3,9 +3,10 @@ import { View, Image, Dimensions, TextStyle, TouchableOpacity, ViewStyle } from 
 import { Screen, Text } from "app/components";
 import { colors, spacing } from "app/theme";
 import { observer } from "mobx-react-lite";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export interface ErreurProps {
-  navigation: any;
+  navigation: NativeStackNavigationProp<any>
 }
 
 /**
@@ -13,7 +14,7 @@ export interface ErreurProps {
  */
 export const Erreur = observer(function Erreur(props: ErreurProps) {
   return (
-    <Screen preset="fixed">
+    <View>
       <TouchableOpacity style={$boutonRetour} onPress={() => props.navigation.goBack()}>
         <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
       </TouchableOpacity>
@@ -21,7 +22,7 @@ export const Erreur = observer(function Erreur(props: ErreurProps) {
         <Text tx="detailsExcursion.erreur.titre" size="xxl" />
         <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
       </View>
-    </Screen>
+    </View>
   );
 });
 

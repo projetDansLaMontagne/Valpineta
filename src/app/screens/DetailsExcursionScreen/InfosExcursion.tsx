@@ -15,8 +15,7 @@ import {
 import { Text, GraphiqueDenivele } from "app/components";
 /**@warning A SUPPRIMER ET DECALER DANS APPNAVIGATOR : */
 import { T_Point } from "app/screens/DetailsExcursionScreen/";
-import { T_Signalement } from "app/navigators";
-import { observer } from "mobx-react-lite";
+import { T_Signalement, T_flat_point } from "app/navigators";
 
 export interface InfosExcursionProps {
   excursion: Record<string, unknown>;
@@ -52,6 +51,60 @@ export function InfosExcursion(props: InfosExcursionProps) {
     difficulteOrientation = excursion.difficulteOrientation as number;
     description = excursion.description as string;
     signalements = excursion.signalements as T_Signalement[];
+
+    return (
+      <ScrollView>
+        <TouchableWithoutFeedback>
+          <View style={$stylePage}>
+            <View style={$containerInformations}>
+              <View style={$containerUneInformation}>
+                <Image style={$iconInformation} source={require("assets/icons/temps.png")} />
+                <Text text={duree} size="xs" />
+              </View>
+              <View style={$containerUneInformation}>
+                <Image style={$iconInformation} source={require("assets/icons/explorer.png")} />
+                <Text text={distance + " km"} size="xs" />
+              </View>
+              <View style={$containerUneInformation}>
+                <Image
+                  style={$iconInformation}
+                  source={require("assets/icons/difficulteTechnique.png")}
+                />
+                <Text text={difficulteTechnique.toString()} size="xs" />
+              </View>
+              <View style={$containerUneInformation}>
+                <Image
+                  style={$iconInformation}
+                  source={require("assets/icons/difficulteOrientation.png")}
+                />
+                <Text text={difficulteOrientation.toString()} size="xs" />
+              </View>
+            </View>
+            <View style={$containerDescriptionEtSignalements}>
+              <Text text="Description" size="lg" />
+              <Text text={afficherDescriptionCourte(description)} size="xxs" />
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Description", { excursion: excursion });
+                }}
+              >
+                {description === "" ? null : (
+                  <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
+                )}
+              </TouchableOpacity>
+            </View>
+            {/* Appel de la fonction pour traiter les signalements et générer les éléments JSX correspondants */}
+            {renderSignalements(signalements, setIsAllSignalements, userLocation, props.excursion.track)}
+            <View style={$containerDenivele}>
+              <Text tx="detailsExcursion.titres.denivele" size="xl" />
+              {excursion.track && (
+                <GraphiqueDenivele points={excursion.track as T_Point[]} detaille={true} />
+              )}
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+    )
   }
 
   /**
@@ -69,116 +122,62 @@ export function InfosExcursion(props: InfosExcursionProps) {
     }
   }
 
-  return (
-    <ScrollView>
-      <TouchableWithoutFeedback>
-        <View style={$stylePage}>
-          <View style={$containerInformations}>
-            <View style={$containerUneInformation}>
-              <Image style={$iconInformation} source={require("assets/icons/temps.png")} />
-              <Text text={duree} size="xs" />
-            </View>
-            <View style={$containerUneInformation}>
-              <Image style={$iconInformation} source={require("assets/icons/explorer.png")} />
-              <Text text={distance + " km"} size="xs" />
-            </View>
-            <View style={$containerUneInformation}>
-              <Image
-                style={$iconInformation}
-                source={require("assets/icons/difficulteTechnique.png")}
-              />
-              <Text text={difficulteTechnique.toString()} size="xs" />
-            </View>
-            <View style={$containerUneInformation}>
-              <Image
-                style={$iconInformation}
-                source={require("assets/icons/difficulteOrientation.png")}
-              />
-              <Text text={difficulteOrientation.toString()} size="xs" />
-            </View>
-          </View>
-          <View style={$containerDescriptionEtSignalements}>
-            <Text text="Description" size="lg" />
-            <Text text={afficherDescriptionCourte(description)} size="xxs" />
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Description", { excursion: excursion });
-              }}
-            >
-              {description === "" ? null : (
-                <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
-              )}
-            </TouchableOpacity>
-          </View>
+  // Fonction pour traiter les signalements et générer les éléments JSX correspondants
+  function renderSignalements(signalements: T_Signalement[], setIsAllSignalements: Function, userLocation: any, track: any) {
+    // Trier les signalements en fonction de leur distance par rapport à l'utilisateur
+    const sortedSignalements = signalements
+      .slice() // Pour créer une copie du tableau afin de ne pas modifier l'original
+      .map((signalement) => {
+        // Calcul de la distance pour chaque signalement
+        const coordSignalement: T_flat_point = {
+          lat: signalement.lat,
+          lon: signalement.lon,
+        };
+        const distanceSignalement = userLocation ? recupDistance(coordSignalement, track) : 0;
+        return { signalement, distanceSignalement };
+      })
+      .sort((a, b) => a.distanceSignalement - b.distanceSignalement);
+
+    // Générer les éléments JSX pour chaque signalement
+    return (
+      <>
+        {signalements.length > 0 && (
           <View>
-            {signalements?.length > 0 && (
-              <>
-                <View style={$headerSignalement}>
-                  <View>
-                    <Text tx="detailsExcursion.titres.signalements" size="lg" />
+            <View style={$headerSignalement}>
+              <View>
+                <Text tx="detailsExcursion.titres.signalements" size="lg" />
+              </View>
+              <View>
+                <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                  <Text
+                    style={$lienSignalements}
+                    tx="detailsExcursion.boutons.voirDetails"
+                    size="xs"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <ScrollView horizontal>
+              <View style={$scrollLine}>
+                {sortedSignalements.map(({ signalement, distanceSignalement }, index) => (
+                  <View key={index}>
+                    <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                      <CarteSignalement
+                        type={signalement.type === "Avertissement" ? "avertissement" : "pointInteret"}
+                        details={false}
+                        nomSignalement={signalement.nom}
+                        distanceDuDepart={`${distanceSignalement}`}
+                      />
+                    </TouchableOpacity>
                   </View>
-                  <View>
-                    {signalements.length > 0 && (
-                      <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                        <Text
-                          style={$lienSignalements}
-                          tx="detailsExcursion.boutons.voirDetails"
-                          size="xs"
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                </View>
-                <ScrollView horizontal>
-                  <TouchableWithoutFeedback>
-                    <View style={$scrollLine}>
-                      {signalements.map((signalement, index) => {
-                        // Calculate the distance for each warning
-                        const coordSignalement: T_Point = {
-                          lat: signalement.lat,
-                          lon: signalement.lon,
-                          /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
-                          alt: 0,
-                          dist: 0,
-                          pos: 0,
-                        };
-                        const distanceSignalement = userLocation
-                          ? recupDistance(coordSignalement, props.excursion.track)
-                          : 0;
-                        const carteType =
-                          signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
-
-                        return (
-                          <View key={index}>
-                            <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                              <CarteSignalement
-                                type={carteType}
-                                details={false}
-                                nomSignalement={signalement.nom}
-                                distanceDuDepart={`${distanceSignalement}`}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  </TouchableWithoutFeedback>
-                </ScrollView>
-
-              </>
-            )}
+                ))}
+              </View>
+            </ScrollView>
           </View>
-
-          <View style={$containerDenivele}>
-            <Text tx="detailsExcursion.titres.denivele" size="xl" />
-            {excursion.track && (
-              <GraphiqueDenivele points={excursion.track as T_Point[]} detaille={true} />
-            )}
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </ScrollView>
-  );
+        )}
+      </>
+    );
+  }
 }
 
 /* -------------------------------------------------------------------------- */

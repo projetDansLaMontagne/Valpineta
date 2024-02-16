@@ -8,6 +8,7 @@ import { T_flat_point } from "app/navigators";
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
 export const recupDistance = (point: T_flat_point, data: any) => {
   if (!point || !point.lat || !point.lon) {
+    console.log("Coordonnées du signalement non valides", point);
     console.error("Coordonnées du signalement non valides");
     return 0;
   }

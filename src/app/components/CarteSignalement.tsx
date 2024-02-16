@@ -16,7 +16,7 @@ export interface CarteSignalementProps {
 
   distanceDuDepart: string;
 
-  imageSignalement?: Image;
+  imageSignalement?: string;
 
   onPress?: () => void;
 }
@@ -113,7 +113,7 @@ function entete(type, nomSignalement, distanceDuDepart) {
         <Image source={require("../../assets/icons/pin.png")} style={styles.iconeRouge} />
       )}
       <Text style={styles.heading}>{nomSignalement}</Text>
-      <Text>{distanceDuDepart} km</Text>
+      <Text>{distanceDuDepart}</Text>
     </View>
   );
 }

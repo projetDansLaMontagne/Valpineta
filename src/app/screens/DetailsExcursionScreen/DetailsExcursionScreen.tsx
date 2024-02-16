@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
 import { AppStackScreenProps, TPoint, T_Signalement, T_excursion, T_flat_point } from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
-import { Text, Screen, Button } from "app/components";
+import { Text, Erreur, Button } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
@@ -16,8 +16,6 @@ import { LatLng, Marker, Polyline } from "react-native-maps";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import { MapScreen } from "app/screens/MapScreen";
 import { SuiviTrack } from "./SuiviTrack";
-import { Erreur } from "./Erreur";
-import { DemarrerExcursion } from "./DemarrerExcursion";
 import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 import { PopupSignalement } from "./PopupSignalement";
 import { ExcursionTerminee } from "./ExcursionTerminee";
@@ -93,9 +91,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       } as LatLng);
     }, [excursion]);
 
-    /**
-     * ! Pas nécessaire pour le moment
-     */
     useEffect(() => {
       const fetchLocation = async () => {
         const location = await getUserLocation();
@@ -113,29 +108,32 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }
     };
 
-    //utilsier useEffect pour déclancher le popup lorsqu'on est a moins de 5 mètre d'un signalement
+    //utilser useEffect pour déclancher le popup lorsqu'on est a moins de 30 mètres d'un signalement
     useEffect(() => {
-      if (userLocation) {
-        const coordUser: T_flat_point = {
-          lat: userLocation?.latitude,
-          lon: userLocation?.longitude,
-        };
-
-        for (let i = 0; i < excursion.signalements.length; i++) {
-          const coordSignalement: T_flat_point = {
-            lat: excursion.signalements[i].lat,
-            lon: excursion.signalements[i].lon,
+      const interval = setInterval(() => {
+        if (userLocation) {
+          const coordUser: T_flat_point = {
+            lat: userLocation?.latitude,
+            lon: userLocation?.longitude,
           };
 
-          const distance = distanceEntrePoints(coordUser, coordSignalement);
-          if (distance < 0.03) {
-            setModalSignalementVisible(true)
-            setSignalementPopup(excursion.signalements[i])
+          for (let i = 0; i < excursion.signalements.length; i++) {
+            const coordSignalement: T_flat_point = {
+              lat: excursion.signalements[i].lat,
+              lon: excursion.signalements[i].lon,
+            };
+
+            const distance = distanceEntrePoints(coordUser, coordSignalement);
+            if (distance < 0.03) {
+              setModalSignalementVisible(true)
+              setSignalementPopup(excursion.signalements[i])
+            }
           }
         }
-      }
-    }
-      , [userLocation]);
+      }, 5000); // exécute toutes les 5 secondes (5000 millisecondes)
+
+      return () => clearInterval(interval); // Nettoie l'intervalle
+    }, []); // Utilisation d'une dépendance vide pour n'exécuter l'effet qu'une seule fois
 
     useEffect(() => {
       if (suiviExcursion.etat === "terminee") {
@@ -200,15 +198,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           />)}
       </View>
     ) : (
-      <Screen preset="fixed">
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-          <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-        </TouchableOpacity>
-        <View style={$containerErreur}>
-          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
-          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
-        </View>
-      </Screen>
+      <Erreur navigation={navigation} />
     );
 
     /**
@@ -233,7 +223,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       setcontainerInfoAffiche: React.Dispatch<any>,
       isAllSignalements: boolean,
       setIsAllSignalements: React.Dispatch<any>,
-      userLocation: Array<number>,
+      userLocation: LatLng,
       footerHeight: number,
     ) {
       let nomExcursion = "";
@@ -295,7 +285,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                     : { left: width - width / 2.5 - spacing.lg / 1.5 },
                 ]}
               />
-              <DemarrerExcursion excursion={excursion} setIsSuiviTrack={setIsSuiviTrack} isSuiviTrack={isSuiviTrack} userLocation={userLocation} />
+              <Button
+                style={[$buttonCommencer, { bottom: 200 }]}
+                textStyle={{ color: colors.palette.blanc, fontSize: 22, fontWeight: "bold", justifyContent: "center" }}
+                text="Commencer"
+                onPress={() => setIsSuiviTrack(!isSuiviTrack)}
+              />
               {containerInfoAffiche ? (
                 <InfosExcursion
                   excursion={excursion}
@@ -482,20 +477,6 @@ const $containerGrand: ViewStyle = {
   marginTop: height / 4,
 };
 
-const $boutonSuivi: ViewStyle = {
-  backgroundColor: colors.fond,
-  borderWidth: 1,
-  borderColor: colors.bordure,
-  borderRadius: 10,
-  padding: spacing.sm,
-  margin: spacing.lg,
-  width: 50,
-  position: "absolute",
-  top: 15,
-  zIndex: 1,
-  left: 70,
-};
-
 const $boutonRetour: ViewStyle = {
   backgroundColor: colors.fond,
   borderWidth: 1,
@@ -564,14 +545,16 @@ const $souligneInfosAvis: ViewStyle = {
   position: "relative",
 };
 
-/* ---------------------------- Style page erreur --------------------------- */
+/* ---------------------------- Style du bouton commencer --------------------------- */
 
-const $containerErreur: ViewStyle = {
-  flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const $texteErreur: TextStyle = {
-  textAlign: "center",
+const $buttonCommencer: ViewStyle = {
+  alignSelf: "center",
+  width: width / 2,
+  backgroundColor: colors.bouton,
+  borderRadius: 13,
+  position: "absolute",
+  zIndex: 3,
+  minHeight: 10,
+  height: 41,
+  borderColor: colors.bouton,
 };

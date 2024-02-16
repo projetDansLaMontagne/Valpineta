@@ -1,4 +1,4 @@
-import { TSignalement } from "app/navigators";
+import { T_Signalement } from "app/navigators";
 import { colors } from "app/theme";
 import { spacing } from "app/theme/spacing";
 import { ImageStyle, TextStyle, View, ViewStyle, Image, Modal } from "react-native";
@@ -8,11 +8,11 @@ import { Dimensions } from 'react-native';
 const { height } = Dimensions.get('window');
 
 export interface PopupSignalementProps {
-    signalement: TSignalement;
-    modalSignalementVisible: boolean;
-    setModalSignalementVisible: (modalSignalementVisible: boolean) => void;
-    estEntier: boolean;
-    setEstEntier: (estEntier: boolean) => void;
+    signalement: T_Signalement;
+    modalSignalementVisible: boolean; // Etat du modal (modal = popup permettant d'alerter l'utilisateur sur un signalement)
+    setModalSignalementVisible: (modalSignalementVisible: boolean) => void; // Permet de changer l'état de modal
+    estEntier: boolean; // Si true, on affiche la description du signalement en entier
+    setEstEntier: (estEntier: boolean) => void; // Permet de changer l'état de estEntier
 }
 
 export function PopupSignalement(props: PopupSignalementProps) {
