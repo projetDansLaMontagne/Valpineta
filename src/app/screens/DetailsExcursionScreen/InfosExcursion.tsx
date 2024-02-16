@@ -137,7 +137,6 @@ export function InfosExcursion(props: InfosExcursionProps) {
         return { signalement, distanceSignalement };
       })
       .sort((a, b) => a.distanceSignalement - b.distanceSignalement);
-
     // Générer les éléments JSX pour chaque signalement
     return (
       <>
@@ -166,7 +165,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
                         type={signalement.type === "Avertissement" ? "avertissement" : "pointInteret"}
                         details={false}
                         nomSignalement={signalement.nom}
-                        distanceDuDepart={`${distanceSignalement}`}
+                        distanceDuDepart={`${distanceSignalement + " km"}`}
                       />
                     </TouchableOpacity>
                   </View>
