@@ -26,6 +26,22 @@ const fr = {
       button: "Essayons à nouveau",
     },
   },
+  loadingScreen: {
+    trigger: "Synchroniser les données",
+    triggerButton: "Synchroniser",
+    title: "Chargement...",
+    titleFinished: "Chargement terminé !",
+    paragraph: "Ne bougez pas, nous chargeons les données pour vous.",
+    textBeforeButton: "Charger Page Loading",
+    buttonText: "Accueil",
+    error: "Une erreur est survenue, veuillez réessayer ultérieurement.",
+    noConnection: "Pas de connexion internet, veuillez réessayer ultérieurement.",
+    steps: {
+      step1: "Chargement du fichier des excursions.",
+      step2: "Mise à jour des excursions.",
+      step3: "Mise à jour des fichiers GPX.",
+    },
+  },
   mapScreen: {
     title: "Carte",
     locate: {

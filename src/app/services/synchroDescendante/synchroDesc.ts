@@ -86,7 +86,7 @@ export const API_FILE_MD5_URL = (file: `${string}.gpx`) =>
   `${BASE_URL}md5-file?file=tracks/${file}`;
 
 export const API_EXCURSIONS_URL = `${BASE_URL}excursions`;
-export const API_EXCURSIONS_MD5_URL = `${BASE_URL}excursions?isMd5=true`;
+export const API_EXCURSIONS_MD5_URL = `${API_EXCURSIONS_URL}?isMd5=true`;
 // END VARIABLES ======================================================================================= END VARIABLES
 
 // FUNCTIONS ================================================================================================ FUNCTIONS
@@ -173,12 +173,24 @@ export const downloadExcursionsJson = async (): Promise<void> => {
   });
 
   // On récupère le MD5 du fichier sur le serveur
-  const md5API = await fetch(API_EXCURSIONS_MD5_URL).then(res => res.json() as Promise<string>);
+  // la réponse est un string
+  console.log(`[synchroDesc] fetch API_EXCURSIONS_MD5_URL -> `, API_EXCURSIONS_MD5_URL);
+  const md5API = await fetch(API_EXCURSIONS_MD5_URL)
+    .then(res => res.json() as Promise<string>)
+    .catch(error => {
+      console.error("Error fetching API_EXCURSIONS_MD5_URL:", error);
+      return "";
+    });
+
+  console.log(`[synchroDesc] MD5 du fichier de l'API -> `, md5API);
 
   // On compare les deux MD5 pour savoir si le téléchargement s'est bien passé.
   if (md5 !== md5API) {
     // Suppression du fichier temporaire
     await FileSystem.deleteAsync(EXCURSIONS_TEMP_FILE_DEST);
+    console.error(
+      `[synchroDesc - 182] MD5 du fichier 'excursions.json' différents: ${md5} ${md5API}`,
+    );
     throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
   }
 
@@ -234,8 +246,9 @@ export const updateExcursionsJsonRequest = async (debug?: EDebugMode): Promise<v
 
   // On compare les deux MD5 pour savoir si le téléchargement s'est bien passé.
   if (md5 !== md5API) {
-    console.log(`[synchroDesc] MD5 du fichier 'excursions.json' différents:`);
-    console.log(md5, md5API);
+    console.error(
+      `[synchroDesc - 238] MD5 du fichier 'excursions.json' différents: ${md5} ${md5API}`,
+    );
     throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
   } else {
     debug >= EDebugMode.MEDIUM &&
@@ -360,6 +373,21 @@ export const updateExcursionsJson = (
 };
 
 /**
+ * Crée le dossier 'GPX' s'il n'existe pas.
+ *
+ * @returns {Promise<void>}
+ */
+/* istanbul ignore next */
+const createGPXFolder = async (): Promise<void> => {
+  // check si le dossier 'GPX-temp' existe
+  const GPXFolder = await FileSystem.getInfoAsync(GPX_FOLDER);
+  // Si le dossier 'GPX-temp' n'existe pas, on le crée
+  if (!GPXFolder.exists) {
+    await FileSystem.makeDirectoryAsync(GPX_FOLDER);
+  }
+};
+
+/**
  * Crée le dossier 'GPX-temp' s'il n'existe pas.
  *
  * @returns {Promise<void>}
@@ -424,6 +452,8 @@ const dlGPXFile = async (file: `${string}.gpx`): Promise<void> => {
     throw new Error(`Erreur lors du téléchargement du fichier '${file}'. Les MD5 sont différents.`);
   }
 
+  await createGPXFolder();
+
   // On copie le fichier dans le dossier 'GPX'
   await FileSystem.copyAsync({
     from: `${GPX_TEMP_FOLDER}${file}`,
@@ -447,6 +477,7 @@ const dlGPXFile = async (file: `${string}.gpx`): Promise<void> => {
 export const getAndCopyGPXFiles = async (
   callbackToGetNumberOfFiles?: TCallbackToGetNumberOfFiles,
 ): Promise<void> => {
+  await createGPXFolder();
   await createGPXTempFolder();
 
   // On récupère la liste des fichiers GPX présents sur le téléphone

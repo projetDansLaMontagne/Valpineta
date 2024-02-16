@@ -24,7 +24,22 @@ const es = {
       button: "Essayons à nouveau",
     },
   },
-
+  loadingScreen: {
+    trigger: "sincronizar los datos",
+    triggerButton: "Sincronizar",
+    title: "Cargando...",
+    titleFinished: "¡Carga terminada!",
+    paragraph: "Cargamos los datos para usted.",
+    textBeforeButton: "Charger Page Loading",
+    buttonText: "Inicio",
+    error: "Se produjo un error, inténtalo de nuevo más tarde.",
+    noConnection: "Sin conexión a internet, inténtalo de nuevo más tarde",
+    steps: {
+      step1: "Cargando el archivo de excursiones.",
+      step2: "Actualización de las excursiones.",
+      step3: "Actualización de archivos de GPX.",
+    },
+  },
   mapScreen: {
     title: "Mapa",
     locate: {

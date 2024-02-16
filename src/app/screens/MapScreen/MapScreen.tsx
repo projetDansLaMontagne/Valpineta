@@ -33,11 +33,7 @@ import TilesRequire from "app/services/importAssets/tilesRequire";
 
 import fichierJson from "assets/Tiles/tiles_struct.json";
 import { ImageSource } from "react-native-vector-icons/Icon";
-import {
-  synchroDescendante,
-  TCallbackStep,
-  TCallbackToGetNumberOfFiles,
-} from "../../services/synchroDescendante/synchroDesc";
+
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
@@ -112,7 +108,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
-  const [excursions, setExcursions] = useState<Array<TExcursion>>(undefined);
+  const [excursions, _] = useState<Array<TExcursion>>(undefined);
 
   // Ref(s)
   const intervalRef = useRef(null);
@@ -138,14 +134,16 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   /**
    * Animate the map to follow the user location.
    * @param passedLocation {Location.LocationObject} The location to animate to
+   * @param debug {boolean} If true, log some debug information
    * @returns {void}
    */
   const animateToLocation: T_animateToLocation = (
     passedLocation: Location.LocationObject | LatLng,
+    debug?: boolean,
   ): void => {
     if (mapRef.current) {
       if (!location && !passedLocation) {
-        console.log("[MapScreen] location is null");
+        debug && console.log("[MapScreen] location is null");
         return;
       }
 
@@ -160,7 +158,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
         },
       });
     } else {
-      console.log("[MapScreen] mapRef.current is null");
+      debug && console.log("[MapScreen] mapRef.current is null");
     }
   };
 
@@ -168,13 +166,13 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied");
+      console.error("[MapScreen] Permission to access location was denied");
     } else {
       debug && console.log("[MapScreen] Permission ok");
       const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
       debug && console.log("[MapScreen] folderInfo: ", folderInfo);
       if (folderInfo.exists && !folderInfo.isDirectory) {
-        debug && console.log("Tuiles déjà DL");
+        debug && console.log("[MapScreen] Tuiles déjà DL");
         await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
       } else {
         // Supprimer le dossier
@@ -191,9 +189,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   /**
    * Remove the location subscription
    */
-  const removeLocationSubscription = () => {
+  const removeLocationSubscription = (debug?: boolean) => {
     if (watchPositionSubscriptionRef.current) {
-      console.log("[MapScreen] watchPositionSubscriptionRef.current.remove() ");
+      debug && console.log("[MapScreen] watchPositionSubscriptionRef.current.remove() ");
       watchPositionSubscriptionRef.current.remove();
 
       setLocation(null);
@@ -216,7 +214,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied");
+      console.error("[MapScreen] Permission to access location was denied");
+      setGavePermission(false);
+      return;
     }
 
     // write code for the app to handle GPS changes
@@ -251,9 +251,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     return false;
   };
 
-  const toggleFollowUserLocation = () => {
+  const toggleFollowUserLocation = async () => {
     if (!gavePermission) {
-      askUserLocation().then(() => console.log("[MapScreen] aled"));
+      await askUserLocation();
     }
 
     setFollowUserLocation(!followUserLocation);
@@ -324,28 +324,14 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     }
   }, [excursions]);
 
-  /**
-   *  ! TESTS
-   */
-  const coStepStatus: TCallbackStep = (compteur, total) => {
-    console.log(`[MapScreen] étape ${compteur} / ${total}`);
-  };
-
-  const coGPXStatus: TCallbackToGetNumberOfFiles = (filesDownloaded, filesToDl) => {
-    console.log(`[synchroDesc] fichiers GPX copiés: ${filesDownloaded} / ${filesToDl}`);
-  };
-  /**
-   * ! FIN TESTS
-   */
-
   useEffect(() => {
-    downloadTiles(true).then(() => {
-      console.log("[MapScreen] PAGE CHARGEE");
-    });
-
-    synchroDescendante(coStepStatus, coGPXStatus).then(() => {
-      console.log("[MapScreen] synchroDescendante() ok");
-    });
+    downloadTiles(true)
+      .then(() => {
+        console.log("[MapScreen] PAGE CHARGEE");
+      })
+      .catch(e => {
+        console.error("[MapScreen] PAGE CHARGEE error: ", e);
+      });
 
     return () => {
       removeLocationSubscription();

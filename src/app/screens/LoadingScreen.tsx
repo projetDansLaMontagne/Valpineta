@@ -1,6 +1,6 @@
 /**
  * @file src/app/screens/LoadingScreen.tsx
- * @description LoadingScreen component.
+ * @description Écran de chargement des fichiers GPX et du fichier `excursions.json`.
  * @author Tom Planche
  */
 
@@ -11,10 +11,12 @@ import { FC, useEffect, useState } from "react";
 import { Button, Icon, Screen, Text } from "../components";
 import { View, ViewStyle } from "react-native";
 import {
+  EDebugMode,
+  ESynchroDescendanteRes,
   getNumberOfExcursions,
   synchroDescendante,
-  TDebugMode,
 } from "../services/synchroDescendante/synchroDesc";
+import i18n from "i18n-js";
 // END IMPORTS ==========================================================================================   END IMPORTS
 
 // VARIABLES ================================================================================================ VARIABLE
@@ -32,45 +34,24 @@ type TEtape = {
   goal?: number;
 };
 
-// autres
-const etapes: TEtape[] = [
-  {
-    title: "Chargement du fichier des excursions.",
-    description: "blablalba",
-  },
-  {
-    title: "Mise à jour des excursions. Blablabla titre long",
-    description: "blablalba 2",
-  },
-  {
-    title: "Mise à jour des fichiers GPX.",
-    description: "blablalba 3",
-    goal: 2,
-  },
-];
 // END VARIABLES ======================================================================================= END VARIABLES
 
 // COMPONENENT  ============================================================================================= COMPONENT
 /**
  * Step component
  *
- * @param title
- * @param description
- * @param error
- * @param isLoading
- * @param isDone
- * @param currentStep
- * @param goal
+ *
+ * @return {JSX.Element}
  */
 const Step: FC<TEtape> = ({
-  title,
-  description,
-  error,
-  currentStep,
-  goal,
-  totalStep,
-  totalGoal,
-}) => {
+  title, // titre de l'étape
+  description, // description de l'étape
+  error, // erreur de l'étape
+  currentStep, // étape actuelle
+  goal, // objectif
+  totalStep, // étape totale
+  totalGoal, // objectif total
+}): JSX.Element => {
   // States
   const [isDetailVisible, setIsDetailVisible] = useState(false);
 
@@ -148,28 +129,32 @@ const Step: FC<TEtape> = ({
 export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingScreen(_props) {
   // States
   const [step, setStep] = useState(0);
-  const [stepsArray, setStepsArray] = useState(etapes);
+  const [stepsArray, setStepsArray] = useState<TEtape[]>();
 
   const [dlGPX, setDlGPX] = useState(0);
   const [totalGPX, setTotalGPX] = useState(0);
 
-  const [allOK, setAllOK] = useState(false);
+  const [synchroDescRes, setSynchroDescRes] = useState<ESynchroDescendanteRes>();
+  const [synchoTries, setSynchoTries] = useState(0);
 
   // Fonctions
   const goToMapScreen = () => {
-    // const { navigation } = _props;
-    // navigation.navigate("CarteStack");
-
-    setStep(step + 1);
+    _props.navigation.goBack();
+    _props.navigation.navigate("CarteStack");
   };
 
-  // useEffect
-  useEffect(() => {
-    const blabla = async () => {
-      const nbExcursions = await getNumberOfExcursions();
-      setTotalGPX(nbExcursions);
+  const retrySynchro = () => {
+    setStep(0);
+    trySyncho();
+  };
 
-      const synchoOK = await synchroDescendante(
+  const trySyncho = async () => {
+    const nbExcursions = await getNumberOfExcursions();
+    setTotalGPX(nbExcursions);
+    setSynchoTries(synchoTries => synchoTries + 1);
+
+    setSynchroDescRes(
+      await synchroDescendante(
         (step, totalSteps) => {
           console.log(`[LoadingScreen] step: ${step}/${totalSteps}`);
           setStep(step);
@@ -178,20 +163,34 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
           filesDownloaded > dlGPX && setDlGPX(filesDownloaded);
           filesToDl > totalGPX && setTotalGPX(filesToDl);
         },
-        TDebugMode.HIGH,
-      );
+        EDebugMode.LOW,
+      ),
+    );
+  };
 
-      if (!synchoOK) {
-        setStep(-1);
-      } else {
-        setAllOK(true);
-      }
+  // useEffect
+  useEffect(() => {
+    /**
+     * ! ii18n.t renvoie un objet, mais le type dit que c'est un string
+     */
+    const steps: { [key: string]: string } = i18n.t("loadingScreen.steps", {
+      returnObjects: true,
+    }) as unknown as {
+      // le `as unknown as` est nécessaire pour que le type soit accepté
+      [key: string]: string;
     };
+    const stepsArray: TEtape[] = Object.values(steps).map(title => ({ title }));
 
-    blabla();
+    setStepsArray(stepsArray);
+
+    trySyncho();
   }, []);
 
   useEffect(() => {
+    if (!stepsArray) {
+      return;
+    }
+
     if (step > 0) {
       setStepsArray(
         stepsArray.map((etape, index) => {
@@ -213,6 +212,9 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
   }, [step]);
 
   useEffect(() => {
+    if (!stepsArray) {
+      return;
+    }
     if (totalGPX > 0) {
       setStepsArray(
         stepsArray.map((etape, index) => {
@@ -238,22 +240,49 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
     }
   }, [dlGPX]);
 
+  useEffect(() => {
+    switch (synchroDescRes) {
+      case ESynchroDescendanteRes.KO:
+        if (synchoTries < 3) {
+          setTimeout(() => {
+            retrySynchro();
+          }, 3000);
+        } else {
+          setSynchroDescRes(ESynchroDescendanteRes.KO);
+        }
+
+        break;
+    }
+  }, [synchroDescRes]);
+
   // Render
   return (
     <Screen>
       <View style={$screenStyle}>
         <Text preset="heading" style={{ textAlign: "center" }}>
-          {allOK ? "Chargement terminé" : "Chargement en cours..."}
+          {synchroDescRes === ESynchroDescendanteRes.OK
+            ? i18n.t("loadingScreen.titleFinished")
+            : i18n.t("loadingScreen.title")}
         </Text>
         <Text tx="loadingScreen.paragraph" />
 
-        <View style={$stepContainerStyle}>
-          {stepsArray.map((etape, index) => (
-            <Step key={index} {...etape} totalStep={step} totalGoal={index + 1} />
-          ))}
-        </View>
+        {stepsArray && (
+          <View style={$stepContainerStyle}>
+            {stepsArray.map((etape, index) => (
+              <Step key={index} {...etape} totalStep={step} totalGoal={index + 1} />
+            ))}
+          </View>
+        )}
 
-        {allOK && <Button onPress={goToMapScreen} tx="loadingScreen.texteBouton" />}
+        {synchroDescRes === ESynchroDescendanteRes.OK && (
+          <Button onPress={goToMapScreen} tx="loadingScreen.buttonText" />
+        )}
+
+        {synchroDescRes === ESynchroDescendanteRes.KO && <Text tx="loadingScreen.error" />}
+
+        {synchroDescRes === ESynchroDescendanteRes.NO_CONNEXION && (
+          <Text tx="loadingScreen.noConnection" />
+        )}
       </View>
     </Screen>
   );

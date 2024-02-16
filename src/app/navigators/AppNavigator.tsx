@@ -26,6 +26,7 @@ import { Text } from "app/components";
 
 import { useStores } from "app/models";
 import React, { useEffect } from "react";
+import { checkIfFirstLaunch } from "../services/CheckIfFirstLaunch";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -117,10 +118,12 @@ type CarteStackParamList = {
   Carte: undefined;
   DetailsExcursion: undefined | { excursion: TExcursion };
   Description: { excursion: TExcursion };
+  Loading: undefined;
 };
 
 type ParametresStackParamList = {
   Parametres: undefined;
+  Loading: undefined;
 };
 
 export type AppStackParamList = {
@@ -174,6 +177,19 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     tabBarLabel: ({ color }) => <Text tx={tx} style={{ color, fontSize: 10 }} />,
   });
 
+  /**
+   * ! ca ne marche pas, par défaut pour le moment, l'app arrive sur la page de chargement
+   * ! a tous les coups.
+   */
+  // check si c'est la première fois que l'utilisateur ouvre l'application
+  const [firstLaunch, setFirstLaunch] = React.useState<boolean | undefined>();
+  useEffect(() => {
+    checkIfFirstLaunch().then(res => {
+      console.log(`[AppNavigator] checkIfFirstLaunch: ${res}`);
+      setFirstLaunch(res);
+    });
+  }, []);
+
   const Tab = createBottomTabNavigator();
   return (
     <NavigationContainer
@@ -182,7 +198,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        initialRouteName={"CarteStack"}
+        initialRouteName={firstLaunch ? "ParametresStack" : "CarteStack"}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
@@ -245,13 +261,16 @@ const CarteStackScreen = () => (
 );
 
 const ParametresStack = createNativeStackNavigator<ParametresStackParamList>();
-const ParametresStackScreen = () => (
-  <ParametresStack.Navigator
-    initialRouteName={"Parametres"}
-    screenOptions={{
-      headerShown: false,
-    }}
-  >
-    <ParametresStack.Screen name="Parametres" component={Screens.ParametresScreen} />
-  </ParametresStack.Navigator>
-);
+const ParametresStackScreen = () => {
+  return (
+    <ParametresStack.Navigator
+      initialRouteName={"Loading"}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <ParametresStack.Screen name="Loading" component={Screens.LoadingScreen} />
+      <ParametresStack.Screen name="Parametres" component={Screens.ParametresScreen} />
+    </ParametresStack.Navigator>
+  );
+};

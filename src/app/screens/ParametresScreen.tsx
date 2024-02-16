@@ -7,6 +7,7 @@ import { colors, spacing } from "app/theme";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useStores } from "app/models";
 import I18n from "i18n-js";
+import { useNavigation } from "@react-navigation/native";
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
 const { width, height } = Dimensions.get("window");
@@ -17,6 +18,8 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
   useEffect(() => {
     parametres.setLangues(I18n.locale);
   }, []);
+
+  const navigation = useNavigation();
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
@@ -43,7 +46,17 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           <Text style={$texteBouton} tx={"parametres.changerLangue.espagnol"} size="sm" />
         </TouchableOpacity>
       </View>
-      <Text></Text>
+      <View style={$containerBoutonLoadingScreen}>
+        <Text style={$texteParametre} tx={"loadingScreen.trigger"} size="sm" />
+        <TouchableOpacity
+          style={$containerBoutons}
+          onPress={() => {
+            navigation.navigate("Loading");
+          }}
+        >
+          <Text style={$buttonStyle} tx={"loadingScreen.triggerButton"} size="sm" />
+        </TouchableOpacity>
+      </View>
     </Screen>
   );
 });
@@ -51,7 +64,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
 const $titre: TextStyle = {
   marginTop: spacing.lg,
   marginBottom: spacing.xs,
-  width: width,
+  width,
   textAlign: "center",
   color: colors.text,
 };
@@ -59,7 +72,7 @@ const $titre: TextStyle = {
 const $souligne: ViewStyle = {
   borderBottomColor: colors.text,
   borderBottomWidth: 1,
-  width: width,
+  width,
 };
 
 const $containerUnParametre: ViewStyle = {
@@ -67,7 +80,7 @@ const $containerUnParametre: ViewStyle = {
   justifyContent: "space-around",
   padding: spacing.xs,
   paddingTop: spacing.lg,
-  width: width,
+  width,
 };
 
 const $containerIconTexte: ViewStyle = {
@@ -78,6 +91,13 @@ const $containerIconTexte: ViewStyle = {
 const $containerBoutons: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
+  marginHorizontal: spacing.sm,
+};
+
+const $containerBoutonLoadingScreen: ViewStyle = {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
   marginHorizontal: spacing.sm,
 };
 
@@ -97,4 +117,11 @@ const $texteBouton: TextStyle = {
   color: colors.text,
   paddingRight: spacing.xs,
   paddingLeft: spacing.xs,
+};
+
+const $buttonStyle: ViewStyle = {
+  borderColor: colors.bordure,
+  borderWidth: 1,
+  padding: spacing.sm,
+  borderRadius: 5,
 };
