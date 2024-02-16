@@ -111,7 +111,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     //utilser useEffect pour déclancher le popup lorsqu'on est a moins de 30 mètres d'un signalement
     useEffect(() => {
       const interval = setInterval(() => {
+        console.log("Vérification de proximité de signalements");
         if (userLocation) {
+          console.log("userLocationRecupéré")
           const coordUser: T_flat_point = {
             lat: userLocation?.latitude,
             lon: userLocation?.longitude,
@@ -125,10 +127,17 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
             const distance = distanceEntrePoints(coordUser, coordSignalement);
             if (distance < 0.03) {
+              console.log("Proximité d'un signalement");
               setModalSignalementVisible(true)
               setSignalementPopup(excursion.signalements[i])
             }
+            else {
+              console.log("Pas de signalement proche", distance);
+            }
           }
+        }
+        else {
+          console.log("userLocationPasRecupéré")
         }
       }, 5000); // exécute toutes les 5 secondes (5000 millisecondes)
 

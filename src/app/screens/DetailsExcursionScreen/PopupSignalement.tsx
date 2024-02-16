@@ -4,6 +4,7 @@ import { spacing } from "app/theme/spacing";
 import { ImageStyle, TextStyle, View, ViewStyle, Image, Modal } from "react-native";
 import { Text, Button } from "app/components";
 import { Dimensions } from 'react-native';
+import { useStores } from "app/models";
 
 const { height } = Dimensions.get('window');
 
@@ -17,7 +18,7 @@ export interface PopupSignalementProps {
 
 export function PopupSignalement(props: PopupSignalementProps) {
     const { signalement, modalSignalementVisible, setModalSignalementVisible, estEntier, setEstEntier } = props;
-
+    const { synchroMontante } = useStores();
     return (
         <Modal
             animationType="slide"
@@ -52,7 +53,7 @@ export function PopupSignalement(props: PopupSignalementProps) {
                         style={[$bouton, { backgroundColor: colors.palette.rouge }]}
                         textStyle={$texteBouton}
                         tx="detailsExcursion.popup.signalement.absent"
-                        onPress={() => setModalSignalementVisible(false)}
+                        onPress={() => [setModalSignalementVisible(false), synchroMontante.tryToPush]}
                     />
                     <Button
                         style={[$bouton, { backgroundColor: colors.palette.orange }]}

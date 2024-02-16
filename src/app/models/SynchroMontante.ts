@@ -19,6 +19,7 @@ const signalement = types.model({
 });
 const MINUTE_EN_MILLISECONDES = 60000;
 export enum EtatSynchro {
+  // TODO: ajoute des etats pour signalmements a supprimer
   RienAEnvoyer,
   NonConnecte,
   ErreurServeur,
@@ -37,6 +38,7 @@ export const SynchroMontanteModel = types
   .model("SynchroMontante")
   .props({
     signalements: types.optional(types.array(signalement), []),
+    signalementsASupprimer: types.optional(types.array(types.number), []),
     intervalId: types.maybeNull(types.union(types.number, types.frozen<null | NodeJS.Timeout>())),
     intervalleSynchro: types.optional(types.number, IntervalleSynchro.TresFrequente),
   })
@@ -90,6 +92,15 @@ export const SynchroMontanteModel = types
             return EtatSynchro.ErreurServeur;
           }
         }
+        if (self.signalementsASupprimer.length > 0) {
+          console.log("[SYNCHRO MONTANTE] tentative suppression");
+          const success = pushSignalementsASupprimer();
+          if (success) {
+            return EtatSynchro.BienEnvoye;
+          } else {
+            return EtatSynchro.ErreurServeur;
+          }
+        }
 
         // AJOUTER ICI LA SYNCHRO DES AUTRES DONNEES
 
@@ -131,6 +142,35 @@ export const SynchroMontanteModel = types
       return response.ok;
     }
 
+    function pushSignalementsASupprimer() {
+      // const response = await api.apisauce.post(
+      //   "set-signalement",
+      //   {
+      //     signalements: JSON.stringify(self.signalements),
+      //   },
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //   },
+      // );
+
+      const response = { ok: true };
+
+      if (response.ok) {
+        console.log("Signalements supprimés");
+        removeAllSignalementsASupprimer();
+      } else {
+        console.log(
+          "[SYNCHRO MONTANTE] Debug : Erreur serveur lors de la synchronisation : ",
+          // getGeneralApiProblem(response),
+        );
+      }
+
+      return response.ok;
+    }
+
+
     /* --------------------------------- SETTERS -------------------------------- */
     function addSignalement(signalement: T_Signalement) {
       self.signalements.push(signalement);
@@ -140,6 +180,10 @@ export const SynchroMontanteModel = types
     }
     function setIntervalleSynchro(intervalle: IntervalleSynchro) {
       self.intervalleSynchro = intervalle;
+    }
+
+    function removeAllSignalementsASupprimer() {
+      self.signalementsASupprimer.clear();
     }
 
     return {
@@ -152,7 +196,7 @@ export const SynchroMontanteModel = types
     };
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> {}
-export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> {}
-export interface SynchroMontanteSnapshotIn extends SnapshotIn<typeof SynchroMontanteModel> {}
+export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> { }
+export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> { }
+export interface SynchroMontanteSnapshotIn extends SnapshotIn<typeof SynchroMontanteModel> { }
 export const createSynchroMontanteDefaultModel = () => types.optional(SynchroMontanteModel, {});
