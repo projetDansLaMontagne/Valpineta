@@ -288,7 +288,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
               <Button
                 style={[$buttonCommencer, { bottom: 200 }]}
                 textStyle={{ color: colors.palette.blanc, fontSize: 22, fontWeight: "bold", justifyContent: "center" }}
-                text="Commencer"
+                tx="detailsExcursion.boutons.commencerExcursion"
                 onPress={() => setIsSuiviTrack(!isSuiviTrack)}
               />
               {containerInfoAffiche ? (

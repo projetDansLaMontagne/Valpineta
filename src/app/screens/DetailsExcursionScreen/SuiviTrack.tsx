@@ -116,8 +116,8 @@ export function SuiviTrack(props: SuiviTrackProps) {
   return excursion ? (
     <SwipeUpDown
       ref={swipeUpDownRef}
-      itemMini={item(true)}
-      itemFull={item(false)}
+      itemMini={item(excursion, true)}
+      itemFull={item(excursion, false)}
       animation="easeInEaseOut"
       swipeHeight={height / 5 + footerHeight}
       disableSwipeIcon={true}
@@ -129,17 +129,17 @@ export function SuiviTrack(props: SuiviTrackProps) {
   );
 
   //Fonction principale
-  function item(isMini) {
+  function item(excursion, isMini) {
     return (
       <View style={isMini ? $containerPetit : $containerGrand}>
         <View style={$containerBoutonChrono}>
-          <TouchableOpacity onPress={() => { toggleChrono(); modifierEtatExcursion(suiviExcursion); }}>
+          <TouchableOpacity onPress={() => { toggleChrono(); modifierEtatExcursion(excursion, suiviExcursion); }}>
             <Image
               style={$boutonPauseArret}
               tintColor={colors.bouton}
-              source={chronoRunning ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
+              source={suiviExcursion.etat == "enCours" ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { resetChrono(); suiviExcursion.setEtat("terminee") }}>
+          <TouchableOpacity onPress={() => { resetChrono(); suiviExcursion.setEtat({ newEtat: "terminee" }) }}>
             <Image style={$boutonPauseArret} source={require("assets/icons/arret.png")} />
           </TouchableOpacity>
         </View>
@@ -178,7 +178,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
                     lon: signalement.lon,
                   };
 
-                  const positionPercentage = (recupDistance(coordonnesSignalement, excursion.track) / parseFloat(excursion.distance)) * 100;
+                  const positionPercentage = (recupDistance(coordonnesSignalement, excursion.track) / excursion.distance) * 100;
                   return (
                     <View key={index} style={{ position: 'absolute', left: `${positionPercentage}%`, bottom: spacing.xs }}>
                       <Image
@@ -434,12 +434,12 @@ function descritpion(excursion, altitudeActuelle) {
   );
 }
 
-function modifierEtatExcursion(suiviExcursion) {
+function modifierEtatExcursion(excursion, suiviExcursion) {
   if (suiviExcursion.etat === "enCours") {
-    suiviExcursion.setEtat("enPause");
+    suiviExcursion.setEtat({ newEtat: "enPause" });
   }
   else {
-    suiviExcursion.setEtat("enCours");
+    suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: excursion.track });
   }
 }
 

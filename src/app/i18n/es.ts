@@ -62,6 +62,7 @@ const es = {
       lireSuite: "Leer más",
       voirDetails: "Ver detalles",
       retourInformations: "Volver a la información",
+      commencerExcursion: "Empezar",
     },
     erreur: {
       titre: "Error",

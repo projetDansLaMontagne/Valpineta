@@ -13,7 +13,7 @@ interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> { }
 const { width, height } = Dimensions.get("window");
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
-  const { parametres, synchroMontante } = useStores();
+  const { parametres, synchroMontante, suiviExcursion } = useStores();
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
@@ -57,6 +57,43 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           dropdownContainerStyle={$dropdownContainerStyle}
         />
       </View>
+      <Text>{suiviExcursion.etat}</Text>
+
+      {suiviExcursion.etat === "enCours" && (
+        <>
+          <Button
+            text="Mettre en pause"
+            onPress={() => suiviExcursion.setEtat({ newEtat: "enPause" })}
+          />
+          <Button text="Stopper" onPress={() => suiviExcursion.setEtat({ newEtat: "terminee" })} />
+        </>
+      )}
+      {suiviExcursion.etat === "enPause" && (
+        <>
+          <Button
+            text="Reprendre"
+            onPress={() => suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: [] })}
+          />
+          <Button text="Stopper" onPress={() => suiviExcursion.setEtat({ newEtat: "terminee" })} />
+        </>
+      )}
+      {suiviExcursion.etat === "terminee" && (
+        <Button
+          text="Valider fin de rando"
+          onPress={() => suiviExcursion.setEtat({ newEtat: "nonDemarree" })}
+        />
+      )}
+      {suiviExcursion.etat === "nonDemarree" && (
+        <Button
+          text="Demarrer rando"
+          onPress={() => suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: [] })}
+        />
+      )}
+      {suiviExcursion.trackReel.map((point, i) => (
+        <Text key={i}>
+          {new Date(point.timestamp).toLocaleTimeString()} {point.lat} {point.lon}
+        </Text>
+      ))}
     </Screen>
   );
 });

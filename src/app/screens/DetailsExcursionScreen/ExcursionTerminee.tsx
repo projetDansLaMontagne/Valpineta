@@ -28,12 +28,12 @@ export function ExcursionTerminee(props: ExcursionTermineeProps) {
                     <View style={styles.containerBouton}>
                         <TouchableOpacity
                             style={[styles.button, { opacity: 0.7 }]}
-                            onPress={() => { setModalExcursionTermineeVisible(!modalExcursionTermineeVisible); suiviExcursion.setEtat("nonDemarree") }}>
+                            onPress={() => { setModalExcursionTermineeVisible(!modalExcursionTermineeVisible); suiviExcursion.setEtat({ newEtat: "nonDemarree" }) }}>
                             <Text style={styles.textStyle} tx="detailsExcursion.popup.excursionTerminee.fermer" size="sm" />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => { setModalExcursionTermineeVisible(!modalExcursionTermineeVisible); navigation.navigate("Carte"); suiviExcursion.setEtat("nonDemarree") }}>
+                            onPress={() => { setModalExcursionTermineeVisible(!modalExcursionTermineeVisible); navigation.navigate("Carte"); suiviExcursion.setEtat({ newEtat: "nonDemarree" }) }}>
                             <Text style={styles.textStyle} tx="detailsExcursion.popup.excursionTerminee.accueil" size="sm" />
                         </TouchableOpacity>
                     </View>

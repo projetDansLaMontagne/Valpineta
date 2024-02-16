@@ -63,6 +63,7 @@ const fr = {
       lireSuite: "Lire la suite",
       voirDetails: "Voir détails",
       retourInformations: "Revenir aux informations",
+      commencerExcursion: "Commencer",
     },
     erreur: {
       titre: "Erreur",
