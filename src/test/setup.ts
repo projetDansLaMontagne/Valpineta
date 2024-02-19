@@ -28,9 +28,6 @@ jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
 )
 
-jest.mock('@react-native-community/netinfo', () => mockRNCNetInfo);
-
-
 jest.mock("i18n-js", () => ({
   currentLocale: () => "en",
   t: (key: string, params: Record<string, string>) => {

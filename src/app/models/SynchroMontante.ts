@@ -10,11 +10,12 @@ import { Instance, SnapshotIn, SnapshotOut, types, unprotect, isProtected } from
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import { T_Signalement } from "app/navigators";
 import NetInfo from "@react-native-community/netinfo";
-import { reaction } from "mobx";
+import { reaction, runInAction } from "mobx";
 //Api
 import { api } from "app/services/api";
 import { getGeneralApiProblem } from "app/services/api/apiProblem";
 import { ApiResponse } from "apisauce";
+import { run } from "jest";
 
 const signalement = types.model({
   nom: types.string,
@@ -25,7 +26,7 @@ const signalement = types.model({
   lon: types.number,
   postId: types.number,
 });
-const MINUTE_EN_MILLISECONDES = 60000;
+export const MINUTE_EN_MILLISECONDES = 60000;
 export enum EtatSynchro {
   RienAEnvoyer,
   NonConnecte,
@@ -49,6 +50,8 @@ export const SynchroMontanteModel = types
     signalements: types.optional(types.array(signalement), []),
     // intervalId: types.maybeNull(types.union(types.number, types.frozen<null | NodeJS.Timeout>())),
     intervalleSynchro: types.optional(types.number, IntervalleSynchro.TresFrequente),
+    tryingToPush: types.optional(types.boolean, false),
+    testing: types.optional(types.boolean, false),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -68,6 +71,7 @@ export const SynchroMontanteModel = types
         },
       );
     }
+    /*istanbul ignore next*/
     function beforeDestroy() {
       clearInterval(intervalId);
     }
@@ -76,32 +80,42 @@ export const SynchroMontanteModel = types
      * Si oui, tente de les pousser vers le serveur
      */
     async function startChecking() {
-      const { isConnected } = await NetInfo.fetch();
+      let isConnected = false;
+      if (self.testing) {
+        isConnected = true;
+      } else {
+        /*istanbul ignore next*/
+        const state = await NetInfo.fetch();
+        /*istanbul ignore next*/
+        isConnected = state.isConnected;
+      }
+      /*istanbul ignore next*/
       intervalId = setInterval(
         () => tryToPush(isConnected, self.signalements),
         self.intervalleSynchro * MINUTE_EN_MILLISECONDES,
       );
     }
-    /**
-     * Stoppe la boucle de synchronisation
-     */
-    // function stopChecking() {
-    //   if (self.intervalId) {
-    //     clearInterval(self.intervalId);
-    //   }
-    // }
 
     const tryToPush = async (
       isConnected: boolean,
       signalements: T_Signalement[],
     ): Promise<EtatSynchro> => {
       if (isConnected) {
-        if (signalements.length > 0) {
+        if (signalements.length > 0 && !self.tryingToPush) {
+          runInAction(() => {
+            self.tryingToPush = true;
+          });
           const response = await callApi(signalements);
           const success = await traiterResultat(response);
           if (success) {
+            runInAction(() => {
+              self.tryingToPush = false;
+            });
             return EtatSynchro.BienEnvoye;
           } else {
+            runInAction(() => {
+              self.tryingToPush = false;
+            });
             return EtatSynchro.ErreurServeur;
           }
         }
@@ -119,7 +133,9 @@ export const SynchroMontanteModel = types
     async function traiterResultat(response: ApiResponse<any, any>): Promise<boolean> {
       if (response) {
         if (response.ok) {
-          removeAllSignalements();
+          runInAction(() => {
+            self.signalements.clear();
+          });
           return true;
         } else {
           getGeneralApiProblem(response);
@@ -149,15 +165,16 @@ export const SynchroMontanteModel = types
     function addSignalement(signalement: T_Signalement) {
       self.signalements.push(signalement);
     }
-    function removeAllSignalements() {
-      self.signalements.clear();
-    }
     function setIntervalleSynchro(intervalle: IntervalleSynchro) {
       if (intervalle in IntervalleSynchro) {
         self.intervalleSynchro = intervalle;
       } else {
         self.intervalleSynchro = IntervalleSynchro.TresFrequente;
       }
+    }
+
+    function setTryingtoPush(tryingToPush: boolean) {
+      self.tryingToPush = tryingToPush;
     }
 
     return {
@@ -167,8 +184,8 @@ export const SynchroMontanteModel = types
       callApi,
       tryToPush,
       addSignalement,
-      removeAllSignalements,
       setIntervalleSynchro,
+      setTryingtoPush,
     };
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
 

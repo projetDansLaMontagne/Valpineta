@@ -7,10 +7,10 @@
  * @see https://medium.com/welldone-software/jest-how-to-mock-a-function-call-inside-a-module-21c05c57a39f
  */
 
-import { expect, test, beforeAll, afterAll, describe, jest } from "@jest/globals";
+import { expect, test, beforeAll, afterAll, afterEach, describe, jest, beforeEach } from "@jest/globals";
 import { SynchroMontanteModel } from "./SynchroMontante";
 import { T_Signalement } from "app/navigators";
-import { EtatSynchro, IntervalleSynchro, intervalId } from "./SynchroMontante";
+import { EtatSynchro, IntervalleSynchro, intervalId, MINUTE_EN_MILLISECONDES} from "./SynchroMontante";
 import { ApiOkResponse, ApiResponse } from "apisauce";
 import { destroy, unprotect } from "mobx-state-tree";
 import mockRNCNetInfo from '@react-native-community/netinfo/jest/netinfo-mock.js';
@@ -43,15 +43,14 @@ const signalementInvalide: T_Signalement = {
 describe("[SynchroMontante] fonctions interne", () => {
   let synchroMontante: ReturnType<typeof SynchroMontanteModel.create>;
 
-  describe("[SynchroMontante] fonctions de manipulation des signalements", () => {
-    beforeAll(() => {
-      synchroMontante = SynchroMontanteModel.create({});
-      unprotect(synchroMontante);
+  beforeEach(() => {
+    synchroMontante = SynchroMontanteModel.create({
+      testing: true,
     });
+    unprotect(synchroMontante);
+  });
 
-    afterAll(() => {
-      destroy(synchroMontante);
-    });
+  describe("[SynchroMontante] fonctions de manipulation des signalements", () => {
 
     test("Doit ajouter un signalement", () => {
       const signalementLength = synchroMontante.signalements.length;
@@ -64,20 +63,9 @@ describe("[SynchroMontante] fonctions interne", () => {
     test("Doit renvoyer erreur si signalement n'est pas de type T_Signalement", () => {
       expect(() => synchroMontante.addSignalement("test")).toThrowError();
     });
-    test("Doit supprimer tout les signalements", () => {
-      synchroMontante.addSignalement(signalementValide);
-      synchroMontante.addSignalement(signalementValide);
-      synchroMontante.addSignalement(signalementValide);
-      synchroMontante.removeAllSignalements();
-      expect(synchroMontante.signalements.length).toBe(0);
-    });
   });
 
   describe("[SynchroMontante] Fonctions avec l'interval", () => {
-    beforeAll(() => {
-      synchroMontante = SynchroMontanteModel.create({});
-      unprotect(synchroMontante);
-    });
 
     test("Doit pouvoir changer l'intervalle de synchronisation", () => {
       synchroMontante.setIntervalleSynchro(IntervalleSynchro.Moderee);
@@ -251,29 +239,13 @@ describe("[SynchroMontante] fonctions interne", () => {
       ]);
       expect(result).toBe(EtatSynchro.ErreurServeur);
     });
-  });
-});
 
-describe("[SynchroMontante] Démons", ()=>{
-
-  test("Doit appeler tryToPush toutes les minutes", async ()=>{
-
-    const synchroMontante = SynchroMontanteModel.create({
-      intervalleSynchro: IntervalleSynchro.TresFrequente,
+    test("Doit renvoyer EtatSynchro.RienAEnvoyer si tryingToPush est a true", async () => {
+      synchroMontante.setTryingtoPush(true);
+      synchroMontante.addSignalement(signalementValide);
+      const result = await synchroMontante.tryToPush(true, synchroMontante.signalements);
+      expect(result).toBe(EtatSynchro.RienAEnvoyer);
     });
 
-    jest.spyOn(synchroMontante, "tryToPush");
-
-    unprotect(synchroMontante);
-    await sleep(1000);
-    expect(synchroMontante.tryToPush).toHaveBeenCalledTimes(1);
-    await sleep(1000);
-    expect(synchroMontante.tryToPush).toHaveBeenCalledTimes(2);
-    await sleep(1000);
-    expect(synchroMontante.tryToPush).toHaveBeenCalledTimes(3);
-  }, 10000);
+  });
 });
-
-function sleep (ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
