@@ -10,7 +10,7 @@ import I18n from "i18n-js";
 import { useNavigation } from "@react-navigation/native";
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
   const { parametres } = useStores();

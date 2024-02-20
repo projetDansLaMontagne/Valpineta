@@ -1,6 +1,8 @@
 /**
  * @file src/app/screens/LoadingScreen.tsx
  * @description Écran de chargement des fichiers GPX et du fichier `excursions.json`.
+ * Cet écran est le premier écran de l'application, il est affiché lors du lancement de l'application.
+ * Il est aussi affiché lors de la synchronisation manuelle (paramètres > Synchroniser).
  * @author Tom Planche
  */
 
@@ -9,7 +11,7 @@ import { AppStackScreenProps } from "../navigators";
 import { observer } from "mobx-react-lite";
 import { FC, useEffect, useState } from "react";
 import { Button, Icon, Screen, Text } from "../components";
-import { View, ViewStyle } from "react-native";
+import { ActivityIndicator, View, ViewStyle } from "react-native";
 import {
   EDebugMode,
   ESynchroDescendanteRes,
@@ -38,8 +40,14 @@ type TEtape = {
 
 // COMPONENENT  ============================================================================================= COMPONENT
 /**
- * Step component
+ * Composant Step
  *
+ * Il représente une étape de la synchronisation descendante.
+ * Une étape peut être en chargement, terminée ou en erreur.
+ * Elle peut aussi avoir une description.
+ *
+ * Elle peut aussi avoir un compteur de progression (ex: 3/5).
+ * 3 serait `currentStep` et 5 serait `goal`.
  *
  * @return {JSX.Element}
  */
@@ -47,10 +55,10 @@ const Step: FC<TEtape> = ({
   title, // titre de l'étape
   description, // description de l'étape
   error, // erreur de l'étape
-  currentStep, // étape actuelle
-  goal, // objectif
-  totalStep, // étape totale
-  totalGoal, // objectif total
+  currentStep, // étape actuelle / progression par rapport à l'objectif de l'étape actuelle
+  goal, // objectif de l'étape actuelle
+  totalStep, // étape totale de la synchronisation
+  totalGoal, // objectif total de la synchronisation
 }): JSX.Element => {
   // States
   const [isDetailVisible, setIsDetailVisible] = useState(false);
@@ -104,13 +112,15 @@ const Step: FC<TEtape> = ({
           />
         )}
 
-        {totalStep >= totalGoal && (
+        {totalStep >= totalGoal ? (
           <Icon
             icon={"check"}
             style={{
               alignSelf: "center",
             }}
           />
+        ) : (
+          <ActivityIndicator size="small" color="black" />
         )}
       </View>
 

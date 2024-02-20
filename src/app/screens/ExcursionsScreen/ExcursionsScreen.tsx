@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { AppStackScreenProps, TExcursion, TFiltres, T_valeurs_filtres } from "app/navigators";
 import { Screen, Text } from "app/components";
@@ -236,6 +237,8 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           <Image style={styles.iconeFiltre} source={filtreIcone} />
         </TouchableOpacity>
       </View>
+
+      {!excursionsFiltreesBarre && <ActivityIndicator size="large" color={colors.palette.vert} />}
 
       {excursionsFiltreesBarre &&
         (excursionsFiltreesBarre.length == 0 ? (

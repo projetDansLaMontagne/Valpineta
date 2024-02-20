@@ -19,6 +19,11 @@
  *   - GPX:
  *     - API qui prend un fichier en paramètre et qui renvoie le MD5 du fichier afin de
  *     vérifier si le téléchargement s'est bien passé.
+ *       -> `${BASE_URL}md5-file?file=tracks/<nom-du-fichier-extension-incluse>`
+ *   - `excursions.json`:
+ *     - API qui renvoie le MD5 du fichier `excursions.json` afin de vérifier si le téléchargement
+ *     s'est bien passé.
+ *       -> `${BASE_URL}excursions?isMd5=true`
  *
  * ! REMARQUES
  * - Pour le moment, je compare chaque excursion et chaque signalement. Nous n'avons pas côté API
