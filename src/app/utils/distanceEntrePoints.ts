@@ -33,9 +33,9 @@ export const distanceEntrePoints = (coord1: T_flat_point, coord2: T_flat_point) 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(coord1.lat)) *
-    Math.cos(toRadians(coord2.lat)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos(toRadians(coord2.lat)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   // Distance en radians
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));

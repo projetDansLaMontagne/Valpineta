@@ -21,7 +21,7 @@ export interface ListeSignalementsProps {
   distanceDepuisUser?: boolean; // Si true, on trie les signalements par rapport à la distance depuis l'utilisateur sinon on trie par rapport à la distance depuis le départ
 }
 export function ListeSignalements(props: ListeSignalementsProps) {
-  const calculerDistanceSignalement = (signalement) => {
+  const calculerDistanceSignalement = signalement => {
     // Déclaration des coordonnées à l'intérieur de la fonction
     const coordSignalement: T_flat_point = {
       lat: signalement.lat,
@@ -33,10 +33,19 @@ export function ListeSignalements(props: ListeSignalementsProps) {
     };
 
     if (props.distanceDepuisUser) {
-      const distanceDepartPointLePlusProcheSignalement = recupDistance(coordSignalement, props.excursion.track);
-      const distanceDepartPointLePlusProcheUtilisateur = recupDistance(coordUser, props.excursion.track);
-      let distanceSignalement = distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur;
-      return distanceSignalement < 0 ? translate("listeSignalements.signalementDepasse") : distanceSignalement;
+      const distanceDepartPointLePlusProcheSignalement = recupDistance(
+        coordSignalement,
+        props.excursion.track,
+      );
+      const distanceDepartPointLePlusProcheUtilisateur = recupDistance(
+        coordUser,
+        props.excursion.track,
+      );
+      let distanceSignalement =
+        distanceDepartPointLePlusProcheSignalement - distanceDepartPointLePlusProcheUtilisateur;
+      return distanceSignalement < 0
+        ? translate("listeSignalements.signalementDepasse")
+        : distanceSignalement;
     } else {
       return props.userLocation ? recupDistance(coordSignalement, props.excursion.track) : Infinity;
     }
@@ -81,15 +90,11 @@ export function ListeSignalements(props: ListeSignalementsProps) {
     });
   };
 
-
-
   return (
     <View style={props.style}>
       <ScrollView>
         <TouchableWithoutFeedback>
-          <View style={$containerSignalements}>
-            {renderSignalements()}
-          </View>
+          <View style={$containerSignalements}>{renderSignalements()}</View>
         </TouchableWithoutFeedback>
       </ScrollView>
 
@@ -105,7 +110,6 @@ export function ListeSignalements(props: ListeSignalementsProps) {
     </View>
   );
 }
-
 
 const { width, height } = Dimensions.get("window");
 

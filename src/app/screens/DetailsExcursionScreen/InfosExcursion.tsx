@@ -89,12 +89,21 @@ export function InfosExcursion(props: InfosExcursionProps) {
                 }}
               >
                 {description === "" ? null : (
-                  <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
+                  <Text
+                    style={$lienDescription}
+                    tx="detailsExcursion.boutons.lireSuite"
+                    size="xxs"
+                  />
                 )}
               </TouchableOpacity>
             </View>
             {/* Appel de la fonction pour traiter les signalements et générer les éléments JSX correspondants */}
-            {renderSignalements(signalements, setIsAllSignalements, userLocation, props.excursion.track)}
+            {renderSignalements(
+              signalements,
+              setIsAllSignalements,
+              userLocation,
+              props.excursion.track,
+            )}
             <View style={$containerDenivele}>
               <Text tx="detailsExcursion.titres.denivele" size="xl" />
               {excursion.track && (
@@ -104,7 +113,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
-    )
+    );
   }
 
   /**
@@ -123,11 +132,16 @@ export function InfosExcursion(props: InfosExcursionProps) {
   }
 
   // Fonction pour traiter les signalements et générer les éléments JSX correspondants
-  function renderSignalements(signalements: T_Signalement[], setIsAllSignalements: Function, userLocation: any, track: any) {
+  function renderSignalements(
+    signalements: T_Signalement[],
+    setIsAllSignalements: Function,
+    userLocation: any,
+    track: any,
+  ) {
     // Trier les signalements en fonction de leur distance par rapport à l'utilisateur
     const sortedSignalements = signalements
       .slice() // Pour créer une copie du tableau afin de ne pas modifier l'original
-      .map((signalement) => {
+      .map(signalement => {
         // Calcul de la distance pour chaque signalement
         const coordSignalement: T_flat_point = {
           lat: signalement.lat,
@@ -162,7 +176,9 @@ export function InfosExcursion(props: InfosExcursionProps) {
                   <View key={index}>
                     <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
                       <CarteSignalement
-                        type={signalement.type === "Avertissement" ? "avertissement" : "pointInteret"}
+                        type={
+                          signalement.type === "Avertissement" ? "avertissement" : "pointInteret"
+                        }
                         details={false}
                         nomSignalement={signalement.nom}
                         distanceDuDepart={`${distanceSignalement + " km"}`}

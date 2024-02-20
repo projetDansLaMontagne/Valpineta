@@ -106,7 +106,7 @@ const fr = {
     },
   },
   listeSignalements: {
-    signalementDepasse: "Dépassé"
+    signalementDepasse: "Dépassé",
   },
   parametres: {
     titre: "Paramètres",
@@ -117,7 +117,7 @@ const fr = {
     },
     choisirSynchro: {
       titre: "Synchronisation",
-    }
+    },
   },
   pageFiltres: {
     tri: {

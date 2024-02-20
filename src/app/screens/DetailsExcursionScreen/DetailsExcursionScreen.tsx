@@ -1,7 +1,13 @@
 import React, { FC, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
-import { AppStackScreenProps, TPoint, T_Signalement, T_excursion, T_flat_point } from "app/navigators";
+import {
+  AppStackScreenProps,
+  TPoint,
+  T_Signalement,
+  T_excursion,
+  T_flat_point,
+} from "app/navigators";
 import { GpxDownloader } from "./GpxDownloader";
 import { Text, Erreur, Button } from "app/components";
 import { spacing, colors } from "app/theme";
@@ -57,7 +63,7 @@ export type TExcursion = {
   track: T_Point[];
 };
 
-interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> { }
+interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
 export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
   function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
     const { route, navigation } = props;
@@ -77,10 +83,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const footerHeight = useBottomTabBarHeight();
     const allPoints = excursion.track.map(
       (point: T_Point) =>
-      ({
-        latitude: point.lat,
-        longitude: point.lon,
-      } as LatLng),
+        ({
+          latitude: point.lat,
+          longitude: point.lon,
+        } as LatLng),
     );
 
     // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
@@ -111,7 +117,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     //utilser useEffect pour déclancher le popup lorsqu'on est a moins de 30 mètres d'un signalement
     useEffect(() => {
       if (userLocation) {
-        console.log("userLocation", userLocation);
         const coordUser: T_flat_point = {
           lat: userLocation?.latitude,
           lon: userLocation?.longitude,
@@ -125,31 +130,38 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
           const distance = distanceEntrePoints(coordUser, coordSignalement);
           if (distance < 0.03) {
-            setModalSignalementVisible(true)
-            setSignalementPopup(excursion.signalements[i])
+            setModalSignalementVisible(true);
+            setSignalementPopup(excursion.signalements[i]);
           }
         }
       }
-    }
-      , [userLocation]);
+    }, [userLocation]);
 
     useEffect(() => {
       if (suiviExcursion.etat === "terminee") {
-        setModalExcursionTermineeVisible(true)
+        setModalExcursionTermineeVisible(true);
       }
-    }
-      , [suiviExcursion.etat]);
+    }, [suiviExcursion.etat]);
 
     // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <View style={$container}>
-
         {modalSignalementVisible && isSuiviTrack && (
-          <PopupSignalement signalement={signalementPopup} modalSignalementVisible={modalSignalementVisible} setModalSignalementVisible={setModalSignalementVisible} estEntier={estEntier} setEstEntier={setEstEntier} />
+          <PopupSignalement
+            signalement={signalementPopup}
+            modalSignalementVisible={modalSignalementVisible}
+            setModalSignalementVisible={setModalSignalementVisible}
+            estEntier={estEntier}
+            setEstEntier={setEstEntier}
+          />
         )}
 
         {modalExcursionTermineeVisible && isSuiviTrack && (
-          <ExcursionTerminee navigation={navigation} modalExcursionTermineeVisible={modalExcursionTermineeVisible} setModalExcursionTermineeVisible={setModalExcursionTermineeVisible} />
+          <ExcursionTerminee
+            navigation={navigation}
+            modalExcursionTermineeVisible={modalExcursionTermineeVisible}
+            setModalExcursionTermineeVisible={setModalExcursionTermineeVisible}
+          />
         )}
 
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
@@ -171,11 +183,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         )}
 
         {isSuiviTrack ? (
-          <SuiviTrack
-            excursion={excursion}
-            navigation={navigation}
-            setStartPoint={setStartPoint}
-          />
+          <SuiviTrack excursion={excursion} navigation={navigation} setStartPoint={setStartPoint} />
         ) : (
           <SwipeUpDown
             itemMini={itemMini()}
@@ -193,7 +201,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             swipeHeight={30 + footerHeight}
             disableSwipeIcon={true}
             ref={swipeUpDownRef}
-          />)}
+          />
+        )}
       </View>
     ) : (
       <Erreur navigation={navigation} />
@@ -240,8 +249,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             style={$containerGrand}
           />
         );
-      }
-      else {
+      } else {
         return (
           <View style={$containerGrand}>
             <View style={$containerTitre}>
@@ -285,7 +293,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
               />
               <Button
                 style={[$buttonCommencer, { bottom: 200 }]}
-                textStyle={{ color: colors.palette.blanc, fontSize: 22, fontWeight: "bold", justifyContent: "center" }}
+                textStyle={{
+                  color: colors.palette.blanc,
+                  fontSize: 22,
+                  fontWeight: "bold",
+                  justifyContent: "center",
+                }}
                 tx="detailsExcursion.boutons.commencerExcursion"
                 onPress={() => setIsSuiviTrack(!isSuiviTrack)}
               />

@@ -44,12 +44,12 @@ type MapScreenProps = AppStackScreenProps<"Carte"> & {
   children?: React.ReactNode;
 } & (
     | {
-      hideOverlay: true;
-    }
+        hideOverlay: true;
+      }
     | {
-      hideOverlay: false;
-      overlayDebugMode?: boolean;
-    }
+        hideOverlay: false;
+        overlayDebugMode?: boolean;
+      }
   );
 
 type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) => void;
@@ -124,7 +124,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   const [excursions, setExcursions] = useState<TExcursion[]>(undefined);
 
-  const [coordinates, setCoordinates] = useState<Array<{ latitude: number; longitude: number }>>([]);
+  const [coordinates, setCoordinates] = useState<Array<{ latitude: number; longitude: number }>>(
+    [],
+  );
 
   const [userLocation, setUserLocation] = useState(null);
 
@@ -364,7 +366,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     const fetchLocation = async () => {
       const location = await getUserLocation();
       setUserLocation(location);
-
     };
     const interval = setInterval(fetchLocation, userLocationIntervalMs);
     return () => {
@@ -376,10 +377,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     if (userLocation) {
       if (userLocation.latitude && userLocation.longitude && estDemarre) {
         // Ajoutez les nouvelles coordonnées à la liste des coordonnées.
-        setCoordinates([...coordinates, { latitude: userLocation.latitude, longitude: userLocation.longitude }]);
-      };
+        setCoordinates([
+          ...coordinates,
+          { latitude: userLocation.latitude, longitude: userLocation.longitude },
+        ]);
+      }
     }
-
   }, [userLocation]);
 
   const { width, height } = Dimensions.get("window");
@@ -434,7 +437,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             maxZoomLevel={15} // Niveau de zoom maximum
           >
             {/* Polyline pour tracer le trajet */}
-            <Polyline coordinates={coordinates} strokeColor={colors.palette.vertTresClair} strokeWidth={5} />
+            <Polyline
+              coordinates={coordinates}
+              strokeColor={colors.palette.vertTresClair}
+              strokeWidth={5}
+            />
 
             <UrlTile
               urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
@@ -452,51 +459,51 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               // Oier voulait toutes les excursions sur la carte
               // si on était pas dans la page détail excursion.
               !_props.isInDetailExcursion &&
-              excursions !== undefined &&
-              excursions.length > 0 &&
-              excursions.map((excursion, index) => {
-                if (excursion.track) {
-                  return (
-                    <React.Fragment key={index}>
-                      <Polyline
-                        coordinates={excursion.track.map(point => {
-                          return {
-                            latitude: point.lat,
-                            longitude: point.lon,
-                          } as LatLng;
-                        })}
-                        strokeColor={colors.palette.vert}
-                        strokeWidth={5}
-                        style={{
-                          zIndex: 1000000,
-                        }}
-                      />
-
-                      <Marker
-                        coordinate={
-                          {
-                            latitude: excursion.track[0].lat ?? 0,
-                            longitude: excursion.track[0].lon ?? 0,
-                          } as LatLng
-                        }
-                        title={excursion.fr.nom}
-                        centerOffset={{ x: 0, y: -15 }}
-                      >
-                        <Image
-                          source={image}
+                excursions !== undefined &&
+                excursions.length > 0 &&
+                excursions.map((excursion, index) => {
+                  if (excursion.track) {
+                    return (
+                      <React.Fragment key={index}>
+                        <Polyline
+                          coordinates={excursion.track.map(point => {
+                            return {
+                              latitude: point.lat,
+                              longitude: point.lon,
+                            } as LatLng;
+                          })}
+                          strokeColor={colors.palette.vert}
+                          strokeWidth={5}
                           style={{
-                            width: 30,
-                            height: 30,
-                            tintColor: colors.palette.marron,
+                            zIndex: 1000000,
                           }}
                         />
-                      </Marker>
-                    </React.Fragment>
-                  );
-                } else {
-                  return null;
-                }
-              })
+
+                        <Marker
+                          coordinate={
+                            {
+                              latitude: excursion.track[0].lat ?? 0,
+                              longitude: excursion.track[0].lon ?? 0,
+                            } as LatLng
+                          }
+                          title={excursion.fr.nom}
+                          centerOffset={{ x: 0, y: -15 }}
+                        >
+                          <Image
+                            source={image}
+                            style={{
+                              width: 30,
+                              height: 30,
+                              tintColor: colors.palette.marron,
+                            }}
+                          />
+                        </Marker>
+                      </React.Fragment>
+                    );
+                  } else {
+                    return null;
+                  }
+                })
             }
           </MapView>
 

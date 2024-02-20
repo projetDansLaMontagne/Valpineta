@@ -16,7 +16,7 @@ import { CarteExcursion } from "./CarteExcursion";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
 
-interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> { }
+interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
 
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(
   props: ExcursionsScreenProps,

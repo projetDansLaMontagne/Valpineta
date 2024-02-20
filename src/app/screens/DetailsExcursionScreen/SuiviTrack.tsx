@@ -43,10 +43,8 @@ export function SuiviTrack(props: SuiviTrackProps) {
   const [chronoTime, setChronoTime] = useState(0);
   const [avancement, setAvancement] = useState(0);
 
-
   function showMini() {
-    if (swipeUpDownRef.current)
-      swipeUpDownRef.current.showMini();
+    if (swipeUpDownRef.current) swipeUpDownRef.current.showMini();
   }
 
   function toggleChrono() {
@@ -121,7 +119,6 @@ export function SuiviTrack(props: SuiviTrackProps) {
       animation="easeInEaseOut"
       swipeHeight={height / 5 + footerHeight}
       disableSwipeIcon={true}
-
     />
   ) : (
     //sinon on affiche une erreur
@@ -133,13 +130,28 @@ export function SuiviTrack(props: SuiviTrackProps) {
     return (
       <View style={isMini ? $containerPetit : $containerGrand}>
         <View style={$containerBoutonChrono}>
-          <TouchableOpacity onPress={() => { toggleChrono(); modifierEtatExcursion(excursion, suiviExcursion); }}>
+          <TouchableOpacity
+            onPress={() => {
+              toggleChrono();
+              modifierEtatExcursion(excursion, suiviExcursion);
+            }}
+          >
             <Image
               style={$boutonPauseArret}
               tintColor={colors.bouton}
-              source={suiviExcursion.etat == "enCours" ? require("assets/icons/pause.png") : require("assets/icons/play.png")} />
+              source={
+                suiviExcursion.etat == "enCours"
+                  ? require("assets/icons/pause.png")
+                  : require("assets/icons/play.png")
+              }
+            />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { resetChrono(); suiviExcursion.setEtat({ newEtat: "terminee" }) }}>
+          <TouchableOpacity
+            onPress={() => {
+              resetChrono();
+              suiviExcursion.setEtat({ newEtat: "terminee" });
+            }}
+          >
             <Image style={$boutonPauseArret} source={require("assets/icons/arret.png")} />
           </TouchableOpacity>
         </View>
@@ -149,10 +161,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
             <Text style={$texteInfo}>{formatTime(chronoTime)}</Text>
           </View>
           <View style={$containerInfo}>
-            <Image
-              style={$icone}
-              source={require("assets/icons/denivelePositifV2.png")}
-            />
+            <Image style={$icone} source={require("assets/icons/denivelePositifV2.png")} />
             <Text style={$texteInfo}> {deniveleMonte.toFixed()} m</Text>
           </View>
           <View style={$containerInfo}>
@@ -163,7 +172,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
         <View style={{ bottom: spacing.xs }}>
           <View>
             <View style={$containerProgress}>
-              {excursion.signalements && (
+              {excursion.signalements &&
                 //pour chaque signalement, en fonction de son type on affiche une icone differente
                 excursion.signalements.map((signalement, index) => {
                   let icone;
@@ -178,9 +187,18 @@ export function SuiviTrack(props: SuiviTrackProps) {
                     lon: signalement.lon,
                   };
 
-                  const positionPercentage = (recupDistance(coordonnesSignalement, excursion.track) / excursion.distance) * 100;
+                  const positionPercentage =
+                    (recupDistance(coordonnesSignalement, excursion.track) / excursion.distance) *
+                    100;
                   return (
-                    <View key={index} style={{ position: 'absolute', left: `${positionPercentage}%`, bottom: spacing.xs }}>
+                    <View
+                      key={index}
+                      style={{
+                        position: "absolute",
+                        left: `${positionPercentage}%`,
+                        bottom: spacing.xs,
+                      }}
+                    >
                       <Image
                         source={require("assets/icons/pinFull.png")}
                         style={{
@@ -190,15 +208,12 @@ export function SuiviTrack(props: SuiviTrackProps) {
                             signalement.type == "PointInteret"
                               ? colors.palette.vert
                               : colors.palette.rouge,
-                        }} />
-                      <Image
-                        source={icone}
-                        style={iconeStyle}
+                        }}
                       />
+                      <Image source={icone} style={iconeStyle} />
                     </View>
                   );
-                })
-              )}
+                })}
               <View style={$progressBar}>
                 <View style={{ ...$progressBarFill, width: `${progress}%` }} />
               </View>
@@ -210,16 +225,20 @@ export function SuiviTrack(props: SuiviTrackProps) {
           <View style={$listeDistances}>
             <View style={$containerTextVariable}>
               <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
-              <Text size="xs" weight="bold">{avancement.toFixed(2)} km</Text>
+              <Text size="xs" weight="bold">
+                {avancement.toFixed(2)} km
+              </Text>
               {/*A remplacer par la distance parcourue par l'utilisateur*/}
             </View>
             <View style={$containerTextVariable}>
               <Text tx={"suiviTrack.barreAvancement.total"} size="xs" />
-              <Text size="xs" weight="bold">{excursion.distance} km</Text>
+              <Text size="xs" weight="bold">
+                {excursion.distance} km
+              </Text>
             </View>
           </View>
         </View>
-        {isMini ? null :
+        {isMini ? null : (
           <View>
             <View style={$containerBouton}>
               <TouchableOpacity
@@ -231,7 +250,11 @@ export function SuiviTrack(props: SuiviTrackProps) {
                 <Text
                   tx="suiviTrack.titres.description"
                   size="lg"
-                  style={[containerInfoAffiche ? { color: colors.bouton, paddingLeft: spacing.lg } : { color: colors.text, paddingLeft: spacing.lg }]}
+                  style={[
+                    containerInfoAffiche
+                      ? { color: colors.bouton, paddingLeft: spacing.lg }
+                      : { color: colors.text, paddingLeft: spacing.lg },
+                  ]}
                 />
               </TouchableOpacity>
               <TouchableOpacity
@@ -243,51 +266,53 @@ export function SuiviTrack(props: SuiviTrackProps) {
                 <Text
                   tx="suiviTrack.titres.signalements"
                   size="lg"
-                  style={[containerInfoAffiche ? { color: colors.text, paddingEnd: spacing.lg } : { color: colors.bouton, paddingEnd: spacing.lg }]}
+                  style={[
+                    containerInfoAffiche
+                      ? { color: colors.text, paddingEnd: spacing.lg }
+                      : { color: colors.bouton, paddingEnd: spacing.lg },
+                  ]}
                 />
               </TouchableOpacity>
             </View>
             <View
               style={[
                 $souligneDescriptionAvis,
-                containerInfoAffiche
-                  ? { left: spacing.lg }
-                  : { left: width / 2 },
+                containerInfoAffiche ? { left: spacing.lg } : { left: width / 2 },
               ]}
             ></View>
             {containerInfoAffiche ? (
               descritpion(excursion, altitudeActuelle)
+            ) : userLocation == null ? (
+              <View style={$containerLoader}>
+                <ActivityIndicator size="large" color={colors.palette.vert} />
+              </View>
             ) : (
-              userLocation == null ? (
-                <View style={$containerLoader}>
-                  <ActivityIndicator size="large" color={colors.palette.vert} />
-                </View>
-              ) : (
-                <ListeSignalements
-                  excursion={excursion}
-                  footerHeight={footerHeight}
-                  style={$containerSignalements}
-                  userLocation={userLocation}
-                  distanceDepuisUser={true}
-                  setStartPoint={setStartPoint}
-                  swipeDown={showMini}
-                />
-              )
-            )
-            }
-
-
+              <ListeSignalements
+                excursion={excursion}
+                footerHeight={footerHeight}
+                style={$containerSignalements}
+                userLocation={userLocation}
+                distanceDepuisUser={true}
+                setStartPoint={setStartPoint}
+                swipeDown={showMini}
+              />
+            )}
           </View>
-        }
-      </View >
+        )}
+      </View>
     );
   }
 }
 
-
 /* --------------------------------- Fonctions --------------------------------- */
 
-function getUserLocationAndUpdate(setAltitudeActuelle, setDeniveleMonte, deniveleMonte, setDeniveleDescendu, deniveleDescendu) {
+function getUserLocationAndUpdate(
+  setAltitudeActuelle,
+  setDeniveleMonte,
+  deniveleMonte,
+  setDeniveleDescendu,
+  deniveleDescendu,
+) {
   return new Promise(async (resolve, reject) => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -437,8 +462,7 @@ function descritpion(excursion, altitudeActuelle) {
 function modifierEtatExcursion(excursion, suiviExcursion) {
   if (suiviExcursion.etat === "enCours") {
     suiviExcursion.setEtat({ newEtat: "enPause" });
-  }
-  else {
+  } else {
     suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: excursion.track });
   }
 }
@@ -655,9 +679,9 @@ const iconeStyle: ImageStyle = {
   height: 18,
   top: 4,
   left: 7.2,
-  position: 'absolute',
-  tintColor: colors.palette.blanc
-}
+  position: "absolute",
+  tintColor: colors.palette.blanc,
+};
 
 const $containerLoader: ViewStyle = {
   top: height / 7,

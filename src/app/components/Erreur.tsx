@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export interface ErreurProps {
-  navigation: NativeStackNavigationProp<any>
+  navigation: NativeStackNavigationProp<any>;
 }
 
 /**

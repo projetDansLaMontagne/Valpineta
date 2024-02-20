@@ -101,7 +101,6 @@ export const SynchroMontanteModel = types
             return EtatSynchro.ErreurServeur;
           }
         }
-
         // AJOUTER ICI LA SYNCHRO DES AUTRES DONNEES
 
         return EtatSynchro.RienAEnvoyer;
@@ -170,7 +169,6 @@ export const SynchroMontanteModel = types
       return response.ok;
     }
 
-
     /* --------------------------------- SETTERS -------------------------------- */
     function addSignalement(signalement: T_Signalement) {
       self.signalements.push(signalement);
@@ -181,7 +179,9 @@ export const SynchroMontanteModel = types
     function setIntervalleSynchro(intervalle: IntervalleSynchro) {
       self.intervalleSynchro = intervalle;
     }
-
+    function addSignalementASupprimer(id: number) {
+      self.signalementsASupprimer.push(id);
+    }
     function removeAllSignalementsASupprimer() {
       self.signalementsASupprimer.clear();
     }
@@ -193,10 +193,11 @@ export const SynchroMontanteModel = types
       addSignalement,
       removeAllSignalements,
       setIntervalleSynchro,
+      addSignalementASupprimer,
     };
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> { }
-export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> { }
-export interface SynchroMontanteSnapshotIn extends SnapshotIn<typeof SynchroMontanteModel> { }
+export interface SynchroMontanteStore extends Instance<typeof SynchroMontanteModel> {}
+export interface SynchroMontanteSnapshotOut extends SnapshotOut<typeof SynchroMontanteModel> {}
+export interface SynchroMontanteSnapshotIn extends SnapshotIn<typeof SynchroMontanteModel> {}
 export const createSynchroMontanteDefaultModel = () => types.optional(SynchroMontanteModel, {});

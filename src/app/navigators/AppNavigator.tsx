@@ -74,6 +74,7 @@ export type TFiltres = {
 export type T_TypeSignalement = "PointInteret" | "Avertissement";
 
 export type T_Signalement = {
+  id?: number;
   nom: string;
   description: string;
   image: string;
@@ -146,7 +147,7 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 /* -------------------------------------------------------------------------- */
 
 export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer>> { }
+  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme();

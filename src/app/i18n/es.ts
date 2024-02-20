@@ -105,7 +105,7 @@ const es = {
     },
   },
   listeSignalements: {
-    signalementDepasse: "Superado"
+    signalementDepasse: "Superado",
   },
   parametres: {
     titre: "Ajustes",
