@@ -97,13 +97,35 @@ export function SuiviTrack(props: SuiviTrackProps) {
       // Convertir la distance en nombre
       const distanceNumber = excursion.distance;
 
-      if (!isNaN(distanceNumber) && avancement < distanceNumber) {
-        setAvancement(prevAvancement => {
-          const newAvancement = prevAvancement + 0.005; // A modifier par la distance parcourue par l'utilisateur
-          return newAvancement;
+      if (!isNaN(distanceNumber) && avancement < distanceNumber) { // A voir avec nico comment je récupère la distance, genre est ce que je dois la calculer ou est ce que je la récupère
+        setAvancement(() => {
+          if (suiviExcursion.trackSuivi.length > 0 && suiviExcursion.trackReel.length > 0) {
+            let distance = 0;
+            const dernierIndextrackSuivi = suiviExcursion.trackSuivi.length - 1;
+            const dernierElementTrackSuivi = suiviExcursion.trackSuivi[dernierIndextrackSuivi];
+            const latDernier = dernierElementTrackSuivi.lat;
+            const lonDernier = dernierElementTrackSuivi.lon;
+
+            const dernierIndextrackReel = suiviExcursion.trackReel.length - 1;
+            const dernierElementTrackReel = suiviExcursion.trackReel[dernierIndextrackReel];
+            const latDernierReel = dernierElementTrackReel.lat;
+            const lonDernierReel = dernierElementTrackReel.lon;
+            
+            if(latDernier == latDernierReel && lonDernier == lonDernierReel){
+              distance = dernierElementTrackSuivi.dist;
+            }
+            return distance;
+        }
+        else{
+          return 0;
+        }
+          
         });
 
         setProgress((avancement / distanceNumber) * 100);
+      }
+      else {
+        
       }
     }, 500);
 
