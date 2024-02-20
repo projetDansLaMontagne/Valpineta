@@ -103,10 +103,12 @@ Voici quelques liens afin de pouvoir continuer les recherches :
 * [Timer Mocks](https://jestjs.io/docs/timer-mocks)
 
 
-##Liens utiles :
+##Ressources :
 * [Jest](https://jestjs.io/fr/docs/getting-started)
 * [Mobx state tree](https://mobx-state-tree.js.org/intro/welcome)
 * [Notre boilerplate avec mobx state tree](https://github.com/infinitered/ignite/blob/master/docs/concept/MobX-State-Tree.md)
 * [Notre boilerplate avec jest](https://github.com/infinitered/ignite/blob/master/docs/concept/Testing.md)
+
+Contact <oier.cesat@gmail.com>
 
 
