@@ -1,1 +1,8 @@
 src/
+
+
+.commitignore
+.idea
+.expo
+commit_message.md
+package-lock.json
