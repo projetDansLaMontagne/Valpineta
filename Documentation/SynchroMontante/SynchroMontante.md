@@ -19,7 +19,7 @@ Le service regroupe toutes les fonctions permetant d'envoyer en base de données
 Une fois le signalement envoyé, le serveur renvoie une réponse qui sera traité par le service, puis le service renvera un status à la Screen, qui affichera une alerte correspondante au status. 
 
 ##Test 
-Afin de pouvoir tester la synchronisation montante, nous avons réalisés des tests unitaires sur les fonctions permetant de pouvoir envoyer des signalements. Pour l'instant tous les tests réalisés, sont des tests unitaires réalisés avec [Jest](https://jestjs.io/fr/docs/getting-started) sur la classe et les fonctions du store de la synchronisation montante.
+Afin de pouvoir tester la synchronisation montante, nous avons réalisés des tests unitaires sur les fonctions permetant de pouvoir envoyer des signalements. Pour l'instant tous les tests réalisés, sont des tests unitaires réalisés avec [Jest](https://jestjs.io/fr/docs/getting-started) sur la classe et les fonctions du store de la synchronisation montante. Si vous n'êtes pas à l'aise avec les tests, jetez un oeil sur [comment tester Valpineta](./../Test.md).
 
 Les fonctions qui sont couvertes par des tests unitaires sont :
 ```
@@ -30,7 +30,7 @@ addSignalement,
 setIntervalleSynchro,
 setTryingtoPush,
 ```
-Ces fonctions sont regroupés par des ``describe`` qui englobent une serie de test spécifique. Il en existe 5, fonctions de manipulation des signalements, fonctions avec l'interval, callApi, traiterResultat et tryToPush. Chacun de ces ``describe`` permet de pouvoir tester soit une fonction spécifique si elle contient beaucoup beaucoup de test, comme callApi, tryToPush ou bien traiterResultat ou alors de pouvoir tester certaines fonctions liées entre elles.
+Nous avons un describe global et 5 sous describe. 
 Nous allons décrire plus en détail chaque serie de test.
 
 ###Fonctions de manipulation des signalements
