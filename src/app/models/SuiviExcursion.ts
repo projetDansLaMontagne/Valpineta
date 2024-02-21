@@ -1,7 +1,6 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import * as Location from "expo-location";
-import { TPoint } from "app/navigators";
 import * as TaskManager from "expo-task-manager";
 
 // Types
@@ -34,7 +33,7 @@ export const SuiviExcursionModel = types
     trackReel: types.optional(types.array(T_point_GPX), []),
     trackSuivi: types.optional(types.array(T_point), []),
     iPointCourant: 0,
-    __DEV__: true,
+    __DEV__: false,
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -80,7 +79,7 @@ export const SuiviExcursionModel = types
     type switchStateParams =
       | {
           newEtat: "enCours";
-          trackSuivi: Instance<typeof T_point>[];
+          trackSuivi?: Instance<typeof T_point>[]; // Si on passe de nonDemarree a enCours, on doit fournir le trackSuivi
         }
       | { newEtat: Exclude<T_etat_excursion, "enCours"> };
     /**
@@ -91,19 +90,11 @@ export const SuiviExcursionModel = types
       console.log(self.etat, "-->", props.newEtat);
       const { newEtat } = props;
 
-      /* ---------------------------------- Debug --------------------------------- */
-      // if (self.__DEV__ && newEtat == "enCours") {
-      //   // En debug, on met un track personnalise pour pouvoir faire des tests
-      //   const track: TPoint[] = require("assets/tests_examples/track_test_tache_loca.json");
-      //   props.trackSuivi = track as Instance<typeof T_point>[];
-      // }
-
       /* ------------------------------ Verifications ----------------------------- */
       let verificationsOK = false;
-      // changement d etat possible
       switch (self.etat) {
         case "nonDemarree":
-          if (newEtat === "enCours") verificationsOK = true;
+          if (newEtat === "enCours" && props.trackSuivi !== undefined) verificationsOK = true;
           break;
 
         case "enCours":
@@ -117,10 +108,6 @@ export const SuiviExcursionModel = types
         case "terminee":
           if (newEtat === "nonDemarree") verificationsOK = true;
           break;
-      }
-      // params : trackSuivi bien present
-      if (newEtat === "enCours" && !props.trackSuivi) {
-        verificationsOK = false;
       }
 
       /* -------------------------- Actions consecutives -------------------------- */
@@ -197,8 +184,13 @@ export const SuiviExcursionModel = types
         if ((await tacheEnCours()) === false) {
           await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME, {
             accuracy: ACCURACY,
-            timeInterval: self.__DEV__ ? 1000 : undefined,
+            timeInterval: self.__DEV__
+              ? 1000
+              : undefined /**@warning ne fonctionne pas sur Xiaomi. L'opti de batterie fait qu il envoie la loc seulement quand on bouge */,
             distanceInterval: self.__DEV__ ? undefined : DISTANCE_INTERVAL,
+
+            pausesUpdatesAutomatically: self.__DEV__ ? false : true, // APPLE only : permet d envoyer moins de loc si elles sont rapprochees
+            showsBackgroundLocationIndicator: true, // APPLE only : pour changer l apparence du bandeau
 
             foregroundService: {
               notificationTitle: "Suivi de votre randonnées en cours",
