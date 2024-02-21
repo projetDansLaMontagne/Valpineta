@@ -16,7 +16,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
   const { parametres, synchroMontante, suiviExcursion } = useStores();
 
   // En debug, on met un track personnalise pour pouvoir faire des tests haut niveau
-  const trackSuivi: TPoint[] = require("assets/tests_examples/track_test_manuel_devant_chez_nico.json");
+  const trackSuivi: TPoint[] = undefined; // = require("assets/tests_examples/track_test_manuel_devant_chez_nico.json");
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>

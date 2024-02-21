@@ -472,7 +472,7 @@ function modifierEtatExcursion(excursion, suiviExcursion) {
   if (suiviExcursion.etat === "enCours") {
     suiviExcursion.setEtat({ newEtat: "enPause" });
   } else {
-    suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: excursion.track });
+    suiviExcursion.setEtat({ newEtat: "enCours" });
   }
 }
 
