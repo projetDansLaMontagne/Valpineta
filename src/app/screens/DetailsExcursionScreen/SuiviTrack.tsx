@@ -19,6 +19,7 @@ import { ListeSignalements } from "./ListeSignalements";
 import { recupDistance } from "app/utils/recupDistance";
 import { T_flat_point, T_excursion } from "app/navigators";
 import { useStores } from "app/models";
+import { set } from "date-fns";
 const { width, height } = Dimensions.get("window");
 
 export interface SuiviTrackProps {
@@ -47,10 +48,6 @@ export function SuiviTrack(props: SuiviTrackProps) {
     if (swipeUpDownRef.current) swipeUpDownRef.current.showMini();
   }
 
-  function toggleChrono() {
-    setChronoRunning(!chronoRunning);
-  }
-
   function resetChrono() {
     setChronoRunning(false);
     setChronoTime(0);
@@ -63,6 +60,14 @@ export function SuiviTrack(props: SuiviTrackProps) {
     const format = (num: number) => (num < 10 ? `0${num}` : `${num}`);
     return `${format(hours)}:${format(minutes)}:${format(seconds)}`;
   }
+
+  useEffect(() => {
+    if (suiviExcursion.etat == "enCours") {
+      setChronoRunning(true);
+    } else if (suiviExcursion.etat == "enPause") {
+      setChronoRunning(false);
+    }
+  }, [suiviExcursion.etat]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -97,35 +102,18 @@ export function SuiviTrack(props: SuiviTrackProps) {
       // Convertir la distance en nombre
       const distanceNumber = excursion.distance;
 
-      if (!isNaN(distanceNumber) && avancement < distanceNumber) { // A voir avec nico comment je récupère la distance, genre est ce que je dois la calculer ou est ce que je la récupère
+      if (!isNaN(distanceNumber) && avancement < distanceNumber) {
+        // On récupère la distance parcourue grace a trackSuivi et là distance du point courant par rapport au départ, car on veut pas afficher que l'utilisateur a parcouru plus que la distance totale
         setAvancement(() => {
-          if (suiviExcursion.trackSuivi.length > 0 && suiviExcursion.trackReel.length > 0) {
-            let distance = 0;
-            const dernierIndextrackSuivi = suiviExcursion.trackSuivi.length - 1;
-            const dernierElementTrackSuivi = suiviExcursion.trackSuivi[dernierIndextrackSuivi];
-            const latDernier = dernierElementTrackSuivi.lat;
-            const lonDernier = dernierElementTrackSuivi.lon;
-
-            const dernierIndextrackReel = suiviExcursion.trackReel.length - 1;
-            const dernierElementTrackReel = suiviExcursion.trackReel[dernierIndextrackReel];
-            const latDernierReel = dernierElementTrackReel.lat;
-            const lonDernierReel = dernierElementTrackReel.lon;
-            
-            if(latDernier == latDernierReel && lonDernier == lonDernierReel){
-              distance = dernierElementTrackSuivi.dist;
-            }
-            return distance;
-        }
-        else{
-          return 0;
-        }
-          
+          if (suiviExcursion.iPointCourant > 0) {
+            return suiviExcursion.trackSuivi[suiviExcursion.iPointCourant].dist;
+          } else {
+            return 0;
+          }
         });
 
         setProgress((avancement / distanceNumber) * 100);
-      }
-      else {
-        
+      } else {
       }
     }, 500);
 
@@ -154,7 +142,6 @@ export function SuiviTrack(props: SuiviTrackProps) {
         <View style={$containerBoutonChrono}>
           <TouchableOpacity
             onPress={() => {
-              toggleChrono();
               modifierEtatExcursion(excursion, suiviExcursion);
             }}
           >

@@ -300,7 +300,10 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   justifyContent: "center",
                 }}
                 tx="detailsExcursion.boutons.commencerExcursion"
-                onPress={() => setIsSuiviTrack(!isSuiviTrack)}
+                onPress={() => [
+                  setIsSuiviTrack(!isSuiviTrack),
+                  suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: excursion.track }),
+                ]}
               />
               {containerInfoAffiche ? (
                 <InfosExcursion
