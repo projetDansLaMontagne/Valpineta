@@ -8,10 +8,16 @@ export interface ExcursionTermineeProps {
   navigation: NativeStackNavigationProp<any>;
   modalExcursionTermineeVisible: boolean;
   setModalExcursionTermineeVisible: (modalExcursionTermineeVisible: boolean) => void;
+  setIsSuiviTrack;
 }
 
 export function ExcursionTerminee(props: ExcursionTermineeProps) {
-  const { navigation, modalExcursionTermineeVisible, setModalExcursionTermineeVisible } = props;
+  const {
+    navigation,
+    modalExcursionTermineeVisible,
+    setModalExcursionTermineeVisible,
+    setIsSuiviTrack,
+  } = props;
   const { suiviExcursion } = useStores();
 
   return (
@@ -35,6 +41,7 @@ export function ExcursionTerminee(props: ExcursionTermineeProps) {
               onPress={() => {
                 setModalExcursionTermineeVisible(!modalExcursionTermineeVisible);
                 suiviExcursion.setEtat({ newEtat: "nonDemarree" });
+                setIsSuiviTrack(false);
               }}
             >
               <Text
@@ -49,6 +56,7 @@ export function ExcursionTerminee(props: ExcursionTermineeProps) {
                 setModalExcursionTermineeVisible(!modalExcursionTermineeVisible);
                 navigation.navigate("Carte");
                 suiviExcursion.setEtat({ newEtat: "nonDemarree" });
+                setIsSuiviTrack(false);
               }}
             >
               <Text

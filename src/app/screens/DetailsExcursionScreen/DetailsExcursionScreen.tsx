@@ -161,6 +161,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
             navigation={navigation}
             modalExcursionTermineeVisible={modalExcursionTermineeVisible}
             setModalExcursionTermineeVisible={setModalExcursionTermineeVisible}
+            setIsSuiviTrack={setIsSuiviTrack}
           />
         )}
 

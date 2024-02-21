@@ -142,7 +142,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
         <View style={$containerBoutonChrono}>
           <TouchableOpacity
             onPress={() => {
-              modifierEtatExcursion(excursion, suiviExcursion);
+              modifierEtatExcursion(suiviExcursion);
             }}
           >
             <Image
@@ -468,7 +468,7 @@ function descritpion(excursion, altitudeActuelle) {
   );
 }
 
-function modifierEtatExcursion(excursion, suiviExcursion) {
+function modifierEtatExcursion(suiviExcursion) {
   if (suiviExcursion.etat === "enCours") {
     suiviExcursion.setEtat({ newEtat: "enPause" });
   } else {

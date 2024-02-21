@@ -64,6 +64,7 @@ const fr = {
       voirDetails: "Voir détails",
       retourInformations: "Revenir aux informations",
       commencerExcursion: "Commencer",
+      reprendreExcursion: "Revenir à l'excursion en cours",
     },
     erreur: {
       titre: "Erreur",
