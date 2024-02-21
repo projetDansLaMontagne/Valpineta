@@ -10,20 +10,17 @@ La synchronisation montante des données fonctionne sur 3 étapes dans l'applica
 
 ## Fonctionnement
 
-### NouveauSignalementScreen
+Dans un Screen, l'utilisateur déclenche une action nécessitant l'envoie de données en base de données. Des fonctions sont alors déclenchées afin de vérifier que ce qui est envoyé en base de données soit cohérent et interprétable par le serveur.
 
-Dans cette Screen, l'utilisateur peut remplir des champs necessaires à l'envoie du signalement comme le titre, la description, et ajouter une image 
-
+###Ajouter un signalement
+Pour ajouter un signalement, plusieurs vérification sont faites, et plusieurs demandes de permissions.
 Pour pouvoir ajouter une photo, nous avons besoin de la permission de l'utilisateur d'utiliser l'appareil photo ainsi que sa librairie. En fonction de ces autorisations, la fonction choisirPhoto afin un actionSheet, appèle la fonction prendrePhoto() ou bien ajouterPhoto()
 
 Une fois tous les champs ajoutés, la fonction verifSignalement vérifie toutes les informations de l'utilisateur afin de pouvoir envoyer un signalement cohérent à la base de données. S'il un d'eux n'est pas conforme, alors la fonction renvoie à l'utilisateur une alerte informant qu'une des valeurs n'est pas conforme.
 
 ### Store
-Une fois le signalement crée, il est ajouté dans un store, ici SynchroMontante. Cela permet de stocker dans un tableau tous les signalements à envoyer et d'y accéder de n'importe où dans l'application. 
-
-### Sercive
-Le service regroupe toutes les fonctions permetant d'envoyer en base de données un signalement. Dans le fichier synchroMontanteService nous avons plusieurs fonctions atomiques et une englobant tous les autres. Cette fonction globale SynchroMontanteSignalement est appelée par NouveauSignalementScreen lorsque le signalement est validé par vérifSignalement. Ensuite, l'image est transformée en base64, puis on vérifie si le signalement existe déjà dans le store, si ça n'est pas le cas, on l'ajoute dans le store. Ensuite on vérifie si l'application est connecté et dans ce cas le signalement est envoyé en base de données. 
-Une fois le signalement envoyé, le serveur renvoie une réponse qui sera traité par le service, puis le service renvera un status à la Screen, qui affichera une alerte correspondante au status. 
+Une fois l'attribut conforme, il est ajouté dans le store synchroMontante. Cela permet de stocker tous les attribut à envoyer et d'y accéder de n'importe où dans l'application. 
+Ce strore vient avec plusieurs méthodes qui permettent de gérer la réponse du serveur et d'éffectuer des traitements. Si l'envoie des données ne s'est pas passée correctement, l'attribut est toujours stocké dans le store et sera renvoyé plus tard selon un interval défini par l'utilisateur dans les paramètres. Si l'envoie s'est bien passé, alors l'attribut est supprimé du store afin de ne pas le renvoyer lors du future tentative.
 
 ## Tests
 Afin de pouvoir tester la synchronisation montante, nous avons réalisés des tests unitaires sur les fonctions permetant de pouvoir envoyer des signalements. Pour l'instant tous les tests réalisés, sont des tests unitaires réalisés avec [Jest](JestGettingStarted) sur la classe et les fonctions du store de la synchronisation montante. Si vous n'êtes pas à l'aise avec les tests, jetez un oeil sur [comment tester Valpineta](documentation-des-tests).

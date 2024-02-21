@@ -4,16 +4,14 @@ serveur Valpineta:{
 Application Valpineta{
     label.near: top-left
 }
-Application Valpineta.Services
-Application Valpineta.Stores
+
 Application Valpineta.Screen 
+Application Valpineta.Stores.Attributs
+Application Valpineta.Stores.Methodes
 
-Application Valpineta.Screen.NouveauSignalementScreen -> Application Valpineta.Stores.SynchroMontante: Ajout d'un signalement
-Application Valpineta.Stores.SynchroMontante -> Application Valpineta.Services.SynchroMontanteServiceSignalement : si l'utilisateur est connecté
-Application Valpineta.Services.SynchroMontanteServiceSignalement -> serveur Valpineta : signalements envoyés
-serveur Valpineta -> Application Valpineta.Services.SynchroMontanteServiceSignalement : réponse du serveur
-Application Valpineta.Services.SynchroMontanteServiceSignalement -> Application Valpineta.Screen.NouveauSignalementScreen: Informer l'utilisateur
-
-Application Valpineta.Stores.SynchroMontante -> Application Valpineta.Screen.NouveauSignalementScreen : non connecté
-(Application Valpineta.Stores.SynchroMontante -> Application Valpineta.Screen.NouveauSignalementScreen)[0].style.stroke:red
-
+Application Valpineta.Screen.NouveauSignalementScreen -> Application Valpineta.Stores.Attributs: Ajout d'un signalement
+Application Valpineta.Stores.Attributs -> Application Valpineta.Stores.Methodes : si l'utilisateur est connecté
+Application Valpineta.Stores.Methodes -> serveur Valpineta : signalements envoyés
+Application Valpineta.Stores.Methodes -> Application Valpineta.Stores.Methodes : "Chrone envoyant les signalements"
+serveur Valpineta -> Application Valpineta.Stores.Methodes : réponse du serveur
+Application Valpineta.Stores.Methodes -> Application Valpineta.Screen.NouveauSignalementScreen: Informer l'utilisateur
