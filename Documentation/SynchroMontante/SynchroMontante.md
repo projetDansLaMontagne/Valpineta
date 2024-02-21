@@ -21,6 +21,7 @@ Une fois tous les champs ajoutés, la fonction verifSignalement vérifie toutes 
 ### Store
 Une fois l'attribut conforme, il est ajouté dans le store synchroMontante. Cela permet de stocker tous les attribut à envoyer et d'y accéder de n'importe où dans l'application. 
 Ce strore vient avec plusieurs méthodes qui permettent de gérer la réponse du serveur et d'éffectuer des traitements. Si l'envoie des données ne s'est pas passée correctement, l'attribut est toujours stocké dans le store et sera renvoyé plus tard selon un interval défini par l'utilisateur dans les paramètres. Si l'envoie s'est bien passé, alors l'attribut est supprimé du store afin de ne pas le renvoyer lors du future tentative.
+En effet, un chrone se lance juste après la création du store synchroMontante. Il vérifie s'il y a des attributs a envoyer en base de données et si l'utilisateur est connecté, sinon le chrone fera une nouvelle tentative selon l'interval défini dans les paramètres.
 
 ## Tests
 Afin de pouvoir tester la synchronisation montante, nous avons réalisés des tests unitaires sur les fonctions permetant de pouvoir envoyer des signalements. Pour l'instant tous les tests réalisés, sont des tests unitaires réalisés avec [Jest](JestGettingStarted) sur la classe et les fonctions du store de la synchronisation montante. Si vous n'êtes pas à l'aise avec les tests, jetez un oeil sur [comment tester Valpineta](documentation-des-tests).
