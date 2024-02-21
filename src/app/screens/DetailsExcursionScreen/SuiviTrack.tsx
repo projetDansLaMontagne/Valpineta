@@ -98,28 +98,30 @@ export function SuiviTrack(props: SuiviTrackProps) {
   }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      // Convertir la distance en nombre
-      const distanceNumber = excursion.distance;
+    console.log("useEffect");
+    // Convertir la distance en nombre
+    const distanceNumber = excursion.distance;
 
-      if (!isNaN(distanceNumber) && avancement < distanceNumber) {
-        // On récupère la distance parcourue grace a trackSuivi et là distance du point courant par rapport au départ, car on veut pas afficher que l'utilisateur a parcouru plus que la distance totale
-        setAvancement(() => {
-          if (suiviExcursion.iPointCourant > 0) {
-            return suiviExcursion.trackSuivi[suiviExcursion.iPointCourant].dist;
-          } else {
-            return 0;
-          }
-        });
+    if (!isNaN(distanceNumber) && avancement / 1000 < distanceNumber) {
+      console.log;
+      // On récupère la distance parcourue grace a trackSuivi et là distance du point courant par rapport au départ, car on veut pas afficher que l'utilisateur a parcouru plus que la distance totale
+      setAvancement(() => {
+        console.log("setAvancement");
+        if (suiviExcursion.iPointCourant > 0) {
+          console.log("distance mise a jour");
+          console.log(suiviExcursion.trackSuivi[suiviExcursion.iPointCourant].dist);
+          return suiviExcursion.trackSuivi[suiviExcursion.iPointCourant].dist;
+        } else {
+          return 0;
+        }
+      });
 
-        setProgress((avancement / distanceNumber) * 100);
-      } else {
-      }
-    }, 500);
-
-    // Nettoyer l'intervalle lorsqu'un composant est démonté
-    return () => clearInterval(intervalId);
-  }, [progress, avancement, excursion.distance]);
+      setProgress((avancement / 1000 / distanceNumber) * 100);
+    } else {
+      console.log("avancement :", avancement, "distanceNumber", distanceNumber);
+      // Réinitialiser les valeurs si nécessaire
+    }
+  }, [suiviExcursion.iPointCourant]);
 
   return excursion ? (
     <SwipeUpDown
@@ -235,7 +237,7 @@ export function SuiviTrack(props: SuiviTrackProps) {
             <View style={$containerTextVariable}>
               <Text tx={"suiviTrack.barreAvancement.parcouru"} size="xs" />
               <Text size="xs" weight="bold">
-                {avancement.toFixed(2)} km
+                {(avancement / 1000).toFixed(3)} km
               </Text>
               {/*A remplacer par la distance parcourue par l'utilisateur*/}
             </View>

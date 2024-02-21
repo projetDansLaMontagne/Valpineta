@@ -35,6 +35,7 @@ import * as fileSystem from "expo-file-system";
 import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import { getUserLocation } from "app/utils/getUserLocation";
+import { useStores } from "app/models";
 
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
@@ -128,9 +129,13 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     [],
   );
 
+  const [polylineCoordinates, setPolylineCoordinates] = useState<
+    Array<{ latitude: number; longitude: number }>
+  >([]);
+
   const [userLocation, setUserLocation] = useState(null);
 
-  const [estDemarre, setEstDemarre] = useState(false);
+  const { suiviExcursion } = useStores();
 
   // Ref(s)
   const intervalRef = useRef(null);
@@ -374,16 +379,16 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, []);
 
   useEffect(() => {
-    if (userLocation) {
-      if (userLocation.latitude && userLocation.longitude && estDemarre) {
-        // Ajoutez les nouvelles coordonnées à la liste des coordonnées.
-        setCoordinates([
-          ...coordinates,
-          { latitude: userLocation.latitude, longitude: userLocation.longitude },
-        ]);
-      }
+    if (userLocation && suiviExcursion.etat === "enCours") {
+      setPolylineCoordinates(prevCoordinates => [
+        ...prevCoordinates,
+        { latitude: userLocation.latitude, longitude: userLocation.longitude },
+      ]);
     }
-  }, [userLocation]);
+    if (suiviExcursion.etat === "terminee") {
+      setPolylineCoordinates([]);
+    }
+  }, [userLocation, suiviExcursion.etat]);
 
   const { width, height } = Dimensions.get("window");
 
@@ -400,7 +405,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       <View style={styles.container}>
         <View style={styles.mapContainer}>
           <MapView
-            mapType={Platform.OS === "android" ? "none" : "standard"}
+            //mapType={Platform.OS === "android" ? "none" : "standard"}
             ref={mapRef}
             style={{
               height,
@@ -434,11 +439,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             zoomControlEnabled={false}
             zoomEnabled={true}
             minZoomLevel={12} // Niveau de zoom minimum
-            maxZoomLevel={15} // Niveau de zoom maximum
+            maxZoomLevel={22} // Niveau de zoom maximum
           >
             {/* Polyline pour tracer le trajet */}
             <Polyline
-              coordinates={coordinates}
+              coordinates={polylineCoordinates}
               strokeColor={colors.palette.vertTresClair}
               strokeWidth={5}
             />
