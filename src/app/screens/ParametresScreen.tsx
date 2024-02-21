@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { observer } from "mobx-react-lite";
 import { ViewStyle, TextStyle, Dimensions, View, TouchableOpacity } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps, TPoint } from "app/navigators";
 import { Screen, Text, Button } from "app/components";
 import { colors, spacing } from "app/theme";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -10,10 +10,13 @@ import Dropdown from "react-native-input-select";
 import { translate } from "app/i18n";
 
 interface ParametresScreenProps extends AppStackScreenProps<"Parametres"> {}
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export const ParametresScreen: FC<ParametresScreenProps> = observer(function ParametresScreen() {
   const { parametres, synchroMontante, suiviExcursion } = useStores();
+
+  // En debug, on met un track personnalise pour pouvoir faire des tests haut niveau
+  const trackSuivi: TPoint[] = require("assets/tests_examples/track_test_manuel_devant_chez_nico.json");
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
@@ -66,14 +69,12 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
             onPress={() => suiviExcursion.setEtat({ newEtat: "enPause" })}
           />
           <Button text="Stopper" onPress={() => suiviExcursion.setEtat({ newEtat: "terminee" })} />
+          <Text>Point courant : {suiviExcursion.iPointCourant}</Text>
         </>
       )}
       {suiviExcursion.etat === "enPause" && (
         <>
-          <Button
-            text="Reprendre"
-            onPress={() => suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: [] })}
-          />
+          <Button text="Reprendre" onPress={() => suiviExcursion.setEtat({ newEtat: "enCours" })} />
           <Button text="Stopper" onPress={() => suiviExcursion.setEtat({ newEtat: "terminee" })} />
         </>
       )}
@@ -86,7 +87,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
       {suiviExcursion.etat === "nonDemarree" && (
         <Button
           text="Demarrer rando"
-          onPress={() => suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: [] })}
+          onPress={() => suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: trackSuivi })}
         />
       )}
       {suiviExcursion.trackReel.map((point, i) => (
