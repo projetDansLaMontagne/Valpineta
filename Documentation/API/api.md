@@ -27,11 +27,13 @@ Les routes disponibles publiquement sont les suivantes:
 ###  GET
 - `excursions`:
     - Récupère toutes les excursions du site Valpineta
+    - Paramètres:
+        - `id`: Id de l'excursion à récupérer
 
 - `dl-file`: 
     - Télécharge un fichier depuis le site Valpineta, la route de base est uploadDirectory de wordpress
     - Paramètres:
-        - `file`: Nom du fichier à télécharger
+        - `isMd5`: Requête pour savoir si on veut le hash MD5 du fichier
 - `md5-file`: 
     - Télécharge le hash MD5 d'un fichier depuis le site Valpineta, la route de base est uploadDirectory de wordpress
     - Paramètres:
