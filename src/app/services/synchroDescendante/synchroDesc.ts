@@ -196,17 +196,9 @@ export const downloadExcursionsJson = async (): Promise<void> => {
     console.error(
       `[synchroDesc - 182] MD5 du fichier 'excursions.json' différents: ${md5} ${md5API}`,
     );
+
     throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
   }
-
-  // On copie le fichier dans le dossier 'fichiers'
-  await FileSystem.copyAsync({
-    from: EXCURSIONS_TEMP_FILE_DEST,
-    to: EXCURSIONS_FILE_DEST,
-  });
-
-  // On supprime le fichier temporaire
-  await FileSystem.deleteAsync(EXCURSIONS_TEMP_FILE_DEST);
 };
 
 /**
@@ -238,27 +230,33 @@ export const getExcursionsJsonFromDevice = async (): Promise<Array<TExcursion>> 
  */
 /* istanbul ignore next */
 export const updateExcursionsJsonRequest = async (debug?: EDebugMode): Promise<void> => {
-  // On récupère les excursions présentes sur le téléphone
-  const excursionsJson = await getExcursionsJsonFromDevice();
+  // On vérifie si le fichier 'excursions-temp.json' existe
+  const excursionsTempFile = await FileSystem.getInfoAsync(EXCURSIONS_TEMP_FILE_DEST);
 
-  // On récupère le MD5 du fichier 'excursions.json' sur le serveur.
-  const md5API = await fetch(API_EXCURSIONS_MD5_URL).then(res => res.json() as Promise<string>);
+  // Si le fichier 'excursions-temp.json' existe, on le supprime
+  if (!excursionsTempFile.exists) {
+    // On récupère le MD5 du fichier 'excursions.json' sur le serveur.
+    const md5API = await fetch(API_EXCURSIONS_MD5_URL).then(res => res.json() as Promise<string>);
 
-  // Téléchargement du fichier 'excursions.json' depuis le serveur.
-  const { md5 } = await FileSystem.downloadAsync(API_EXCURSIONS_URL, EXCURSIONS_TEMP_FILE_DEST, {
-    md5: true,
-  });
+    // Téléchargement du fichier 'excursions.json' depuis le serveur.
+    const { md5 } = await FileSystem.downloadAsync(API_EXCURSIONS_URL, EXCURSIONS_TEMP_FILE_DEST, {
+      md5: true,
+    });
 
-  // On compare les deux MD5 pour savoir si le téléchargement s'est bien passé.
-  if (md5 !== md5API) {
-    console.error(
-      `[synchroDesc - 238] MD5 du fichier 'excursions.json' différents: ${md5} ${md5API}`,
-    );
-    throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
-  } else {
-    debug >= EDebugMode.MEDIUM &&
-      console.log("[synchroDesc] MD5 du fichier 'excursions.json' identiques");
+    // On compare les deux MD5 pour savoir si le téléchargement s'est bien passé.
+    if (md5 !== md5API) {
+      console.error(
+        `[synchroDesc - 238] MD5 du fichier 'excursions.json' différents: ${md5} ${md5API}`,
+      );
+      throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
+    } else {
+      debug >= EDebugMode.MEDIUM &&
+        console.log("[synchroDesc] MD5 du fichier 'excursions.json' identiques");
+    }
   }
+
+  // Récupération des excursions depuis le fichier 'excursions.json'.
+  const excursionsJson = await getExcursionsJsonFromDevice();
 
   // Récupération des excursions depuis le fichier 'excursions-temp.json'.
   const excursionsServer = await FileSystem.readAsStringAsync(EXCURSIONS_TEMP_FILE_DEST).then(
