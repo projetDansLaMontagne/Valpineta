@@ -1,0 +1,36 @@
+direction: right
+
+vars: {
+  d2-config: {
+    layout-engine: elk
+  }
+}
+
+classes: {
+  temp-file: {
+    style: {
+      stroke: "#53C0D8"
+      opacity: 0.75
+    }
+    shape: page
+    style.multiple: false
+  }
+}
+
+FileSystem.fichiers.'excursions.json': {
+  shape: page
+  style.multiple: false
+}
+FileSystem.fichiers.'excursions-temp.json'
+FileSystem.fichiers.'excursions-temp.json'.class: temp-file
+FileSystem.GPX
+FileSystem.GPXTemp
+FileSystem.GPXTemp.class: temp-file
+
+FileSystem.GPXTemp -> FileSystem.GPX: {
+  style.animated: true
+}
+
+FileSystem.fichiers.'excursions-temp.json' -> FileSystem.fichiers.'excursions.json': {
+  style.animated: true
+}
