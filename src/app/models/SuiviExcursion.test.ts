@@ -35,7 +35,9 @@ test("Tache de suivi fonctionnelle", () => {
     { lat: 43.483184, lon: -1.502409, alt: 5.5, dist: 1459.8 },
     { lat: 43.483025, lon: -1.502783, alt: 5.8, dist: 1494.8 },
   ];
-  const instance = SuiviExcursionModel.create({ trackSuivi: parcoursSuivi });
+  const instance = SuiviExcursionModel.create({
+    excursionSuivie: { index: 0, track: parcoursSuivi },
+  });
 
   expect(instance).toBeTruthy();
 });

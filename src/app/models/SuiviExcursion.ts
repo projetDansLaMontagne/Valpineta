@@ -16,6 +16,10 @@ const T_point = types.model({
   alt: types.number,
   dist: types.number,
 });
+const T_excursion_suivie = types.model({
+  index: types.number,
+  track: types.array(T_point),
+});
 type T_etat_excursion = "nonDemarree" | "enCours" | "enPause" | "terminee";
 
 // Constantes
@@ -31,7 +35,7 @@ export const SuiviExcursionModel = types
   .props({
     etat: "nonDemarree",
     trackReel: types.optional(types.array(T_point_GPX), []),
-    trackSuivi: types.optional(types.array(T_point), []),
+    excursionSuivie: types.maybeNull(T_excursion_suivie),
     iPointCourant: 0,
     __DEV__: false,
   })
@@ -56,8 +60,8 @@ export const SuiviExcursionModel = types
     /**
      * Setter privé pour le track suivi
      */
-    _setTrackSuivi(value: Instance<typeof T_point>[]) {
-      self.trackSuivi.replace(value);
+    _setExcursionSuivie(value: Instance<typeof T_excursion_suivie>) {
+      self.excursionSuivie = value;
     },
     /**
      * Setter privé pour le point courant
@@ -79,7 +83,7 @@ export const SuiviExcursionModel = types
     type switchStateParams =
       | {
           newEtat: "enCours";
-          trackSuivi?: Instance<typeof T_point>[]; // Si on passe de nonDemarree a enCours, on doit fournir le trackSuivi
+          excursionSuivie?: Instance<typeof T_excursion_suivie>; // Si on passe de nonDemarree a enCours, on doit fournir l excursionSuivie
         }
       | { newEtat: Exclude<T_etat_excursion, "enCours"> };
     /**
@@ -94,7 +98,7 @@ export const SuiviExcursionModel = types
       let verificationsOK = false;
       switch (self.etat) {
         case "nonDemarree":
-          if (newEtat === "enCours" && props.trackSuivi !== undefined) verificationsOK = true;
+          if (newEtat === "enCours" && props.excursionSuivie !== undefined) verificationsOK = true;
           break;
 
         case "enCours":
@@ -116,12 +120,12 @@ export const SuiviExcursionModel = types
         switch (newEtat) {
           case "nonDemarree":
             self._setTrackReel([]);
-            self._setTrackSuivi([]);
+            self._setExcursionSuivie(undefined);
             self._setPointCourant(0);
             aFonctionne = true;
             break;
           case "enCours":
-            self._setTrackSuivi(props.trackSuivi);
+            self._setExcursionSuivie(props.excursionSuivie);
             aFonctionne = await startBackgroundTask();
             break;
           case "enPause":

@@ -29,8 +29,9 @@ export function tacheLocalisationBackground(
   });
 
   // Positionnement sur le track reel
-  const { trackSuivi, trackReel } = suiviExcursion;
-
+  const { excursionSuivie, trackReel } = suiviExcursion;
+  const trackSuivi = excursionSuivie.track;
+  
   const lastLoc = trackReel[trackReel.length - 1];
   const nbPoints = trackSuivi.length;
   const PX = { lat: lastLoc.lat, lon: lastLoc.lon }; //Position actuelle
