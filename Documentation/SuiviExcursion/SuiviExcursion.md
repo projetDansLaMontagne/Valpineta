@@ -68,6 +68,26 @@ _Cette fonctionnalité est également gérée en front à l'heure de la rédacti
 
 Le modèle suiviExcursion va également permettre de gérer le chronometrage de l'application, en tache de fond car, si on le fait en front, elle se met en pause dès qu'on ferme l'appli. Mettre un simple horaire de départ ne peut pas convenir car on peut faire des pauses.
 
+## Suivi d'une excursion (affichage)
+
+Lorsqu'un utilisateur arrive sur la page d'une excursion, il va pouvoir décider de la démarrer. Lorsqu'il va faire cette action, l'interface va être directement modifiée. Il aura accès à de nouvelles informations et fonctionnalités en direct telles que :
+
+- La possibilité de mettre en pause / reprendre le chronométrage de l'excursion.
+- Voir le dénivelé positif réalisé
+- Voir le dénivelé négatif réalisé
+- Voir son avancée par rapport à l'excursion. Cela est possible de deux manières :
+  - En observant la distance actuellement parcourue, par rapport à la distance totale de l'excursion
+  - En observant l'avancée d'un curseur représentant l'avancement de l'utilisateur
+- Arrêter complètement le chronomètre, mettant donc fin à l'excursion
+- Retrouver des informations sur l'excursion telles que la difficulté
+- La courbe représentant le dénivelé de l'excursion
+- L'altitude actuelle de l'utilisateur
+- La plus haute altitude atteinte
+- La plus basse altitude atteinte
+- La liste des signalements que l'on va pouvoir rencontrer sur notre parcours visible de deux manières :
+  - Dans un onglet à part sous forme de liste
+  - Au niveau du curseur représentant notre avancement dans l'excursion.
+
 # Contacts
 
 Nicolas DELAHAIE  

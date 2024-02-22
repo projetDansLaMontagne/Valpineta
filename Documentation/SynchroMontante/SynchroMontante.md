@@ -12,11 +12,20 @@ La synchronisation montante des données fonctionne sur 3 étapes dans l'applica
 
 Dans un Screen, l'utilisateur déclenche une action nécessitant l'envoie de données en base de données. Des fonctions sont alors déclenchées afin de vérifier que ce qui est envoyé en base de données soit cohérent et interprétable par le serveur.
 
-###Ajouter un signalement
+### Ajouter un signalement
 Pour ajouter un signalement, plusieurs vérification sont faites, et plusieurs demandes de permissions.
 Pour pouvoir ajouter une photo, nous avons besoin de la permission de l'utilisateur d'utiliser l'appareil photo ainsi que sa librairie. En fonction de ces autorisations, la fonction choisirPhoto afin un actionSheet, appèle la fonction prendrePhoto() ou bien ajouterPhoto()
 
 Une fois tous les champs ajoutés, la fonction verifSignalement vérifie toutes les informations de l'utilisateur afin de pouvoir envoyer un signalement cohérent à la base de données. S'il un d'eux n'est pas conforme, alors la fonction renvoie à l'utilisateur une alerte informant qu'une des valeurs n'est pas conforme.
+
+### Supprimer un signalement
+Lorsqu'un utilisateur approche d'un signalement (à 30 mètres de celui-ci), alors, un pop-up apparait sur l'écran. L'utilisateur va donc avoir la possibilité de faire 3 actions sur ce pop-up par rapport au signalement en question :
+
+- Appuyer sur un bouton "Présent" qui ne va pas réaliser d'actions mais va fermer le pop-up
+- Appuyer sur le bouton "Absent" qui va permettre de fermer la pop-up puis de supprimer ce signalement. L'id du signalement concerné est stoqué dans un store puis une requete est envoyée pour le supprimer en base de données si l'utilisateur à de la connexion. Sinon, il restera stoqué dans le store et sera envoyé durant la prochaine synchronisation montante. La décision de supprimer le signalement dès qu'une personne le signale à été prise en accord avec la commanditaire car nous partons du principe que les gens ne sont pas là pour être malveillant.
+- Appuyer sur le bouton "Voir plus" qui donne plus de détail sur le signalement. On pourra donc voir une description plus précise à propos de ce signalement.
+
+L'apparition du pop-up bloque toutes les autres actions qui pourraient être possible lorsqu'une excursion est commencée. Cela signifie qu'une action de l'utilisateur est absolument requise, celui-ci ne peut pas l'éviter.
 
 ### Store
 Une fois l'attribut conforme, il est ajouté dans le store synchroMontante. Cela permet de stocker tous les attribut à envoyer et d'y accéder de n'importe où dans l'application. 
