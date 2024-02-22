@@ -4,7 +4,8 @@
 [Tom Planche](mailto:tomplanche@icloud.com)
 
 ## Schéma
-<img src="assets/SynchroDesceandante.svg"/>
+
+![SchemaSynchroDesc](./assets/SynchroDesceandante.png)
 
 ## Fonctionnement
 Ce service est un service de synchronisation descendante. Il permet de
