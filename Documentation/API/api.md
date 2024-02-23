@@ -9,6 +9,7 @@ Elle contient aussi une page de modération des signalements
 
 ## Installation
 Il suffit de l'ajouter dans les plugins de wordpress et de l'activer.
+<img src="extention.png"/>
 
 ## Architecture
 L'API est composée de plusieurs fichiers:
