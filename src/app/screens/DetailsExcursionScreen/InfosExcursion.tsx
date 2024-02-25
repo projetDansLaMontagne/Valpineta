@@ -15,58 +15,41 @@ import {
 import { Text, GraphiqueDenivele } from "app/components";
 /**@warning A SUPPRIMER ET DECALER DANS APPNAVIGATOR : */
 import { T_Point } from "app/screens/DetailsExcursionScreen/";
-import { T_Signalement } from "app/navigators";
-import { observer } from "mobx-react-lite";
+import { T_excursion } from "app/navigators";
 
 export interface InfosExcursionProps {
-  excursion: Record<string, unknown>;
+  excursion: T_excursion;
   navigation: any;
   setIsAllSignalements;
   userLocation;
 }
 
+/**
+ * 
+ * @precondition l'excursion doit absolument être définie 
+ */
 export function InfosExcursion(props: InfosExcursionProps) {
   const { excursion, navigation, setIsAllSignalements, userLocation } = props;
 
-  let duree: string = "";
-  let distance: string = "";
-  let difficulteOrientation: number = 0;
-  let difficulteTechnique: number = 0;
-  let description: string = "";
-  let signalements: T_Signalement[] = [];
-  if (
-    excursion.duree !== undefined ||
-    excursion.distance !== undefined ||
-    excursion.difficulteOrientation !== undefined ||
-    excursion.difficulteTechnique !== undefined ||
-    excursion.description !== undefined ||
-    excursion.signalements != undefined
-  ) {
-    duree = (excursion.duree as { h: number }).h + "h";
-    if ((excursion.duree as { m: number }).m !== 0) {
-      // Si la durée en minutes est différente de 0, on l'affiche en plus de la durée en heures
-      duree = duree + (excursion.duree as { m: number }).m;
-    }
-    distance = excursion.distance as string;
-    difficulteTechnique = excursion.difficulteTechnique as number;
-    difficulteOrientation = excursion.difficulteOrientation as number;
-    description = excursion.description as string;
-    signalements = excursion.signalements as T_Signalement[];
+  /**
+   * @returns la description courte
+   */
+  function descriptionFormatee(description: string): string {
+    const descriptionCoupe: string = description.slice(0, 100);
+    let descriptionFinale: string = descriptionCoupe + "...";
+    descriptionFinale = descriptionFinale.replace(/<[^>]*>?/gm, "");
+    return descriptionFinale;
   }
 
   /**
-   * @param description
-   * @returns la description courte
+   * @returns une version affichable du type {h m}
    */
-  function afficherDescriptionCourte(description: string) {
-    if (description == null) {
-      return null;
-    } else {
-      const descriptionCoupe: string = description.slice(0, 100);
-      let descriptionFinale: string = descriptionCoupe + "...";
-      descriptionFinale = descriptionFinale.replace(/<[^>]*>?/gm, "");
-      return descriptionFinale;
+  function dureeAffichable(duree: typeof excursion.duree): string {
+    let dureeAffichable = duree.h + "h";
+    if (duree.m !== 0) {
+      dureeAffichable = dureeAffichable + duree.m;
     }
+    return dureeAffichable;
   }
 
   return (
@@ -76,49 +59,49 @@ export function InfosExcursion(props: InfosExcursionProps) {
           <View style={$containerInformations}>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation} source={require("assets/icons/temps.png")} />
-              <Text text={duree} size="xs" />
+              <Text text={dureeAffichable(excursion.duree)} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image style={$iconInformation} source={require("assets/icons/explorer.png")} />
-              <Text text={distance + " km"} size="xs" />
+              <Text text={excursion.distance + " km"} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("assets/icons/difficulteTechnique.png")}
               />
-              <Text text={difficulteTechnique.toString()} size="xs" />
+              <Text text={excursion.difficulteTechnique.toString()} size="xs" />
             </View>
             <View style={$containerUneInformation}>
               <Image
                 style={$iconInformation}
                 source={require("assets/icons/difficulteOrientation.png")}
               />
-              <Text text={difficulteOrientation.toString()} size="xs" />
+              <Text text={excursion.difficulteOrientation.toString()} size="xs" />
             </View>
           </View>
           <View style={$containerDescriptionEtSignalements}>
             <Text text="Description" size="lg" />
-            <Text text={afficherDescriptionCourte(description)} size="xxs" />
+            <Text text={descriptionFormatee(excursion.description)} size="xxs" />
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("Description", { excursion: excursion });
               }}
             >
-              {description === "" ? null : (
+              {excursion.description !== "" && (
                 <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
               )}
             </TouchableOpacity>
           </View>
           <View>
-            {signalements?.length > 0 && (
+            {excursion.signalements.length > 0 && (
               <>
                 <View style={$headerSignalement}>
                   <View>
                     <Text tx="detailsExcursion.titres.signalements" size="lg" />
                   </View>
                   <View>
-                    {signalements.length > 0 && (
+                    {excursion.signalements.length > 0 && (
                       <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
                         <Text
                           style={$lienSignalements}
@@ -132,7 +115,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
                 <ScrollView horizontal>
                   <TouchableWithoutFeedback>
                     <View style={$scrollLine}>
-                      {signalements.map((signalement, index) => {
+                      {excursion?.signalements.map((signalement, index) => {
                         // Calculate the distance for each warning
                         const coordSignalement: T_Point = {
                           lat: signalement.lat,
