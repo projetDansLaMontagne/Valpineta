@@ -71,10 +71,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
         } as LatLng),
     );
 
-    const changeStartPoint = (point: LatLng) => {
-      setStartPoint(point);
-    };
-
     // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
     useEffect(() => {
       setStartPoint({
@@ -83,36 +79,12 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       } as LatLng);
     }, [excursion]);
 
-    /**
-     * ! Pas nécessaire pour le moment
-     */
     useEffect(() => {
-      const fetchLocation = async () => {
+      (async () => {
         const location = await getUserLocation();
         setUserLocation(location);
-      };
-
-      fetchLocation();
+      })();
     }, []);
-
-    /**
-     * ! FIN Pas nécessaire pour le moment
-     */
-
-    /**
-     * ! NON FONCTIONNEL
-     * J'aimerai que le swipeUpDown se baisse automatiquement
-     * lors du click sur un signalement
-     */
-    // if (swipeUpDownRef) {
-    //   r(`[DetailsExcursionScreen - useEffect] aled`);
-    //   swipeUpDownRef.current.showMini();
-    // } else {
-    //   console.error("swipeUpDownRef.current is null");
-    // }
-    /**
-     * ! FIN NON FONCTIONNEL
-     */
 
     const swipeUpDown = () => {
       if (swipeUpDownRef) {
@@ -123,7 +95,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }
     };
 
-    // si excursion est défini, on affiche les informations de l'excursion
     return excursion ? (
       <View style={$container}>
         <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
@@ -146,17 +117,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
         <SwipeUpDown
           itemMini={itemMini()}
-          itemFull={itemFull(
-            excursion,
-            navigation,
-            containerInfoAffiche,
-            setcontainerInfoAffiche,
-            isAllSignalements,
-            setIsAllSignalements,
-            userLocation,
-            footerHeight,
-            changeStartPoint,
-          )}
+          itemFull={itemFull()}
           animation="easeInEaseOut"
           swipeHeight={30 + footerHeight}
           disableSwipeIcon={true}
@@ -187,91 +148,73 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     }
 
     /**
-     * @param excursion, navigation, containerInfoAffiche, setcontainerInfoAffiche, isAllSignalements, setIsAllSignalements, userLocation,
      * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
      */
-    function itemFull(
-      excursion: Record<string, unknown>,
-      navigation: NativeStackNavigationProp<any>,
-      containerInfoAffiche: boolean,
-      setcontainerInfoAffiche: React.Dispatch<any>,
-      isAllSignalements: boolean,
-      setIsAllSignalements: React.Dispatch<any>,
-      userLocation: Array<number>,
-      footerHeight: number,
-    ) {
-      let nomExcursion = "";
-      if (excursion !== undefined) {
-        nomExcursion = excursion.nom as string;
-      }
-      if (isAllSignalements) {
-        return (
-          <ListeSignalements
-            excursion={excursion}
-            userLocation={userLocation}
-            setIsAllSignalements={setIsAllSignalements}
-            footerHeight={footerHeight}
-            setStartPoint={setStartPoint}
-            swipeDown={swipeUpDown}
-            style={$containerGrand}
-          />
-        );
-      } else {
-        return (
-          <View style={$containerGrand}>
-            <View style={$containerTitre}>
-              <Text text={nomExcursion} size="xl" style={$titre} />
-              <GpxDownloader />
-            </View>
-            <View>
-              <View style={$containerBouton}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setcontainerInfoAffiche(true);
-                  }}
-                  style={$boutonInfoAvis}
-                >
-                  <Text
-                    tx="detailsExcursion.titres.infos"
-                    size="lg"
-                    style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setcontainerInfoAffiche(false);
-                  }}
-                  style={$boutonInfoAvis}
-                >
-                  <Text
-                    tx="detailsExcursion.titres.avis"
-                    size="lg"
-                    style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  $souligneInfosAvis,
-                  containerInfoAffiche
-                    ? { left: spacing.lg }
-                    : { left: width - width / 2.5 - spacing.lg / 1.5 },
-                ]}
-              ></View>
-              {containerInfoAffiche ? (
-                <InfosExcursion
-                  excursion={excursion}
-                  navigation={navigation}
-                  setIsAllSignalements={setIsAllSignalements}
-                  userLocation={userLocation}
-                />
-              ) : (
-                <Avis />
-              )}
-            </View>
+    function itemFull() {
+      return isAllSignalements ? (
+        <ListeSignalements
+          excursion={excursion}
+          userLocation={userLocation}
+          setIsAllSignalements={setIsAllSignalements}
+          footerHeight={footerHeight}
+          setStartPoint={setStartPoint}
+          swipeDown={swipeUpDown}
+          style={$containerGrand}
+        />
+      ) : (
+        <View style={$containerGrand}>
+          <View style={$containerTitre}>
+            <Text text={excursion.nom} size="xl" style={$titre} />
+            <GpxDownloader />
           </View>
-        );
-      }
+          <View>
+            <View style={$containerBouton}>
+              <TouchableOpacity
+                onPress={() => {
+                  setcontainerInfoAffiche(true);
+                }}
+                style={$boutonInfoAvis}
+              >
+                <Text
+                  tx="detailsExcursion.titres.infos"
+                  size="lg"
+                  style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setcontainerInfoAffiche(false);
+                }}
+                style={$boutonInfoAvis}
+              >
+                <Text
+                  tx="detailsExcursion.titres.avis"
+                  size="lg"
+                  style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
+                />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={[
+                $souligneInfosAvis,
+                containerInfoAffiche
+                  ? { left: spacing.lg }
+                  : { left: width - width / 2.5 - spacing.lg / 1.5 },
+              ]}
+            ></View>
+            {containerInfoAffiche ? (
+              <InfosExcursion
+                excursion={excursion}
+                navigation={navigation}
+                setIsAllSignalements={setIsAllSignalements}
+                userLocation={userLocation}
+              />
+            ) : (
+              <Avis />
+            )}
+          </View>
+        </View>
+      );
     }
   },
 );
