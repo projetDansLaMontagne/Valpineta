@@ -25,8 +25,8 @@ export interface InfosExcursionProps {
 }
 
 /**
- * 
- * @precondition l'excursion doit absolument être définie 
+ *
+ * @precondition l'excursion doit absolument être définie
  */
 export function InfosExcursion(props: InfosExcursionProps) {
   const { excursion, navigation, setIsAllSignalements, userLocation } = props;
@@ -133,14 +133,13 @@ export function InfosExcursion(props: InfosExcursionProps) {
 
                         return (
                           <View key={index}>
-                            <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
-                              <CarteSignalement
-                                type={carteType}
-                                details={false}
-                                nomSignalement={signalement.titre}
-                                distanceDuDepart={`${distanceSignalement}`}
-                              />
-                            </TouchableOpacity>
+                            <CarteSignalement
+                              type={carteType}
+                              details={false}
+                              nomSignalement={signalement.nom}
+                              distanceDuDepart={`${distanceSignalement}`}
+                              onPress={() => setIsAllSignalements(true)}
+                            />
                           </View>
                         );
                       })}
