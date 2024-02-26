@@ -1,11 +1,11 @@
 /**@warning cette fonction n est pas utile. On peit acceder a cette distance en soustrayant la distance du point par la sienne  */
 
 // A SUPPRIMER : importation Coordonnees
-import { T_Point } from "app/screens/DetailsExcursionScreen/";
+import { T_flat_point, TPoint } from "app/navigators";
 import { distanceEntrePoints } from "./distanceEntrePoints";
 
 //Fonction me permettant de récupérer la distance entre l'utilisateur et le signalement en passant par les points du tracé
-export const recupDistance = (point: T_Point, data: any) => {
+export const recupDistance = (point: T_flat_point, data: TPoint[]) => {
   if (!point || !point.lat || !point.lon) {
     console.error("Coordonnées du signalement non valides");
     return 0;
@@ -14,7 +14,7 @@ export const recupDistance = (point: T_Point, data: any) => {
   // Initialiser la distance minimale avec une valeur élevée
   let distanceMinimale: number = Number.MAX_VALUE;
 
-  let coordPointPlusProche: T_Point;
+  let coordPointPlusProche: TPoint;
 
   // Parcourir toutes les coordonnées dans le fichier
   for (const coord of data) {

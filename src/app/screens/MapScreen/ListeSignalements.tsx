@@ -1,8 +1,7 @@
 import { Button, CarteSignalement } from "app/components";
-import { T_Point } from "app/screens/DetailsExcursionScreen/";
+import { T_flat_point } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { recupDistance } from "app/utils/recupDistance";
-import { observer } from "mobx-react-lite";
 import { Dimensions, ScrollView, TouchableWithoutFeedback, View, ViewStyle } from "react-native";
 import { LatLng } from "react-native-maps";
 
@@ -28,16 +27,8 @@ export function ListeSignalements(props: ListeSignalementsProps) {
           <View style={$containerSignalements}>
             {props?.excursion?.signalements?.map((signalement, index) => {
               // Calcule de la distance pour chaque avertissement
-              const coordSignalement: T_Point = {
-                lat: signalement.lat,
-                lon: signalement.lon,
-                /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
-                alt: 0,
-                dist: 0,
-                pos: 0,
-              };
               const distanceSignalement = props.userLocation
-                ? recupDistance(coordSignalement, props.excursion.track)
+                ? recupDistance(signalement as T_flat_point, props.excursion.track)
                 : 0;
               const carteType =
                 signalement.type === "Avertissement" ? "avertissement" : "pointInteret";

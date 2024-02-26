@@ -14,8 +14,8 @@ import {
 } from "react-native";
 import { Text, GraphiqueDenivele } from "app/components";
 /**@warning A SUPPRIMER ET DECALER DANS APPNAVIGATOR : */
-import { T_Point } from "app/screens/DetailsExcursionScreen/";
-import { T_Signalement, T_excursion } from "app/navigators";
+import { T_Point } from "app/components/GraphiqueDenivele";
+import { T_Signalement, T_excursion, T_flat_point } from "app/navigators";
 
 export interface InfosExcursionProps {
   excursion: T_excursion;
@@ -117,16 +117,8 @@ export function InfosExcursion(props: InfosExcursionProps) {
                     <View style={$scrollLine}>
                       {excursion?.signalements.map((signalement, index) => {
                         // Calculate the distance for each warning
-                        const coordSignalement: T_Point = {
-                          lat: signalement.lat,
-                          lon: signalement.lon,
-                          /**@warning les 0 sont une solution temporaire : c'est le mauvais type */
-                          alt: 0,
-                          dist: 0,
-                          pos: 0,
-                        };
-                        const distanceSignalement = userLocation
-                          ? recupDistance(coordSignalement, props.excursion.track)
+                        const distanceSignalement = props.userLocation
+                          ? recupDistance(signalement as T_flat_point, props.excursion.track)
                           : 0;
                         const carteType =
                           signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
