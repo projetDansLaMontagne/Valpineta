@@ -109,7 +109,7 @@ type ExcursionStackParamList = {
 };
 
 type CarteStackParamList = {
-  Carte: undefined;
+  Carte: undefined | { excursion: T_excursion };
   DetailsExcursion: undefined | { excursion: T_excursion };
   Description: { excursion: T_excursion };
   NouveauSignalement: { type: T_TypeSignalement };

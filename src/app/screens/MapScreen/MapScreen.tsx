@@ -10,12 +10,19 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  TextStyle,
 } from "react-native";
-import { AppStackScreenProps, T_Signalement, T_excursion } from "app/navigators";
-import { Screen } from "app/components";
+import { AppStackScreenProps, T_Signalement, T_excursion, TPoint } from "app/navigators";
+import { Screen, Text } from "app/components";
 import { spacing, colors } from "app/theme";
-import { T_Point } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
+
+import { GpxDownloader } from "../DetailsExcursionScreen/GpxDownloader";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { ListeSignalements } from "../DetailsExcursionScreen/ListeSignalements";
+import { InfosExcursion } from "../DetailsExcursionScreen/InfosExcursion";
+import { Avis } from "../DetailsExcursionScreen/Avis";
 
 // location
 import * as Location from "expo-location";
@@ -27,21 +34,22 @@ import { Asset } from "expo-asset";
 import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
+import SwipeUpDown from "react-native-swipe-up-down";
 
 // images
 const binoculars: ImageSource = require("assets/icons/binoculars.png");
 const attention: ImageSource = require("assets/icons/attention.png");
 const markerImage: ImageSource = require("assets/icons/location.png");
 
-type MapScreenProps = AppStackScreenProps<"Carte"> & {
-  excursionAffichee?: T_excursion;
-};
-export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
-  const { navigation, route } = _props;
-  const excursionAffichee = route?.params?.excursion ?? _props.excursionAffichee;
+const { width, height } = Dimensions.get("window");
 
+type MapScreenProps = AppStackScreenProps<"Carte"> & {};
+export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_props) {
   // Constants
+  const { navigation, route } = _props;
+  const excursion = route?.params?.excursion;
   const USER_LOCATION_INTERVAL_MS = 1000; // ! mabye change this value
+  const footerHeight = useBottomTabBarHeight();
 
   // States
   const [gavePermission, setGavePermission] = useState(false);
@@ -50,11 +58,14 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
   const [startPoint, setStartPoint] = useState<LatLng>();
+  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
+  const [isAllSignalements, setIsAllSignalements] = useState(false);
 
   // Refs
   const intervalRef = useRef(null);
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
   const mapRef = useRef<MapView>(null);
+  const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
 
   // Buttons
   const followLocationButtonRef = useRef(null);
@@ -174,6 +185,13 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     setMenuIsOpen(!menuIsOpen);
   };
 
+  const swipeUpDown = () => {
+    if (swipeUpDownRef) {
+      swipeUpDownRef.current.showMini();
+    } else {
+    }
+  };
+
   /* ------------------------------- USE EFFECTS ------------------------------ */
   useEffect(() => {
     return () => {
@@ -212,18 +230,18 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
   useEffect(() => {
-    if (excursionAffichee !== undefined) {
+    if (excursion !== undefined) {
       setStartPoint({
-        latitude: excursionAffichee.track[0].lat,
-        longitude: excursionAffichee.track[0].lon,
+        latitude: excursion.track[0].lat,
+        longitude: excursion.track[0].lon,
       } as LatLng);
     }
-  }, [excursionAffichee]);
+  }, [excursion]);
 
   useEffect(() => {
-    downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
+    downloadTiles();
 
-    if (!excursionAffichee) {
+    if (!excursion) {
       const excursions = require("assets/JSON/excursions.json") as T_excursion[];
       setAllExcursions(excursions);
     }
@@ -234,8 +252,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, []);
 
   /* -------------------------------- Constants ------------------------------- */
-  const { width, height } = Dimensions.get("window");
-
   const ASPECT_RATIO = width / height;
   const LATITUDE = 42.63099943470989;
   const LONGITUDE = 0.21949934093707602;
@@ -243,7 +259,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
   return (
-    <Screen style={$container} safeAreaEdges={["bottom"]}>
+    <Screen style={$screen} safeAreaEdges={["bottom"]}>
       <View style={styles.container}>
         <View style={styles.mapContainer}>
           <MapView
@@ -293,12 +309,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               }}
             />
 
-            {excursionAffichee ? (
+            {excursion ? (
               // Affichage de l excursion, des markers et des signalements
               <>
                 <Polyline
-                  coordinates={excursionAffichee.track.map(
-                    (point: T_Point) =>
+                  coordinates={excursion.track.map(
+                    (point: TPoint) =>
                       ({
                         latitude: point.lat,
                         longitude: point.lon,
@@ -309,11 +325,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 />
 
                 <StartMiddleAndEndHandler
-                  track={excursionAffichee.track}
-                  typeParcours={excursionAffichee.es.typeParcours}
+                  track={excursion.track}
+                  typeParcours={excursion.es.typeParcours}
                 />
 
-                {excursionAffichee?.signalements.map((signalement, i) => (
+                {excursion?.signalements.map((signalement, i) => (
                   <SignalementHandler signalement={signalement} key={i} />
                 ))}
               </>
@@ -374,7 +390,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
           <View
             style={{
               ...styles.mapOverlayLeft,
-              bottom: excursionAffichee ? 20 : 0,
+              bottom: excursion ? 20 : 0,
             }}
           >
             <MapButton
@@ -396,7 +412,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               <View
                 style={{
                   ...styles.mapOverlay,
-                  bottom: excursionAffichee ? 20 : 0,
+                  bottom: excursion ? 20 : 0,
                 }}
               >
                 {menuIsOpen && (
@@ -436,10 +452,100 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               </View>
             )
           }
+
+          <SwipeUpDown
+            itemMini={<ItemMini />}
+            itemFull={<ItemFull />}
+            animation="easeInEaseOut"
+            swipeHeight={30 + footerHeight}
+            disableSwipeIcon={true}
+            ref={swipeUpDownRef}
+          />
         </View>
       </View>
     </Screen>
   );
+
+  /**
+   * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas
+   */
+  function ItemMini() {
+    return (
+      <View style={$containerPetit}>
+        <Image source={require("assets/icons/swipe-up.png")} />
+      </View>
+    );
+  }
+
+  /**
+   * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
+   */
+  function ItemFull() {
+    return isAllSignalements ? (
+      <ListeSignalements
+        excursion={excursion}
+        userLocation={location}
+        setIsAllSignalements={setIsAllSignalements}
+        footerHeight={footerHeight}
+        setStartPoint={undefined}
+        swipeDown={swipeUpDown}
+        style={$containerGrand}
+      />
+    ) : (
+      <View style={$containerGrand}>
+        <View style={$containerTitre}>
+          <Text text={excursion.nom} size="xl" style={$titre} />
+          <GpxDownloader />
+        </View>
+        <View>
+          <View style={$containerBouton}>
+            <TouchableOpacity
+              onPress={() => {
+                setcontainerInfoAffiche(true);
+              }}
+              style={$boutonInfoAvis}
+            >
+              <Text
+                tx="detailsExcursion.titres.infos"
+                size="lg"
+                style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setcontainerInfoAffiche(false);
+              }}
+              style={$boutonInfoAvis}
+            >
+              <Text
+                tx="detailsExcursion.titres.avis"
+                size="lg"
+                style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
+              />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={[
+              $souligneInfosAvis,
+              containerInfoAffiche
+                ? { left: spacing.lg }
+                : { left: width - width / 2.5 - spacing.lg / 1.5 },
+            ]}
+          />
+          {containerInfoAffiche ? (
+            <InfosExcursion
+              excursion={excursion}
+              navigation={navigation}
+              setIsAllSignalements={setIsAllSignalements}
+              userLocation={location}
+            />
+          ) : (
+            <Avis />
+          )}
+        </View>
+      </View>
+    );
+  }
 });
 
 /* ------------------------------ JSX ELEMENTS ------------------------------ */
@@ -455,7 +561,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
  * @returns les points de départ, milieu et fin de l'excursion
  */
 type StartMiddleAndEndHandlerProps = {
-  track: T_Point[];
+  track: TPoint[];
   typeParcours: "Ida" | "Ida y Vuelta" | "Circular";
 };
 const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
@@ -470,7 +576,7 @@ const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
     ...track[track.length - 1],
     title: "Arrivée",
   };
-  let points: T_Point[];
+  let points: TPoint[] & { title: string }[];
 
   // Calcul du point du milieu
   // Si c'est un aller-retour, le parcours étant symétrique,
@@ -623,14 +729,11 @@ const createFolderStruct = async (
 };
 const downloadTiles = async () => {
   const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
-  console.log("[MapScreen] folderInfo: ", folderInfo);
 
   if (folderInfo.exists && !folderInfo.isDirectory) {
-    console.log("Tuiles déjà DL");
     await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
   } else {
     // Supprimer le dossier
-    console.log("[MapScreen] Suppression du dossier");
     await fileSystem.deleteAsync(folderDest, { idempotent: true });
 
     const assets = await TilesRequire();
@@ -643,14 +746,13 @@ const downloadTiles = async () => {
 const values = {
   locateBtnContainerSize: 50,
 };
-const $container: ViewStyle = {
+const $screen: ViewStyle = {
   display: "flex",
 };
 const mapOverlayStyle: ViewStyle = {
   position: "absolute",
   right: 0,
 
-  // height: "max-content",
   width: "20%",
   display: "flex",
   flexDirection: "column",
@@ -659,8 +761,6 @@ const mapOverlayStyle: ViewStyle = {
   gap: spacing.sm,
 
   padding: spacing.sm,
-
-  zIndex: 1000,
 };
 const buttonContainer = {
   height: values.locateBtnContainerSize,
@@ -735,4 +835,84 @@ const $boutonRetour: ViewStyle = {
   top: 20,
   left: 0,
   zIndex: 1,
+};
+
+const $containerGrand: ViewStyle = {
+  flex: 1,
+  width: width,
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
+  marginTop: height / 4,
+};
+
+const $container: ViewStyle = {
+  flex: 1,
+  width: width,
+  height: height,
+  backgroundColor: colors.fond,
+};
+
+//Style de itemMini
+
+const $containerPetit: ViewStyle = {
+  flex: 1,
+  width: width,
+  backgroundColor: colors.fond,
+  alignItems: "center",
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
+  padding: spacing.xxs,
+};
+
+//Style du container du titre et du bouton de téléchargement
+
+const $containerTitre: ViewStyle = {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  width: width - width / 5,
+  margin: spacing.lg,
+};
+
+const $titre: ViewStyle = {
+  marginTop: spacing.xs,
+  paddingRight: spacing.xl,
+};
+
+//Style du container des boutons infos et avis
+
+const $containerBouton: ViewStyle = {
+  flexDirection: "row",
+  justifyContent: "space-around",
+  width: width,
+};
+
+const $boutonInfoAvis: ViewStyle = {
+  paddingLeft: spacing.xxl,
+  paddingRight: spacing.xxl,
+};
+
+const $souligneInfosAvis: ViewStyle = {
+  backgroundColor: colors.bouton,
+  height: 2,
+  width: width / 2.5,
+  position: "relative",
+};
+
+/* --------------------------------- ERREUR --------------------------------- */
+
+const $containerErreur: ViewStyle = {
+  justifyContent: "center",
+  alignItems: "center",
+  width: width,
+  height: height,
+  padding: spacing.lg,
+};
+
+const $texteErreur: TextStyle = {
+  marginTop: spacing.lg,
+  marginBottom: height / 2,
 };
