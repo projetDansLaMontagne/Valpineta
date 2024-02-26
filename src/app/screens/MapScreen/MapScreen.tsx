@@ -98,7 +98,7 @@ const getAllTracks = (): T_excursion[] => {
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
   // A SUPP
   const { navigation, route } = _props;
-  const excursionAffichee = route.params?.excursion;
+  const excursionAffichee = route.params?.excursion ?? _props.excursionAffichee;
 
   // Variables
   const userLocationIntervalMs = 1000; // ! mabye change this value
