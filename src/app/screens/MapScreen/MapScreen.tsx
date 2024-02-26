@@ -9,6 +9,7 @@ import {
   ViewStyle,
   Dimensions,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import { AppStackScreenProps, T_Signalement, T_excursion } from "app/navigators";
 import { Screen } from "app/components";
@@ -366,6 +367,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             )}
           </MapView>
 
+          <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
+            <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
+          </TouchableOpacity>
+
           <View
             style={{
               ...styles.mapOverlayLeft,
@@ -634,14 +639,13 @@ const downloadTiles = async () => {
   }
 };
 
+/* ------------------------------ STYLES ------------------------------ */
 const values = {
   locateBtnContainerSize: 50,
 };
-
 const $container: ViewStyle = {
   display: "flex",
 };
-
 const mapOverlayStyle: ViewStyle = {
   position: "absolute",
   right: 0,
@@ -658,7 +662,6 @@ const mapOverlayStyle: ViewStyle = {
 
   zIndex: 1000,
 };
-
 const buttonContainer = {
   height: values.locateBtnContainerSize,
   width: values.locateBtnContainerSize,
@@ -672,7 +675,6 @@ const buttonContainer = {
 
   pointerEvents: "auto",
 };
-
 const styles = StyleSheet.create({
   actionsButtonContainer: {
     ...(buttonContainer as ViewStyle),
@@ -721,3 +723,16 @@ const styles = StyleSheet.create({
     left: 0,
   },
 });
+const $boutonRetour: ViewStyle = {
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
+  padding: spacing.sm,
+  margin: spacing.lg,
+  width: 50,
+  position: "absolute",
+  top: 20,
+  left: 0,
+  zIndex: 1,
+};

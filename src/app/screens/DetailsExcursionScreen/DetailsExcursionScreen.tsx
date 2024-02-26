@@ -79,12 +79,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
       }
     };
 
-    return excursion ? (
+    return (
       <View style={$container}>
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-          <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-        </TouchableOpacity>
-
         {excursion && (
           /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
           <MapScreen excursionAffichee={excursion} />
@@ -99,16 +95,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           ref={swipeUpDownRef}
         />
       </View>
-    ) : (
-      <Screen preset="fixed">
-        <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-          <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-        </TouchableOpacity>
-        <View style={$containerErreur}>
-          <Text tx="detailsExcursion.erreur.titre" size="xxl" />
-          <Text style={$texteErreur} size="sm" tx="detailsExcursion.erreur.message" />
-        </View>
-      </Screen>
     );
 
     /**
@@ -132,7 +118,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           userLocation={userLocation}
           setIsAllSignalements={setIsAllSignalements}
           footerHeight={footerHeight}
-          setStartPoint={setStartPoint}
+          setStartPoint={undefined}
           swipeDown={swipeUpDown}
           style={$containerGrand}
         />
