@@ -22,7 +22,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/ty
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ListeSignalements } from "../DetailsExcursionScreen/ListeSignalements";
 import { InfosExcursion } from "../DetailsExcursionScreen/InfosExcursion";
-import { Avis } from "../DetailsExcursionScreen/Avis";
+import { Avis } from "./Avis";
 
 // location
 import * as Location from "expo-location";
