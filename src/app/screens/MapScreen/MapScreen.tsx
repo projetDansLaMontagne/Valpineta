@@ -44,8 +44,6 @@ type MapScreenProps = AppStackScreenProps<"Carte"> & {
   hideOverlay: boolean;
 };
 
-type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) => void;
-
 let COMPTEUR = 0;
 const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
 const cacheDirectory = `${fileSystem.cacheDirectory}cartes/OSM`;
@@ -129,8 +127,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
    * @param passedLocation {Location.LocationObject} The location to animate to
    * @returns {void}
    */
-  const animateToLocation: T_animateToLocation = (
-    passedLocation: Location.LocationObject | LatLng,
+  const animateToLocation = (
+    passedLocation?: Location.LocationObject | LatLng,
   ): void => {
     if (mapRef.current) {
       if (!location && !passedLocation) {
