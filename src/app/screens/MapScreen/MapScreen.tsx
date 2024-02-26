@@ -18,7 +18,7 @@ import {
   Dimensions,
   Image,
 } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps, T_Signalement, T_excursion } from "app/navigators";
 import { Screen } from "app/components";
 import { spacing, colors } from "app/theme";
 
@@ -32,13 +32,14 @@ import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
 
 import fichierJson from "assets/Tiles/tiles_struct.json";
-import { TExcursion } from "app/screens/DetailsExcursionScreen";
+import { T_Point } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
 
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
-  children?: React.ReactNode;
+  excursionAffichee?: T_excursion;
+
   // A SUPPRIMER : hideOverlay depend de l etat du l excursion (montrer uniquement si on est en cours)
   hideOverlay: boolean;
 };
@@ -93,8 +94,8 @@ const createFolderStruct = async (
  *
  * @returns The list of all the tracks
  */
-const getAllTracks = (): TExcursion[] => {
-  return require("assets/JSON/excursions.json") as TExcursion[];
+const getAllTracks = (): T_excursion[] => {
+  return require("assets/JSON/excursions.json") as T_excursion[];
 };
 
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
@@ -106,7 +107,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const [location, setLocation] = useState(null);
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
-  const [excursions, setExcursions] = useState<TExcursion[]>(undefined);
+  const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
 
   // Refs
   const intervalRef = useRef(null);
@@ -314,16 +315,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [followUserLocation]);
 
   useEffect(() => {
-    if (excursions !== undefined && excursions.length > 0) {
-      console.log(`[MapScreen] excursions[]: ${JSON.stringify(excursions[0].track[0])}`);
-    }
-  }, [excursions]);
-
-  useEffect(() => {
     downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
 
-    if (!_props.children) {
-      setExcursions(getAllTracks());
+    if (!_props.excursionAffichee) {
+      setAllExcursions(getAllTracks());
     }
 
     return () => {
@@ -392,58 +387,78 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               }}
             />
 
-            {_props.children}
+            {_props.excursionAffichee ? (
+              // Affichage de l excursion, des markers et des signalements
+              <>
+                <Polyline
+                  coordinates={_props.excursionAffichee.track.map(
+                    (point: T_Point) =>
+                      ({
+                        latitude: point.lat,
+                        longitude: point.lon,
+                      } as LatLng),
+                  )}
+                  strokeColor={colors.bouton}
+                  strokeWidth={5}
+                />
 
-            {
+                <StartMiddleAndEndHandler
+                  track={_props.excursionAffichee.track}
+                  typeParcours={_props.excursionAffichee.es.typeParcours}
+                />
+
+                {_props.excursionAffichee?.signalements.map((signalement, i) => (
+                  <SignalementHandler signalement={signalement} key={i} />
+                ))}
+              </>
+            ) : (
               // Oier voulait toutes les excursions sur la carte
               // si on était pas dans la page détail excursion.
-              !_props.children &&
-                excursions !== undefined &&
-                excursions.length > 0 &&
-                excursions.map((excursion, index) => {
-                  if (excursion.track) {
-                    return (
-                      <React.Fragment key={index}>
-                        <Polyline
-                          coordinates={excursion.track.map(point => {
-                            return {
-                              latitude: point.lat,
-                              longitude: point.lon,
-                            } as LatLng;
-                          })}
-                          strokeColor={colors.palette.vert}
-                          strokeWidth={5}
+              allExcursions !== undefined &&
+              allExcursions.map((excursion, index) => {
+                if (excursion.track) {
+                  return (
+                    <React.Fragment key={index}>
+                      <Polyline
+                        coordinates={excursion.track.map(point => {
+                          return {
+                            latitude: point.lat,
+                            longitude: point.lon,
+                          } as LatLng;
+                        })}
+                        strokeColor={colors.palette.vert}
+                        strokeWidth={5}
+                        style={{
+                          zIndex: 1000000,
+                        }}
+                      />
+
+                      <Marker
+                        coordinate={
+                          {
+                            latitude: excursion.track[0].lat ?? 0,
+                            longitude: excursion.track[0].lon ?? 0,
+                          } as LatLng
+                        }
+                        title={excursion.fr.nom}
+                        centerOffset={{ x: 0, y: -15 }}
+                      >
+                        <Image
+                          source={markerImage}
                           style={{
-                            zIndex: 1000000,
+                            width: 30,
+                            height: 30,
+                            tintColor: colors.palette.marron,
                           }}
                         />
-
-                        <Marker
-                          coordinate={
-                            {
-                              latitude: excursion.track[0].lat ?? 0,
-                              longitude: excursion.track[0].lon ?? 0,
-                            } as LatLng
-                          }
-                          title={excursion.fr.nom}
-                          centerOffset={{ x: 0, y: -15 }}
-                        >
-                          <Image
-                            source={markerImage}
-                            style={{
-                              width: 30,
-                              height: 30,
-                              tintColor: colors.palette.marron,
-                            }}
-                          />
-                        </Marker>
-                      </React.Fragment>
-                    );
-                  } else {
-                    return null;
-                  }
-                })
-            }
+                      </Marker>
+                    </React.Fragment>
+                  );
+                } else {
+                  return null;
+                }
+              })
+            )}
           </MapView>
 
           {_props.hideOverlay === false && (
@@ -451,7 +466,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               <View
                 style={{
                   ...styles.mapOverlay,
-                  bottom: _props.children ? 20 : 0,
+                  bottom: _props.excursionAffichee ? 20 : 0,
                 }}
               >
                 {menuIsOpen && (
@@ -492,7 +507,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               <View
                 style={{
                   ...styles.mapOverlayLeft,
-                  bottom: _props.children ? 20 : 0,
+                  bottom: _props.excursionAffichee ? 20 : 0,
                 }}
               >
                 <MapButton
@@ -517,6 +532,146 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     </Screen>
   );
 });
+
+/**
+ * @description Affiche les points de départ, milieu et fin de l'excursion en fonction du type de parcours.
+ * Un parcours en boucle n'a pas de point d'arrivée.
+ * Un parcours en aller-retour a un point d'arrivée.
+ * Tous les parcours ont un point de départ et un point de milieu.
+ *
+ * @param track {T_Point[]} - le fichier gpx de l'excursion
+ * @param typeParcours {"Ida" | "Ida y Vuelta" | "Circular"} - le type de parcours
+ *
+ * @returns les points de départ, milieu et fin de l'excursion
+ */
+type StartMiddleAndEndHandlerProps = {
+  track: T_Point[];
+  typeParcours: "Ida" | "Ida y Vuelta" | "Circular";
+};
+const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
+  const { track, typeParcours } = props;
+
+  // Point d'arrivée
+  const start = {
+    ...track[0],
+    title: "Départ",
+  };
+  const end = {
+    ...track[track.length - 1],
+    title: "Arrivée",
+  };
+  let points: T_Point[];
+
+  // Calcul du point du milieu
+  // Si c'est un aller-retour, le parcours étant symétrique,
+  // on prend le point à la moitié de la distance totale
+  const middleDistance = end.dist / (typeParcours === "Ida y Vuelta" ? 1 : 2);
+
+  const middle = {
+    ...track
+      .sort((a, b) => {
+        return a.dist - b.dist;
+      })
+      .find(point => point.dist >= middleDistance),
+    title: "Milieu",
+  };
+  // find prend le premier élément qui correspond à la condition, vu que c'est sorted, on a le bon point
+
+  // À ce stade, on a les points d'arrivée et du milieu.
+  switch (typeParcours) {
+    case "Ida": // aller simple
+      // Point de départ si c'est un aller simple
+      points = [start, middle, end];
+      break;
+    case "Ida y Vuelta":
+    case "Circular":
+      // Point d'arrivée si c'est un aller-retour
+      start.title = "Départ / Arrivée";
+
+      points = [start, middle];
+      break;
+  }
+
+  const image: ImageSource = require("assets/icons/location.png");
+
+  return points.map((point, index) => (
+    <Marker
+      coordinate={{
+        latitude: point.lat ?? 0,
+        longitude: point.lon ?? 0,
+      }}
+      key={index}
+      // Si l'array de points ne contient que 2 points,
+      // on est sur un aller simple, le deuxième point est donc l'arrivée
+      title={point.title}
+      pinColor={index === 1 ? colors.bouton : colors.text}
+      style={{
+        zIndex: 999,
+      }}
+      centerOffset={{ x: 0, y: -15 }}
+    >
+      <Image
+        source={image}
+        style={{
+          width: 30,
+          height: 30,
+          tintColor: index === 1 ? colors.bouton : colors.text,
+        }}
+      />
+    </Marker>
+  ));
+};
+
+const binoculars: ImageSource = require("assets/icons/binoculars.png");
+const attention: ImageSource = require("assets/icons/attention.png");
+
+/**
+ * @description Affiche les signalements sur la carte.
+ *
+ * @param signalements {T_Signalement[]} - les signalements de l'excursion
+ *
+ * @returns les signalements à afficher sur la carte.
+ */
+const SignalementHandler = ({ signalement }: { signalement: T_Signalement }) => {
+  let iconColor: string;
+  let image: ImageSource;
+
+  switch (signalement.type) {
+    case "PointInteret":
+      image = binoculars;
+      break;
+    case "Avertissement":
+      image = attention;
+      break;
+    default:
+      iconColor = "black";
+      image = binoculars;
+      break;
+  }
+
+  return (
+    <Marker
+      coordinate={{
+        latitude: signalement.lat ?? 0,
+        longitude: signalement.lon ?? 0,
+      }}
+      title={signalement.nom}
+      style={{
+        zIndex: 999,
+      }}
+      centerOffset={{ x: 0, y: signalement.type === "PointInteret" ? 0 : -15 }}
+    >
+      <Image
+        source={image}
+        style={{
+          width: 30,
+          height: 30,
+          tintColor: iconColor,
+        }}
+      />
+    </Marker>
+  );
+};
 
 const values = {
   locateBtnContainerSize: 50,
