@@ -27,19 +27,20 @@ import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
 
+// images
 const binoculars: ImageSource = require("assets/icons/binoculars.png");
 const attention: ImageSource = require("assets/icons/attention.png");
+const markerImage: ImageSource = require("assets/icons/location.png");
 
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   excursionAffichee?: T_excursion;
 };
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
-  // A SUPP
   const { navigation, route } = _props;
   const excursionAffichee = route?.params?.excursion ?? _props.excursionAffichee;
 
-  // Variables
-  const userLocationIntervalMs = 1000; // ! mabye change this value
+  // Constants
+  const USER_LOCATION_INTERVAL_MS = 1000; // ! mabye change this value
 
   // States
   const [gavePermission, setGavePermission] = useState(false);
@@ -96,48 +97,33 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
    */
   const removeLocationSubscription = () => {
     if (watchPositionSubscriptionRef.current) {
-      console.log("[MapScreen] watchPositionSubscriptionRef.current.remove() ");
       watchPositionSubscriptionRef.current.remove();
-
       setLocation(null);
     }
   };
 
   /**
    * Get the user location (authorization is asked if not already given).
-   * @param debug {boolean} If true, log some debug information
    * @returns {Promise<void>}
    */
-  const getLocationAsync = async (debug?: boolean): Promise<void> => {
-    if (debug) {
-      console.log(`[[MapScreen]] getLocationAsync()`);
-      console.log(
-        `[[MapScreen]] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`,
-      );
-    }
-
+  const startLocationAsync = async (): Promise<void> => {
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
       console.log("[MapScreen] Permission to access location was denied");
+    } else {
+      // write code for the app to handle GPS changes
+      watchPositionSubscriptionRef.current = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.BestForNavigation,
+          timeInterval: USER_LOCATION_INTERVAL_MS,
+          distanceInterval: 1,
+        },
+        location => {
+          setLocation(location);
+        },
+      );
     }
-
-    // write code for the app to handle GPS changes
-    watchPositionSubscriptionRef.current = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.BestForNavigation,
-        timeInterval: userLocationIntervalMs,
-        distanceInterval: 1,
-      },
-      location => {
-        if (debug) {
-          console.log(`[[MapScreen]] watchPositionAsync()`);
-          console.log(`[[MapScreen]] location.coords.latitude: ${location.coords.latitude}`);
-          console.log(`[[MapScreen]] location.coords.longitude: ${location.coords.longitude}`);
-        }
-        setLocation(location);
-      },
-    );
   };
 
   const askUserLocation = async () => {
@@ -223,7 +209,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     console.log(`[[MapScreen]] followUserLocation: ${followUserLocation}`);
 
     if (followUserLocation) {
-      getLocationAsync(true)
+      startLocationAsync(true)
         .then(() => console.log("[MapScreen] getLocationAsync() ok"))
         .catch(e => console.log("[MapScreen] getLocationAsync() error: ", e));
     } else {
@@ -256,7 +242,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   /* -------------------------------- Constants ------------------------------- */
   const { width, height } = Dimensions.get("window");
-  const markerImage: ImageSource = require("assets/icons/location.png");
 
   const ASPECT_RATIO = width / height;
   const LATITUDE = 42.63099943470989;
