@@ -17,6 +17,8 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 import { MapScreen } from "app/screens/MapScreen";
 
 const { width, height } = Dimensions.get("window");
+const binoculars: ImageSource = require("assets/icons/binoculars.png");
+const attention: ImageSource = require("assets/icons/attention.png");
 
 /**@warning types a mettre dans appNavigator */
 export interface Coordonnees {
@@ -106,12 +108,14 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
             <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
 
-            {startMiddleAndEndHandler(
-              excursion.track,
-              excursion.es.typeParcours as "Ida" | "Ida y Vuelta" | "Circular",
-            )}
+            <StartMiddleAndEndHandler
+              track={excursion.track}
+              typeParcours={excursion.es.typeParcours}
+            />
 
-            {signalementsHandler(excursion.signalements)}
+            {excursion?.signalements.map((signalement, i) => (
+              <SignalementHandler signalement={signalement} key={i} />
+            ))}
           </MapScreen>
         )}
 
@@ -201,7 +205,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
                   ? { left: spacing.lg }
                   : { left: width - width / 2.5 - spacing.lg / 1.5 },
               ]}
-            ></View>
+            />
             {containerInfoAffiche ? (
               <InfosExcursion
                 excursion={excursion}
@@ -220,7 +224,6 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 );
 
 /**
- * @function startMiddleAndEndHandler
  * @description Affiche les points de départ, milieu et fin de l'excursion en fonction du type de parcours.
  * Un parcours en boucle n'a pas de point d'arrivée.
  * Un parcours en aller-retour a un point d'arrivée.
@@ -231,10 +234,13 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
  *
  * @returns les points de départ, milieu et fin de l'excursion
  */
-const startMiddleAndEndHandler = (
-  track: T_Point[],
-  typeParcours: "Ida" | "Ida y Vuelta" | "Circular",
-) => {
+type StartMiddleAndEndHandlerProps = {
+  track: T_Point[];
+  typeParcours: "Ida" | "Ida y Vuelta" | "Circular";
+};
+const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
+  const { track, typeParcours } = props;
+
   // Point d'arrivée
   const start = {
     ...track[0],
@@ -278,99 +284,79 @@ const startMiddleAndEndHandler = (
 
   const image: ImageSource = require("assets/icons/location.png");
 
-  return points.map((point, index) => {
-    return (
-      <Marker
-        coordinate={{
-          latitude: point.lat ?? 0,
-          longitude: point.lon ?? 0,
-        }}
-        key={index}
-        // Si l'array de points ne contient que 2 points,
-        // on est sur un aller simple, le deuxième point est donc l'arrivée
-        title={point.title}
-        pinColor={index === 1 ? colors.bouton : colors.text}
+  return points.map((point, index) => (
+    <Marker
+      coordinate={{
+        latitude: point.lat ?? 0,
+        longitude: point.lon ?? 0,
+      }}
+      key={index}
+      // Si l'array de points ne contient que 2 points,
+      // on est sur un aller simple, le deuxième point est donc l'arrivée
+      title={point.title}
+      pinColor={index === 1 ? colors.bouton : colors.text}
+      style={{
+        zIndex: 999,
+      }}
+      centerOffset={{ x: 0, y: -15 }}
+    >
+      <Image
+        source={image}
         style={{
-          zIndex: 999,
+          width: 30,
+          height: 30,
+          tintColor: index === 1 ? colors.bouton : colors.text,
         }}
-        centerOffset={{ x: 0, y: -15 }}
-      >
-        <Image
-          source={image}
-          style={{
-            width: 30,
-            height: 30,
-            tintColor: index === 1 ? colors.bouton : colors.text,
-          }}
-        />
-      </Marker>
-    );
-  });
+      />
+    </Marker>
+  ));
 };
 
 /**
- * @function signalementsHandler
  * @description Affiche les signalements sur la carte.
  *
  * @param signalements {T_Signalement[]} - les signalements de l'excursion
  *
  * @returns les signalements à afficher sur la carte.
  */
-const signalementsHandler = (signalements: T_Signalement[]) => {
-  const binoculars: ImageSource = require("assets/icons/binoculars.png");
-  const attention: ImageSource = require("assets/icons/attention.png");
+const SignalementHandler = ({ signalement }: { signalement: T_Signalement }) => {
+  let iconColor: string;
+  let image: ImageSource;
+
+  switch (signalement.type) {
+    case "PointInteret":
+      image = binoculars;
+      break;
+    case "Avertissement":
+      image = attention;
+      break;
+    default:
+      iconColor = "black";
+      image = binoculars;
+      break;
+  }
 
   return (
-    <>
-      {signalements.map((signalement, index) => {
-        /**
-         * ! ATTENDRE PR DE NICO QUI A TYPÉ LES SIGNALEMENTS
-         */
-        let iconColor: string;
-        let image: ImageSource;
-
-        switch (signalement.type) {
-          case "PointInteret":
-            image = binoculars;
-            break;
-          case "Avertissement":
-            image = attention;
-            break;
-          default:
-            iconColor = "black";
-            image = binoculars;
-            break;
-        }
-
-        return (
-          <Marker
-            coordinate={{
-              latitude: signalement.latitude ?? 0,
-              longitude: signalement.longitude ?? 0,
-            }}
-            // key={point.dist}
-            key={index}
-            // Si l'array de points ne contient que 2 points,
-            // on est sur un aller simple, le deuxième point est donc l'arrivée
-            title={signalement.titre}
-            // pinColor={iconColor}
-            style={{
-              zIndex: 999,
-            }}
-            centerOffset={{ x: 0, y: signalement.type === "PointInteret" ? 0 : -15 }}
-          >
-            <Image
-              source={image}
-              style={{
-                width: 30,
-                height: 30,
-                tintColor: iconColor,
-              }}
-            />
-          </Marker>
-        );
-      })}
-    </>
+    <Marker
+      coordinate={{
+        latitude: signalement.lat ?? 0,
+        longitude: signalement.lon ?? 0,
+      }}
+      title={signalement.nom}
+      style={{
+        zIndex: 999,
+      }}
+      centerOffset={{ x: 0, y: signalement.type === "PointInteret" ? 0 : -15 }}
+    >
+      <Image
+        source={image}
+        style={{
+          width: 30,
+          height: 30,
+          tintColor: iconColor,
+        }}
+      />
+    </Marker>
   );
 };
 
