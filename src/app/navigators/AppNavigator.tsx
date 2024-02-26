@@ -82,7 +82,7 @@ export type T_Signalement = {
 export type T_infoLangue = {
   nom: string;
   description: string;
-  typeParcours: string;
+  typeParcours: "Ida" | "Ida y Vuelta" | "Circular";
 };
 
 export type T_excursion = {

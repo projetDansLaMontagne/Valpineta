@@ -15,7 +15,7 @@ import {
 import { Text, GraphiqueDenivele } from "app/components";
 /**@warning A SUPPRIMER ET DECALER DANS APPNAVIGATOR : */
 import { T_Point } from "app/screens/DetailsExcursionScreen/";
-import { T_excursion } from "app/navigators";
+import { T_Signalement, T_excursion } from "app/navigators";
 
 export interface InfosExcursionProps {
   excursion: T_excursion;
@@ -83,15 +83,15 @@ export function InfosExcursion(props: InfosExcursionProps) {
           <View style={$containerDescriptionEtSignalements}>
             <Text text="Description" size="lg" />
             <Text text={descriptionFormatee(excursion.description)} size="xxs" />
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Description", { excursion: excursion });
-              }}
-            >
-              {excursion.description !== "" && (
+            {excursion.description !== "" && (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Description", { excursion: excursion });
+                }}
+              >
                 <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
-              )}
-            </TouchableOpacity>
+              </TouchableOpacity>
+            )}
           </View>
           <View>
             {excursion.signalements.length > 0 && (
