@@ -38,17 +38,10 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
-
   children?: React.ReactNode;
-} & (
-    | {
-        hideOverlay: true;
-      }
-    | {
-        hideOverlay: false;
-        overlayDebugMode: boolean;
-      }
-  );
+  // A SUPPRIMER : hideOverlay depend de l etat du l excursion (montrer uniquement si on est en cours)
+  hideOverlay: boolean;
+};
 
 type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) => void;
 
@@ -279,7 +272,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     setMenuIsOpen(!menuIsOpen);
   };
 
-
   /* ------------------------------- USE EFFECTS ------------------------------ */
   useEffect(() => {
     return () => {
@@ -338,7 +330,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       removeLocationSubscription();
     };
   }, []);
-  
 
   /* -------------------------------- Constants ------------------------------- */
   const { width, height } = Dimensions.get("window");
@@ -455,12 +446,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             }
           </MapView>
 
-          {!_props.hideOverlay && (
+          {_props.hideOverlay === false && (
             <>
               <View
                 style={{
                   ...styles.mapOverlay,
-                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
                   bottom: _props.children ? 20 : 0,
                 }}
               >
@@ -502,7 +492,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               <View
                 style={{
                   ...styles.mapOverlayLeft,
-                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
                   bottom: _props.children ? 20 : 0,
                 }}
               >
@@ -552,12 +541,6 @@ const mapOverlayStyle: ViewStyle = {
   padding: spacing.sm,
 
   zIndex: 1000,
-};
-
-const mapOverlayStyleDebug: ViewStyle = {
-  borderColor: colors.palette.vert,
-  borderWidth: 4,
-  borderRadius: 10,
 };
 
 const buttonContainer = {
