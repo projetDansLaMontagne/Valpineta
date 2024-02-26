@@ -37,7 +37,6 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
-  startLocation?: LatLng;
   excursionAffichee?: T_excursion;
 
   // A SUPPRIMER : hideOverlay depend de l etat du l excursion (montrer uniquement si on est en cours)
@@ -97,6 +96,10 @@ const getAllTracks = (): T_excursion[] => {
 };
 
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
+  // A SUPP
+  const { navigation, route } = _props;
+  const excursionAffichee = route.params?.excursion;
+
   // Variables
   const userLocationIntervalMs = 1000; // ! mabye change this value
 
@@ -106,6 +109,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
+  const [startPoint, setStartPoint] = useState<LatLng>();
 
   // Refs
   const intervalRef = useRef(null);
@@ -127,9 +131,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
    * @param passedLocation {Location.LocationObject} The location to animate to
    * @returns {void}
    */
-  const animateToLocation = (
-    passedLocation?: Location.LocationObject | LatLng,
-  ): void => {
+  const animateToLocation = (passedLocation?: Location.LocationObject | LatLng): void => {
     if (mapRef.current) {
       if (!location && !passedLocation) {
         console.log("[MapScreen] location is null");
@@ -254,14 +256,14 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   };
 
   const ButtonOnPressAvertissement = () => {
-    _props.navigation.navigate("CarteStack", {
+    navigation.navigate("CarteStack", {
       screen: "NouveauSignalement",
       params: { type: "Avertissement" },
     });
   };
 
   const ButtonOnPressPointInteret = () => {
-    _props.navigation.navigate("CarteStack", {
+    navigation.navigate("CarteStack", {
       screen: "NouveauSignalement",
       params: { type: "PointInteret" },
     });
@@ -296,9 +298,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [menuIsOpen]);
 
   useEffect(() => {
-    console.log(`[MapScreen] _props.startLocation: ${JSON.stringify(_props.startLocation)}`);
-    _props.startLocation && animateToLocation(_props.startLocation);
-  }, [_props.startLocation]);
+    startPoint && animateToLocation(startPoint);
+  }, [startPoint]);
 
   useEffect(() => {
     console.log(`[[MapScreen]] followUserLocation: ${followUserLocation}`);
@@ -312,10 +313,20 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     }
   }, [followUserLocation]);
 
+  // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
+  useEffect(() => {
+    if (excursionAffichee !== undefined) {
+      setStartPoint({
+        latitude: excursionAffichee.track[0].lat,
+        longitude: excursionAffichee.track[0].lon,
+      } as LatLng);
+    }
+  }, [excursionAffichee]);
+
   useEffect(() => {
     downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
 
-    if (!_props.excursionAffichee) {
+    if (!excursionAffichee) {
       setAllExcursions(getAllTracks());
     }
 
@@ -348,15 +359,15 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               ...styles.map,
             }}
             initialRegion={{
-              latitude: _props.startLocation?.latitude ?? LATITUDE,
-              longitude: _props.startLocation?.longitude ?? LONGITUDE,
+              latitude: startPoint?.latitude ?? LATITUDE,
+              longitude: startPoint?.longitude ?? LONGITUDE,
               latitudeDelta: LATITUDE_DELTA,
               longitudeDelta: LONGITUDE_DELTA,
             }}
             initialCamera={{
               center: {
-                latitude: _props.startLocation?.latitude ?? LATITUDE,
-                longitude: _props.startLocation?.longitude ?? LONGITUDE,
+                latitude: startPoint?.latitude ?? LATITUDE,
+                longitude: startPoint?.longitude ?? LONGITUDE,
               },
               pitch: 0,
               heading: 0,
@@ -385,11 +396,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               }}
             />
 
-            {_props.excursionAffichee ? (
+            {excursionAffichee ? (
               // Affichage de l excursion, des markers et des signalements
               <>
                 <Polyline
-                  coordinates={_props.excursionAffichee.track.map(
+                  coordinates={excursionAffichee.track.map(
                     (point: T_Point) =>
                       ({
                         latitude: point.lat,
@@ -401,11 +412,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 />
 
                 <StartMiddleAndEndHandler
-                  track={_props.excursionAffichee.track}
-                  typeParcours={_props.excursionAffichee.es.typeParcours}
+                  track={excursionAffichee.track}
+                  typeParcours={excursionAffichee.es.typeParcours}
                 />
 
-                {_props.excursionAffichee?.signalements.map((signalement, i) => (
+                {excursionAffichee?.signalements.map((signalement, i) => (
                   <SignalementHandler signalement={signalement} key={i} />
                 ))}
               </>
@@ -464,7 +475,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               <View
                 style={{
                   ...styles.mapOverlay,
-                  bottom: _props.excursionAffichee ? 20 : 0,
+                  bottom: excursionAffichee ? 20 : 0,
                 }}
               >
                 {menuIsOpen && (
@@ -505,7 +516,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
               <View
                 style={{
                   ...styles.mapOverlayLeft,
-                  bottom: _props.excursionAffichee ? 20 : 0,
+                  bottom: excursionAffichee ? 20 : 0,
                 }}
               >
                 <MapButton

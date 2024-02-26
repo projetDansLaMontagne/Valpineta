@@ -60,24 +60,8 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
     const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
     const [isAllSignalements, setIsAllSignalements] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
-    const [startPoint, setStartPoint] = useState<LatLng>();
     const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
     const footerHeight = useBottomTabBarHeight();
-    const allPoints = excursion.track.map(
-      (point: T_Point) =>
-        ({
-          latitude: point.lat,
-          longitude: point.lon,
-        } as LatLng),
-    );
-
-    // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
-    useEffect(() => {
-      setStartPoint({
-        latitude: excursion.track[0].lat,
-        longitude: excursion.track[0].lon,
-      } as LatLng);
-    }, [excursion]);
 
     useEffect(() => {
       (async () => {
@@ -101,9 +85,9 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
           <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
         </TouchableOpacity>
 
-        {allPoints && startPoint && (
+        {excursion && (
           /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
-          <MapScreen startLocation={startPoint} hideOverlay={false} excursionAffichee={excursion} />
+          <MapScreen hideOverlay={false} excursionAffichee={excursion} />
         )}
 
         <SwipeUpDown
