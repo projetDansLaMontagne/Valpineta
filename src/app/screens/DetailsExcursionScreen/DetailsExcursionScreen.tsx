@@ -87,7 +87,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
         {excursion && (
           /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
-          <MapScreen hideOverlay={false} excursionAffichee={excursion} />
+          <MapScreen excursionAffichee={excursion} />
         )}
 
         <SwipeUpDown

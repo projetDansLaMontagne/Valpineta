@@ -1,11 +1,3 @@
-/**
- * ! PROPS
- *
- * - startLocation: LatLng, si on veut centrer la carte sur une position au chargement,
- * si on met un state et que l'on change la valeur, la carte se recentre
- * - hideOverlay: boolean, si on veut afficher les boutons de la carte.®
- */
-
 import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
@@ -38,9 +30,6 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 // variables
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   excursionAffichee?: T_excursion;
-
-  // A SUPPRIMER : hideOverlay depend de l etat du l excursion (montrer uniquement si on est en cours)
-  hideOverlay: boolean;
 };
 
 let COMPTEUR = 0;
@@ -470,72 +459,75 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             )}
           </MapView>
 
-          {_props.hideOverlay === false && (
-            <>
-              <View
-                style={{
-                  ...styles.mapOverlay,
-                  bottom: excursionAffichee ? 20 : 0,
-                }}
-              >
-                {menuIsOpen && (
-                  <>
-                    <MapButton
-                      ref={addPOIBtnRef}
-                      style={{
-                        ...styles.actionsButtonContainer,
-                      }}
-                      onPress={ButtonOnPressAvertissement}
-                      icon={"eye"}
-                      iconSize={spacing.lg}
-                      iconColor={colors.palette.blanc}
-                    />
-                    <MapButton
-                      ref={addWarningBtnRef}
-                      style={{
-                        ...styles.actionsButtonContainer,
-                      }}
-                      onPress={ButtonOnPressPointInteret}
-                      icon="exclamation-circle"
-                      iconSize={spacing.lg}
-                      iconColor={colors.palette.blanc}
-                    />
-                  </>
-                )}
-                <MapButton
-                  ref={toggleBtnMenuRef}
+          {
+            /**@todo DOIT DEPENDRE DU STORE SuiviExcursion.etat (pour n'afficher les boutons que lorsqu'on est en rando) */
+            "enCours" !== "enCours" && (
+              <>
+                <View
                   style={{
-                    ...styles.actionsButtonContainer,
+                    ...styles.mapOverlay,
+                    bottom: excursionAffichee ? 20 : 0,
                   }}
-                  onPress={toggleMenu}
-                  icon={menuIsOpen ? "times" : "map-marker-alt"}
-                  iconSize={spacing.lg}
-                  iconColor={colors.palette.blanc}
-                />
-              </View>
-              <View
-                style={{
-                  ...styles.mapOverlayLeft,
-                  bottom: excursionAffichee ? 20 : 0,
-                }}
-              >
-                <MapButton
-                  ref={followLocationButtonRef}
+                >
+                  {menuIsOpen && (
+                    <>
+                      <MapButton
+                        ref={addPOIBtnRef}
+                        style={{
+                          ...styles.actionsButtonContainer,
+                        }}
+                        onPress={ButtonOnPressAvertissement}
+                        icon={"eye"}
+                        iconSize={spacing.lg}
+                        iconColor={colors.palette.blanc}
+                      />
+                      <MapButton
+                        ref={addWarningBtnRef}
+                        style={{
+                          ...styles.actionsButtonContainer,
+                        }}
+                        onPress={ButtonOnPressPointInteret}
+                        icon="exclamation-circle"
+                        iconSize={spacing.lg}
+                        iconColor={colors.palette.blanc}
+                      />
+                    </>
+                  )}
+                  <MapButton
+                    ref={toggleBtnMenuRef}
+                    style={{
+                      ...styles.actionsButtonContainer,
+                    }}
+                    onPress={toggleMenu}
+                    icon={menuIsOpen ? "times" : "map-marker-alt"}
+                    iconSize={spacing.lg}
+                    iconColor={colors.palette.blanc}
+                  />
+                </View>
+                <View
                   style={{
-                    ...styles.locateButtonContainer,
+                    ...styles.mapOverlayLeft,
+                    bottom: excursionAffichee ? 20 : 0,
                   }}
-                  onPress={toggleFollowUserLocation}
-                  icon="location-arrow"
-                  iconSize={spacing.lg}
-                  iconColor={
-                    followUserLocation
-                      ? colors.palette.bleuLocActive
-                      : colors.palette.bleuLocInactive
-                  }
-                />
-              </View>
-            </>
-          )}
+                >
+                  <MapButton
+                    ref={followLocationButtonRef}
+                    style={{
+                      ...styles.locateButtonContainer,
+                    }}
+                    onPress={toggleFollowUserLocation}
+                    icon="location-arrow"
+                    iconSize={spacing.lg}
+                    iconColor={
+                      followUserLocation
+                        ? colors.palette.bleuLocActive
+                        : colors.palette.bleuLocInactive
+                    }
+                  />
+                </View>
+              </>
+            )
+          }
         </View>
       </View>
     </Screen>
