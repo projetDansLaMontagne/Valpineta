@@ -29,9 +29,9 @@ import MapButton from "./MapButton";
 import { Asset } from "expo-asset";
 
 import * as fileSystem from "expo-file-system";
-// import TilesRequire from "app/services/importAssets/tilesRequire";
+import TilesRequire from "app/services/importAssets/tilesRequire";
 
-// import fichierJson from "assets/Tiles/tiles_struct.json";
+import fichierJson from "assets/Tiles/tiles_struct.json";
 import { TExcursion } from "app/screens/DetailsExcursionScreen";
 import { ImageSource } from "react-native-vector-icons/Icon";
 
@@ -39,7 +39,6 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   startLocation?: LatLng;
 
-  isInDetailExcursion?: boolean;
   children?: React.ReactNode;
 } & (
     | {
@@ -47,7 +46,7 @@ type MapScreenProps = AppStackScreenProps<"Carte"> & {
       }
     | {
         hideOverlay: false;
-        overlayDebugMode?: boolean;
+        overlayDebugMode: boolean;
       }
   );
 
@@ -172,26 +171,22 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   };
 
   const downloadTiles = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    askUserLocation();
 
-    if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied");
+    const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
+    console.log("[MapScreen] folderInfo: ", folderInfo);
+
+    if (folderInfo.exists && !folderInfo.isDirectory) {
+      console.log("Tuiles déjà DL");
+      await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
     } else {
-      console.log("[MapScreen] Permission ok");
-      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
-      console.log("[MapScreen] folderInfo: ", folderInfo);
-      if (folderInfo.exists && !folderInfo.isDirectory) {
-        console.log("Tuiles déjà DL");
-        await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
-      } else {
-        // Supprimer le dossier
-        console.log("[MapScreen] Suppression du dossier");
-        await fileSystem.deleteAsync(folderDest, { idempotent: true });
+      // Supprimer le dossier
+      console.log("[MapScreen] Suppression du dossier");
+      await fileSystem.deleteAsync(folderDest, { idempotent: true });
 
-        const assets = await TilesRequire();
+      const assets = await TilesRequire();
 
-        await createFolderStruct(fichierJson, folderDest, assets);
-      }
+      await createFolderStruct(fichierJson, folderDest, assets);
     }
   };
 
@@ -268,12 +263,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
 
   const askUserLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
+    const permissionsOK = status === "granted";
+
+    if (!permissionsOK) {
       console.log("[MapScreen] Permission to access location was denied");
-      setGavePermission(false);
-      return;
     }
-    setGavePermission(true);
+    setGavePermission(permissionsOK);
   };
 
   const ButtonOnPressAvertissement = () => {
@@ -344,7 +339,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   useEffect(() => {
     downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
 
-    if (!_props.isInDetailExcursion) {
+    if (!_props.children) {
       setExcursions(getAllTracks());
     }
 
@@ -419,7 +414,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
             {
               // Oier voulait toutes les excursions sur la carte
               // si on était pas dans la page détail excursion.
-              !_props.isInDetailExcursion &&
+              !_props.children &&
                 excursions !== undefined &&
                 excursions.length > 0 &&
                 excursions.map((excursion, index) => {
@@ -474,7 +469,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 style={{
                   ...styles.mapOverlay,
                   ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                  bottom: _props.isInDetailExcursion ? 20 : 0,
+                  bottom: _props.children ? 20 : 0,
                 }}
               >
                 {menuIsOpen && (
@@ -516,7 +511,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                 style={{
                   ...styles.mapOverlayLeft,
                   ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                  bottom: _props.isInDetailExcursion ? 20 : 0,
+                  bottom: _props.children ? 20 : 0,
                 }}
               >
                 <MapButton

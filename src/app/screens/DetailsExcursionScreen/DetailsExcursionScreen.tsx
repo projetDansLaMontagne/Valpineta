@@ -105,7 +105,7 @@ export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
 
         {allPoints && startPoint && (
           /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
-          <MapScreen startLocation={startPoint} isInDetailExcursion={true} hideOverlay={false}>
+          <MapScreen startLocation={startPoint} hideOverlay={false}>
             <Polyline coordinates={allPoints} strokeColor={colors.bouton} strokeWidth={5} />
 
             <StartMiddleAndEndHandler
