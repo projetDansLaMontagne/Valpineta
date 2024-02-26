@@ -1,20 +1,4 @@
-import React, { FC, useState, useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { View, ViewStyle, TouchableOpacity, Image, TextStyle, Dimensions } from "react-native";
-import { AppStackScreenProps, TPoint, T_Signalement } from "app/navigators";
-import { GpxDownloader } from "./GpxDownloader";
-import { Text, Screen } from "app/components";
-import { spacing, colors } from "app/theme";
-import SwipeUpDown from "react-native-swipe-up-down";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { ListeSignalements } from "./ListeSignalements";
-import { getUserLocation } from "app/utils/getUserLocation";
-import { InfosExcursion } from "./InfosExcursion";
-import { Avis } from "./Avis";
-import { LatLng, Marker, Polyline } from "react-native-maps";
-import { ImageSource } from "react-native-vector-icons/Icon";
-import { MapScreen } from "app/screens/MapScreen";
+import { TPoint, T_Signalement } from "app/navigators";
 
 /**@warning types a mettre dans appNavigator */
 export interface Coordonnees {
@@ -48,20 +32,3 @@ export type TExcursion = {
   nomTrackGpx: string;
   track: T_Point[];
 };
-
-interface DetailsExcursionScreenProps extends AppStackScreenProps<"DetailsExcursion"> {}
-export const DetailsExcursionScreen: FC<DetailsExcursionScreenProps> = observer(
-  function DetailsExcursionScreen(props: DetailsExcursionScreenProps) {
-    const { route, navigation } = props;
-    const excursion = route.params?.excursion;
-
-    return (
-      <View style={$container}>
-        {excursion && (
-          /**@warning MapScreen doit etre transforme en composant, ce n est pas un screen */
-          <MapScreen excursion={excursion} />
-        )}
-      </View>
-    );
-  },
-);
