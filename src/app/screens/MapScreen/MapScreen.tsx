@@ -98,38 +98,29 @@ const createFolderStruct = async (
 /**
  * Get all the tracks of the `src/assets/JSON/excursions.json` file.
  *
- * @returns {Promise<TExcursion[]>} The list of all the tracks
+ * @returns The list of all the tracks
  */
 const getAllTracks = (): TExcursion[] => {
   return require("assets/JSON/excursions.json") as TExcursion[];
 };
 
-// Component(s)
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
-  //Props
-  const { navigation } = _props;
-
   // Variables
   const userLocationIntervalMs = 1000; // ! mabye change this value
 
-  // State(s)
+  // States
   const [gavePermission, setGavePermission] = useState(false);
   const [location, setLocation] = useState(null);
-
   const [followUserLocation, setFollowUserLocation] = useState(false);
-
   const [menuIsOpen, setMenuIsOpen] = useState(false);
-
   const [excursions, setExcursions] = useState<TExcursion[]>(undefined);
 
-  // Ref(s)
+  // Refs
   const intervalRef = useRef(null);
-
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
   const mapRef = useRef<MapView>(null);
 
-  // buttons
-  /**@warning la navigation doit se faire avec props.navigation avec Ignite */
+  // Buttons
   const followLocationButtonRef = useRef(null);
   const toggleBtnMenuRef = useRef(null);
   const addPOIBtnRef = useRef(null);
@@ -138,9 +129,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   // Animation(s)
   const buttonOpacity = useRef(new Animated.Value(0)).current;
 
-  // Var(s)
-
-  // Method(s)
+  // Functions
   /**
    * Animate the map to follow the user location.
    * @param passedLocation {Location.LocationObject} The location to animate to
@@ -239,6 +228,17 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     );
   };
 
+  const askUserLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    const permissionsOK = status === "granted";
+
+    if (!permissionsOK) {
+      console.log("[MapScreen] Permission to access location was denied");
+    }
+    setGavePermission(permissionsOK);
+  };
+
+  /* ------------------------------- CALL BACKS ------------------------------- */
   /**
    * Handle the map moves
    * I want the map to follow the user location if the map is centered on the user location
@@ -261,25 +261,15 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     setFollowUserLocation(!followUserLocation);
   };
 
-  const askUserLocation = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    const permissionsOK = status === "granted";
-
-    if (!permissionsOK) {
-      console.log("[MapScreen] Permission to access location was denied");
-    }
-    setGavePermission(permissionsOK);
-  };
-
   const ButtonOnPressAvertissement = () => {
-    navigation.navigate("CarteStack", {
+    _props.navigation.navigate("CarteStack", {
       screen: "NouveauSignalement",
       params: { type: "Avertissement" },
     });
   };
 
   const ButtonOnPressPointInteret = () => {
-    navigation.navigate("CarteStack", {
+    _props.navigation.navigate("CarteStack", {
       screen: "NouveauSignalement",
       params: { type: "PointInteret" },
     });
@@ -289,7 +279,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     setMenuIsOpen(!menuIsOpen);
   };
 
-  // Effect(s)
+
+  /* ------------------------------- USE EFFECTS ------------------------------ */
   useEffect(() => {
     return () => {
       clearInterval(intervalRef.current);
@@ -347,16 +338,17 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       removeLocationSubscription();
     };
   }, []);
+  
 
+  /* -------------------------------- Constants ------------------------------- */
   const { width, height } = Dimensions.get("window");
+  const markerImage: ImageSource = require("assets/icons/location.png");
 
   const ASPECT_RATIO = width / height;
   const LATITUDE = 42.63099943470989;
   const LONGITUDE = 0.21949934093707602;
   const LATITUDE_DELTA = 0.0922;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
-  const image: ImageSource = require("assets/icons/location.png");
 
   return (
     <Screen style={$container} safeAreaEdges={["bottom"]}>
@@ -446,7 +438,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
                           centerOffset={{ x: 0, y: -15 }}
                         >
                           <Image
-                            source={image}
+                            source={markerImage}
                             style={{
                               width: 30,
                               height: 30,
