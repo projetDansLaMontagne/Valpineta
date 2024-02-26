@@ -17,7 +17,7 @@ import { Screen, Text } from "app/components";
 import { spacing, colors } from "app/theme";
 import { ImageSource } from "react-native-vector-icons/Icon";
 
-import { GpxDownloader } from "../DetailsExcursionScreen/GpxDownloader";
+import { GpxDownloader } from "./GpxDownloader";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ListeSignalements } from "./ListeSignalements";
