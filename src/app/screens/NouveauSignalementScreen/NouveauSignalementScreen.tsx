@@ -8,7 +8,6 @@ import {
   View,
   Dimensions,
   ViewStyle,
-  Alert,
   ActivityIndicator,
   TouchableOpacity,
   ImageStyle,
@@ -18,9 +17,12 @@ import { colors, spacing } from "app/theme";
 import * as ImagePicker from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { translate } from "app/i18n";
+import NetInfo from "@react-native-community/netinfo";
 // Composants
 import { Button, Screen, Text } from "app/components";
-import { EtatSynchro, useStores } from "app/models";
+import { useStores } from "app/models";
+//Fonctions
+import { saisiesValides, blobToBase64, AlerteStatus } from "./NouveauSignalementFonctions";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: T_TypeSignalement;
@@ -104,92 +106,42 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     };
 
     /**
-     * Indique si les informations du signalement sont correctes (tailles de champs, caractères autorisés et photo OK)
-     */
-    const saisiesValides = (nom: string, description: string, image: string): boolean => {
-      let saisieBonne = true;
-
-      // Regex pour vérifier si les champs sont corrects et contiennent uniquement des caractères autorisés
-      const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*-+,.:;"]+$/;
-
-      // Vérification du nom
-      if (nom === "" || !regex.test(nom) || nom.length < 3 || nom.length > 50) {
-        setNomErreur(true);
-        saisieBonne = false;
-      } else {
-        setNomErreur(false);
-      }
-
-      // Vérification de la description
-      if (
-        description === "" ||
-        !regex.test(description) ||
-        description.length < 10 ||
-        description.length > 1000
-      ) {
-        setDescriptionErreur(true);
-        saisieBonne = false;
-      } else {
-        setDescriptionErreur(false);
-      }
-
-      // Vérification de la photo
-      if (!image) {
-        setPhotoErreur(true);
-        saisieBonne = false;
-      } else {
-        setPhotoErreur(false);
-      }
-      return saisieBonne;
-    };
-
-    /**
-     * fonction pour afficher une alerte en fonction du status de fin de l'envoi du signalement
-     */
-    const AlerteStatus = (status: EtatSynchro) => {
-      switch (status) {
-        case EtatSynchro.BienEnvoye:
-          Alert.alert("Reussite !", "Votre signalement a bien été enregistré", [], {
-            cancelable: true,
-          });
-          break;
-
-        case EtatSynchro.NonConnecte:
-          Alert.alert(
-            "Hors connexion",
-            "Votre signalement sera automatiquement enregistré lors de votre prochaine connexion (duree du cycle parametrable)",
-            [],
-            { cancelable: true },
-          );
-          break;
-
-        case EtatSynchro.ErreurServeur:
-          Alert.alert(
-            "Erreur serveur",
-            "Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer plus tard.",
-            [],
-            { cancelable: true },
-          );
-          break;
-      }
-    };
-
-    /**
      * Fonction pour envoyer le signalement en base de données
      */
     const envoyerSignalement = async (signalement: T_Signalement) => {
-      if (saisiesValides(signalement.nom, signalement.description, signalement.image)) {
+      let saisieValide: boolean = false;
+      let nomErreur = false;
+      let descriptionErreur = false;
+      let photoErreur = false;
+      saisieValide = saisiesValides(
+        signalement.nom,
+        signalement.description,
+        signalement.image,
+        saisieValide,
+        nomErreur,
+        descriptionErreur,
+        photoErreur,
+      );
+      if (saisieValide) {
         //Conversion de l'image url en base64
         const blob = await fetch(signalement.image).then(response => response.blob());
         signalement.image = await blobToBase64(blob);
 
         setIsLoading(true);
         synchroMontante.addSignalement(signalement);
-        const status = await synchroMontante.tryToPush();
+        const connexion = await NetInfo.fetch();
+        const status = await synchroMontante.tryToPush(
+          connexion.isConnected,
+          synchroMontante.signalements,
+        );
         setIsLoading(false);
 
         AlerteStatus(status);
         props.navigation.goBack();
+      } else {
+        setNomErreur(nomErreur);
+        setDescriptionErreur(descriptionErreur);
+        setPhotoErreur(photoErreur);
       }
     };
 
@@ -291,31 +243,6 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
   },
 );
 
-/**
- * Transforme un blob en base64
- * @param blob
- * @returns blob en base64
- */
-async function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result);
-      } else {
-        reject(
-          new Error(
-            "[SynchroMontanteService -> blobToBase64 ]Conversion Blob vers Base64 a échoué.",
-          ),
-        );
-      }
-    };
-
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 /* -------------------------------------------------------------------------- */
 /*                                   STYLES                                   */

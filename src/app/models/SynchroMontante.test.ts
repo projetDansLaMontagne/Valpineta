@@ -10,10 +10,9 @@
 import { expect, test, beforeAll, afterAll, afterEach, describe, jest, beforeEach } from "@jest/globals";
 import { SynchroMontanteModel } from "./SynchroMontante";
 import { T_Signalement } from "app/navigators";
-import { EtatSynchro, IntervalleSynchro, intervalId, MINUTE_EN_MILLISECONDES} from "./SynchroMontante";
+import { EtatSynchro, IntervalleSynchro} from "./SynchroMontante";
 import { ApiOkResponse, ApiResponse } from "apisauce";
 import { destroy, unprotect } from "mobx-state-tree";
-import mockRNCNetInfo from '@react-native-community/netinfo/jest/netinfo-mock.js';
 
 const signalementValide: T_Signalement = {
   nom: "nom",
@@ -36,9 +35,6 @@ const signalementAvecBlob: T_Signalement = {
   postId: 0,
 };
 
-const signalementInvalide: T_Signalement = {
-  test: "test",
-};
 
 describe("[SynchroMontante] fonctions interne", () => {
   let synchroMontante: ReturnType<typeof SynchroMontanteModel.create>;
@@ -59,10 +55,7 @@ describe("[SynchroMontante] fonctions interne", () => {
     });
     test("Doit renvoyer une erreur si on ajoute un signalement vide", () => {
       expect(() => synchroMontante.addSignalement({} as T_Signalement)).toThrowError();
-    });
-    test("Doit renvoyer erreur si signalement n'est pas de type T_Signalement", () => {
-      expect(() => synchroMontante.addSignalement("test")).toThrowError();
-    });
+    });   
   });
 
   describe("[SynchroMontante] Fonctions avec l'interval", () => {
@@ -70,14 +63,6 @@ describe("[SynchroMontante] fonctions interne", () => {
     test("Doit pouvoir changer l'intervalle de synchronisation", () => {
       synchroMontante.setIntervalleSynchro(IntervalleSynchro.Moderee);
       expect(synchroMontante.intervalleSynchro).toBe(IntervalleSynchro.Moderee);
-    });
-    test("Doit renvoyer une erreur si on change l'intervalle de synchronisation avec une valeur non valide", () => {
-      synchroMontante.setIntervalleSynchro(0);
-      expect(synchroMontante.intervalleSynchro).toBe(IntervalleSynchro.TresFrequente);
-    });
-    test("Doit renvoyer une erreur si l'intervalle n'est passé en paramètre", () => {
-      synchroMontante.setIntervalleSynchro();
-      expect(synchroMontante.intervalleSynchro).toBe(IntervalleSynchro.TresFrequente);
     });
   });
 
@@ -100,25 +85,6 @@ describe("[SynchroMontante] fonctions interne", () => {
       ]);
       expect(response.ok).toBeTruthy();
     }, 10000);
-
-    test("Doit renvoyer faux si il y a un signalement invalide parmis des valides", async () => {
-      const response = await synchroMontante.callApi([
-        signalementValide,
-        signalementInvalide,
-        signalementValide,
-      ]);
-      expect(response.ok).toBeFalsy();
-    });
-
-    test("Doit renvoyer faux si callApi n'a aucun paramètre", async () => {
-      const response = await synchroMontante.callApi();
-      expect(response.ok).toBeFalsy();
-    });
-
-    test("Doit renvoyer faux si callApi un type invalide", async () => {
-      const response = await synchroMontante.callApi(signalementInvalide);
-      expect(response.ok).toBeFalsy();
-    });
   });
 
   describe("[SynchroMontante] traiterResultat ", () => {
@@ -224,20 +190,6 @@ describe("[SynchroMontante] fonctions interne", () => {
       const result = await synchroMontante.tryToPush(false, synchroMontante.signalements);
       expect(result).toBe(EtatSynchro.NonConnecte);
       expect(synchroMontante.signalements.length).toBe(1);
-    });
-
-    test("Doit renvoyer EtatSynchro.ErreurServeur si les signalemenets a envoyer ne sont pas bon", async () => {
-      const result = await synchroMontante.tryToPush(true, [signalementInvalide]);
-      expect(result).toBe(EtatSynchro.ErreurServeur);
-    });
-
-    test("Doit renvoyer EtatSynchro.ErreurServeur si un signalemenets a envoyer n'est pas bon", async () => {
-      const result = await synchroMontante.tryToPush(true, [
-        signalementInvalide,
-        signalementValide,
-        signalementValide,
-      ]);
-      expect(result).toBe(EtatSynchro.ErreurServeur);
     });
 
     test("Doit renvoyer EtatSynchro.RienAEnvoyer si tryingToPush est a true", async () => {

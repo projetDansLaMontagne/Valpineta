@@ -15,7 +15,6 @@ import { reaction, runInAction } from "mobx";
 import { api } from "app/services/api";
 import { getGeneralApiProblem } from "app/services/api/apiProblem";
 import { ApiResponse } from "apisauce";
-import { run } from "jest";
 
 const signalement = types.model({
   nom: types.string,
