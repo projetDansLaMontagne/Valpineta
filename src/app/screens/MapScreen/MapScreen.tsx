@@ -13,6 +13,8 @@ import {
 import { AppStackScreenProps, T_Signalement, T_excursion } from "app/navigators";
 import { Screen } from "app/components";
 import { spacing, colors } from "app/theme";
+import { T_Point } from "app/screens/DetailsExcursionScreen";
+import { ImageSource } from "react-native-vector-icons/Icon";
 
 // location
 import * as Location from "expo-location";
@@ -20,70 +22,17 @@ import MapView, { LatLng, Marker, Polyline, UrlTile } from "react-native-maps";
 import MapButton from "./MapButton";
 import { Asset } from "expo-asset";
 
+// files
 import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
-
 import fichierJson from "assets/Tiles/tiles_struct.json";
-import { T_Point } from "app/screens/DetailsExcursionScreen";
-import { ImageSource } from "react-native-vector-icons/Icon";
 
-// variables
+const binoculars: ImageSource = require("assets/icons/binoculars.png");
+const attention: ImageSource = require("assets/icons/attention.png");
+
 type MapScreenProps = AppStackScreenProps<"Carte"> & {
   excursionAffichee?: T_excursion;
 };
-
-let COMPTEUR = 0;
-const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
-const cacheDirectory = `${fileSystem.cacheDirectory}cartes/OSM`;
-
-// Fonction(s)
-/**
- * Create the folder structure (recursively)
- *
- * @param folderStruct {Object} The folder structure
- * @param folderPath {string} The path of the folder
- * @param assetsList {Promise<Asset[]>} The list of assets
- */
-const createFolderStruct = async (
-  folderStruct: any,
-  folderPath: string = folderDest,
-  assetsList: Asset[],
-) => {
-  for (const folder in folderStruct) {
-    if (folderStruct.hasOwnProperty(folder)) {
-      if (typeof folderStruct[folder] === "string") {
-        const fileName = folderStruct[folder].split("/").pop();
-        // remove 'folderDest' from 'folderPath'
-        const fileFolder = folderPath.replace(folderDest, "");
-
-        await fileSystem.makeDirectoryAsync(`${folderDest}${fileFolder}`, {
-          intermediates: true,
-        });
-
-        const assetsListUri = assetsList[COMPTEUR].localUri;
-        COMPTEUR++;
-
-        await fileSystem.copyAsync({
-          from: assetsListUri,
-          to: `${folderDest}${fileFolder}/${fileName}`,
-        });
-      } else {
-        // Récursivement créer la structure des dossiers pour les sous-dossiers
-        await createFolderStruct(folderStruct[folder], `${folderPath}/${folder}`, assetsList);
-      }
-    }
-  }
-};
-
-/**
- * Get all the tracks of the `src/assets/JSON/excursions.json` file.
- *
- * @returns The list of all the tracks
- */
-const getAllTracks = (): T_excursion[] => {
-  return require("assets/JSON/excursions.json") as T_excursion[];
-};
-
 export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
   // A SUPP
   const { navigation, route } = _props;
@@ -139,26 +88,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       });
     } else {
       console.log("[MapScreen] mapRef.current is null");
-    }
-  };
-
-  const downloadTiles = async () => {
-    askUserLocation();
-
-    const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
-    console.log("[MapScreen] folderInfo: ", folderInfo);
-
-    if (folderInfo.exists && !folderInfo.isDirectory) {
-      console.log("Tuiles déjà DL");
-      await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
-    } else {
-      // Supprimer le dossier
-      console.log("[MapScreen] Suppression du dossier");
-      await fileSystem.deleteAsync(folderDest, { idempotent: true });
-
-      const assets = await TilesRequire();
-
-      await createFolderStruct(fichierJson, folderDest, assets);
     }
   };
 
@@ -316,7 +245,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
 
     if (!excursionAffichee) {
-      setAllExcursions(getAllTracks());
+      const excursions = require("assets/JSON/excursions.json") as T_excursion[];
+      setAllExcursions(excursions);
     }
 
     return () => {
@@ -534,6 +464,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   );
 });
 
+/* ------------------------------ JSX ELEMENTS ------------------------------ */
 /**
  * @description Affiche les points de départ, milieu et fin de l'excursion en fonction du type de parcours.
  * Un parcours en boucle n'a pas de point d'arrivée.
@@ -622,10 +553,6 @@ const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
     </Marker>
   ));
 };
-
-const binoculars: ImageSource = require("assets/icons/binoculars.png");
-const attention: ImageSource = require("assets/icons/attention.png");
-
 /**
  * @description Affiche les signalements sur la carte.
  *
@@ -672,6 +599,66 @@ const SignalementHandler = ({ signalement }: { signalement: T_Signalement }) => 
       />
     </Marker>
   );
+};
+
+/* ------------------------------ TILES IMPORT ------------------------------ */
+let COMPTEUR = 0;
+const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
+const cacheDirectory = `${fileSystem.cacheDirectory}cartes/OSM`;
+
+/**
+ * Create the folder structure (recursively)
+ *
+ * @param folderStruct {Object} The folder structure
+ * @param folderPath {string} The path of the folder
+ * @param assetsList {Promise<Asset[]>} The list of assets
+ */
+const createFolderStruct = async (
+  folderStruct: any,
+  folderPath: string = folderDest,
+  assetsList: Asset[],
+) => {
+  for (const folder in folderStruct) {
+    if (folderStruct.hasOwnProperty(folder)) {
+      if (typeof folderStruct[folder] === "string") {
+        const fileName = folderStruct[folder].split("/").pop();
+        // remove 'folderDest' from 'folderPath'
+        const fileFolder = folderPath.replace(folderDest, "");
+
+        await fileSystem.makeDirectoryAsync(`${folderDest}${fileFolder}`, {
+          intermediates: true,
+        });
+
+        const assetsListUri = assetsList[COMPTEUR].localUri;
+        COMPTEUR++;
+
+        await fileSystem.copyAsync({
+          from: assetsListUri,
+          to: `${folderDest}${fileFolder}/${fileName}`,
+        });
+      } else {
+        // Récursivement créer la structure des dossiers pour les sous-dossiers
+        await createFolderStruct(folderStruct[folder], `${folderPath}/${folder}`, assetsList);
+      }
+    }
+  }
+};
+const downloadTiles = async () => {
+  const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
+  console.log("[MapScreen] folderInfo: ", folderInfo);
+
+  if (folderInfo.exists && !folderInfo.isDirectory) {
+    console.log("Tuiles déjà DL");
+    await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
+  } else {
+    // Supprimer le dossier
+    console.log("[MapScreen] Suppression du dossier");
+    await fileSystem.deleteAsync(folderDest, { idempotent: true });
+
+    const assets = await TilesRequire();
+
+    await createFolderStruct(fichierJson, folderDest, assets);
+  }
 };
 
 const values = {
