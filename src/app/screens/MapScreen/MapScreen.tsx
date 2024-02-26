@@ -107,11 +107,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
    * @returns {Promise<void>}
    */
   const startLocationAsync = async (): Promise<void> => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    const permissionsOK = await askPermissions();
 
-    if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied");
-    } else {
+    if (permissionsOK) {
       // write code for the app to handle GPS changes
       watchPositionSubscriptionRef.current = await Location.watchPositionAsync(
         {
@@ -126,7 +124,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
     }
   };
 
-  const askUserLocation = async () => {
+  const askPermissions = async (): Promise<boolean> => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     const permissionsOK = status === "granted";
 
@@ -134,6 +132,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
       console.log("[MapScreen] Permission to access location was denied");
     }
     setGavePermission(permissionsOK);
+
+    return permissionsOK;
   };
 
   /* ------------------------------- CALL BACKS ------------------------------- */
@@ -152,10 +152,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   };
 
   const toggleFollowUserLocation = () => {
-    if (!gavePermission) {
-      askUserLocation().then(() => console.log("[MapScreen] aled"));
-    }
-
     setFollowUserLocation(!followUserLocation);
   };
 
@@ -206,12 +202,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_
   }, [startPoint]);
 
   useEffect(() => {
-    console.log(`[[MapScreen]] followUserLocation: ${followUserLocation}`);
-
     if (followUserLocation) {
-      startLocationAsync(true)
-        .then(() => console.log("[MapScreen] getLocationAsync() ok"))
-        .catch(e => console.log("[MapScreen] getLocationAsync() error: ", e));
+      startLocationAsync();
     } else {
       removeLocationSubscription();
     }
