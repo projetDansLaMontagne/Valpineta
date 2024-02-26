@@ -20,8 +20,8 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 import { GpxDownloader } from "../DetailsExcursionScreen/GpxDownloader";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { ListeSignalements } from "../DetailsExcursionScreen/ListeSignalements";
-import { InfosExcursion } from "../DetailsExcursionScreen/InfosExcursion";
+import { ListeSignalements } from "./ListeSignalements";
+import { InfosExcursion } from "./InfosExcursion";
 import { Avis } from "./Avis";
 
 // location
