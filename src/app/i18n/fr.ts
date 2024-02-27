@@ -122,43 +122,22 @@ const fr = {
       annuler: "Annuler",
     },
     alerte: {
-      permissions: {
-        titre: "Permissions",
-        message: "Veuillez autoriser l'accès à la caméra et à la galerie pour ajouter une photo",
+      erreur: {
+        titre: "Erreur",
+        message: "Une erreur est survenue, veuillez réessayer",
+      },
+      rienAEnvoyer: {
+        titre: "Rien à envoyer",
+        message: "Vous n'avez pas de signalement à envoyer",
+      },
+      envoyeEnBdd: {
+        titre: "Signalement envoyé",
+        message: "Votre signalement a bien été envoyé",
       },
       ajouteEnLocal: {
         titre: "Ajout réussi",
         message:
           "Votre signalement a bien été ajouté en mémoire, il sera envoyé lorsque vous serez connecté à internet",
-        boutons: {
-          ajoute: "Ajouter un autre",
-          retour: "Retour à la carte",
-        },
-      },
-      dejaExistant: {
-        titre: "Signalement déjà existant",
-        message: "Un signalement similaire existe déjà à cet endroit",
-      },
-      mauvaisFormat: {
-        titre: "Mauvais format",
-        message: "Veuillez vérifier que les champs sont correctement remplis",
-      },
-      envoyeEnBdd: {
-        titre: "Signalement envoyé",
-        message: "Votre signalement a bien été envoyé",
-        boutons: {
-          ajoute: "Ajouter un autre",
-          retour: "Retour à la carte",
-        },
-      },
-      synchroEffectuee: {
-        titre: "Synchronisation effectuée",
-        message:
-          "La synchronisation montante a bien été effectuée et vos signalements ont bien été envoyés",
-      },
-      erreur: {
-        titre: "Erreur",
-        message: "Une erreur est survenue, veuillez réessayer",
       },
     },
     erreur: {

@@ -1,6 +1,7 @@
 import { Alert } from "react-native";
 import { EtatSynchro } from "app/services/SynchroMontanteService";
 import { de } from "date-fns/locale";
+import { translate } from "app/i18n";
 
 // Regex contanant uniquement des caractères autorisés
 const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*()\-_+,.:;¡¿"«»¡¿&\/\\[\]]+$/;
@@ -94,15 +95,14 @@ export async function blobToBase64(blob: Blob): Promise<string> {
 export const AlerteStatus = (status: EtatSynchro) => {
   switch (status) {
     case EtatSynchro.BienEnvoye:
-      Alert.alert("Reussite !", "Votre signalement a bien été enregistré", [], {
+      Alert.alert(translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"), translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"), [], {
         cancelable: true,
       });
       break;
 
     case EtatSynchro.NonConnecte:
       Alert.alert(
-        "Hors connexion",
-        "Votre signalement sera automatiquement enregistré lors de votre prochaine connexion (duree du cycle parametrable)",
+        translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"), translate("pageNouveauSignalement.alerte.ajouteEnLocal.message"),
         [],
         { cancelable: true },
       );
@@ -110,16 +110,18 @@ export const AlerteStatus = (status: EtatSynchro) => {
 
     case EtatSynchro.ErreurServeur:
       Alert.alert(
-        "Erreur serveur",
-        "Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer plus tard.",
+        translate("pageNouveauSignalement.alerte.erreur.titre"), translate("pageNouveauSignalement.alerte.erreur.message"),
         [],
         { cancelable: true },
       );
       break;
     case EtatSynchro.RienAEnvoyer:
-      Alert.alert("Rien à envoyer", "Aucun signalement à envoyer", [], { cancelable: true });
+      Alert.alert( translate("pageNouveauSignalement.alerte.rienAEnvoyer.titre"), translate("pageNouveauSignalement.alerte.rienAEnvoyer.message"), [], { cancelable: true });
       break;
     default:
-      Alert.alert("Erreur", "Une erreur est survenue", [], { cancelable: true });
-  }
+      Alert.alert(
+        translate("pageNouveauSignalement.alerte.erreur.titre"), translate("pageNouveauSignalement.alerte.erreur.message"),
+        [],
+        { cancelable: true },
+      );  }
 };

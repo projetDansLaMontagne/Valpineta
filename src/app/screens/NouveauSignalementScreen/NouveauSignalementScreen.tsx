@@ -132,7 +132,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         setIsLoading(false);
 
         AlerteStatus(status);
-        if (status === EtatSynchro.BienEnvoye) {
+        if (status === EtatSynchro.BienEnvoye || status === EtatSynchro.NonConnecte) {
           props.navigation.goBack();
         }
         else {

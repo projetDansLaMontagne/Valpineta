@@ -174,7 +174,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     intervalId = setInterval(async () => {
       const netInfo = await NetInfo.fetch();
       tryToPush(netInfo.isConnected, synchroMontante.signalements, synchroMontante);
-      console.log(synchroMontante.intervalleSynchro);
     }, synchroMontante.intervalleSynchro * MINUTE_EN_MILLISECONDES);
 
     return () => clearInterval(intervalId);
