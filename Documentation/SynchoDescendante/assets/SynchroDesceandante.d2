@@ -1,0 +1,153 @@
+direction: right
+
+vars: {
+  d2-config: {
+    layout-engine: elk
+  }
+}
+
+classes: {
+  temp-file: {
+    style: {
+      stroke: "#53C0D8"
+      opacity: 0.75
+    }
+    shape: page
+    style.multiple: false
+  }
+
+  write-only-arrow: {
+    style: {
+      stroke: green
+    }
+  }
+
+  read-only-arrow: {
+    style: {
+      stroke: red
+    }
+  }
+}
+
+Application Valpineta: {
+  label.near: top-left
+}
+
+# RACINES 1
+Application Valpineta.FileSystem
+Application Valpineta.Screens
+Application Valpineta.Services
+Application Valpineta.WordPress
+
+# RACINES 2
+Application Valpineta.FileSystem.fichiers: {
+  label.near: top-left
+}
+Application Valpineta.FileSystem.fichiers.'excursions.json': {
+  shape: page
+  style.multiple: false
+}
+Application Valpineta.FileSystem.fichiers.'excursions-temp.json'
+Application Valpineta.FileSystem.fichiers.'excursions-temp.json'.class: temp-file
+Application Valpineta.FileSystem.GPX
+Application Valpineta.FileSystem.GPXTemp
+Application Valpineta.FileSystem.GPXTemp.class: temp-file
+
+Application Valpineta.Screens.AutresScreensOuServices
+Application Valpineta.Screens.LoadingScreen
+
+Application Valpineta.Services.'synchroDescendante.ts'.getExcursionsJsonFromDevice <-> Application Valpineta.FileSystem.fichiers.'excursions.json'
+(Application Valpineta.Services.'synchroDescendante.ts'.getExcursionsJsonFromDevice <-> Application Valpineta.FileSystem.fichiers.'excursions.json')[0].class: read-only-arrow
+
+Application Valpineta.Services.'synchroDescendante.ts'.updateExcursionsJson -> Application Valpineta.FileSystem.fichiers.'excursions.json'
+(Application Valpineta.Services.'synchroDescendante.ts'.updateExcursionsJson -> Application Valpineta.FileSystem.fichiers.'excursions.json')[0].class: write-only-arrow
+
+Application Valpineta.Services.'synchroDescendante.ts'.excursionsJsonExists <-> Application Valpineta.FileSystem.fichiers
+(Application Valpineta.Services.'synchroDescendante.ts'.excursionsJsonExists <-> Application Valpineta.FileSystem.fichiers)[0].class: read-only-arrow
+
+Application Valpineta.WordPress.API-WORDPRESS <-> Application Valpineta.Services.'synchroDescendante.ts'.downloadExcursionsJson
+Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante -> Application Valpineta.Services.'synchroDescendante.ts'.downloadExcursionsJson
+Application Valpineta.Services.'synchroDescendante.ts'.downloadExcursionsJson -> Application Valpineta.FileSystem.fichiers.'excursions-temp.json'
+(Application Valpineta.Services.'synchroDescendante.ts'.downloadExcursionsJson -> Application Valpineta.FileSystem.fichiers.'excursions-temp.json')[0].class: write-only-arrow
+
+Application Valpineta.Services.'synchroDescendante.ts'.dlGPXFile -> Application Valpineta.FileSystem.GPXTemp
+(Application Valpineta.Services.'synchroDescendante.ts'.dlGPXFile -> Application Valpineta.FileSystem.GPXTemp)[0].class: write-only-arrow
+
+Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante -> Application Valpineta.Services.'synchroDescendante.ts'.dlGPXFile
+Application Valpineta.WordPress.API-WORDPRESS <-> Application Valpineta.Services.'synchroDescendante.ts'.dlGPXFile
+
+Application Valpineta.Screens.AutresScreensOuServices -> Application Valpineta.Services.'synchroDescendante.ts'.getExcursionsJsonFromDevice: '[1]'
+Application Valpineta.Screens.LoadingScreen -> Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante
+Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante -> Application Valpineta.Services.'synchroDescendante.ts'.updateExcursionsJson
+Application Valpineta.Services.'synchroDescendante.ts'.synchroDescendante -> Application Valpineta.Services.'synchroDescendante.ts'.excursionsJsonExists
+
+Application Valpineta.WordPress.API-WORDPRESS: {
+  icon: https://icons.terrastruct.com/essentials%2F112-server.svg
+}
+
+Application Valpineta.FileSystem.GPXTemp -> Application Valpineta.FileSystem.GPX: '[2]' {
+  style.animated: true
+}
+
+Application Valpineta.FileSystem.fichiers.'excursions-temp.json' -> Application Valpineta.FileSystem.fichiers.'excursions.json': '[3]' {
+  style.animated: true
+}
+
+Légende: {
+  near: bottom-center
+  direction: down # TALA seulement
+
+  Texte: |md
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 1rem;
+      "
+    >
+      <div
+        style="
+          background: red;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          padding: .5rem 1rem 0 1rem;
+        "
+      >
+        <p>Lecture seulement</p>
+      </div>
+      <div
+        style="
+          background: green;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          padding: .5rem 1rem 0 1rem;
+        "
+      >
+        <p>Écriture seulement</p>
+      </div>
+    </div>
+
+    # [1]
+    Pour accéder au fichier des excursions, il ne faudra utiliser *uniquement* cette fonction.
+
+    # [2]
+    Afin de garantir la bonne copie des fichiers en cas de corruption (arrêt de la connexion ou mauvaise transmission),\
+    lors du téléchargement d'un fichier depuis l'API,
+    on le télécharge d'abord dans le dossier `GPXTemp`\
+    puis on vérifie sa signature MD5 avec le serveur, si elle est correcte, on le déplace dans le dossier `GPX`.\
+    Cela assure d'avoir des fichiers non corrompus.
+
+    # [3]
+    Même fonctionnement pour le fichier `excursions.json`.\
+    Étant le fichier le plus crucial pour notre application, on se doit de s'assurer de son intégrité.
+  |
+}

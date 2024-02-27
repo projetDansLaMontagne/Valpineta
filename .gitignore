@@ -94,3 +94,6 @@ src/node_modules
 src/ios
 .commitignore
 commit_message.md
+src/
+
+

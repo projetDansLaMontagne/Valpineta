@@ -65,16 +65,6 @@ export enum ESynchroDescendanteRes {
 export type TCallbackToGetNumberOfFiles = (filesDownloaded: number, filesToDl: number) => void;
 export type TCallbackStep = (step: number, totalSteps: number) => void;
 
-/**
- * Niveau de debug.
- * Ne sert que pour dev.
- */
-export enum EDebugMode {
-  LOW = 0,
-  MEDIUM,
-  HIGH,
-}
-
 // Other(s)
 export const BASE_URL = Config.API_URL;
 const DOCUMENTS_FOLDER = `${FileSystem.documentDirectory}` as const;
