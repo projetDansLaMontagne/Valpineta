@@ -7,12 +7,12 @@
  * @see https://medium.com/welldone-software/jest-how-to-mock-a-function-call-inside-a-module-21c05c57a39f
  */
 
-import { expect, test, beforeAll, afterAll, afterEach, describe, jest, beforeEach } from "@jest/globals";
+import { expect, test, describe, beforeEach } from "@jest/globals";
 import { SynchroMontanteModel } from "./SynchroMontante";
 import { T_Signalement } from "app/navigators";
 import { EtatSynchro, IntervalleSynchro} from "./SynchroMontante";
 import { ApiOkResponse, ApiResponse } from "apisauce";
-import { destroy, unprotect } from "mobx-state-tree";
+import { unprotect } from "mobx-state-tree";
 
 const signalementValide: T_Signalement = {
   nom: "nom",
@@ -35,6 +35,8 @@ const signalementAvecBlob: T_Signalement = {
   postId: 0,
 };
 
+const signalementInvalide = {
+} as T_Signalement;
 
 describe("[SynchroMontante] fonctions interne", () => {
   let synchroMontante: ReturnType<typeof SynchroMontanteModel.create>;
@@ -54,16 +56,28 @@ describe("[SynchroMontante] fonctions interne", () => {
       expect(synchroMontante.signalements.length).toBe(signalementLength + 1);
     });
     test("Doit renvoyer une erreur si on ajoute un signalement vide", () => {
-      expect(() => synchroMontante.addSignalement({} as T_Signalement)).toThrowError();
+      expect(() => synchroMontante.addSignalement(signalementInvalide)).toThrowError();
     });   
   });
 
   describe("[SynchroMontante] Fonctions avec l'interval", () => {
 
-    test("Doit pouvoir changer l'intervalle de synchronisation", () => {
+    test("Doit pouvoir changer l'intervalle de synchronisation en Modere", () => {
       synchroMontante.setIntervalleSynchro(IntervalleSynchro.Moderee);
       expect(synchroMontante.intervalleSynchro).toBe(IntervalleSynchro.Moderee);
     });
+    test("Doit pouvoir changer l'intervalle de synchronisation en TresFrequente", () => {
+      synchroMontante.setIntervalleSynchro(IntervalleSynchro.TresFrequente);
+      expect(synchroMontante.intervalleSynchro).toBe(IntervalleSynchro.TresFrequente);
+    })
+    test("Doit pouvoir changer l'intervalle de synchronisation en PeuFrequente", () => {
+      synchroMontante.setIntervalleSynchro(IntervalleSynchro.PeuFrequente);
+      expect(synchroMontante.intervalleSynchro).toBe(IntervalleSynchro.PeuFrequente);
+    })
+    test("Doit pouvoir changer l'intervalle de synchronisation en Jamais", () => {
+      synchroMontante.setIntervalleSynchro(0 as IntervalleSynchro);
+      expect(synchroMontante.intervalleSynchro).toBe(IntervalleSynchro.TresFrequente);
+    })
   });
 
   describe("[SynchroMontante] callApi", () => {
@@ -85,6 +99,20 @@ describe("[SynchroMontante] fonctions interne", () => {
       ]);
       expect(response.ok).toBeTruthy();
     }, 10000);
+
+    test('Doit renvoyer un erreur si on tente d\'envoyer un signalement invalide', async () => {
+      const response = await synchroMontante.callApi([signalementInvalide]);
+      expect(response.ok).toBeFalsy();
+    })
+
+    test("Doit renvoyer une erreur avec un tableau contenant un signalement invalide", async () => {
+      const response = await synchroMontante.callApi([
+        signalementAvecBlob,
+        signalementValide,
+        signalementInvalide
+      ]);
+      expect(response.ok).toBeFalsy();
+    }, 10000);    
   });
 
   describe("[SynchroMontante] traiterResultat ", () => {

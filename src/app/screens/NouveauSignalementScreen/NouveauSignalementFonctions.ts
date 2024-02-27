@@ -89,8 +89,9 @@ export async function blobToBase64(blob: Blob): Promise<string> {
 }
 
 /**
-     * fonction pour afficher une alerte en fonction du status de fin de l'envoi du signalement
-     */
+ * Affiche une alerte en fonction du status de la synchronisation
+ * @param status 
+ */
 export const AlerteStatus = (status: EtatSynchro) => {
     switch (status) {
       case EtatSynchro.BienEnvoye:
@@ -116,5 +117,13 @@ export const AlerteStatus = (status: EtatSynchro) => {
           { cancelable: true },
         );
         break;
+        case EtatSynchro.RienAEnvoyer:
+          Alert.alert(
+            "Rien à envoyer",
+            "Aucun signalement à envoyer",
+            [],
+            { cancelable: true },
+          );
+          break;
     }
   };

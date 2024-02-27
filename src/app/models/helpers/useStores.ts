@@ -16,6 +16,7 @@ import { unprotect } from "mobx-state-tree";
  * instantiating it, although that should be rare.
  */
 const _rootStore = RootStoreModel.create({});
+unprotect(_rootStore);
 
 /**
  * The RootStoreContext provides a way to access

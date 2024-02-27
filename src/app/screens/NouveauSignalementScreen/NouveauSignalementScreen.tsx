@@ -20,7 +20,7 @@ import { translate } from "app/i18n";
 import NetInfo from "@react-native-community/netinfo";
 // Composants
 import { Button, Screen, Text } from "app/components";
-import { useStores } from "app/models";
+import { useStores, tryingToPush } from "app/models";
 //Fonctions
 import { saisiesValides, blobToBase64, AlerteStatus } from "./NouveauSignalementFonctions";
 
@@ -53,7 +53,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const { showActionSheetWithOptions } = useActionSheet();
 
     const { synchroMontante } = useStores();
-
+    // console.log(tryingToPush)
+    // console.log(synchroMontante.signalements)
+    // console.log(synchroMontante.testing)
     /**
      * Fonction qui aguille l'utilisateur pour ajouter une photo à son signalement
      */
@@ -134,10 +136,11 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           connexion.isConnected,
           synchroMontante.signalements,
         );
+        console.log(status);
         setIsLoading(false);
 
         AlerteStatus(status);
-        props.navigation.goBack();
+        // // props.navigation.goBack();
       } else {
         setNomErreur(nomErreur);
         setDescriptionErreur(descriptionErreur);
@@ -154,7 +157,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         <TouchableOpacity style={$boutonRetour} onPress={() => props.navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
-            source={require("../../assets/icons/back.png")}
+            source={require("../../../assets/icons/back.png")}
           />
         </TouchableOpacity>
         <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
@@ -214,7 +217,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
             <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
               <Image
                 style={{ tintColor: colors.palette.vert }}
-                source={require("../../assets/icons/camera.png")}
+                source={require("../../../assets/icons/camera.png")}
               />
               <Text tx="pageNouveauSignalement.boutons.photo" size="xs" style={$textBoutonPhoto} />
             </TouchableOpacity>

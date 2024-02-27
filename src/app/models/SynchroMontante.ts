@@ -39,6 +39,7 @@ export enum IntervalleSynchro {
 }
 
 export let intervalId: NodeJS.Timeout | null = null;
+export let tryingToPush = false;
 
 /**
  * Model description here for TypeScript hints.
@@ -49,7 +50,6 @@ export const SynchroMontanteModel = types
     signalements: types.optional(types.array(signalement), []),
     // intervalId: types.maybeNull(types.union(types.number, types.frozen<null | NodeJS.Timeout>())),
     intervalleSynchro: types.optional(types.number, IntervalleSynchro.TresFrequente),
-    tryingToPush: types.optional(types.boolean, false),
     testing: types.optional(types.boolean, false),
   })
   .actions(withSetPropAction)
@@ -57,8 +57,7 @@ export const SynchroMontanteModel = types
   .actions(self => {
     /* ---------------------------------- DEMON --------------------------------- */
     function afterCreate() {
-      startChecking();
-      unprotect(self);
+      // startChecking();
       reaction(
         () => self.intervalleSynchro,
         _ => {
@@ -66,7 +65,7 @@ export const SynchroMontanteModel = types
           if (intervalId) {
             clearInterval(intervalId);
           }
-          startChecking();
+          // startChecking();
         },
       );
     }
@@ -80,6 +79,9 @@ export const SynchroMontanteModel = types
      */
     async function startChecking() {
       let isConnected = false;
+      runInAction(() => {
+        tryingToPush = false;
+      });
       if (self.testing) {
         isConnected = true;
       } else {
@@ -100,21 +102,18 @@ export const SynchroMontanteModel = types
       signalements: T_Signalement[],
     ): Promise<EtatSynchro> => {
       if (isConnected) {
-        if (signalements.length > 0 && !self.tryingToPush) {
-          runInAction(() => {
-            self.tryingToPush = true;
-          });
+        if (signalements.length > 0 && !tryingToPush) {
+            tryingToPush = true;
           const response = await callApi(signalements);
           const success = await traiterResultat(response);
           if (success) {
-            runInAction(() => {
-              self.tryingToPush = false;
-            });
+              console.log("tryToPush success");
+              tryingToPush = false;
+            
             return EtatSynchro.BienEnvoye;
           } else {
-            runInAction(() => {
-              self.tryingToPush = false;
-            });
+              console.log("tryToPush error");
+              tryingToPush = false;
             return EtatSynchro.ErreurServeur;
           }
         }
@@ -172,10 +171,6 @@ export const SynchroMontanteModel = types
       }
     }
 
-    function setTryingtoPush(tryingToPush: boolean) {
-      self.tryingToPush = tryingToPush;
-    }
-
     return {
       afterCreate,
       beforeDestroy,
@@ -184,7 +179,6 @@ export const SynchroMontanteModel = types
       tryToPush,
       addSignalement,
       setIntervalleSynchro,
-      setTryingtoPush,
     };
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
 
