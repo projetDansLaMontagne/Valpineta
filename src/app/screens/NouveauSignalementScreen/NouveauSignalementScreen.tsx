@@ -20,9 +20,10 @@ import { translate } from "app/i18n";
 import NetInfo from "@react-native-community/netinfo";
 // Composants
 import { Button, Screen, Text } from "app/components";
-import { useStores, tryingToPush } from "app/models";
+import { useStores } from "app/models";
+import { tryToPush, EtatSynchro } from "app/services/SynchroMontanteService";
 //Fonctions
-import { saisiesValides, blobToBase64, AlerteStatus } from "./NouveauSignalementFonctions";
+import { blobToBase64, AlerteStatus, verifSaisiesValides } from "./NouveauSignalementFonctions";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: T_TypeSignalement;
@@ -53,9 +54,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     const { showActionSheetWithOptions } = useActionSheet();
 
     const { synchroMontante } = useStores();
-    // console.log(tryingToPush)
-    // console.log(synchroMontante.signalements)
-    // console.log(synchroMontante.testing)
+
     /**
      * Fonction qui aguille l'utilisateur pour ajouter une photo à son signalement
      */
@@ -111,20 +110,13 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      * Fonction pour envoyer le signalement en base de données
      */
     const envoyerSignalement = async (signalement: T_Signalement) => {
-      let saisieValide: boolean = false;
-      let nomErreur = false;
-      let descriptionErreur = false;
-      let photoErreur = false;
-      saisieValide = saisiesValides(
-        signalement.nom,
-        signalement.description,
-        signalement.image,
-        saisieValide,
-        nomErreur,
-        descriptionErreur,
-        photoErreur,
+      let { saisiesValides, nomErreur, descriptionErreur, photoErreur } = verifSaisiesValides(
+        nom,
+        description,
+        image,
       );
-      if (saisieValide) {
+      
+      if (saisiesValides) {
         //Conversion de l'image url en base64
         const blob = await fetch(signalement.image).then(response => response.blob());
         signalement.image = await blobToBase64(blob);
@@ -132,15 +124,22 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         setIsLoading(true);
         synchroMontante.addSignalement(signalement);
         const connexion = await NetInfo.fetch();
-        const status = await synchroMontante.tryToPush(
+        const status = await tryToPush(
           connexion.isConnected,
           synchroMontante.signalements,
+          synchroMontante,
         );
-        console.log(status);
         setIsLoading(false);
 
         AlerteStatus(status);
-        // // props.navigation.goBack();
+        if (status === EtatSynchro.BienEnvoye) {
+          props.navigation.goBack();
+        }
+        else {
+          setNom("");
+          setDescription("");
+          setImage(undefined);
+        }
       } else {
         setNomErreur(nomErreur);
         setDescriptionErreur(descriptionErreur);
@@ -173,7 +172,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           <Text text="Col de la marmotte" size="lg" />
           {nomErreur && (
             <Text
-              text="pageNouveauSignalement.erreur.titre"
+              tx="pageNouveauSignalement.erreur.titre"
               size="xs"
               style={{ color: colors.palette.rouge }}
             />

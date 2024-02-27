@@ -220,12 +220,5 @@ describe("[SynchroMontante] fonctions interne", () => {
       expect(synchroMontante.signalements.length).toBe(1);
     });
 
-    test("Doit renvoyer EtatSynchro.RienAEnvoyer si tryingToPush est a true", async () => {
-      synchroMontante.setTryingtoPush(true);
-      synchroMontante.addSignalement(signalementValide);
-      const result = await synchroMontante.tryToPush(true, synchroMontante.signalements);
-      expect(result).toBe(EtatSynchro.RienAEnvoyer);
-    });
-
   });
 });

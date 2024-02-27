@@ -95,6 +95,11 @@ describe("[NouveauSignalementFonction]", () => {
       const photoErreur = verifPhoto(photo);
       expect(photoErreur).toBe(true);
     });
+    test("photoErreur doit être vrai si la photo est vide", () => {
+      const photo = undefined;
+      const photoErreur = verifPhoto(photo);
+      expect(photoErreur).toBe(true);
+    });
   });
   describe("[saisiesValides]", () => {
     test("saisieBonne doit être vrai si les saisies sont correctes", () => {

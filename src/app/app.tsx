@@ -19,10 +19,10 @@ if (__DEV__) {
 import "./i18n";
 import "./utils/ignoreWarnings";
 import { useFonts } from "expo-font";
-import React from "react";
+import React, { useEffect } from "react";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as Linking from "expo-linking";
-import { useInitialRootStore } from "./models";
+import { useInitialRootStore, useStores } from "./models";
 import { AppNavigator, useNavigationPersistence } from "./navigators";
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary";
 import * as storage from "./utils/storage";
@@ -63,6 +63,7 @@ interface AppProps {
  * This is the root component of our app.
  */
 function App(props: AppProps) {
+
   const { hideSplashScreen } = props;
   const {
     initialNavigationState,

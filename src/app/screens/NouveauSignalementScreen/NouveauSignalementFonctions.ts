@@ -1,5 +1,6 @@
 import { Alert } from "react-native";
-import { EtatSynchro } from "app/models";
+import { EtatSynchro } from "app/services/SynchroMontanteService";
+import { de } from "date-fns/locale";
 
 // Regex contanant uniquement des caractères autorisés
 const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*()\-_+,.:;¡¿"«»¡¿&\/\\[\]]+$/;
@@ -7,27 +8,25 @@ const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*()\-_+,.:;¡¿"«»¡¿&\/\\[\
 /**
  * Indique si les informations du signalement sont correctes (tailles de champs, caractères autorisés et photo OK)
  */
-export const saisiesValides = (
+export const verifSaisiesValides = (
   nom: string,
   description: string,
   image: string,
-  saisieBonne: boolean,
-  nomErreur: boolean,
-  descriptionErreur: boolean,
-  photoErreur: boolean,
-): boolean => {
-  nomErreur = verifNom(nom);
-  descriptionErreur = verifDescription(description);
-  photoErreur = verifPhoto(image);
+
+): {saisiesValides:boolean, nomErreur:boolean, descriptionErreur:boolean, photoErreur:boolean } => {
+  let nomErreur = verifNom(nom);
+  let descriptionErreur = verifDescription(description);
+  let photoErreur = verifPhoto(image);
+  let saisiesValides = false;
 
   // Si tout est bon, on retourne vrai
   if (!nomErreur && !descriptionErreur && !photoErreur) {
-    saisieBonne = true;
+    saisiesValides = true;
   } else {
-    saisieBonne = false;
+    saisiesValides = false;
   }
 
-  return saisieBonne;
+  return { saisiesValides, nomErreur, descriptionErreur, photoErreur };
 };
 
 /**
@@ -36,7 +35,7 @@ export const saisiesValides = (
  * @param photoErreur
  */
 export function verifPhoto(image: string): boolean {
-  return image === "";
+  return image === "" || image === undefined || image === null;
 }
 
 /**
@@ -90,40 +89,37 @@ export async function blobToBase64(blob: Blob): Promise<string> {
 
 /**
  * Affiche une alerte en fonction du status de la synchronisation
- * @param status 
+ * @param status
  */
 export const AlerteStatus = (status: EtatSynchro) => {
-    switch (status) {
-      case EtatSynchro.BienEnvoye:
-        Alert.alert("Reussite !", "Votre signalement a bien été enregistré", [], {
-          cancelable: true,
-        });
-        break;
+  switch (status) {
+    case EtatSynchro.BienEnvoye:
+      Alert.alert("Reussite !", "Votre signalement a bien été enregistré", [], {
+        cancelable: true,
+      });
+      break;
 
-      case EtatSynchro.NonConnecte:
-        Alert.alert(
-          "Hors connexion",
-          "Votre signalement sera automatiquement enregistré lors de votre prochaine connexion (duree du cycle parametrable)",
-          [],
-          { cancelable: true },
-        );
-        break;
+    case EtatSynchro.NonConnecte:
+      Alert.alert(
+        "Hors connexion",
+        "Votre signalement sera automatiquement enregistré lors de votre prochaine connexion (duree du cycle parametrable)",
+        [],
+        { cancelable: true },
+      );
+      break;
 
-      case EtatSynchro.ErreurServeur:
-        Alert.alert(
-          "Erreur serveur",
-          "Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer plus tard.",
-          [],
-          { cancelable: true },
-        );
-        break;
-        case EtatSynchro.RienAEnvoyer:
-          Alert.alert(
-            "Rien à envoyer",
-            "Aucun signalement à envoyer",
-            [],
-            { cancelable: true },
-          );
-          break;
-    }
-  };
+    case EtatSynchro.ErreurServeur:
+      Alert.alert(
+        "Erreur serveur",
+        "Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer plus tard.",
+        [],
+        { cancelable: true },
+      );
+      break;
+    case EtatSynchro.RienAEnvoyer:
+      Alert.alert("Rien à envoyer", "Aucun signalement à envoyer", [], { cancelable: true });
+      break;
+    default:
+      Alert.alert("Erreur", "Une erreur est survenue", [], { cancelable: true });
+  }
+};
