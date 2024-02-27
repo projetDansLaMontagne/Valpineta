@@ -16,6 +16,7 @@ import { AppStackScreenProps, T_Signalement, T_excursion, TPoint } from "app/nav
 import { Screen, Text } from "app/components";
 import { spacing, colors } from "app/theme";
 import { ImageSource } from "react-native-vector-icons/Icon";
+import { useStores } from "app/models";
 
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
@@ -23,6 +24,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ListeSignalements } from "./ListeSignalements";
 import { InfosExcursion } from "./InfosExcursion";
 import { Avis } from "./Avis";
+import { applicationLangue } from "app/screens/ExcursionsScreen";
 
 // location
 import * as Location from "expo-location";
@@ -62,6 +64,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const [isAllSignalements, setIsAllSignalements] = useState(false);
 
   // Refs
+  const { parametres } = useStores();
   const intervalRef = useRef(null);
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
   const mapRef = useRef<MapView>(null);
@@ -247,10 +250,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   useEffect(() => {
     downloadTiles();
 
-    if (!excursion) {
-      const excursions = require("assets/JSON/excursions.json") as T_excursion[];
-      setAllExcursions(excursions);
-    }
+    const excursions: T_excursion[] = require("assets/JSON/excursions.json");
+    setAllExcursions(applicationLangue(excursions, parametres.langue));
 
     return () => {
       removeLocationSubscription();
@@ -315,8 +316,9 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
               }}
             />
 
+            {/* tracks affiches */}
             {excursion ? (
-              // Affichage de l excursion, des markers, des signalements et du swiper
+              // Affichage de l excursion, des markers et des signalements
               <>
                 <Polyline
                   coordinates={excursion.track.map(
@@ -340,8 +342,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
                 ))}
               </>
             ) : (
-              // Oier voulait toutes les excursions sur la carte
-              // si on était pas dans la page détail excursion.
+              // Affichage de toutes les excursions
               allExcursions !== undefined &&
               allExcursions.map((excursion, index) => {
                 if (excursion.track) {
@@ -358,6 +359,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
                         strokeWidth={5}
                         style={{
                           zIndex: 1000000,
+                        }}
+                        onPress={() => {
+                          navigation.navigate("CarteStack", {
+                            screen: "Carte",
+                            params: { excursion },
+                          });
                         }}
                       />
 
@@ -389,6 +396,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             )}
           </MapView>
 
+          {/* Bouton de centrage */}
           <View
             style={{
               ...styles.mapOverlayLeft,
@@ -408,6 +416,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
               }
             />
           </View>
+
+          {/* Boutons de signalements */}
           {
             /**@todo DOIT DEPENDRE DU STORE SuiviExcursion.etat (pour n'afficher les boutons que lorsqu'on est en rando) */
             "enCours" === "enCours" && (
@@ -455,11 +465,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             )
           }
 
+          {/* Swiper et bouton retour */}
           {excursion && (
             <>
               <SwipeUpDown
-                itemMini={<ItemMini />}
-                itemFull={<ItemFull />}
+                itemMini={<SwiperContent type="mini" />}
+                itemFull={<SwiperContent type="full" />}
                 animation="easeInEaseOut"
                 swipeHeight={30 + footerHeight}
                 disableSwipeIcon={true}
@@ -481,6 +492,16 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
       </View>
     </Screen>
   );
+
+  function SwiperContent(props: { type: "mini" | "full" }) {
+    if (props.type === "mini") {
+      return <ItemMini />;
+    }
+    if (props.type === "full") {
+      return <ItemFull />;
+    }
+    return null;
+  }
 
   /**
    * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas
