@@ -38,8 +38,7 @@ const fr = {
     noConnection: "Pas de connexion internet, veuillez réessayer ultérieurement.",
     steps: {
       step1: "Chargement du fichier des excursions.",
-      step2: "Mise à jour des excursions.",
-      step3: "Mise à jour des fichiers GPX.",
+      step2: "Mise à jour des fichiers GPX.",
     },
   },
   mapScreen: {

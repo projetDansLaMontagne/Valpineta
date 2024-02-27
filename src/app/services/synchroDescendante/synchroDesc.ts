@@ -52,7 +52,6 @@ import Config from "../../config";
 // Type(s)
 export enum ESynchroDescendanteStep {
   DL_EXCURSIONS = 1,
-  MAJ_EXCURSIONS,
   DL_GPX,
   __LENGTH, // À laisser en dernier et ne pas utiliser.
 }
@@ -199,6 +198,15 @@ export const downloadExcursionsJson = async (): Promise<void> => {
 
     throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
   }
+
+  // Déplcement du fichier temporaire
+  await FileSystem.moveAsync({
+    from: EXCURSIONS_TEMP_FILE_DEST,
+    to: EXCURSIONS_FILE_DEST,
+  });
+
+  // Suppression du fichier temporaire
+  await FileSystem.deleteAsync(EXCURSIONS_TEMP_FILE_DEST);
 };
 
 /**
@@ -218,161 +226,6 @@ export const getExcursionsJsonFromDevice = async (): Promise<Array<TExcursion>> 
   }
 
   return [] as Array<TExcursion>;
-};
-
-/**
- * Met à jour le fichier 'excursions.json' en comparant les excursions présentes sur le téléphone et sur le serveur.
- * Il faut vérifier pour chaque excursion si ses signalements ont été modifiés.
- *
- * @param debug {boolean} Affiche des logs dans la console.
- *
- * @returns {Promise<void>}
- */
-/* istanbul ignore next */
-export const updateExcursionsJsonRequest = async (debug?: EDebugMode): Promise<void> => {
-  // On vérifie si le fichier 'excursions-temp.json' existe
-  const excursionsTempFile = await FileSystem.getInfoAsync(EXCURSIONS_TEMP_FILE_DEST);
-
-  // Si le fichier 'excursions-temp.json' existe, on le supprime
-  if (!excursionsTempFile.exists) {
-    // On récupère le MD5 du fichier 'excursions.json' sur le serveur.
-    const md5API = await fetch(API_EXCURSIONS_MD5_URL).then(res => res.json() as Promise<string>);
-
-    // Téléchargement du fichier 'excursions.json' depuis le serveur.
-    const { md5 } = await FileSystem.downloadAsync(API_EXCURSIONS_URL, EXCURSIONS_TEMP_FILE_DEST, {
-      md5: true,
-    });
-
-    // On compare les deux MD5 pour savoir si le téléchargement s'est bien passé.
-    if (md5 !== md5API) {
-      console.error(
-        `[synchroDesc - 238] MD5 du fichier 'excursions.json' différents: ${md5} ${md5API}`,
-      );
-      throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
-    } else {
-      debug >= EDebugMode.MEDIUM &&
-        console.log("[synchroDesc] MD5 du fichier 'excursions.json' identiques");
-    }
-  }
-
-  // Récupération des excursions depuis le fichier 'excursions.json'.
-  const excursionsJson = await getExcursionsJsonFromDevice();
-
-  // Récupération des excursions depuis le fichier 'excursions-temp.json'.
-  const excursionsServer = await FileSystem.readAsStringAsync(EXCURSIONS_TEMP_FILE_DEST).then(
-    res => JSON.parse(res) as Array<TExcursion>,
-  );
-
-  const { hasChanged, excursionsJson: excursionsJsonUpdated } = updateExcursionsJson(
-    excursionsServer,
-    excursionsJson,
-    debug,
-  );
-
-  if (hasChanged) {
-    // On met à jour le fichier 'excursions.json' sur le téléphone
-    await FileSystem.writeAsStringAsync(
-      EXCURSIONS_FILE_DEST,
-      JSON.stringify(excursionsJsonUpdated),
-    );
-  }
-
-  debug >= EDebugMode.LOW && console.log(`[synchroDesc] ${DOCUMENTS_FOLDER}`);
-
-  // On supprime le fichier 'excursions-temp.json'
-  await FileSystem.deleteAsync(EXCURSIONS_TEMP_FILE_DEST);
-};
-
-/**
- * Met à jour le fichier 'excursions.json' en comparant les excursions présentes sur le téléphone et sur le serveur.
- * Il faut vérifier chaque excursion et chaque signalement.
- *
- * @param excursionsServer {Array<TExcursion>} Excursions présentes sur le serveur.
- * @param excursionsJson {Array<TExcursion>} Excursions présentes sur le téléphone.
- * @param debug {boolean} Affiche des logs dans la console.
- *
- * @returns {boolean} True si le fichier 'excursions.json' a été modifié, false sinon.
- */
-export const updateExcursionsJson = (
-  excursionsServer: Array<TExcursion>,
-  excursionsJson: Array<TExcursion>,
-  debug?: EDebugMode,
-): {
-  hasChanged: boolean;
-  excursionsJson: Array<TExcursion>;
-} => {
-  let hasChanged = false;
-
-  if (excursionsServer.length === 0) {
-    debug >= 1 && console.log("[synchroDesc] pas d'excursions sur le serveur");
-    return {
-      hasChanged: excursionsJson.length > 0,
-      excursionsJson: [],
-    };
-  }
-
-  // On cherche si des excursions ont été supprimées
-  for (const excursionJson of excursionsJson) {
-    // On récupère l'excursion correspondante sur le serveur
-    const excursionServer = excursionsServer.find(
-      excursion => excursion.postId === excursionJson.postId,
-    );
-
-    debug >= 2 && console.log(`[synchroDesc] excursionJson.postId -> ${excursionJson.postId}`);
-    debug >= 2 && console.log(`[synchroDesc] excursionServer.postId -> ${excursionServer?.postId}`);
-
-    // Si l'excursion n'est pas présente sur le serveur
-    if (!excursionServer) {
-      // On supprime l'excursion sur le téléphone
-      debug &&
-        console.log(
-          `[synchroDesc] l'excursion ${excursionJson.postId} n'est pas présente sur le serveur`,
-        );
-      const index = excursionsJson.indexOf(excursionJson);
-      excursionsJson.splice(index, 1);
-
-      hasChanged = true;
-    }
-  }
-
-  // On compare les excursions
-  for (const excursionServer of excursionsServer) {
-    // On récupère l'excursion correspondante sur le téléphone
-    const excursionJson = excursionsJson.find(
-      excursion => excursion.postId === excursionServer.postId,
-    );
-
-    // Si l'excursion est présente sur le téléphone
-    if (excursionJson) {
-      // On compare les deux excursions
-      if (!areObjectsEquals(excursionServer, excursionJson)) {
-        // Si les excursions sont différentes, on met à jour l'excursion sur le téléphone
-        debug &&
-          console.log(
-            `[synchroDesc] l'excursion ${excursionServer.postId} est présente sur le téléphone mais est différente`,
-          );
-        const index = excursionsJson.indexOf(excursionJson);
-        excursionsJson[index] = excursionServer;
-
-        hasChanged = true;
-      }
-    } else {
-      // Si l'excursion n'est pas présente sur le téléphone, on l'ajoute
-      debug &&
-        console.log(
-          `[synchroDesc] l'excursion ${excursionServer.postId} n'est pas présente sur le téléphone`,
-        );
-      excursionsJson.push(excursionServer);
-
-      hasChanged = true;
-    }
-  }
-
-  // On retourne les excursions mises à jour
-  return {
-    hasChanged,
-    excursionsJson,
-  };
 };
 
 /**
@@ -546,7 +399,6 @@ export const getAndCopyGPXFiles = async (
 export const synchroDescendante = async (
   callbackStep?: TCallbackStep,
   callbackToGetNumberOfFiles?: TCallbackToGetNumberOfFiles,
-  debug?: EDebugMode,
 ): Promise<ESynchroDescendanteRes> => {
   const connexion = await NetInfo.fetch();
 
@@ -564,12 +416,6 @@ export const synchroDescendante = async (
     }
     callbackStep &&
       callbackStep(ESynchroDescendanteStep.DL_EXCURSIONS, ESynchroDescendanteStep.__LENGTH - 1);
-
-    // On met à jour le fichier 'excursions.json'
-    await updateExcursionsJsonRequest(debug);
-
-    callbackStep &&
-      callbackStep(ESynchroDescendanteStep.MAJ_EXCURSIONS, ESynchroDescendanteStep.__LENGTH - 1);
 
     // On copie les fichiers GPX
     await getAndCopyGPXFiles(callbackToGetNumberOfFiles);

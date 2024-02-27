@@ -173,7 +173,6 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
           filesDownloaded > dlGPX && setDlGPX(filesDownloaded);
           filesToDl > totalGPX && setTotalGPX(filesToDl);
         },
-        EDebugMode.LOW,
       ),
     );
   };

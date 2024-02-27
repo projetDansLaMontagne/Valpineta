@@ -36,8 +36,7 @@ const es = {
     noConnection: "Sin conexión a internet, inténtalo de nuevo más tarde",
     steps: {
       step1: "Cargando el archivo de excursiones.",
-      step2: "Actualización de las excursiones.",
-      step3: "Actualización de archivos de GPX.",
+      step2: "Actualización de archivos de GPX.",
     },
   },
   mapScreen: {
