@@ -151,6 +151,17 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
     return permissionsOK;
   };
 
+  /**
+   * Affiche la couleur a utiliser pour l excursion en fonction de son index
+   */
+  const excursionColor = () => {
+    const greenMin = 80;
+    const greenMax = 220;
+    const greenValue = Math.floor(Math.random() * (greenMax - greenMin) + greenMin); // valeur de green (de 94 à 194)
+    const greenValueHexa = greenValue.toString(16);
+    return `#00${greenValueHexa}27`;
+  };
+
   /* ------------------------------- CALL BACKS ------------------------------- */
   /**
    * Handle the map moves
@@ -316,8 +327,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
               }}
             />
 
-            {/* tracks affiches */}
-            {excursion ? (
+            {/* Excursion detaillee */}
+            {excursion && (
               // Affichage de l excursion, des markers et des signalements
               <>
                 <Polyline
@@ -341,41 +352,48 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
                   <SignalementHandler signalement={signalement} key={i} />
                 ))}
               </>
-            ) : (
-              // Affichage de toutes les excursions
-              allExcursions !== undefined &&
-              allExcursions.map((excursion, index) => {
-                if (excursion.track) {
+            )}
+
+            {/* Toutes les excursions */}
+            {allExcursions !== undefined &&
+              allExcursions.map((exc, index) => {
+                if (exc.track) {
+                  // Le track devient invisible et incliquable si une excursion est affichee
+                  const color = excursion ? "#00000000" : excursionColor();
+                  const onPress = excursion
+                    ? null
+                    : () =>
+                        navigation.navigate("CarteStack", {
+                          screen: "Carte",
+                          params: { excursion: exc },
+                        });
+
                   return (
                     <React.Fragment key={index}>
                       <Polyline
-                        coordinates={excursion.track.map(point => {
+                        coordinates={exc.track.map(point => {
                           return {
                             latitude: point.lat,
                             longitude: point.lon,
                           } as LatLng;
                         })}
-                        strokeColor={colors.palette.vert}
+                        strokeColor={color}
                         strokeWidth={5}
                         style={{
                           zIndex: 1000000,
                         }}
-                        onPress={() => {
-                          navigation.navigate("CarteStack", {
-                            screen: "Carte",
-                            params: { excursion },
-                          });
-                        }}
+                        onPress={onPress}
+                        tappable={true} // pour permettre le onpress sur Anroid
                       />
 
                       <Marker
                         coordinate={
                           {
-                            latitude: excursion.track[0].lat ?? 0,
-                            longitude: excursion.track[0].lon ?? 0,
+                            latitude: exc.track[0].lat ?? 0,
+                            longitude: exc.track[0].lon ?? 0,
                           } as LatLng
                         }
-                        title={excursion.fr.nom}
+                        title={exc.nom}
                         centerOffset={{ x: 0, y: -15 }}
                       >
                         <Image
@@ -383,17 +401,17 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
                           style={{
                             width: 30,
                             height: 30,
-                            tintColor: colors.palette.marron,
+                            tintColor: color,
                           }}
                         />
                       </Marker>
                     </React.Fragment>
                   );
                 } else {
+                  console.log("[MapScreen] WARNING : parcours sans track ");
                   return null;
                 }
-              })
-            )}
+              })}
           </MapView>
 
           {/* Bouton de centrage */}
