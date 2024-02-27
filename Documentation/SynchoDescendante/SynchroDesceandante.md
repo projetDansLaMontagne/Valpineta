@@ -12,11 +12,11 @@ Ce service est un service de synchronisation descendante. Il permet de
 synchroniser les données de l'API vers les fichiers locaux de l'application.
 Cette synchronisation nécessite une connexion internet.
 
-Toutes ses fonctions et son fonctionnement détaillé sont expliqués dans le [script](synchroDesc.ts).
+Toutes ses fonctions et son fonctionnement détaillé sont expliqués dans le [script](../../src/app/services/synchroDescendante/synchroDesc.ts).
 
 
 ## Tests
-> Une batterie de tests sont disponibles dans le fichier [synchroDesc.test.ts](synchroDesc.test.ts).
+> Une batterie de tests sont disponibles dans le fichier [synchroDesc.test.ts](../../src/app/services/synchroDescendante/synchroDesc.test.ts).
 > Ils permettent d'assurer le bon fonctionnement des fonctions de ce service et par extension de cette fonctionnalité.
 
 Si vous ne savez quelles technologies nous utilisons pour les tests ou comment les lancer, vous pouvez consulter notre [documentation](documentation-des-tests) sur les tests.
@@ -86,5 +86,3 @@ Ici, le paramètre `modeDebug` est un paramètre qui permet de savoir si on doit
 | updateExcursionsJson      | Plus d'excursions sur le téléphone |                       | [excursion1, excursion2, excursion3], [], modeDebug                       | Devrait indiquer un changement et le tableau devrait contenir trois excursions              |
 
 [documentation-des-tests]: ../Test.md
-[synchroDesc.ts]: ../src/app/services/synchroDescendante/synchroDesc.ts
-[synchroDesc.test.ts]: ../src/app/services/synchroDescendante/synchroDesc.test.ts
