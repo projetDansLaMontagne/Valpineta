@@ -17,8 +17,8 @@ import { Screen, Text } from "app/components";
 import { spacing, colors } from "app/theme";
 import { ImageSource } from "react-native-vector-icons/Icon";
 
-import { GpxDownloader } from "./GpxDownloader";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ListeSignalements } from "./ListeSignalements";
 import { InfosExcursion } from "./InfosExcursion";
@@ -192,6 +192,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
     }
   };
 
+  const downloadAndSaveFile = () => {
+    if (excursion) {
+      Sharing.shareAsync(FileSystem.documentDirectory + excursion.nomTrackGpx);
+    }
+  };
+
   /* ------------------------------- USE EFFECTS ------------------------------ */
   useEffect(() => {
     return () => {
@@ -310,7 +316,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             />
 
             {excursion ? (
-              // Affichage de l excursion, des markers et des signalements
+              // Affichage de l excursion, des markers, des signalements et du swiper
               <>
                 <Polyline
                   coordinates={excursion.track.map(
@@ -383,10 +389,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             )}
           </MapView>
 
-          <TouchableOpacity style={$boutonRetour} onPress={() => navigation.goBack()}>
-            <Image style={{ tintColor: colors.bouton }} source={require("assets/icons/back.png")} />
-          </TouchableOpacity>
-
           <View
             style={{
               ...styles.mapOverlayLeft,
@@ -453,14 +455,28 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             )
           }
 
-          <SwipeUpDown
-            itemMini={<ItemMini />}
-            itemFull={<ItemFull />}
-            animation="easeInEaseOut"
-            swipeHeight={30 + footerHeight}
-            disableSwipeIcon={true}
-            ref={swipeUpDownRef}
-          />
+          {excursion && (
+            <>
+              <SwipeUpDown
+                itemMini={<ItemMini />}
+                itemFull={<ItemFull />}
+                animation="easeInEaseOut"
+                swipeHeight={30 + footerHeight}
+                disableSwipeIcon={true}
+                ref={swipeUpDownRef}
+              />
+
+              <TouchableOpacity
+                style={$boutonRetour}
+                onPress={() => navigation.navigate("CarteStack", { screen: "Carte" })}
+              >
+                <Image
+                  style={{ tintColor: colors.bouton }}
+                  source={require("assets/icons/back.png")}
+                />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
     </Screen>
@@ -495,7 +511,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
       <View style={$containerGrand}>
         <View style={$containerTitre}>
           <Text text={excursion.nom} size="xl" style={$titre} />
-          <GpxDownloader />
+          <View style={{ justifyContent: "center" }}>
+            <TouchableOpacity onPress={() => downloadAndSaveFile()}>
+              <Image source={require("assets/icons/download.png")} style={$iconDownload}></Image>
+            </TouchableOpacity>
+          </View>
         </View>
         <View>
           <View style={$containerBouton}>
@@ -915,4 +935,10 @@ const $containerErreur: ViewStyle = {
 const $texteErreur: TextStyle = {
   marginTop: spacing.lg,
   marginBottom: height / 2,
+};
+
+const $iconDownload: ImageStyle = {
+  width: 40,
+  height: 40,
+  tintColor: colors.bouton,
 };
