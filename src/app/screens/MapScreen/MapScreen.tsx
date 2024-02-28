@@ -280,6 +280,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   return (
     <Screen style={$screen}>
       <View style={styles.container}>
+        {/* Map */}
         <MapView
           mapType={Platform.OS === "android" ? "none" : "standard"} // pour n avoir aucune autre tuile que Valpineta sur android
           ref={mapRef}
@@ -315,7 +316,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
           <UrlTile
             urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
             tileSize={256}
-            // shouldReplaceMapContent={true}
+            offlineMode={true}
             style={{
               zIndex: -1,
               pointerEvents: "none",
