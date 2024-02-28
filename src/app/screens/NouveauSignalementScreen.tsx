@@ -194,99 +194,101 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     };
 
     return isLoading ? (
-      <Screen style={$containerLoader} preset="fixed" safeAreaEdges={["top", "bottom"]}>
+      <Screen
+        style={{ justifyContent: "center", alignItems: "center" }}
+        preset="fixed"
+        safeAreaEdges={["top", "bottom"]}
+      >
         <ActivityIndicator size="large" color={colors.palette.vert} />
       </Screen>
     ) : (
-      <View style={$view}>
+      <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
         <TouchableOpacity style={$boutonRetour} onPress={() => props.navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
-        <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
+        <Text
+          style={$h1}
+          tx={
+            type === "Avertissement"
+              ? "pageNouveauSignalement.titreAvertissement"
+              : "pageNouveauSignalement.titrePointInteret"
+          }
+          size="xxl"
+        />
+        <Text text="Col de la marmotte" size="lg" />
+        {nomErreur && (
           <Text
-            style={$h1}
-            tx={
-              type === "Avertissement"
-                ? "pageNouveauSignalement.titreAvertissement"
-                : "pageNouveauSignalement.titrePointInteret"
+            text="pageNouveauSignalement.erreur.titre"
+            size="xs"
+            style={{ color: colors.palette.rouge }}
+          />
+        )}
+        <TextInput
+          placeholder={translate("pageNouveauSignalement.placeholderNom")}
+          placeholderTextColor={nomErreur ? colors.palette.rouge : colors.text}
+          onChangeText={setNom}
+          value={nom}
+          style={[
+            { ...$inputnom },
+            nomErreur
+              ? { borderColor: colors.palette.rouge }
+              : { borderColor: colors.palette.vert },
+          ]}
+        />
+        {descriptionErreur && (
+          <Text
+            tx="pageNouveauSignalement.erreur.description"
+            size="xs"
+            style={{ color: colors.palette.rouge }}
+          />
+        )}
+        <TextInput
+          placeholder={translate("pageNouveauSignalement.placeholderDescription")}
+          placeholderTextColor={descriptionErreur ? colors.palette.rouge : colors.text}
+          onChangeText={setDescription}
+          multiline={true}
+          value={description}
+          style={[
+            { ...$inputDescription },
+            descriptionErreur
+              ? { borderColor: colors.palette.rouge }
+              : { borderColor: colors.palette.vert },
+          ]}
+        />
+        <View>
+          {photoErreur && !image && (
+            <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
+          )}
+          <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
+            <Image
+              style={{ tintColor: colors.palette.vert }}
+              source={require("../../assets/icons/camera.png")}
+            />
+            <Text tx="pageNouveauSignalement.boutons.photo" size="xs" style={$textBoutonPhoto} />
+          </TouchableOpacity>
+          {image && <Image source={{ uri: image }} style={$image} />}
+          <Button
+            style={$bouton}
+            tx="pageNouveauSignalement.boutons.valider"
+            onPress={() =>
+              envoyerSignalement({
+                nom,
+                type,
+                description,
+                image,
+                // WARNING A CHANGER AVEC LA LOCALISATION REELLE DE L'UTILISATEUR
+                lat: 42.666,
+                lon: 0.1034,
+                postId: 2049,
+              })
             }
-            size="xxl"
+            textStyle={$textBouton}
           />
-          <Text text="Col de la marmotte" size="lg" />
-          {nomErreur && (
-            <Text
-              text="pageNouveauSignalement.erreur.titre"
-              size="xs"
-              style={{ color: colors.palette.rouge }}
-            />
-          )}
-          <TextInput
-            placeholder={translate("pageNouveauSignalement.placeholderNom")}
-            placeholderTextColor={nomErreur ? colors.palette.rouge : colors.text}
-            onChangeText={setNom}
-            value={nom}
-            style={[
-              { ...$inputnom },
-              nomErreur
-                ? { borderColor: colors.palette.rouge }
-                : { borderColor: colors.palette.vert },
-            ]}
-          />
-          {descriptionErreur && (
-            <Text
-              tx="pageNouveauSignalement.erreur.description"
-              size="xs"
-              style={{ color: colors.palette.rouge }}
-            />
-          )}
-          <TextInput
-            placeholder={translate("pageNouveauSignalement.placeholderDescription")}
-            placeholderTextColor={descriptionErreur ? colors.palette.rouge : colors.text}
-            onChangeText={setDescription}
-            multiline={true}
-            value={description}
-            style={[
-              { ...$inputDescription },
-              descriptionErreur
-                ? { borderColor: colors.palette.rouge }
-                : { borderColor: colors.palette.vert },
-            ]}
-          />
-          <View>
-            {photoErreur && !image && (
-              <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
-            )}
-            <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
-              <Image
-                style={{ tintColor: colors.palette.vert }}
-                source={require("../../assets/icons/camera.png")}
-              />
-              <Text tx="pageNouveauSignalement.boutons.photo" size="xs" style={$textBoutonPhoto} />
-            </TouchableOpacity>
-            {image && <Image source={{ uri: image }} style={$image} />}
-            <Button
-              style={$bouton}
-              tx="pageNouveauSignalement.boutons.valider"
-              onPress={() =>
-                envoyerSignalement({
-                  nom,
-                  type,
-                  description,
-                  image,
-                  // WARNING A CHANGER AVEC LA LOCALISATION REELLE DE L'UTILISATEUR
-                  lat: 42.666,
-                  lon: 0.1034,
-                  postId: 2049,
-                })
-              }
-              textStyle={$textBouton}
-            />
-          </View>
-        </Screen>
-      </View>
+        </View>
+      </Screen>
     );
   },
 );
@@ -323,19 +325,9 @@ async function blobToBase64(blob: Blob): Promise<string> {
 
 const { width } = Dimensions.get("window");
 
-const $view: ViewStyle = {
-  flex: 1,
-};
-
 const $container: ViewStyle = {
   paddingRight: spacing.sm,
   paddingLeft: spacing.sm,
-};
-
-const $containerLoader: ViewStyle = {
-  ...$container,
-  justifyContent: "center",
-  alignItems: "center",
 };
 
 const $boutonRetour: ViewStyle = {
@@ -344,15 +336,13 @@ const $boutonRetour: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.sm,
-  margin: spacing.lg,
+  margin: spacing.md,
   width: 50,
-  position: "absolute",
   top: 0,
   zIndex: 1,
 };
 
 const $h1: TextStyle = {
-  marginTop: 50,
   textAlign: "center",
   marginBottom: spacing.sm,
 };
