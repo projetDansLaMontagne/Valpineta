@@ -37,6 +37,7 @@ import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
 import SwipeUpDown from "react-native-swipe-up-down";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // images
 const binoculars: ImageSource = require("assets/icons/binoculars.png");
@@ -412,7 +413,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
         <View
           style={{
             ...styles.mapOverlayLeft,
-            bottom: excursion ? 20 : 0,
+            bottom: excursion ? 60 : 0, // taille par defaut du swiper
           }}
         >
           <MapButton
@@ -436,7 +437,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             <View
               style={{
                 ...styles.mapOverlay,
-                bottom: excursion ? 20 : 0,
+                bottom: excursion ? 60 : 0, // taille par defaut du swiper
               }}
             >
               {menuIsOpen && (
@@ -484,9 +485,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
               itemMini={<SwiperContent type="mini" />}
               itemFull={<SwiperContent type="full" />}
               animation="easeInEaseOut"
-              swipeHeight={30 + footerHeight}
-              disableSwipeIcon={true}
+              swipeHeight={footerHeight + useSafeAreaInsets().bottom} // barre de navigation + footer + hauteur du swiper
+              disableSwipeIcon={false}
               ref={swipeUpDownRef}
+              extraMarginTop={height / 6}
             />
 
             <TouchableOpacity
@@ -812,7 +814,7 @@ const mapOverlayStyle: ViewStyle = {
   justifyContent: "flex-end",
   gap: spacing.sm,
 
-  padding: spacing.sm,
+  paddingBottom: spacing.sm,
 };
 const buttonContainer = {
   height: values.locateBtnContainerSize,
@@ -890,7 +892,6 @@ const $containerGrand: ViewStyle = {
   borderWidth: 1,
   borderColor: colors.bordure,
   borderRadius: 10,
-  marginTop: height / 4,
 };
 
 const $container: ViewStyle = {
