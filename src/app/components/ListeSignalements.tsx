@@ -28,7 +28,7 @@ export const ListeSignalements = observer(function ListeSignalements(
   const SuiviExcursion = { etat: "enCours", iPointCourant: 1100 };
 
   const [signalementsTries, setSignalementsTries] = useState<T_Signalement[]>([]);
-  console.log(track.length);
+
   useEffect(() => {
     setSignalementsTries(
       signalements.sort((a, b) => {

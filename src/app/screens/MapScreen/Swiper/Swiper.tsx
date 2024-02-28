@@ -12,12 +12,11 @@ import {
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
-import { Text } from "app/components";
+import { ListeSignalements, Text } from "app/components";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useState } from "react";
-import { PageSignalements } from "./PageSignalements";
 import { AppStackParamList, T_excursion } from "app/navigators";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
@@ -153,15 +152,20 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                   userLocation={userLocation}
                 />
               ) : (
-                <PageSignalements
-                  track={excursion.track}
-                  signalements={excursion.signalements}
-                  userLocation={userLocation}
-                  setInterfaceCourrante={setInterfaceCourrante}
-                  bottomMargin={bottomMargin}
-                  setCameraTarget={setCameraTarget}
-                  swipeDown={swipeUpDown}
-                />
+                <View style={$containerSignalements}>
+                  <ListeSignalements
+                    detaille={true}
+                    signalements={excursion.signalements}
+                    track={excursion.track}
+                    onPress={(point: T_flat_point) => {
+                      props.setCameraTarget({
+                        latitude: point.lat,
+                        longitude: point.lon,
+                      } as LatLng);
+                      swipeUpDown();
+                    }}
+                  />
+                </View>
               )}
             </TouchableWithoutFeedback>
           </ScrollView>
@@ -219,20 +223,9 @@ const $souligneInfosAvis: ViewStyle = {
   width: width / 2.5,
   position: "relative",
 };
-
-/* --------------------------------- ERREUR --------------------------------- */
-
-const $containerErreur: ViewStyle = {
-  justifyContent: "center",
-  alignItems: "center",
-  width: width,
-  height: height,
-  padding: spacing.lg,
-};
-
-const $texteErreur: TextStyle = {
-  marginTop: spacing.lg,
-  marginBottom: height / 2,
+const $containerSignalements: ViewStyle = {
+  margin: spacing.xs,
+  paddingBottom: 250 /**@warning solution moche et temporaire */,
 };
 
 const $iconDownload: ImageStyle = {
