@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   StyleProp,
-  TextStyle,
   View,
   ViewStyle,
   Image,
@@ -16,8 +15,8 @@ import { ListeSignalements, Text } from "app/components";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useEffect, useState } from "react";
-import { AppStackParamList, T_excursion } from "app/navigators";
+import { useEffect, useRef, useState } from "react";
+import { AppStackParamList, T_excursion, T_flat_point } from "app/navigators";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import { InfosExcursion } from "./InfosExcursion";
@@ -47,16 +46,15 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
   const $styles = [$container, style];
 
   const bottomMargin = useBottomTabBarHeight() + useSafeAreaInsets().bottom;
-  const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
+  const swipeUpDownRef = useRef<any>();
 
   const [interfaceCourrante, setInterfaceCourrante] = useState<"infos" | "avis" | "signalements">(
     "infos",
   );
 
-  const swipeUpDown = () => {
-    if (swipeUpDownRef) {
+  const closeSwiper = () => {
+    if (swipeUpDownRef.current) {
       swipeUpDownRef.current.showMini();
-    } else {
     }
   };
 
@@ -162,7 +160,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                         latitude: point.lat,
                         longitude: point.lon,
                       } as LatLng);
-                      swipeUpDown();
+                      closeSwiper();
                     }}
                   />
                 </View>
