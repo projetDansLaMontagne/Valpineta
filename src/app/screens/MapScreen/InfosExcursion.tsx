@@ -20,7 +20,7 @@ import { T_Signalement, T_excursion, T_flat_point } from "app/navigators";
 export interface InfosExcursionProps {
   excursion: T_excursion;
   navigation: any;
-  setIsAllSignalements;
+  interfaceCourrante: React.MutableRefObject<"infos" | "avis" | "signalements">;
   userLocation;
 }
 
@@ -29,7 +29,7 @@ export interface InfosExcursionProps {
  * @precondition l'excursion doit absolument être définie
  */
 export function InfosExcursion(props: InfosExcursionProps) {
-  const { excursion, navigation, setIsAllSignalements, userLocation } = props;
+  const { excursion, navigation, interfaceCourrante, userLocation } = props;
 
   /**
    * @returns la description courte
@@ -102,7 +102,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
                   </View>
                   <View>
                     {excursion.signalements.length > 0 && (
-                      <TouchableOpacity onPress={() => setIsAllSignalements(true)}>
+                      <TouchableOpacity onPress={() => interfaceCourrante.current = "signalements"}>
                         <Text
                           style={$lienSignalements}
                           tx="detailsExcursion.boutons.voirDetails"
@@ -130,7 +130,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
                               details={false}
                               nomSignalement={signalement.nom}
                               distanceDuDepart={`${distanceSignalement}`}
-                              onPress={() => setIsAllSignalements(true)}
+                              onPress={() => interfaceCourrante.current = "signalements"}
                             />
                           </View>
                         );

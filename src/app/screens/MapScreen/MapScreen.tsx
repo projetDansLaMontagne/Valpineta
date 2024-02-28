@@ -10,20 +10,13 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
-  TextStyle,
 } from "react-native";
 import { AppStackScreenProps, T_Signalement, T_excursion, TPoint } from "app/navigators";
-import { Screen, Text } from "app/components";
+import { Screen } from "app/components";
 import { spacing, colors } from "app/theme";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import { useStores } from "app/models";
 
-import * as Sharing from "expo-sharing";
-import * as FileSystem from "expo-file-system";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { ListeSignalements } from "./ListeSignalements";
-import { InfosExcursion } from "./InfosExcursion";
-import { Avis } from "./Avis";
 import { applicationLangue } from "app/screens/ExcursionsScreen";
 
 // location
@@ -36,8 +29,7 @@ import { Asset } from "expo-asset";
 import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
-import SwipeUpDown from "react-native-swipe-up-down";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Swiper } from "./Swiper";
 
 // images
 const binoculars: ImageSource = require("assets/icons/binoculars.png");
@@ -52,24 +44,20 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const { navigation, route } = _props;
   const excursion = route?.params?.excursion;
   const USER_LOCATION_INTERVAL_MS = 1000; // ! mabye change this value
-  const footerHeight = useBottomTabBarHeight();
 
   // States
   const [gavePermission, setGavePermission] = useState(false);
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState<null | Location.LocationObject>(null);
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
   const [startPoint, setStartPoint] = useState<LatLng>();
-  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
-  const [isAllSignalements, setIsAllSignalements] = useState(false);
 
   // Refs
   const { parametres } = useStores();
   const intervalRef = useRef(null);
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
   const mapRef = useRef<MapView>(null);
-  const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
 
   // Buttons
   const followLocationButtonRef = useRef(null);
@@ -198,19 +186,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
 
   const toggleMenu = () => {
     setMenuIsOpen(!menuIsOpen);
-  };
-
-  const swipeUpDown = () => {
-    if (swipeUpDownRef) {
-      swipeUpDownRef.current.showMini();
-    } else {
-    }
-  };
-
-  const downloadAndSaveFile = () => {
-    if (excursion) {
-      Sharing.shareAsync(FileSystem.documentDirectory + excursion.nomTrackGpx);
-    }
   };
 
   /* ------------------------------- USE EFFECTS ------------------------------ */
@@ -482,15 +457,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
         {/* Swiper et bouton retour */}
         {excursion && (
           <>
-            <SwipeUpDown
-              itemMini={<SwiperContent type="mini" />}
-              itemFull={<SwiperContent type="full" />}
-              animation="easeInEaseOut"
-              swipeHeight={footerHeight + useSafeAreaInsets().bottom} // barre de navigation + footer + hauteur du swiper
-              disableSwipeIcon={false}
-              ref={swipeUpDownRef}
-              extraMarginTop={height / 6}
-            />
+            <Swiper excursion={excursion} navigation={navigation} />
 
             <TouchableOpacity
               style={$boutonRetour}
@@ -506,101 +473,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
       </View>
     </Screen>
   );
-
-  function SwiperContent(props: { type: "mini" | "full" }) {
-    if (props.type === "mini") {
-      return <ItemMini />;
-    }
-    if (props.type === "full") {
-      return <ItemFull />;
-    }
-    return null;
-  }
-
-  /**
-   * @returns le composant réduit des informations, autremeent dit lorsque l'on swipe vers le bas
-   */
-  function ItemMini() {
-    return (
-      <View style={$containerPetit}>
-        <Image source={require("assets/icons/swipe-up.png")} />
-      </View>
-    );
-  }
-
-  /**
-   * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
-   */
-  function ItemFull() {
-    return isAllSignalements ? (
-      <ListeSignalements
-        excursion={excursion}
-        userLocation={location}
-        setIsAllSignalements={setIsAllSignalements}
-        footerHeight={footerHeight}
-        setStartPoint={undefined}
-        swipeDown={swipeUpDown}
-        style={$containerGrand}
-      />
-    ) : (
-      <View style={[$containerGrand, { marginBottom: footerHeight }]}>
-        <View style={$containerTitre}>
-          <Text text={excursion.nom} size="xl" style={$titre} />
-          <View style={{ justifyContent: "center" }}>
-            <TouchableOpacity onPress={() => downloadAndSaveFile()}>
-              <Image source={require("assets/icons/download.png")} style={$iconDownload}></Image>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View>
-          <View style={$containerBouton}>
-            <TouchableOpacity
-              onPress={() => {
-                setcontainerInfoAffiche(true);
-              }}
-              style={$boutonInfoAvis}
-            >
-              <Text
-                tx="detailsExcursion.titres.infos"
-                size="lg"
-                style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setcontainerInfoAffiche(false);
-              }}
-              style={$boutonInfoAvis}
-            >
-              <Text
-                tx="detailsExcursion.titres.avis"
-                size="lg"
-                style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
-              />
-            </TouchableOpacity>
-          </View>
-          <View
-            style={[
-              $souligneInfosAvis,
-              containerInfoAffiche
-                ? { left: spacing.lg }
-                : { left: width - width / 2.5 - spacing.lg / 1.5 },
-            ]}
-          />
-          {containerInfoAffiche ? (
-            <InfosExcursion
-              excursion={excursion}
-              navigation={navigation}
-              setIsAllSignalements={setIsAllSignalements}
-              userLocation={location}
-            />
-          ) : (
-            <Avis />
-          )}
-        </View>
-      </View>
-    );
-  }
 });
 
 /* ------------------------------ JSX ELEMENTS ------------------------------ */
@@ -884,89 +756,4 @@ const $boutonRetour: ViewStyle = {
   top: 20,
   left: 0,
   zIndex: 1,
-};
-
-const $containerGrand: ViewStyle = {
-  flex: 1,
-  width: width,
-  backgroundColor: colors.fond,
-  borderWidth: 1,
-  borderColor: colors.bordure,
-  borderRadius: 10,
-};
-
-const $container: ViewStyle = {
-  flex: 1,
-  width: width,
-  height: height,
-  backgroundColor: colors.fond,
-};
-
-//Style de itemMini
-
-const $containerPetit: ViewStyle = {
-  flex: 1,
-  width: width,
-  backgroundColor: colors.fond,
-  alignItems: "center",
-  borderWidth: 1,
-  borderColor: colors.bordure,
-  borderRadius: 10,
-  padding: spacing.xxs,
-};
-
-//Style du container du titre et du bouton de téléchargement
-
-const $containerTitre: ViewStyle = {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  width: width - width / 5,
-  margin: spacing.lg,
-};
-
-const $titre: ViewStyle = {
-  marginTop: spacing.xs,
-  paddingRight: spacing.xl,
-};
-
-//Style du container des boutons infos et avis
-
-const $containerBouton: ViewStyle = {
-  flexDirection: "row",
-  justifyContent: "space-around",
-  width: width,
-};
-
-const $boutonInfoAvis: ViewStyle = {
-  paddingLeft: spacing.xxl,
-  paddingRight: spacing.xxl,
-};
-
-const $souligneInfosAvis: ViewStyle = {
-  backgroundColor: colors.bouton,
-  height: 2,
-  width: width / 2.5,
-  position: "relative",
-};
-
-/* --------------------------------- ERREUR --------------------------------- */
-
-const $containerErreur: ViewStyle = {
-  justifyContent: "center",
-  alignItems: "center",
-  width: width,
-  height: height,
-  padding: spacing.lg,
-};
-
-const $texteErreur: TextStyle = {
-  marginTop: spacing.lg,
-  marginBottom: height / 2,
-};
-
-const $iconDownload: ImageStyle = {
-  width: 40,
-  height: 40,
-  tintColor: colors.bouton,
 };

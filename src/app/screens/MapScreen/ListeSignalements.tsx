@@ -6,11 +6,10 @@ import { Dimensions, ScrollView, TouchableWithoutFeedback, View, ViewStyle } fro
 import { LatLng } from "react-native-maps";
 
 /**
- * @params setIsAllSignalements, excursion, userLocation
  * @returns la liste des signalements
  */
 export interface ListeSignalementsProps {
-  setIsAllSignalements;
+  interfaceCourrante: React.MutableRefObject<"infos" | "avis" | "signalements">;
   excursion;
   userLocation;
   footerHeight;
@@ -43,7 +42,6 @@ export function ListeSignalements(props: ListeSignalementsProps) {
                     imageSignalement={signalement.image}
                     onPress={() => {
                       // go to the signalement on the map
-                      // setIsAllSignalements(false);
                       props.setStartPoint &&
                         props.setStartPoint({
                           latitude: signalement.lat,
@@ -63,7 +61,7 @@ export function ListeSignalements(props: ListeSignalementsProps) {
         <Button
           style={[$sortirDetailSignalement, { bottom: props.footerHeight }]}
           tx="detailsExcursion.boutons.retourInformations"
-          onPress={() => props.setIsAllSignalements(false)}
+          onPress={() => (props.interfaceCourrante.current = "infos")}
         />
       </View>
     </View>
