@@ -2,6 +2,8 @@
 import * as ReactNative from "react-native"
 import mockFile from "./mockFile"
 import { jest } from "@jest/globals"
+import { locale } from "expo-localization"
+import { ParametresModel } from "app/models"
 
 // libraries to mock
 jest.doMock("react-native", () => {
@@ -24,9 +26,9 @@ jest.doMock("react-native", () => {
   )
 })
 
-// jest.mock("@react-native-async-storage/async-storage", () =>
-//   require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
-// )
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
+)
 
 jest.mock("i18n-js", () => ({
   currentLocale: () => "en",

@@ -35,9 +35,7 @@ export const SynchroMontanteModel = types
   .model("SynchroMontante")
   .props({
     signalements: types.optional(types.array(signalement), []),
-    // intervalId: types.maybeNull(types.union(types.number, types.frozen<null | NodeJS.Timeout>())),
     intervalleSynchro: types.optional(types.number, IntervalleSynchro.TresFrequente),
-    testing: types.optional(types.boolean, false),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -61,8 +59,6 @@ export const SynchroMontanteModel = types
     }
 
     return {
-      // afterCreate,
-      // beforeDestroy,
       addSignalement,
       setIntervalleSynchro,
       removeAllSignalements

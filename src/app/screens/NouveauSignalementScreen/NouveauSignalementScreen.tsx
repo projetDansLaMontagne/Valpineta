@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ImageStyle,
+  Alert,
 } from "react-native";
 import { AppStackScreenProps, T_TypeSignalement, T_Signalement } from "app/navigators";
 import { colors, spacing } from "app/theme";
@@ -23,7 +24,7 @@ import { Button, Screen, Text } from "app/components";
 import { useStores } from "app/models";
 import { tryToPush, EtatSynchro } from "app/services/SynchroMontanteService";
 //Fonctions
-import { blobToBase64, AlerteStatus, verifSaisiesValides } from "./NouveauSignalementFonctions";
+import { blobToBase64, verifSaisiesValides } from "./NouveauSignalementFonctions";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
   type: T_TypeSignalement;
@@ -107,6 +108,58 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     };
 
     /**
+     * Affiche une alerte en fonction du status de la synchronisation
+     * @param status
+     */
+    const AlerteStatus = (status: EtatSynchro) => {
+      switch (status) {
+        case EtatSynchro.BienEnvoye:
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.envoyeEnBdd.titre"),
+            translate("pageNouveauSignalement.alerte.envoyeEnBdd.message"),
+            [],
+            {
+              cancelable: true,
+            },
+          );
+          break;
+
+        case EtatSynchro.NonConnecte:
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.ajouteEnLocal.titre"),
+            translate("pageNouveauSignalement.alerte.ajouteEnLocal.message"),
+            [],
+            { cancelable: true },
+          );
+          break;
+
+        case EtatSynchro.ErreurServeur:
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.erreur.titre"),
+            translate("pageNouveauSignalement.alerte.erreur.message"),
+            [],
+            { cancelable: true },
+          );
+          break;
+        case EtatSynchro.RienAEnvoyer:
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.rienAEnvoyer.titre"),
+            translate("pageNouveauSignalement.alerte.rienAEnvoyer.message"),
+            [],
+            { cancelable: true },
+          );
+          break;
+        default:
+          Alert.alert(
+            translate("pageNouveauSignalement.alerte.erreur.titre"),
+            translate("pageNouveauSignalement.alerte.erreur.message"),
+            [],
+            { cancelable: true },
+          );
+      }
+    };
+
+    /**
      * Fonction pour envoyer le signalement en base de données
      */
     const envoyerSignalement = async (signalement: T_Signalement) => {
@@ -115,7 +168,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         description,
         image,
       );
-      
+
       if (saisiesValides) {
         //Conversion de l'image url en base64
         const blob = await fetch(signalement.image).then(response => response.blob());
@@ -134,8 +187,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
         AlerteStatus(status);
         if (status === EtatSynchro.BienEnvoye || status === EtatSynchro.NonConnecte) {
           props.navigation.goBack();
-        }
-        else {
+        } else {
           setNom("");
           setDescription("");
           setImage(undefined);
@@ -244,7 +296,6 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     );
   },
 );
-
 
 /* -------------------------------------------------------------------------- */
 /*                                   STYLES                                   */

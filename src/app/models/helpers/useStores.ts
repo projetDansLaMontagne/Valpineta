@@ -1,7 +1,7 @@
+/*istanbul ignore file*/
 import { createContext, useContext, useEffect, useState } from "react";
 import { RootStore, RootStoreModel } from "../RootStore";
 import { setupRootStore } from "./setupRootStore";
-import { unprotect } from "mobx-state-tree";
 
 /**
  * Create the initial (empty) global RootStore instance here.

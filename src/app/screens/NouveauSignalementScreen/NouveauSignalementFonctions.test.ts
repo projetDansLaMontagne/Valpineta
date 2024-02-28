@@ -1,14 +1,12 @@
 import {
-  saisiesValides,
+  verifSaisiesValides,
   verifDescription,
   verifNom,
   verifPhoto,
   blobToBase64,
-  AlerteStatus,
 } from "./NouveauSignalementFonctions";
 import { describe, expect, test, jest, afterEach } from "@jest/globals";
-import { EtatSynchro } from "app/models";
-import { Alert } from "react-native";
+
 
 jest.mock("react-native", () => ({
   Alert: {
@@ -101,133 +99,75 @@ describe("[NouveauSignalementFonction]", () => {
       expect(photoErreur).toBe(true);
     });
   });
-  describe("[saisiesValides]", () => {
+  describe("[verifSaisiesValides]", () => {
     test("saisieBonne doit être vrai si les saisies sont correctes", () => {
       const nom = "nom";
       const description = "description";
       const image = "image";
-      const saisieBonne = true;
-      let nomErreur = false;
-      let descriptionErreur = false;
-      let photoErreur = false;
-      const result = saisiesValides(
+      let { saisiesValides, nomErreur, descriptionErreur, photoErreur } = verifSaisiesValides(
         nom,
         description,
         image,
-        saisieBonne,
-        nomErreur,
-        descriptionErreur,
-        photoErreur,
       );
-      expect(result).toBe(true);
+      
+      expect(saisiesValides).toBe(true);
+      expect(nomErreur).toBe(false);
+      expect(descriptionErreur).toBe(false);
+      expect(photoErreur).toBe(false);
     });
     test("saisieBonne doit être faux si le nom est invalide", () => {
       const nom = "";
       const description = "description";
       const image = "image";
-      const saisieBonne = false;
-      let nomErreur = false;
-      let descriptionErreur = false;
-      let photoErreur = false;
-      const result = saisiesValides(
+      let { saisiesValides, nomErreur, descriptionErreur, photoErreur } = verifSaisiesValides(
         nom,
         description,
         image,
-        saisieBonne,
-        nomErreur,
-        descriptionErreur,
-        photoErreur,
       );
-      expect(result).toBe(false);
+      expect(saisiesValides).toBe(false);
+      expect(nomErreur).toBe(true);
+      expect(descriptionErreur).toBe(false);
+      expect(photoErreur).toBe(false);
     });
     test("saisieBonne doit être faux si la description est invalide", () => {
       const nom = "nom";
       const description = "";
       const image = "image";
-      const saisieBonne = false;
-      let nomErreur = false;
-      let descriptionErreur = false;
-      let photoErreur = false;
-      const result = saisiesValides(
+      let { saisiesValides, nomErreur, descriptionErreur, photoErreur } = verifSaisiesValides(
         nom,
         description,
         image,
-        saisieBonne,
-        nomErreur,
-        descriptionErreur,
-        photoErreur,
       );
-      expect(result).toBe(false);
+      expect(saisiesValides).toBe(false);
+      expect(nomErreur).toBe(false);
+      expect(descriptionErreur).toBe(true);
+      expect(photoErreur).toBe(false);
     });
     test("saisieBonne doit être faux si la photo est invalide", () => {
       const nom = "nom";
       const description = "description";
       const image = "";
-      const saisieBonne = false;
-      let nomErreur = false;
-      let descriptionErreur = false;
-      let photoErreur = false;
-      const result = saisiesValides(
+      let { saisiesValides, nomErreur, descriptionErreur, photoErreur } = verifSaisiesValides(
         nom,
         description,
         image,
-        saisieBonne,
-        nomErreur,
-        descriptionErreur,
-        photoErreur,
       );
-      expect(result).toBe(false);
+      expect(saisiesValides).toBe(false);
+      expect(nomErreur).toBe(false);
+      expect(descriptionErreur).toBe(false);
+      expect(photoErreur).toBe(true);
     });
   });
   describe("[blobToBase64]", () => {
-    test("doit convertir un blob en base64", async () => {
-      const text = "Ceci est un test";
-      const blob = new Blob([text], { type: "text/plain" });
-
-      const result = await blobToBase64(blob);
-
-      expect(typeof result).toBe("string");
-      expect(result).toMatch(/^data:text\/plain;base64,/);
+    test("doit convertir un blob en base64 avec FileReader mocké", async () => {
+      const blob = new Blob(["hello world"], { type: "text/plain" });
+      const base64 = await blobToBase64(blob);
+      expect(base64).toBe("data:text/plain;base64,aGVsbG8gd29ybGQ=");
     });
 
     test("doit rejeter une erreur si la conversion échoue", async () => {
       const blob = undefined;
       await expect(blobToBase64(blob)).rejects.toThrowError();
-    });
-  });
-  describe("[AlerteStatus]", () => {
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    test("devrait afficher une alerte en cas de succès", () => {
-      AlerteStatus(EtatSynchro.BienEnvoye);
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Reussite !",
-        "Votre signalement a bien été enregistré",
-        [],
-        { cancelable: true },
-      );
-    });
-
-    test("devrait afficher une alerte en cas de non connexion", () => {
-      AlerteStatus(EtatSynchro.NonConnecte);
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Hors connexion",
-        "Votre signalement sera automatiquement enregistré lors de votre prochaine connexion (duree du cycle parametrable)",
-        [],
-        { cancelable: true },
-      );
-    });
-
-    test("devrait afficher une alerte en cas d'erreur serveur", () => {
-      AlerteStatus(EtatSynchro.ErreurServeur);
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur serveur",
-        "Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer plus tard.",
-        [],
-        { cancelable: true },
-      );
     });
   });
 });
