@@ -48,9 +48,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
   const bottomMargin = useBottomTabBarHeight() + useSafeAreaInsets().bottom;
   const swipeUpDownRef = useRef<any>();
 
-  const [interfaceCourrante, setInterfaceCourrante] = useState<"infos" | "avis" | "signalements">(
-    "infos",
-  );
+  const [interfaceCourrante, setInterfaceCourrante] = useState<"infos" | "signalements">("infos");
 
   const closeSwiper = () => {
     if (swipeUpDownRef.current) {
