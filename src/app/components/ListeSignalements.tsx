@@ -1,9 +1,10 @@
 import * as React from "react";
-import { StyleProp, View, ViewStyle } from "react-native";
+import { ScrollView, StyleProp, TouchableWithoutFeedback, View, ViewStyle } from "react-native";
 import { observer } from "mobx-react-lite";
 import { TPoint, T_Signalement, T_flat_point } from "app/navigators";
 import { CarteSignalement } from "./CarteSignalement";
 import { useEffect, useState } from "react";
+import { spacing } from "app/theme";
 
 export type ListeSignalementsProps = {
   /**
@@ -40,28 +41,37 @@ export const ListeSignalements = observer(function ListeSignalements(
   }, [signalements]);
 
   return (
-    <>
-      {signalementsTries &&
-        signalementsTries.map((signalement, index) => {
-          return (
-            <View key={index}>
-              <CarteSignalement
-                type={signalement.type}
-                nomSignalement={signalement.nom}
-                onPress={onPress ? () => onPress(signalement) : undefined}
-                details={detaille}
-                distanceDuDepartEnM={
-                  detaille && SuiviExcursion.etat === "enCours"
-                    ? track[signalement.idPointLie ?? 0].dist -
-                      track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
-                    : track[signalement.idPointLie ?? 0].dist // Position absolue (par rapport au depart)
-                }
-                imageSignalement={detaille ? signalement.image : undefined}
-                description={detaille ? signalement.description : undefined}
-              />
-            </View>
-          );
-        })}
-    </>
+    <ScrollView>
+      <TouchableWithoutFeedback>
+        <View style={$containerSignalements}>
+          {signalementsTries &&
+            signalementsTries.map((signalement, index) => {
+              return (
+                <View key={index}>
+                  <CarteSignalement
+                    type={signalement.type}
+                    nomSignalement={signalement.nom}
+                    onPress={onPress ? () => onPress(signalement) : undefined}
+                    details={detaille}
+                    distanceDuDepartEnM={
+                      detaille && SuiviExcursion.etat === "enCours"
+                        ? track[signalement.idPointLie ?? 0].dist -
+                          track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
+                        : track[signalement.idPointLie ?? 0].dist // Position absolue (par rapport au depart)
+                    }
+                    imageSignalement={detaille ? signalement.image : undefined}
+                    description={detaille ? signalement.description : undefined}
+                  />
+                </View>
+              );
+            })}
+        </View>
+      </TouchableWithoutFeedback>
+    </ScrollView>
   );
 });
+
+const $containerSignalements: ViewStyle = {
+  margin: spacing.xs,
+  paddingBottom: 250 /**@warning solution moche et temporaire */,
+};

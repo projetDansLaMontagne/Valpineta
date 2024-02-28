@@ -55,83 +55,87 @@ export function InfosExcursion(props: InfosExcursionProps) {
   }
 
   return (
-    <View style={$stylePage}>
-      <View style={$containerInformations}>
-        <View style={$containerUneInformation}>
-          <Image style={$iconInformation} source={require("assets/icons/temps.png")} />
-          <Text text={dureeAffichable(excursion.duree)} size="xs" />
-        </View>
-        <View style={$containerUneInformation}>
-          <Image style={$iconInformation} source={require("assets/icons/explorer.png")} />
-          <Text text={excursion.distance + " km"} size="xs" />
-        </View>
-        <View style={$containerUneInformation}>
-          <Image
-            style={$iconInformation}
-            source={require("assets/icons/difficulteTechnique.png")}
-          />
-          <Text text={excursion.difficulteTechnique.toString()} size="xs" />
-        </View>
-        <View style={$containerUneInformation}>
-          <Image
-            style={$iconInformation}
-            source={require("assets/icons/difficulteOrientation.png")}
-          />
-          <Text text={excursion.difficulteOrientation.toString()} size="xs" />
-        </View>
-      </View>
-      <View style={$containerDescriptionEtSignalements}>
-        <Text text="Description" size="lg" />
-        <Text text={descriptionFormatee(excursion.description)} size="xxs" />
-        {excursion.description !== "" && (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("Description", { excursion: excursion });
-            }}
-          >
-            <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
-          </TouchableOpacity>
-        )}
-      </View>
-      <View>
-        {excursion.signalements.length > 0 && (
-          <>
-            <View style={$headerSignalement}>
-              <View>
-                <Text tx="detailsExcursion.titres.signalements" size="lg" />
-              </View>
-              <View>
-                <TouchableOpacity onPress={() => setInterfaceCourrante("signalements")}>
-                  <Text
-                    style={$lienSignalements}
-                    tx="detailsExcursion.boutons.voirDetails"
-                    size="xs"
-                  />
-                </TouchableOpacity>
-              </View>
+    <ScrollView>
+      <TouchableWithoutFeedback>
+        <View style={$stylePage}>
+          <View style={$containerInformations}>
+            <View style={$containerUneInformation}>
+              <Image style={$iconInformation} source={require("assets/icons/temps.png")} />
+              <Text text={dureeAffichable(excursion.duree)} size="xs" />
             </View>
-            <ScrollView horizontal>
-              <TouchableWithoutFeedback>
-                <View style={$scrollLine}>
-                  <ListeSignalements
-                    signalements={excursion.signalements}
-                    track={excursion.track}
-                    detaille={false}
-                  />
+            <View style={$containerUneInformation}>
+              <Image style={$iconInformation} source={require("assets/icons/explorer.png")} />
+              <Text text={excursion.distance + " km"} size="xs" />
+            </View>
+            <View style={$containerUneInformation}>
+              <Image
+                style={$iconInformation}
+                source={require("assets/icons/difficulteTechnique.png")}
+              />
+              <Text text={excursion.difficulteTechnique.toString()} size="xs" />
+            </View>
+            <View style={$containerUneInformation}>
+              <Image
+                style={$iconInformation}
+                source={require("assets/icons/difficulteOrientation.png")}
+              />
+              <Text text={excursion.difficulteOrientation.toString()} size="xs" />
+            </View>
+          </View>
+          <View style={$containerDescriptionEtSignalements}>
+            <Text text="Description" size="lg" />
+            <Text text={descriptionFormatee(excursion.description)} size="xxs" />
+            {excursion.description !== "" && (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Description", { excursion: excursion });
+                }}
+              >
+                <Text style={$lienDescription} tx="detailsExcursion.boutons.lireSuite" size="xxs" />
+              </TouchableOpacity>
+            )}
+          </View>
+          <View>
+            {excursion.signalements.length > 0 && (
+              <>
+                <View style={$headerSignalement}>
+                  <View>
+                    <Text tx="detailsExcursion.titres.signalements" size="lg" />
+                  </View>
+                  <View>
+                    <TouchableOpacity onPress={() => setInterfaceCourrante("signalements")}>
+                      <Text
+                        style={$lienSignalements}
+                        tx="detailsExcursion.boutons.voirDetails"
+                        size="xs"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </TouchableWithoutFeedback>
-            </ScrollView>
-          </>
-        )}
-      </View>
+                <ScrollView horizontal>
+                  <TouchableWithoutFeedback>
+                    <View style={$scrollLine}>
+                      <ListeSignalements
+                        signalements={excursion.signalements}
+                        track={excursion.track}
+                        detaille={false}
+                      />
+                    </View>
+                  </TouchableWithoutFeedback>
+                </ScrollView>
+              </>
+            )}
+          </View>
 
-      <View style={$containerDenivele}>
-        <Text tx="detailsExcursion.titres.denivele" size="xl" />
-        {excursion.track && (
-          <GraphiqueDenivele points={excursion.track as T_Point[]} detaille={true} />
-        )}
-      </View>
-    </View>
+          <View style={$containerDenivele}>
+            <Text tx="detailsExcursion.titres.denivele" size="xl" />
+            {excursion.track && (
+              <GraphiqueDenivele points={excursion.track as T_Point[]} detaille={true} />
+            )}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </ScrollView>
   );
 }
 

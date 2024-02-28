@@ -138,17 +138,15 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                 : { left: width - width / 2.5 - spacing.lg / 1.5 },
             ]}
           />
-          <ScrollView>
-            <TouchableWithoutFeedback>
-              {interfaceCourrante === "infos" ? (
-                <InfosExcursion
-                  excursion={excursion}
-                  navigation={navigation}
-                  setInterfaceCourrante={setInterfaceCourrante}
-                  userLocation={userLocation}
-                />
-              ) : (
-                <View style={$containerSignalements}>
+          {interfaceCourrante === "infos" ? (
+            <InfosExcursion
+              excursion={excursion}
+              navigation={navigation}
+              setInterfaceCourrante={setInterfaceCourrante}
+              userLocation={userLocation}
+            />
+          ) : (
+            <View style={$containerSignalements}>
                   <ListeSignalements
                     detaille={true}
                     signalements={excursion.signalements}
@@ -161,10 +159,8 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                       closeSwiper();
                     }}
                   />
-                </View>
-              )}
-            </TouchableWithoutFeedback>
-          </ScrollView>
+            </View>
+          )}
         </>
       </View>
     );
