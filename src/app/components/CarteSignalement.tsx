@@ -17,7 +17,7 @@ type CarteSignalementProps = {
   | {
       details: true;
       description: string;
-      imageSignalement?: Image;
+      imageSignalement?: string;
     }
 );
 

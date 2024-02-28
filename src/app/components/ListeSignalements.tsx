@@ -1,22 +1,20 @@
 import * as React from "react";
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { StyleProp, View, ViewStyle } from "react-native";
 import { observer } from "mobx-react-lite";
-import { colors, typography } from "app/theme";
-import { Text } from "app/components/Text";
-import { TPoint, T_Signalement } from "app/navigators";
+import { TPoint, T_Signalement, T_flat_point } from "app/navigators";
 import { CarteSignalement } from "./CarteSignalement";
 import { useEffect, useState } from "react";
 
-export interface ListeSignalementsProps {
+export type ListeSignalementsProps = {
   /**
    * An optional style override useful for padding & margin.
    */
   style?: StyleProp<ViewStyle>;
-  detaille?: boolean;
-  onPress?: () => void;
+  detaille: boolean;
   signalements: T_Signalement[];
   track: TPoint[];
-}
+  onPress?: (point: T_flat_point) => void;
+};
 
 /**
  * Describe your component here
@@ -24,7 +22,10 @@ export interface ListeSignalementsProps {
 export const ListeSignalements = observer(function ListeSignalements(
   props: ListeSignalementsProps,
 ) {
-  const { signalements, track, onPress } = props;
+  const { detaille, signalements, track, onPress } = props;
+
+  /** @todo STATIC, a remplacer par le store */
+  const SuiviExcursion = { etat: "enCours", iPointCourant: 1100 };
 
   const [signalementsTries, setSignalementsTries] = useState<T_Signalement[]>([]);
   console.log(track.length);
@@ -46,10 +47,17 @@ export const ListeSignalements = observer(function ListeSignalements(
             <View key={index}>
               <CarteSignalement
                 type={signalement.type}
-                details={false}
                 nomSignalement={signalement.nom}
-                distanceDuDepartEnM={track[signalement.idPointLie ?? 0].dist}
-                onPress={onPress}
+                onPress={onPress ? () => onPress(signalement) : undefined}
+                details={detaille}
+                distanceDuDepartEnM={
+                  detaille && SuiviExcursion.etat === "enCours"
+                    ? track[signalement.idPointLie ?? 0].dist -
+                      track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
+                    : track[signalement.idPointLie ?? 0].dist // Position absolue (par rapport au depart)
+                }
+                imageSignalement={detaille ? signalement.image : undefined}
+                description={detaille ? signalement.description : undefined}
               />
             </View>
           );

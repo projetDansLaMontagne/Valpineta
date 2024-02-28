@@ -51,7 +51,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
-  const [startPoint, setStartPoint] = useState<LatLng>();
+  const [cameraTarget, setCameraTarget] = useState<LatLng>();
 
   // Refs
   const { parametres } = useStores();
@@ -213,8 +213,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   }, [menuIsOpen]);
 
   useEffect(() => {
-    startPoint && animateToLocation(startPoint);
-  }, [startPoint]);
+    cameraTarget && animateToLocation(cameraTarget);
+  }, [cameraTarget]);
 
   useEffect(() => {
     if (followUserLocation) {
@@ -223,16 +223,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
       removeLocationSubscription();
     }
   }, [followUserLocation]);
-
-  // Ce useEffect permet de bouger sur le debut de l'excursion lors de son affichage.
-  useEffect(() => {
-    if (excursion !== undefined) {
-      setStartPoint({
-        latitude: excursion.track[0].lat,
-        longitude: excursion.track[0].lon,
-      } as LatLng);
-    }
-  }, [excursion]);
 
   useEffect(() => {
     downloadTiles();
@@ -261,15 +251,15 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
           ref={mapRef}
           style={styles.map}
           initialRegion={{
-            latitude: startPoint?.latitude ?? LATITUDE,
-            longitude: startPoint?.longitude ?? LONGITUDE,
+            latitude: cameraTarget?.latitude ?? LATITUDE,
+            longitude: cameraTarget?.longitude ?? LONGITUDE,
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           }}
           initialCamera={{
             center: {
-              latitude: startPoint?.latitude ?? LATITUDE,
-              longitude: startPoint?.longitude ?? LONGITUDE,
+              latitude: cameraTarget?.latitude ?? LATITUDE,
+              longitude: cameraTarget?.longitude ?? LONGITUDE,
             },
             pitch: 0,
             heading: 0,
@@ -457,7 +447,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
         {/* Swiper et bouton retour */}
         {excursion && (
           <>
-            <Swiper excursion={excursion} navigation={navigation} />
+            <Swiper
+              excursion={excursion}
+              navigation={navigation}
+              userLocation={location}
+              setCameraTarget={setCameraTarget}
+            />
 
             <TouchableOpacity
               style={$boutonRetour}
