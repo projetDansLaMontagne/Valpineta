@@ -43,6 +43,7 @@ export const ListeSignalements = observer(function ListeSignalements(
   return (
     signalementsTries &&
     signalementsTries.map((signalement, index) => {
+      const isDistanceRelative = detaille && SuiviExcursion.etat === "enCours";
       return (
         <View key={index}>
           <CarteSignalement
@@ -51,10 +52,11 @@ export const ListeSignalements = observer(function ListeSignalements(
             onPress={onPress ? () => onPress(signalement) : undefined}
             details={detaille}
             distanceDuDepartEnM={
-              detaille && SuiviExcursion.etat === "enCours"
-                ? track[signalement.idPointLie ?? 0].dist - track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
-                : track[signalement.idPointLie ?? 0].dist // Position absolue (par rapport au depart)
+              signalement.idPointLie !== undefined && isDistanceRelative
+                ? track[signalement.idPointLie].dist - track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
+                : track[signalement.idPointLie].dist // Position absolue (par rapport au depart)
             }
+            isDistanceAbsolue={!isDistanceRelative}
             imageSignalement={detaille ? signalement.image : undefined}
             description={detaille ? signalement.description : undefined}
           />
@@ -63,5 +65,3 @@ export const ListeSignalements = observer(function ListeSignalements(
     })
   );
 });
-
-

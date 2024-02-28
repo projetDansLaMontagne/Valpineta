@@ -7,8 +7,8 @@ import { T_TypeSignalement } from "app/navigators";
 type CarteSignalementProps = {
   type: T_TypeSignalement;
   nomSignalement: string;
-  distanceDuDepartEnM: number;
-
+  distanceDuDepartEnM?: number;
+  isDistanceAbsolue: boolean;
   onPress?: () => void;
 } & (
   | {
@@ -22,7 +22,7 @@ type CarteSignalementProps = {
 );
 
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
-  const { details, type, nomSignalement, distanceDuDepartEnM, onPress } = props;
+  const { details, type, nomSignalement, distanceDuDepartEnM, onPress, isDistanceAbsolue } = props;
 
   const check = (paramName, paramValue) => {
     // Vérification de la présence des paramètres
@@ -32,6 +32,26 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
       );
     }
   };
+
+  /**
+   * Retourne le texte indiquant la distance a laquelle se situe le signalement (de maniere relative ou absolue)
+   */
+  function distanceText() {
+    let text = "";
+    if (distanceDuDepartEnM === undefined) {
+      text += "??";
+    } else {
+      if (isDistanceAbsolue) {
+        text += "à ";
+      } else {
+        const pointPasse = distanceDuDepartEnM < 0;
+        text += pointPasse ? "passé de " : "dans ";
+      }
+      text += Math.abs(Math.round(distanceDuDepartEnM / 100) / 10);
+      text += " km";
+    }
+    return text;
+  }
 
   // Verification de la conformite de type des parametres
   check("type", type);
@@ -56,7 +76,8 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
           <Image source={require("../../assets/icons/pin.png")} style={styles.iconeRouge} />
         )}
         <Text style={styles.heading}>{nomSignalement}</Text>
-        <Text>{Math.round(distanceDuDepartEnM / 100) / 10} km</Text>
+
+        <Text>{distanceText()}</Text>
       </View>
 
       {details && (
