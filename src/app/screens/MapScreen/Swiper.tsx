@@ -9,12 +9,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { observer } from "mobx-react-lite";
-import { colors, spacing, typography } from "app/theme";
-import { Text } from "app/components/Text";
+import { colors, spacing } from "app/theme";
+import { Text } from "app/components";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ListeSignalements } from "./ListeSignalements";
 import { AppStackParamList, T_excursion } from "app/navigators";
 import * as Sharing from "expo-sharing";
@@ -47,10 +47,9 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
   const footerHeight = useBottomTabBarHeight();
   const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
 
-  const interfaceCourrante = useRef<"infos" | "avis" | "signalements">("infos");
-
-  // a supprimer
-  const [containerInfoAffiche, setcontainerInfoAffiche] = useState(true);
+  const [interfaceCourrante, setInterfaceCourrante] = useState<"infos" | "avis" | "signalements">(
+    "infos",
+  );
 
   const swipeUpDown = () => {
     if (swipeUpDownRef) {
@@ -86,72 +85,79 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
    * @returns le composant complet des informations, autrement dit lorsque l'on swipe vers le haut
    */
   function ItemFull() {
-    return interfaceCourrante.current == "signalements" ? (
-      <ListeSignalements
-        excursion={props.excursion}
-        userLocation={userLocation}
-        interfaceCourrante={interfaceCourrante}
-        footerHeight={footerHeight}
-        setStartPoint={undefined}
-        swipeDown={swipeUpDown}
-        style={$containerGrand}
-      />
-    ) : (
+    return (
       <View style={[$containerGrand, { marginBottom: footerHeight }]}>
-        <View style={$containerTitre}>
-          <Text text={props.excursion.nom} size="xl" style={$titre} />
-          <View style={{ justifyContent: "center" }}>
-            <TouchableOpacity onPress={() => downloadAndSaveFile()}>
-              <Image source={require("assets/icons/download.png")} style={$iconDownload}></Image>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View>
-          <View style={$containerBouton}>
-            <TouchableOpacity
-              onPress={() => {
-                setcontainerInfoAffiche(true);
-              }}
-              style={$boutonInfoAvis}
-            >
-              <Text
-                tx="detailsExcursion.titres.infos"
-                size="lg"
-                style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setcontainerInfoAffiche(false);
-              }}
-              style={$boutonInfoAvis}
-            >
-              <Text
-                tx="detailsExcursion.titres.avis"
-                size="lg"
-                style={{ color: containerInfoAffiche ? colors.text : colors.bouton }}
-              />
-            </TouchableOpacity>
-          </View>
-          <View
-            style={[
-              $souligneInfosAvis,
-              containerInfoAffiche
-                ? { left: spacing.lg }
-                : { left: width - width / 2.5 - spacing.lg / 1.5 },
-            ]}
+        {interfaceCourrante == "signalements" ? (
+          <ListeSignalements
+            excursion={props.excursion}
+            userLocation={userLocation}
+            setInterfaceCourrante={setInterfaceCourrante}
+            footerHeight={footerHeight}
+            setStartPoint={undefined}
+            swipeDown={swipeUpDown}
+            style={$containerGrand}
           />
-          {containerInfoAffiche ? (
-            <InfosExcursion
-              excursion={props.excursion}
-              navigation={props.navigation}
-              interfaceCourrante={interfaceCourrante}
-              userLocation={userLocation}
-            />
-          ) : (
-            <Avis />
-          )}
-        </View>
+        ) : (
+          <>
+            <View style={$containerTitre}>
+              <Text text={props.excursion.nom} size="xl" style={$titre} />
+              <View style={{ justifyContent: "center" }}>
+                <TouchableOpacity onPress={() => downloadAndSaveFile()}>
+                  <Image
+                    source={require("assets/icons/download.png")}
+                    style={$iconDownload}
+                  ></Image>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View>
+              <View style={$containerBouton}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setInterfaceCourrante("infos");
+                  }}
+                  style={$boutonInfoAvis}
+                >
+                  <Text
+                    tx="detailsExcursion.titres.infos"
+                    size="lg"
+                    style={{ color: interfaceCourrante === "infos" ? colors.text : colors.bouton }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setInterfaceCourrante("avis");
+                  }}
+                  style={$boutonInfoAvis}
+                >
+                  <Text
+                    tx="detailsExcursion.titres.avis"
+                    size="lg"
+                    style={{ color: interfaceCourrante === "infos" ? colors.text : colors.bouton }}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View
+                style={[
+                  $souligneInfosAvis,
+                  interfaceCourrante === "infos"
+                    ? { left: spacing.lg }
+                    : { left: width - width / 2.5 - spacing.lg / 1.5 },
+                ]}
+              />
+              {interfaceCourrante === "infos" ? (
+                <InfosExcursion
+                  excursion={props.excursion}
+                  navigation={props.navigation}
+                  setInterfaceCourrante={setInterfaceCourrante}
+                  userLocation={userLocation}
+                />
+              ) : (
+                <Avis />
+              )}
+            </View>
+          </>
+        )}
       </View>
     );
   }

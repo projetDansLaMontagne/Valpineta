@@ -9,7 +9,7 @@ import { LatLng } from "react-native-maps";
  * @returns la liste des signalements
  */
 export interface ListeSignalementsProps {
-  interfaceCourrante: React.MutableRefObject<"infos" | "avis" | "signalements">;
+  setInterfaceCourrante: React.Dispatch<React.SetStateAction<"infos" | "avis" | "signalements">>;
   excursion;
   userLocation;
   footerHeight;
@@ -20,7 +20,7 @@ export interface ListeSignalementsProps {
 
 export function ListeSignalements(props: ListeSignalementsProps) {
   return (
-    <View style={props.style}>
+    <>
       <ScrollView>
         <TouchableWithoutFeedback>
           <View style={$containerSignalements}>
@@ -61,10 +61,10 @@ export function ListeSignalements(props: ListeSignalementsProps) {
         <Button
           style={[$sortirDetailSignalement, { bottom: props.footerHeight }]}
           tx="detailsExcursion.boutons.retourInformations"
-          onPress={() => (props.interfaceCourrante.current = "infos")}
+          onPress={() => props.setInterfaceCourrante("infos")}
         />
       </View>
-    </View>
+    </>
   );
 }
 
