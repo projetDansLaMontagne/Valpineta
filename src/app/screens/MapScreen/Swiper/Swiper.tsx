@@ -46,7 +46,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
   const { style, userLocation } = props;
   const $styles = [$container, style];
 
-  const footerHeight = useBottomTabBarHeight();
+  const bottomMargin = useBottomTabBarHeight() + useSafeAreaInsets().bottom;
   const swipeUpDownRef = React.useRef<SwipeUpDown>(null);
 
   const [interfaceCourrante, setInterfaceCourrante] = useState<"infos" | "avis" | "signalements">(
@@ -65,7 +65,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
       itemMini={<ItemMini />}
       itemFull={<ItemFull />}
       animation="easeInEaseOut"
-      swipeHeight={footerHeight + useSafeAreaInsets().bottom} // barre de navigation + footer + hauteur du swiper
+      swipeHeight={bottomMargin} // barre de navigation + footer + hauteur du swiper
       disableSwipeIcon={false}
       ref={swipeUpDownRef}
       extraMarginTop={height / 6}
@@ -77,7 +77,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
    */
   function ItemMini() {
     return (
-      <View style={$containerPetit}>
+      <View style={[$styles, { alignItems: "center", padding: spacing.xxs }]}>
         <Image source={require("assets/icons/swipe-up.png")} />
       </View>
     );
@@ -88,13 +88,13 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
    */
   function ItemFull() {
     return (
-      <View style={[$containerGrand]}>
+      <View style={[$styles]}>
         {interfaceCourrante == "signalements" ? (
           <ListeSignalements
             excursion={props.excursion}
             userLocation={userLocation}
             setInterfaceCourrante={setInterfaceCourrante}
-            footerHeight={footerHeight}
+            bottomMargin={bottomMargin}
             setStartPoint={undefined}
             swipeDown={swipeUpDown}
             style={$containerGrand}
@@ -122,7 +122,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                 <Text
                   tx="detailsExcursion.titres.infos"
                   size="lg"
-                  style={{ color: interfaceCourrante === "infos" ? colors.text : colors.bouton }}
+                  style={{ color: interfaceCourrante === "infos" ? colors.bouton : colors.text }}
                 />
               </TouchableOpacity>
               <TouchableOpacity
@@ -134,7 +134,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                 <Text
                   tx="detailsExcursion.titres.avis"
                   size="lg"
-                  style={{ color: interfaceCourrante === "infos" ? colors.text : colors.bouton }}
+                  style={{ color: interfaceCourrante === "avis" ? colors.bouton : colors.text }}
                 />
               </TouchableOpacity>
             </View>
@@ -173,36 +173,15 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
   }
 });
 
-const $containerGrand: ViewStyle = {
-  flex: 1,
-  width: width,
-  backgroundColor: colors.fond,
-  borderWidth: 1,
-  borderColor: colors.bordure,
-  borderRadius: 10,
-};
-
 const $container: ViewStyle = {
   flex: 1,
   width: width,
   height: height,
   backgroundColor: colors.fond,
-};
-
-//Style de itemMini
-
-const $containerPetit: ViewStyle = {
-  flex: 1,
-  width: width,
-  backgroundColor: colors.fond,
-  alignItems: "center",
   borderWidth: 1,
   borderColor: colors.bordure,
   borderRadius: 10,
-  padding: spacing.xxs,
 };
-
-//Style du container du titre et du bouton de téléchargement
 
 const $containerTitre: ViewStyle = {
   flexDirection: "row",

@@ -12,7 +12,7 @@ export interface ListeSignalementsProps {
   setInterfaceCourrante: React.Dispatch<React.SetStateAction<"infos" | "avis" | "signalements">>;
   excursion;
   userLocation;
-  footerHeight;
+  bottomMargin;
   setStartPoint?: React.Dispatch<React.SetStateAction<LatLng>>;
   swipeDown: () => void;
   style: ViewStyle;
@@ -59,7 +59,7 @@ export function ListeSignalements(props: ListeSignalementsProps) {
       </ScrollView>
       <View>
         <Button
-          style={[$sortirDetailSignalement, { bottom: props.footerHeight }]}
+          style={[$sortirDetailSignalement, { bottom: props.bottomMargin }]}
           tx="detailsExcursion.boutons.retourInformations"
           onPress={() => props.setInterfaceCourrante("infos")}
         />
