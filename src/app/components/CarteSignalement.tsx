@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-import NetInfo from "@react-native-community/netinfo";
 import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
@@ -9,7 +7,7 @@ import { T_TypeSignalement } from "app/navigators";
 type CarteSignalementProps = {
   type: T_TypeSignalement;
   nomSignalement: string;
-  distanceDuDepart: number;
+  distanceDuDepartEnM: number;
 
   onPress?: () => void;
 } & (
@@ -24,11 +22,11 @@ type CarteSignalementProps = {
 );
 
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
-  const { details, type, nomSignalement, distanceDuDepart, onPress } = props;
+  const { details, type, nomSignalement, distanceDuDepartEnM, onPress } = props;
 
   const check = (paramName, paramValue) => {
     // Vérification de la présence des paramètres
-    if (!paramValue) {
+    if (paramValue === undefined) {
       console.error(
         `CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`,
       );
@@ -38,7 +36,7 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
   // Verification de la conformite de type des parametres
   check("type", type);
   check("nomSignalement", nomSignalement);
-  check("distanceDuDepart", distanceDuDepart);
+  check("distanceDuDepart", distanceDuDepartEnM);
   if (details === true) {
     // Si on veut les détails, on vérifie la présence de toutes les données
     check("imageSignalement", props.imageSignalement);
@@ -58,7 +56,7 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
           <Image source={require("../../assets/icons/pin.png")} style={styles.iconeRouge} />
         )}
         <Text style={styles.heading}>{nomSignalement}</Text>
-        <Text>{distanceDuDepart} km</Text>
+        <Text>{Math.round(distanceDuDepartEnM / 100) / 10} km</Text>
       </View>
 
       {details && (

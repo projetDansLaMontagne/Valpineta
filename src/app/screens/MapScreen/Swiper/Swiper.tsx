@@ -43,7 +43,7 @@ export type SwiperProps = {
  * Describe your component here
  */
 export const Swiper = observer(function Swiper(props: SwiperProps) {
-  const { style, userLocation } = props;
+  const { style, userLocation, excursion, navigation } = props;
   const $styles = [$container, style];
 
   const bottomMargin = useBottomTabBarHeight() + useSafeAreaInsets().bottom;
@@ -91,18 +91,18 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
       <View style={[$styles]}>
         {interfaceCourrante == "signalements" ? (
           <ListeSignalements
-            excursion={props.excursion}
+            track={excursion.track}
+            signalements={excursion.signalements}
             userLocation={userLocation}
             setInterfaceCourrante={setInterfaceCourrante}
             bottomMargin={bottomMargin}
             setStartPoint={undefined}
             swipeDown={swipeUpDown}
-            style={$containerGrand}
           />
         ) : (
           <>
             <View style={$containerTitre}>
-              <Text text={props.excursion.nom} size="xl" style={$titre} />
+              <Text text={excursion.nom} size="xl" style={$titre} />
               <View style={{ justifyContent: "center" }}>
                 <TouchableOpacity onPress={() => downloadAndSaveFile()}>
                   <Image
@@ -150,8 +150,8 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
               <TouchableWithoutFeedback>
                 {interfaceCourrante === "infos" ? (
                   <InfosExcursion
-                    excursion={props.excursion}
-                    navigation={props.navigation}
+                    excursion={excursion}
+                    navigation={navigation}
                     setInterfaceCourrante={setInterfaceCourrante}
                     userLocation={userLocation}
                   />
@@ -167,8 +167,8 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
   }
 
   function downloadAndSaveFile() {
-    if (props.excursion) {
-      Sharing.shareAsync(FileSystem.documentDirectory + props.excursion.nomTrackGpx);
+    if (excursion) {
+      Sharing.shareAsync(FileSystem.documentDirectory + excursion.nomTrackGpx);
     }
   }
 });
