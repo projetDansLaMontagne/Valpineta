@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   TouchableWithoutFeedback,
+  ImageStyle,
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
@@ -145,7 +146,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
               setInterfaceCourrante={setInterfaceCourrante}
               userLocation={userLocation}
             />
-          ) : (
+          ) : excursion.signalements.length > 0 ? (
             <ScrollView>
               <TouchableWithoutFeedback>
                 <View style={$containerSignalements}>
@@ -164,6 +165,12 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                 </View>
               </TouchableWithoutFeedback>
             </ScrollView>
+          ) : (
+            <Text
+              text={"Aucun signalement pour cette excursion"}
+              size="sm"
+              style={{ textAlign: "center", marginTop: spacing.lg }}
+            />
           )}
         </>
       </View>
