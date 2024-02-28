@@ -542,7 +542,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
         style={$containerGrand}
       />
     ) : (
-      <View style={$containerGrand}>
+      <View style={[$containerGrand, { marginBottom: footerHeight }]}>
         <View style={$containerTitre}>
           <Text text={excursion.nom} size="xl" style={$titre} />
           <View style={{ justifyContent: "center" }}>
