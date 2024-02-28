@@ -41,37 +41,27 @@ export const ListeSignalements = observer(function ListeSignalements(
   }, [signalements]);
 
   return (
-    <ScrollView>
-      <TouchableWithoutFeedback>
-        <View style={$containerSignalements}>
-          {signalementsTries &&
-            signalementsTries.map((signalement, index) => {
-              return (
-                <View key={index}>
-                  <CarteSignalement
-                    type={signalement.type}
-                    nomSignalement={signalement.nom}
-                    onPress={onPress ? () => onPress(signalement) : undefined}
-                    details={detaille}
-                    distanceDuDepartEnM={
-                      detaille && SuiviExcursion.etat === "enCours"
-                        ? track[signalement.idPointLie ?? 0].dist -
-                          track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
-                        : track[signalement.idPointLie ?? 0].dist // Position absolue (par rapport au depart)
-                    }
-                    imageSignalement={detaille ? signalement.image : undefined}
-                    description={detaille ? signalement.description : undefined}
-                  />
-                </View>
-              );
-            })}
+    signalementsTries &&
+    signalementsTries.map((signalement, index) => {
+      return (
+        <View key={index}>
+          <CarteSignalement
+            type={signalement.type}
+            nomSignalement={signalement.nom}
+            onPress={onPress ? () => onPress(signalement) : undefined}
+            details={detaille}
+            distanceDuDepartEnM={
+              detaille && SuiviExcursion.etat === "enCours"
+                ? track[signalement.idPointLie ?? 0].dist - track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
+                : track[signalement.idPointLie ?? 0].dist // Position absolue (par rapport au depart)
+            }
+            imageSignalement={detaille ? signalement.image : undefined}
+            description={detaille ? signalement.description : undefined}
+          />
         </View>
-      </TouchableWithoutFeedback>
-    </ScrollView>
+      );
+    })
   );
 });
 
-const $containerSignalements: ViewStyle = {
-  margin: spacing.xs,
-  paddingBottom: 250 /**@warning solution moche et temporaire */,
-};
+

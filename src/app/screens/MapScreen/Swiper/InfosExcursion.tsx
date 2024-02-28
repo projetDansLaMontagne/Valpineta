@@ -183,7 +183,7 @@ const $containerDenivele: ViewStyle = {};
 
 const $scrollLine: ViewStyle = {
   flexDirection: "row",
-  paddingBottom: spacing.xl,
+  marginBottom: spacing.xl,
 };
 
 const $headerSignalement: ViewStyle = {

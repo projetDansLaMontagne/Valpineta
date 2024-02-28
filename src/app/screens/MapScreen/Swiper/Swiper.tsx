@@ -146,7 +146,9 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
               userLocation={userLocation}
             />
           ) : (
-            <View style={$containerSignalements}>
+            <ScrollView>
+              <TouchableWithoutFeedback>
+                <View style={$containerSignalements}>
                   <ListeSignalements
                     detaille={true}
                     signalements={excursion.signalements}
@@ -159,7 +161,9 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                       closeSwiper();
                     }}
                   />
-            </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </ScrollView>
           )}
         </>
       </View>
