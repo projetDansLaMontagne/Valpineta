@@ -54,6 +54,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const [cameraTarget, setCameraTarget] = useState<LatLng>();
 
   // Refs
+  /** @todo STATIC, a remplacer par le store */
+  const SuiviExcursion = { etat: "enCours" };
   const { parametres } = useStores();
   const intervalRef = useRef(null);
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
@@ -142,11 +144,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
 
   /**
    * Affiche la couleur a utiliser pour l excursion en fonction de son index
+   * @param index intensite de la couleur (0 à 1)
    */
-  const excursionColor = () => {
+  const excursionColor = (intensite: number) => {
     const greenMin = 80;
     const greenMax = 220;
-    const greenValue = Math.floor(Math.random() * (greenMax - greenMin) + greenMin); // valeur de green (de 94 à 194)
+    const greenValue = Math.floor(intensite * (greenMax - greenMin) + greenMin); // valeur de green (de 94 à 194)
     const greenValueHexa = greenValue.toString(16);
     return `#00${greenValueHexa}27`;
   };
@@ -288,8 +291,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             }}
           />
 
-          {/* Excursion detaillee */}
-          {excursion && (
+          {/* Tracés */}
+          {excursion ? (
             // Affichage de l excursion, des markers et des signalements
             <>
               <Polyline
@@ -313,23 +316,14 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
                 <SignalementHandler signalement={signalement} key={i} />
               ))}
             </>
-          )}
-
-          {/* Toutes les excursions */}
-          {allExcursions !== undefined &&
+          ) : (
+            // Toutes les excursions
+            allExcursions !== undefined &&
             allExcursions.map((exc, index) => {
-              if (exc.track) {
-                // Le track devient invisible et incliquable si une excursion est affichee
-                const color = excursion ? "#00000000" : excursionColor();
-                const onPress = excursion
-                  ? null
-                  : () =>
-                      navigation.navigate("CarteStack", {
-                        screen: "Carte",
-                        params: { excursion: exc },
-                      });
+              const color = excursionColor(index / allExcursions.length);
 
-                return (
+              return (
+                exc.track && (
                   <React.Fragment key={index}>
                     <Polyline
                       coordinates={exc.track.map(point => {
@@ -343,7 +337,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
                       style={{
                         zIndex: 1000000,
                       }}
-                      onPress={onPress}
+                      onPress={() =>
+                        navigation.navigate("CarteStack", {
+                          screen: "Carte",
+                          params: { excursion: exc },
+                        })
+                      }
                       tappable={true} // pour permettre le onpress sur Anroid
                     />
 
@@ -367,12 +366,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
                       />
                     </Marker>
                   </React.Fragment>
-                );
-              } else {
-                console.log("[MapScreen] WARNING : parcours sans track ");
-                return null;
-              }
-            })}
+                )
+              );
+            })
+          )}
         </MapView>
 
         {/* Bouton de centrage */}
@@ -397,52 +394,49 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
         </View>
 
         {/* Boutons de signalements */}
-        {
-          /**@todo DOIT DEPENDRE DU STORE SuiviExcursion.etat (pour n'afficher les boutons que lorsqu'on est en rando) */
-          "enCours" === "enCours" && (
-            <View
+        {SuiviExcursion.etat === "enCours" && (
+          <View
+            style={{
+              ...styles.mapOverlay,
+              bottom: excursion ? 60 : 0, // taille par defaut du swiper
+            }}
+          >
+            {menuIsOpen && (
+              <>
+                <MapButton
+                  ref={addPOIBtnRef}
+                  style={{
+                    ...styles.actionsButtonContainer,
+                  }}
+                  onPress={ButtonOnPressAvertissement}
+                  icon={"eye"}
+                  iconSize={spacing.lg}
+                  iconColor={colors.palette.blanc}
+                />
+                <MapButton
+                  ref={addWarningBtnRef}
+                  style={{
+                    ...styles.actionsButtonContainer,
+                  }}
+                  onPress={ButtonOnPressPointInteret}
+                  icon="exclamation-circle"
+                  iconSize={spacing.lg}
+                  iconColor={colors.palette.blanc}
+                />
+              </>
+            )}
+            <MapButton
+              ref={toggleBtnMenuRef}
               style={{
-                ...styles.mapOverlay,
-                bottom: excursion ? 60 : 0, // taille par defaut du swiper
+                ...styles.actionsButtonContainer,
               }}
-            >
-              {menuIsOpen && (
-                <>
-                  <MapButton
-                    ref={addPOIBtnRef}
-                    style={{
-                      ...styles.actionsButtonContainer,
-                    }}
-                    onPress={ButtonOnPressAvertissement}
-                    icon={"eye"}
-                    iconSize={spacing.lg}
-                    iconColor={colors.palette.blanc}
-                  />
-                  <MapButton
-                    ref={addWarningBtnRef}
-                    style={{
-                      ...styles.actionsButtonContainer,
-                    }}
-                    onPress={ButtonOnPressPointInteret}
-                    icon="exclamation-circle"
-                    iconSize={spacing.lg}
-                    iconColor={colors.palette.blanc}
-                  />
-                </>
-              )}
-              <MapButton
-                ref={toggleBtnMenuRef}
-                style={{
-                  ...styles.actionsButtonContainer,
-                }}
-                onPress={toggleMenu}
-                icon={menuIsOpen ? "times" : "map-marker-alt"}
-                iconSize={spacing.lg}
-                iconColor={colors.palette.blanc}
-              />
-            </View>
-          )
-        }
+              onPress={toggleMenu}
+              icon={menuIsOpen ? "times" : "map-marker-alt"}
+              iconSize={spacing.lg}
+              iconColor={colors.palette.blanc}
+            />
+          </View>
+        )}
 
         {/* Swiper et bouton retour */}
         {excursion && (
