@@ -1,10 +1,16 @@
 /**
  * @jest-environment node
+ * @oiercesat Cesat Oier
+ * @version 1.0
+ * @date 2021-02-28
+ * @module app/services/SynchroMontanteService/SynchroMontanteService
+ * @info Les informations de ces tests sont à retrouver dans le fichier SynchroMontanteService.md dans le dossier Documentation
+ * @warning Je ne teste pas les cas où les fonctions n'ont pas de paramètres car ces tests me renvoie des erreurs de compilation
  */
 import { describe, test, expect, beforeEach } from "@jest/globals";
 import { callApi, traiterResultat, tryToPush, EtatSynchro } from "./SynchroMontanteService";
 import { T_Signalement } from "app/navigators";
-import { SynchroMontanteModel, SynchroMontanteStore } from "app/models";
+import { SynchroMontanteModel } from "app/models";
 import { ApiOkResponse, ApiResponse } from "apisauce";
 
 const signalementValide: T_Signalement = {

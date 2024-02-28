@@ -1,3 +1,11 @@
+/**
+ * Fonctions utiles pour le composant NouveauSignalementScreen
+ * @oiercesat Cesat Oier
+ * @version 1.0
+ * @date 2021-02-28
+ * @test app/screens/NouveauSignalementScreen/NouveauSignalementFonctions.test.ts
+ */
+
 // Regex contanant uniquement des caractères autorisés
 const regex = /^[a-zA-Z0-9\u00C0-\u00FF\s'’!$%^*()\-_+,.:;¡¿"«»¡¿&\/\\[\]]+$/;
 

@@ -1,3 +1,10 @@
+/**
+ * @module app/screens/NouveauSignalementScreen/NouveauSignalementFonctions
+ * @oiercesat Cesat Oier
+ * @version 1.0
+ * @date 2021-02-28
+ */
+
 import {
   verifSaisiesValides,
   verifDescription,
@@ -5,15 +12,9 @@ import {
   verifPhoto,
   blobToBase64,
 } from "./NouveauSignalementFonctions";
-import { describe, expect, test, jest, afterEach } from "@jest/globals";
+import { describe, expect, test, jest } from "@jest/globals";
 
-
-jest.mock("react-native", () => ({
-  Alert: {
-    alert: jest.fn(),
-  },
-}));
-
+// Mock des modèles, pour éviter les dépendances
 jest.mock("app/models", () => ({
   EtatSynchro: {
     BienEnvoye: "BienEnvoye",
@@ -45,10 +46,16 @@ describe("[NouveauSignalementFonction]", () => {
       const nomErreur = verifNom(nom);
       expect(nomErreur).toBe(true);
     });
+    // Ce test sert à vérifier que les caractères spéciaux de la langue espagnole et française sont acceptés
     test("nomErreur doit être faux si le nom contient des caractères spéciaux accepté", () => {
       const nom = "Ééèàùçâêîôûäëïöüÿ,;:.-'’!$%^*+\"";
       const nomErreur = verifNom(nom);
       expect(nomErreur).toBe(false);
+    });
+    test("nomErreur doit être vrai si le nom contient des caractères spéciaux non accepté", () => {
+      const nom = "<script>alert('hello');</script>";
+      const nomErreur = verifNom(nom);
+      expect(nomErreur).toBe(true);
     });
   });
   describe("[verif Description]", () => {
@@ -63,7 +70,7 @@ describe("[NouveauSignalementFonction]", () => {
       expect(descriptionErreur).toBe(true);
     });
     test("descriptionErreur doit être vrai si la description contient moins de 10 caractères", () => {
-      const description = "desc";
+      const description = "descripti";
       const descriptionErreur = verifDescription(description);
       expect(descriptionErreur).toBe(true);
     });
@@ -81,6 +88,11 @@ describe("[NouveauSignalementFonction]", () => {
       const descriptionErreur = verifDescription(description);
       expect(descriptionErreur).toBe(false);
     });
+    test("descriptionErreur doit être vrai si la description contient des caractères spéciaux non accepté", () => {
+      const description = "<script>alert('hello');</script>";
+      const descriptionErreur = verifDescription(description);
+      expect(descriptionErreur).toBe(true);
+    });
   });
   describe("[verif Photo]", () => {
     test("photoErreur doit être faux si la photo est renseignée", () => {
@@ -93,12 +105,16 @@ describe("[NouveauSignalementFonction]", () => {
       const photoErreur = verifPhoto(photo);
       expect(photoErreur).toBe(true);
     });
-    test("photoErreur doit être vrai si la photo est vide", () => {
+    test("photoErreur doit être vrai si la photo n\'est pas définie", () => {
       const photo = undefined;
       const photoErreur = verifPhoto(photo);
       expect(photoErreur).toBe(true);
     });
   });
+
+  /*Cette série de test vérifie que tous les boolens sont correctement retournés.
+  Elle ne teste pas les différents cas d'erreurs car ils sont déjà traités dans les tests précédents
+  */
   describe("[verifSaisiesValides]", () => {
     test("saisieBonne doit être vrai si les saisies sont correctes", () => {
       const nom = "nom";
@@ -157,7 +173,25 @@ describe("[NouveauSignalementFonction]", () => {
       expect(descriptionErreur).toBe(false);
       expect(photoErreur).toBe(true);
     });
+    test("saisieBonne doit être faux si toutes les conditions ne sont pas réunies", () => {
+      const nom = "";
+      const description = "";
+      const image = "";
+      let { saisiesValides, nomErreur, descriptionErreur, photoErreur } = verifSaisiesValides(
+        nom,
+        description,
+        image,
+      );
+      expect(saisiesValides).toBe(false);
+      expect(nomErreur).toBe(true);
+      expect(descriptionErreur).toBe(true);
+      expect(photoErreur).toBe(true);
+    });
   });
+
+  /*Cette série de test vérifie que le blob est bien converti en base64
+  @todo: Il faudrait tester le cas où la conversion échoue, je n'arrive pas à trouver de solution pour le moment
+  */
   describe("[blobToBase64]", () => {
     test("doit convertir un blob en base64 avec FileReader mocké", async () => {
       const blob = new Blob(["hello world"], { type: "text/plain" });

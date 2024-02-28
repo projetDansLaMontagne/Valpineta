@@ -1,12 +1,14 @@
 /**
  * Fichier de model pour la synchronisation montante
  * @module app/models/SynchroMontante
- * @authors Cesat Oier, Delahaie Nicolas
+ * @oiercesat Cesat Oier
+ * @Nicolas-Delahaie
  * @version 2.0
  * @date 2024-02-15
- * @see https://mobx-state-tree.js.org/API/#array // utilisation des array avec mobx-state-tree
+ * @info La documentation se trouve dans la branche Documentation ou bien dans ./Documentation
+ * @test Voir le fichier SynchroMontante.test.ts
  */
-import { Instance, SnapshotIn, SnapshotOut, types, unprotect, isProtected } from "mobx-state-tree";
+import { Instance, SnapshotIn, SnapshotOut, types} from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import { T_Signalement } from "app/navigators";
 
@@ -42,11 +44,13 @@ export const SynchroMontanteModel = types
   .actions(self => {
     /* -------------------------------- METHODES -------------------------------- */
 
-
     /* --------------------------------- SETTERS -------------------------------- */
     function addSignalement(signalement: T_Signalement) {
       self.signalements.push(signalement);
     }
+    /**
+     * @info si l'intervalle n'est pas dans l'enum, on met l'intervalle par défaut (TresFrequente) 
+     */
     function setIntervalleSynchro(intervalle: IntervalleSynchro) {
       if (intervalle in IntervalleSynchro) {
         self.intervalleSynchro = intervalle;
@@ -61,7 +65,7 @@ export const SynchroMontanteModel = types
     return {
       addSignalement,
       setIntervalleSynchro,
-      removeAllSignalements
+      removeAllSignalements,
     };
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
 
