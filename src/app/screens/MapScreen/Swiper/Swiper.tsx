@@ -8,6 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
   ScrollView,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
@@ -87,7 +88,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
    */
   function ItemFull() {
     return (
-      <View style={[$containerGrand, { marginBottom: footerHeight }]}>
+      <View style={[$containerGrand]}>
         {interfaceCourrante == "signalements" ? (
           <ListeSignalements
             excursion={props.excursion}
@@ -146,16 +147,18 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
               ]}
             />
             <ScrollView>
-              {interfaceCourrante === "infos" ? (
-                <InfosExcursion
-                  excursion={props.excursion}
-                  navigation={props.navigation}
-                  setInterfaceCourrante={setInterfaceCourrante}
-                  userLocation={userLocation}
-                />
-              ) : (
-                <Avis />
-              )}
+              <TouchableWithoutFeedback>
+                {interfaceCourrante === "infos" ? (
+                  <InfosExcursion
+                    excursion={props.excursion}
+                    navigation={props.navigation}
+                    setInterfaceCourrante={setInterfaceCourrante}
+                    userLocation={userLocation}
+                  />
+                ) : (
+                  <Avis />
+                )}
+              </TouchableWithoutFeedback>
             </ScrollView>
           </>
         )}
