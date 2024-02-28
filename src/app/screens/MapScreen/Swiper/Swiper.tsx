@@ -22,7 +22,6 @@ import { AppStackParamList, T_excursion } from "app/navigators";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import { InfosExcursion } from "./InfosExcursion";
-import { Avis } from "./Avis";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LocationObject } from "expo-location";
 import { LatLng } from "react-native-maps";
@@ -99,79 +98,74 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
   function ItemFull() {
     return (
       <View style={[$styles]}>
-        {interfaceCourrante == "signalements" ? (
-          <PageSignalements
-            track={excursion.track}
-            signalements={excursion.signalements}
-            userLocation={userLocation}
-            setInterfaceCourrante={setInterfaceCourrante}
-            bottomMargin={bottomMargin}
-            setCameraTarget={setCameraTarget}
-            swipeDown={swipeUpDown}
+        <>
+          <View style={$containerTitre}>
+            <Text text={excursion.nom} size="xl" style={$titre} />
+            <View style={{ justifyContent: "center" }}>
+              <TouchableOpacity onPress={() => downloadAndSaveFile()}>
+                <Image source={require("assets/icons/download.png")} style={$iconDownload}></Image>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={$containerBouton}>
+            <TouchableOpacity
+              onPress={() => {
+                setInterfaceCourrante("infos");
+              }}
+              style={$boutonInfoAvis}
+            >
+              <Text
+                tx="detailsExcursion.titres.infos"
+                size="lg"
+                style={{ color: interfaceCourrante === "infos" ? colors.bouton : colors.text }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setInterfaceCourrante("signalements");
+              }}
+              style={$boutonInfoAvis}
+            >
+              <Text
+                text="Signalements"
+                size="lg"
+                style={{
+                  color: interfaceCourrante === "signalements" ? colors.bouton : colors.text,
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={[
+              $souligneInfosAvis,
+              interfaceCourrante === "infos"
+                ? { left: spacing.lg }
+                : { left: width - width / 2.5 - spacing.lg / 1.5 },
+            ]}
           />
-        ) : (
-          <>
-            <View style={$containerTitre}>
-              <Text text={excursion.nom} size="xl" style={$titre} />
-              <View style={{ justifyContent: "center" }}>
-                <TouchableOpacity onPress={() => downloadAndSaveFile()}>
-                  <Image
-                    source={require("assets/icons/download.png")}
-                    style={$iconDownload}
-                  ></Image>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={$containerBouton}>
-              <TouchableOpacity
-                onPress={() => {
-                  setInterfaceCourrante("infos");
-                }}
-                style={$boutonInfoAvis}
-              >
-                <Text
-                  tx="detailsExcursion.titres.infos"
-                  size="lg"
-                  style={{ color: interfaceCourrante === "infos" ? colors.bouton : colors.text }}
+          <ScrollView>
+            <TouchableWithoutFeedback>
+              {interfaceCourrante === "infos" ? (
+                <InfosExcursion
+                  excursion={excursion}
+                  navigation={navigation}
+                  setInterfaceCourrante={setInterfaceCourrante}
+                  userLocation={userLocation}
                 />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setInterfaceCourrante("avis");
-                }}
-                style={$boutonInfoAvis}
-              >
-                <Text
-                  tx="detailsExcursion.titres.avis"
-                  size="lg"
-                  style={{ color: interfaceCourrante === "avis" ? colors.bouton : colors.text }}
+              ) : (
+                <PageSignalements
+                  track={excursion.track}
+                  signalements={excursion.signalements}
+                  userLocation={userLocation}
+                  setInterfaceCourrante={setInterfaceCourrante}
+                  bottomMargin={bottomMargin}
+                  setCameraTarget={setCameraTarget}
+                  swipeDown={swipeUpDown}
                 />
-              </TouchableOpacity>
-            </View>
-            <View
-              style={[
-                $souligneInfosAvis,
-                interfaceCourrante === "infos"
-                  ? { left: spacing.lg }
-                  : { left: width - width / 2.5 - spacing.lg / 1.5 },
-              ]}
-            />
-            <ScrollView>
-              <TouchableWithoutFeedback>
-                {interfaceCourrante === "infos" ? (
-                  <InfosExcursion
-                    excursion={excursion}
-                    navigation={navigation}
-                    setInterfaceCourrante={setInterfaceCourrante}
-                    userLocation={userLocation}
-                  />
-                ) : (
-                  <Avis />
-                )}
-              </TouchableWithoutFeedback>
-            </ScrollView>
-          </>
-        )}
+              )}
+            </TouchableWithoutFeedback>
+          </ScrollView>
+        </>
       </View>
     );
   }
@@ -210,13 +204,13 @@ const $titre: ViewStyle = {
 
 const $containerBouton: ViewStyle = {
   flexDirection: "row",
-  justifyContent: "space-around",
-  width: width,
+  justifyContent: "center",
+  width: "100%",
 };
 
 const $boutonInfoAvis: ViewStyle = {
-  paddingLeft: spacing.xxl,
-  paddingRight: spacing.xxl,
+  flex: 1,
+  alignItems: "center",
 };
 
 const $souligneInfosAvis: ViewStyle = {
