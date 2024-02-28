@@ -277,236 +277,229 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
   return (
-    <Screen style={$screen} safeAreaEdges={["bottom"]}>
+    <Screen style={$screen}>
       <View style={styles.container}>
-        <View style={styles.mapContainer}>
-          <MapView
-            mapType={Platform.OS === "android" ? "none" : "standard"}
-            ref={mapRef}
-            style={{
-              height,
-              width,
-
-              ...styles.map,
-            }}
-            initialRegion={{
+        <MapView
+          mapType={Platform.OS === "android" ? "none" : "standard"} // pour n avoir aucune autre tuile que Valpineta sur android
+          ref={mapRef}
+          style={styles.map}
+          initialRegion={{
+            latitude: startPoint?.latitude ?? LATITUDE,
+            longitude: startPoint?.longitude ?? LONGITUDE,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          }}
+          initialCamera={{
+            center: {
               latitude: startPoint?.latitude ?? LATITUDE,
               longitude: startPoint?.longitude ?? LONGITUDE,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            }}
-            initialCamera={{
-              center: {
-                latitude: startPoint?.latitude ?? LATITUDE,
-                longitude: startPoint?.longitude ?? LONGITUDE,
-              },
-              pitch: 0,
-              heading: 0,
-              altitude: 6000,
-              zoom: 5,
-            }}
-            onMoveShouldSetResponder={handleMapMoves}
-            showsBuildings={true}
-            showsCompass={true}
-            showsMyLocationButton={false} // only for Android
-            shouldRasterizeIOS={true} // only for iOS
-            showsScale={true} // only for iOS
-            showsUserLocation={true}
-            zoomControlEnabled={false}
-            zoomEnabled={true}
-            minZoomLevel={12} // Niveau de zoom minimum
-            maxZoomLevel={15} // Niveau de zoom maximum
-          >
-            <UrlTile
-              urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
-              tileSize={256}
-              // shouldReplaceMapContent={true}
-              style={{
-                zIndex: -1,
-                pointerEvents: "none",
-              }}
-            />
-
-            {/* Excursion detaillee */}
-            {excursion && (
-              // Affichage de l excursion, des markers et des signalements
-              <>
-                <Polyline
-                  coordinates={excursion.track.map(
-                    (point: TPoint) =>
-                      ({
-                        latitude: point.lat,
-                        longitude: point.lon,
-                      } as LatLng),
-                  )}
-                  strokeColor={colors.bouton}
-                  strokeWidth={5}
-                />
-
-                <StartMiddleAndEndHandler
-                  track={excursion.track}
-                  typeParcours={excursion.es.typeParcours}
-                />
-
-                {excursion?.signalements.map((signalement, i) => (
-                  <SignalementHandler signalement={signalement} key={i} />
-                ))}
-              </>
-            )}
-
-            {/* Toutes les excursions */}
-            {allExcursions !== undefined &&
-              allExcursions.map((exc, index) => {
-                if (exc.track) {
-                  // Le track devient invisible et incliquable si une excursion est affichee
-                  const color = excursion ? "#00000000" : excursionColor();
-                  const onPress = excursion
-                    ? null
-                    : () =>
-                        navigation.navigate("CarteStack", {
-                          screen: "Carte",
-                          params: { excursion: exc },
-                        });
-
-                  return (
-                    <React.Fragment key={index}>
-                      <Polyline
-                        coordinates={exc.track.map(point => {
-                          return {
-                            latitude: point.lat,
-                            longitude: point.lon,
-                          } as LatLng;
-                        })}
-                        strokeColor={color}
-                        strokeWidth={5}
-                        style={{
-                          zIndex: 1000000,
-                        }}
-                        onPress={onPress}
-                        tappable={true} // pour permettre le onpress sur Anroid
-                      />
-
-                      <Marker
-                        coordinate={
-                          {
-                            latitude: exc.track[0].lat ?? 0,
-                            longitude: exc.track[0].lon ?? 0,
-                          } as LatLng
-                        }
-                        title={exc.nom}
-                        centerOffset={{ x: 0, y: -15 }}
-                      >
-                        <Image
-                          source={markerImage}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            tintColor: color,
-                          }}
-                        />
-                      </Marker>
-                    </React.Fragment>
-                  );
-                } else {
-                  console.log("[MapScreen] WARNING : parcours sans track ");
-                  return null;
-                }
-              })}
-          </MapView>
-
-          {/* Bouton de centrage */}
-          <View
+            },
+            pitch: 0,
+            heading: 0,
+            altitude: 6000,
+            zoom: 5,
+          }}
+          onMoveShouldSetResponder={handleMapMoves}
+          showsBuildings={true}
+          showsCompass={true}
+          showsMyLocationButton={false} // only for Android
+          shouldRasterizeIOS={true} // only for iOS
+          showsScale={true} // only for iOS
+          showsUserLocation={true}
+          zoomControlEnabled={false}
+          zoomEnabled={true}
+          minZoomLevel={12} // Niveau de zoom minimum
+          maxZoomLevel={15} // Niveau de zoom maximum
+        >
+          <UrlTile
+            urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
+            tileSize={256}
+            // shouldReplaceMapContent={true}
             style={{
-              ...styles.mapOverlayLeft,
-              bottom: excursion ? 20 : 0,
+              zIndex: -1,
+              pointerEvents: "none",
             }}
-          >
-            <MapButton
-              ref={followLocationButtonRef}
-              style={{
-                ...styles.locateButtonContainer,
-              }}
-              onPress={toggleFollowUserLocation}
-              icon="location-arrow"
-              iconSize={spacing.lg}
-              iconColor={
-                followUserLocation ? colors.palette.bleuLocActive : colors.palette.bleuLocInactive
-              }
-            />
-          </View>
+          />
 
-          {/* Boutons de signalements */}
-          {
-            /**@todo DOIT DEPENDRE DU STORE SuiviExcursion.etat (pour n'afficher les boutons que lorsqu'on est en rando) */
-            "enCours" === "enCours" && (
-              <View
-                style={{
-                  ...styles.mapOverlay,
-                  bottom: excursion ? 20 : 0,
-                }}
-              >
-                {menuIsOpen && (
-                  <>
-                    <MapButton
-                      ref={addPOIBtnRef}
-                      style={{
-                        ...styles.actionsButtonContainer,
-                      }}
-                      onPress={ButtonOnPressAvertissement}
-                      icon={"eye"}
-                      iconSize={spacing.lg}
-                      iconColor={colors.palette.blanc}
-                    />
-                    <MapButton
-                      ref={addWarningBtnRef}
-                      style={{
-                        ...styles.actionsButtonContainer,
-                      }}
-                      onPress={ButtonOnPressPointInteret}
-                      icon="exclamation-circle"
-                      iconSize={spacing.lg}
-                      iconColor={colors.palette.blanc}
-                    />
-                  </>
-                )}
-                <MapButton
-                  ref={toggleBtnMenuRef}
-                  style={{
-                    ...styles.actionsButtonContainer,
-                  }}
-                  onPress={toggleMenu}
-                  icon={menuIsOpen ? "times" : "map-marker-alt"}
-                  iconSize={spacing.lg}
-                  iconColor={colors.palette.blanc}
-                />
-              </View>
-            )
-          }
-
-          {/* Swiper et bouton retour */}
+          {/* Excursion detaillee */}
           {excursion && (
+            // Affichage de l excursion, des markers et des signalements
             <>
-              <SwipeUpDown
-                itemMini={<SwiperContent type="mini" />}
-                itemFull={<SwiperContent type="full" />}
-                animation="easeInEaseOut"
-                swipeHeight={30 + footerHeight}
-                disableSwipeIcon={true}
-                ref={swipeUpDownRef}
+              <Polyline
+                coordinates={excursion.track.map(
+                  (point: TPoint) =>
+                    ({
+                      latitude: point.lat,
+                      longitude: point.lon,
+                    } as LatLng),
+                )}
+                strokeColor={colors.bouton}
+                strokeWidth={5}
               />
 
-              <TouchableOpacity
-                style={$boutonRetour}
-                onPress={() => navigation.navigate("CarteStack", { screen: "Carte" })}
-              >
-                <Image
-                  style={{ tintColor: colors.bouton }}
-                  source={require("assets/icons/back.png")}
-                />
-              </TouchableOpacity>
+              <StartMiddleAndEndHandler
+                track={excursion.track}
+                typeParcours={excursion.es.typeParcours}
+              />
+
+              {excursion?.signalements.map((signalement, i) => (
+                <SignalementHandler signalement={signalement} key={i} />
+              ))}
             </>
           )}
+
+          {/* Toutes les excursions */}
+          {allExcursions !== undefined &&
+            allExcursions.map((exc, index) => {
+              if (exc.track) {
+                // Le track devient invisible et incliquable si une excursion est affichee
+                const color = excursion ? "#00000000" : excursionColor();
+                const onPress = excursion
+                  ? null
+                  : () =>
+                      navigation.navigate("CarteStack", {
+                        screen: "Carte",
+                        params: { excursion: exc },
+                      });
+
+                return (
+                  <React.Fragment key={index}>
+                    <Polyline
+                      coordinates={exc.track.map(point => {
+                        return {
+                          latitude: point.lat,
+                          longitude: point.lon,
+                        } as LatLng;
+                      })}
+                      strokeColor={color}
+                      strokeWidth={5}
+                      style={{
+                        zIndex: 1000000,
+                      }}
+                      onPress={onPress}
+                      tappable={true} // pour permettre le onpress sur Anroid
+                    />
+
+                    <Marker
+                      coordinate={
+                        {
+                          latitude: exc.track[0].lat ?? 0,
+                          longitude: exc.track[0].lon ?? 0,
+                        } as LatLng
+                      }
+                      title={exc.nom}
+                      centerOffset={{ x: 0, y: -15 }}
+                    >
+                      <Image
+                        source={markerImage}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          tintColor: color,
+                        }}
+                      />
+                    </Marker>
+                  </React.Fragment>
+                );
+              } else {
+                console.log("[MapScreen] WARNING : parcours sans track ");
+                return null;
+              }
+            })}
+        </MapView>
+
+        {/* Bouton de centrage */}
+        <View
+          style={{
+            ...styles.mapOverlayLeft,
+            bottom: excursion ? 20 : 0,
+          }}
+        >
+          <MapButton
+            ref={followLocationButtonRef}
+            style={{
+              ...styles.locateButtonContainer,
+            }}
+            onPress={toggleFollowUserLocation}
+            icon="location-arrow"
+            iconSize={spacing.lg}
+            iconColor={
+              followUserLocation ? colors.palette.bleuLocActive : colors.palette.bleuLocInactive
+            }
+          />
         </View>
+
+        {/* Boutons de signalements */}
+        {
+          /**@todo DOIT DEPENDRE DU STORE SuiviExcursion.etat (pour n'afficher les boutons que lorsqu'on est en rando) */
+          "enCours" === "enCours" && (
+            <View
+              style={{
+                ...styles.mapOverlay,
+                bottom: excursion ? 20 : 0,
+              }}
+            >
+              {menuIsOpen && (
+                <>
+                  <MapButton
+                    ref={addPOIBtnRef}
+                    style={{
+                      ...styles.actionsButtonContainer,
+                    }}
+                    onPress={ButtonOnPressAvertissement}
+                    icon={"eye"}
+                    iconSize={spacing.lg}
+                    iconColor={colors.palette.blanc}
+                  />
+                  <MapButton
+                    ref={addWarningBtnRef}
+                    style={{
+                      ...styles.actionsButtonContainer,
+                    }}
+                    onPress={ButtonOnPressPointInteret}
+                    icon="exclamation-circle"
+                    iconSize={spacing.lg}
+                    iconColor={colors.palette.blanc}
+                  />
+                </>
+              )}
+              <MapButton
+                ref={toggleBtnMenuRef}
+                style={{
+                  ...styles.actionsButtonContainer,
+                }}
+                onPress={toggleMenu}
+                icon={menuIsOpen ? "times" : "map-marker-alt"}
+                iconSize={spacing.lg}
+                iconColor={colors.palette.blanc}
+              />
+            </View>
+          )
+        }
+
+        {/* Swiper et bouton retour */}
+        {excursion && (
+          <>
+            <SwipeUpDown
+              itemMini={<SwiperContent type="mini" />}
+              itemFull={<SwiperContent type="full" />}
+              animation="easeInEaseOut"
+              swipeHeight={30 + footerHeight}
+              disableSwipeIcon={true}
+              ref={swipeUpDownRef}
+            />
+
+            <TouchableOpacity
+              style={$boutonRetour}
+              onPress={() => navigation.navigate("CarteStack", { screen: "Carte" })}
+            >
+              <Image
+                style={{ tintColor: colors.bouton }}
+                source={require("assets/icons/back.png")}
+              />
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </Screen>
   );
@@ -866,13 +859,7 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
     width: "100%",
-  },
-  mapContainer: {
-    alignItems: "center",
-    display: "flex",
-    flex: 1,
-    position: "relative",
-    width: "100%",
+    height: "100%",
   },
   mapOverlay: {
     ...mapOverlayStyle,
