@@ -15,13 +15,15 @@ import {
 import { Text, GraphiqueDenivele } from "app/components";
 /**@warning A SUPPRIMER ET DECALER DANS APPNAVIGATOR : */
 import { T_Point } from "app/components/GraphiqueDenivele";
-import { T_Signalement, T_excursion, T_flat_point } from "app/navigators";
+import { AppStackParamList, T_excursion } from "app/navigators";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { LocationObject } from "expo-location";
 
 export interface InfosExcursionProps {
   excursion: T_excursion;
-  navigation: any;
+  navigation: NativeStackNavigationProp<AppStackParamList, "Carte", undefined>;
   setInterfaceCourrante: React.Dispatch<React.SetStateAction<"infos" | "avis" | "signalements">>;
-  userLocation;
+  userLocation :LocationObject;
 }
 
 /**

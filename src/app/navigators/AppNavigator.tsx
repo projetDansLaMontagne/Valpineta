@@ -74,12 +74,13 @@ export type T_TypeSignalement = "PointInteret" | "Avertissement";
 
 export type T_Signalement = {
   nom: string;
+  type: T_TypeSignalement;
   description: string;
   image: string;
   lat: number;
   lon: number;
-  type: T_TypeSignalement;
-  postId: number;
+  idExcursion: number;
+  idPointLie: number; // id du point du track sur lequel le signalement est lié
 };
 export type T_infoLangue = {
   nom: string;

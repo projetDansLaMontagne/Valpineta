@@ -1,7 +1,8 @@
 import { Button, CarteSignalement } from "app/components";
-import { T_flat_point } from "app/navigators";
+import { T_excursion, T_flat_point } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { recupDistance } from "app/utils/recupDistance";
+import { LocationObject } from "expo-location";
 import { Dimensions, ScrollView, TouchableWithoutFeedback, View, ViewStyle } from "react-native";
 import { LatLng } from "react-native-maps";
 
@@ -10,12 +11,11 @@ import { LatLng } from "react-native-maps";
  */
 export interface ListeSignalementsProps {
   setInterfaceCourrante: React.Dispatch<React.SetStateAction<"infos" | "avis" | "signalements">>;
-  excursion;
-  userLocation;
-  bottomMargin;
+  excursion: T_excursion;
+  userLocation: LocationObject;
+  bottomMargin: number;
   setStartPoint?: React.Dispatch<React.SetStateAction<LatLng>>;
   swipeDown: () => void;
-  style: ViewStyle;
 }
 
 export function ListeSignalements(props: ListeSignalementsProps) {
@@ -72,7 +72,7 @@ const { width, height } = Dimensions.get("window");
 
 const $containerSignalements: ViewStyle = {
   margin: spacing.xs,
-  paddingBottom: height / 2,
+  paddingBottom: 250 /**@warning solution moche et temporaire */,
 };
 
 const $sortirDetailSignalement: ViewStyle = {
@@ -82,6 +82,5 @@ const $sortirDetailSignalement: ViewStyle = {
   borderColor: colors.bordure,
   width: width / 1.5,
   height: 50,
-  position: "absolute",
   alignSelf: "center",
 };
