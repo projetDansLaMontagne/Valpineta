@@ -7,7 +7,7 @@ import { LatLng } from "react-native-maps";
 /**
  * @returns la liste des signalements
  */
-export interface ListeSignalementsProps {
+export interface PageSignalementsProps {
   setInterfaceCourrante: React.Dispatch<React.SetStateAction<"infos" | "avis" | "signalements">>;
   track: TPoint[]; // pour connaitre les distances des points qui sont lies aux signalements
   signalements: T_Signalement[];
@@ -15,7 +15,7 @@ export interface ListeSignalementsProps {
   swipeDown: () => void;
 }
 
-export function ListeSignalements(props: ListeSignalementsProps) {
+export function PageSignalements(props: PageSignalementsProps) {
   const { track, signalements } = props;
   /** @todo STATIC, a remplacer par le store */
   const SuiviExcursion = { etat: "enCours", iPointCourant: 1100 };

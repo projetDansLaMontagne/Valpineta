@@ -17,7 +17,7 @@ import SwipeUpDown from "react-native-swipe-up-down";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useState } from "react";
-import { ListeSignalements } from "./ListeSignalements";
+import { PageSignalements } from "./PageSignalements";
 import { AppStackParamList, T_excursion } from "app/navigators";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
@@ -90,7 +90,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
     return (
       <View style={[$styles]}>
         {interfaceCourrante == "signalements" ? (
-          <ListeSignalements
+          <PageSignalements
             track={excursion.track}
             signalements={excursion.signalements}
             userLocation={userLocation}
