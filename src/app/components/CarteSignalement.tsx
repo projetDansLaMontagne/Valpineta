@@ -48,15 +48,14 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
         text += pointPasse ? "passé de " : "dans ";
       }
       text += Math.abs(Math.round(distanceDuDepartEnM / 100) / 10);
-      text += " km";
     }
+    text += " km";
     return text;
   }
 
   // Verification de la conformite de type des parametres
   check("type", type);
   check("nomSignalement", nomSignalement);
-  check("distanceDuDepart", distanceDuDepartEnM);
   if (details === true) {
     // Si on veut les détails, on vérifie la présence de toutes les données
     check("imageSignalement", props.imageSignalement);

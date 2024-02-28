@@ -33,8 +33,14 @@ export const ListeSignalements = observer(function ListeSignalements(
   useEffect(() => {
     setSignalementsTries(
       signalements.sort((a, b) => {
-        const distA = track[a.idPointLie ?? 0].dist;
-        const distB = track[b.idPointLie ?? 0].dist;
+        if (a.idPointLie === undefined || b.idPointLie === undefined) {
+          console.log(
+            "[ListeSignalement] WARNING excursions.json mal formate : signalement sans idPointLie",
+          );
+          return 0;
+        }
+        const distA = track[a.idPointLie].dist;
+        const distB = track[b.idPointLie].dist;
         return distA - distB;
       }),
     );
@@ -52,7 +58,9 @@ export const ListeSignalements = observer(function ListeSignalements(
             onPress={onPress ? () => onPress(signalement) : undefined}
             details={detaille}
             distanceDuDepartEnM={
-              signalement.idPointLie !== undefined && isDistanceRelative
+              signalement.idPointLie === undefined
+                ? undefined
+                : isDistanceRelative
                 ? track[signalement.idPointLie].dist - track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
                 : track[signalement.idPointLie].dist // Position absolue (par rapport au depart)
             }
