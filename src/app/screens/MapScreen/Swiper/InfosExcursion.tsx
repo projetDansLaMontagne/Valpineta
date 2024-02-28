@@ -12,7 +12,7 @@ import {
   Dimensions,
   TextStyle,
 } from "react-native";
-import { Text, GraphiqueDenivele } from "app/components";
+import { Text, GraphiqueDenivele, ListeSignalements } from "app/components";
 /**@warning A SUPPRIMER ET DECALER DANS APPNAVIGATOR : */
 import { T_Point } from "app/components/GraphiqueDenivele";
 import { AppStackParamList, T_excursion } from "app/navigators";
@@ -23,7 +23,7 @@ export interface InfosExcursionProps {
   excursion: T_excursion;
   navigation: NativeStackNavigationProp<AppStackParamList, "Carte", undefined>;
   setInterfaceCourrante: React.Dispatch<React.SetStateAction<"infos" | "avis" | "signalements">>;
-  userLocation :LocationObject;
+  userLocation: LocationObject;
 }
 
 /**
@@ -101,40 +101,23 @@ export function InfosExcursion(props: InfosExcursionProps) {
                 <Text tx="detailsExcursion.titres.signalements" size="lg" />
               </View>
               <View>
-                {excursion.signalements.length > 0 && (
-                  <TouchableOpacity onPress={() => setInterfaceCourrante("signalements")}>
-                    <Text
-                      style={$lienSignalements}
-                      tx="detailsExcursion.boutons.voirDetails"
-                      size="xs"
-                    />
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity onPress={() => setInterfaceCourrante("signalements")}>
+                  <Text
+                    style={$lienSignalements}
+                    tx="detailsExcursion.boutons.voirDetails"
+                    size="xs"
+                  />
+                </TouchableOpacity>
               </View>
             </View>
             <ScrollView horizontal>
               <TouchableWithoutFeedback>
                 <View style={$scrollLine}>
-                  {excursion?.signalements.map((signalement, index) => {
-                    // Calculate the distance for each warning
-                    const distanceSignalement = props.userLocation
-                      ? recupDistance(signalement as T_flat_point, props.excursion.track)
-                      : 0;
-                    const carteType =
-                      signalement.type === "Avertissement" ? "avertissement" : "pointInteret";
-
-                    return (
-                      <View key={index}>
-                        <CarteSignalement
-                          type={carteType}
-                          details={false}
-                          nomSignalement={signalement.nom}
-                          distanceDuDepart={`${distanceSignalement}`}
-                          onPress={() => setInterfaceCourrante("signalements")}
-                        />
-                      </View>
-                    );
-                  })}
+                  <ListeSignalements
+                    signalements={excursion.signalements}
+                    track={excursion.track}
+                    detaille={false}
+                  />
                 </View>
               </TouchableWithoutFeedback>
             </ScrollView>
@@ -207,5 +190,5 @@ const $headerSignalement: ViewStyle = {
 const $lienSignalements: TextStyle = {
   textDecorationLine: "underline",
   color: colors.bouton,
-  paddingStart: spacing.xs,
+  padding: spacing.sm,
 };
