@@ -1,5 +1,4 @@
 import { CarteAvis } from "./CarteAvis";
-import { observer } from "mobx-react-lite";
 import { Dimensions, ScrollView, TouchableWithoutFeedback, View, ViewStyle } from "react-native";
 
 export interface AvisProps {}

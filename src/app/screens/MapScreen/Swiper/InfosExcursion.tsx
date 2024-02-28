@@ -53,7 +53,6 @@ export function InfosExcursion(props: InfosExcursionProps) {
   }
 
   return (
-    <ScrollView>
       <TouchableWithoutFeedback>
         <View style={$stylePage}>
           <View style={$containerInformations}>
@@ -150,7 +149,6 @@ export function InfosExcursion(props: InfosExcursionProps) {
           </View>
         </View>
       </TouchableWithoutFeedback>
-    </ScrollView>
   );
 }
 

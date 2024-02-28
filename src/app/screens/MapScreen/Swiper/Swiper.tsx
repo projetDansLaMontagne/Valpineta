@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
@@ -110,41 +111,41 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                 </TouchableOpacity>
               </View>
             </View>
-            <View>
-              <View style={$containerBouton}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setInterfaceCourrante("infos");
-                  }}
-                  style={$boutonInfoAvis}
-                >
-                  <Text
-                    tx="detailsExcursion.titres.infos"
-                    size="lg"
-                    style={{ color: interfaceCourrante === "infos" ? colors.text : colors.bouton }}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setInterfaceCourrante("avis");
-                  }}
-                  style={$boutonInfoAvis}
-                >
-                  <Text
-                    tx="detailsExcursion.titres.avis"
-                    size="lg"
-                    style={{ color: interfaceCourrante === "infos" ? colors.text : colors.bouton }}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  $souligneInfosAvis,
-                  interfaceCourrante === "infos"
-                    ? { left: spacing.lg }
-                    : { left: width - width / 2.5 - spacing.lg / 1.5 },
-                ]}
-              />
+            <View style={$containerBouton}>
+              <TouchableOpacity
+                onPress={() => {
+                  setInterfaceCourrante("infos");
+                }}
+                style={$boutonInfoAvis}
+              >
+                <Text
+                  tx="detailsExcursion.titres.infos"
+                  size="lg"
+                  style={{ color: interfaceCourrante === "infos" ? colors.text : colors.bouton }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setInterfaceCourrante("avis");
+                }}
+                style={$boutonInfoAvis}
+              >
+                <Text
+                  tx="detailsExcursion.titres.avis"
+                  size="lg"
+                  style={{ color: interfaceCourrante === "infos" ? colors.text : colors.bouton }}
+                />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={[
+                $souligneInfosAvis,
+                interfaceCourrante === "infos"
+                  ? { left: spacing.lg }
+                  : { left: width - width / 2.5 - spacing.lg / 1.5 },
+              ]}
+            />
+            <ScrollView>
               {interfaceCourrante === "infos" ? (
                 <InfosExcursion
                   excursion={props.excursion}
@@ -155,7 +156,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
               ) : (
                 <Avis />
               )}
-            </View>
+            </ScrollView>
           </>
         )}
       </View>
