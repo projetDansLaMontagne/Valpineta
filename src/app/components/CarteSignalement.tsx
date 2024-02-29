@@ -58,7 +58,6 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
   check("nomSignalement", nomSignalement);
   if (details === true) {
     // Si on veut les détails, on vérifie la présence de toutes les données
-    check("imageSignalement", props.imageSignalement);
     check("description", props.description);
   }
 
