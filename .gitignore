@@ -36,6 +36,7 @@ local.properties
 src/node_modules/
 npm-debug.log
 yarn-error.log
+yarn.lock
 
 # BUCK
 buck-out/
@@ -91,3 +92,6 @@ src/assets/tracks
 .commitignore
 commit_message.md
 /src/android
+
+#Tests
+src/coverage

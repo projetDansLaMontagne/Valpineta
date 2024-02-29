@@ -25,6 +25,8 @@ import { Text } from "app/components";
 
 import { useStores } from "app/models";
 import React, { useEffect } from "react";
+import NetInfo from "@react-native-community/netinfo";
+import { tryToPush } from "app/services/SynchroMontanteService";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -153,11 +155,32 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   const parametresLogo = require("./../../assets/icons/parametres.png");
   useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
+  const { parametres, synchroMontante } = useStores();
+
   /**
    * @warning CODE REDONDANT mais sans cette partie le footer ne change pas de langue... raison inconnue
    */
-  const { parametres } = useStores();
   useEffect(() => {}, [parametres.langue]);
+
+  /**
+   * @warning Pas forcément le meilleur endroit pour cette partie de code mais je n'ai pas trouvé mieux...
+   */
+  /* -------------------------- CRON SYNCHRO MONTANTE ------------------------- */
+
+  let intervalId: NodeJS.Timeout;
+  const MINUTE_EN_MILLISECONDES = 60000;
+
+  useEffect(() => {
+    intervalId = setInterval(async () => {
+      const netInfo = await NetInfo.fetch();
+      tryToPush(netInfo.isConnected, synchroMontante.signalements, synchroMontante);
+    }, synchroMontante.intervalleSynchro * MINUTE_EN_MILLISECONDES);
+
+    return () => clearInterval(intervalId);
+  }, [synchroMontante.intervalleSynchro]);
+
+  /* ------------------------ FIN CRON SYNCHRO MONTANTE ----------------------- */
+
 
   const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
     tabBarIcon: ({ color }) => (

@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { ApiResponse } from "apisauce";
 
 export type GeneralApiProblem =
@@ -43,6 +44,7 @@ export type GeneralApiProblem =
  *
  * @param response The api response.
  */
+/* istanbul ignore next */
 export function getGeneralApiProblem(response: ApiResponse<any>): GeneralApiProblem | null {
   switch (response.problem) {
     case "CONNECTION_ERROR":

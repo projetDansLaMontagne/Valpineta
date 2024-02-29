@@ -21,6 +21,7 @@ import { IStateTreeNode, SnapshotIn } from "mobx-state-tree";
  *   user.setProp("age", 30)      // no type error
  *   user.setProp("age", "30")    // type error -- must be number
  */
+/*istanbul ignore next*/
 export const withSetPropAction = <T extends IStateTreeNode>(mstInstance: T) => ({
   // generic setter for all properties
   setProp<K extends keyof SnapshotIn<T>, V extends SnapshotIn<T>[K]>(field: K, newValue: V) {

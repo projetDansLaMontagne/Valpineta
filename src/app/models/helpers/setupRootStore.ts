@@ -1,3 +1,4 @@
+/*istanbul ignore file*/
 /**
  * This file is where we do "rehydration" of your RootStore from AsyncStorage.
  * This lets you persist your state between app launches.

@@ -1,6 +1,9 @@
 // we always make sure 'react-native' gets included first
 import * as ReactNative from "react-native"
 import mockFile from "./mockFile"
+import { jest } from "@jest/globals"
+import { locale } from "expo-localization"
+import { ParametresModel } from "app/models"
 
 // libraries to mock
 jest.doMock("react-native", () => {

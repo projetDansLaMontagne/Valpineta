@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 /**
  * This Api class lets you define an API endpoint and methods to request
  * data and process it.

@@ -1,3 +1,4 @@
+/*istanbul ignore file*/
 import { getRoot, IStateTreeNode } from "mobx-state-tree";
 import { RootStore, RootStoreModel } from "../RootStore";
 
