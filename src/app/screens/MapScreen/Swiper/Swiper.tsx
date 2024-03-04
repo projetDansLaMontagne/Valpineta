@@ -63,7 +63,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
       latitude: excursion.track[0].lat,
       longitude: excursion.track[0].lon,
     } as LatLng);
-  }, []);
+  }, [excursion]);
 
   return (
     <SwipeUpDown
@@ -139,39 +139,41 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                 : { left: width - width / 2.5 - spacing.lg / 1.5 },
             ]}
           />
-          {interfaceCourrante === "infos" ? (
+          {interfaceCourrante === "infos" && (
             <InfosExcursion
               excursion={excursion}
               navigation={navigation}
               setInterfaceCourrante={setInterfaceCourrante}
               userLocation={userLocation}
             />
-          ) : excursion.signalements.length > 0 ? (
-            <ScrollView>
-              <TouchableWithoutFeedback>
-                <View style={$containerSignalements}>
-                  <ListeSignalements
-                    detaille={true}
-                    signalements={excursion.signalements}
-                    track={excursion.track}
-                    onPress={(point: T_flat_point) => {
-                      props.setCameraTarget({
-                        latitude: point.lat,
-                        longitude: point.lon,
-                      } as LatLng);
-                      closeSwiper();
-                    }}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
-            </ScrollView>
-          ) : (
-            <Text
-              text={"Aucun signalement pour cette excursion"}
-              size="sm"
-              style={{ textAlign: "center", marginTop: spacing.lg }}
-            />
           )}
+          {interfaceCourrante === "signalements" &&
+            (excursion.signalements.length > 0 ? (
+              <ScrollView>
+                <TouchableWithoutFeedback>
+                  <View style={$containerSignalements}>
+                    <ListeSignalements
+                      detaille={true}
+                      signalements={excursion.signalements}
+                      track={excursion.track}
+                      onPress={(point: T_flat_point) => {
+                        props.setCameraTarget({
+                          latitude: point.lat,
+                          longitude: point.lon,
+                        } as LatLng);
+                        closeSwiper();
+                      }}
+                    />
+                  </View>
+                </TouchableWithoutFeedback>
+              </ScrollView>
+            ) : (
+              <Text
+                text={"Aucun signalement pour cette excursion"}
+                size="sm"
+                style={{ textAlign: "center", marginTop: spacing.lg }}
+              />
+            ))}
         </>
       </View>
     );
