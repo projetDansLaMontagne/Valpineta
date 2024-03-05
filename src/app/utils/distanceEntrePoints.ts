@@ -1,6 +1,4 @@
-import { T_Point } from "app/components";
-import { Coordonnees } from "../screens/DetailsExcursionScreen/DetailsExcursionScreen";
-import { TPoint, T_flat_point } from "app/navigators";
+import { T_flat_point } from "app/navigators";
 
 // Fonction de calcul de distance entre deux coordonnées
 export const distanceEntrePoints = (coord1: T_flat_point, coord2: T_flat_point) => {

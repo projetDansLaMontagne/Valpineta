@@ -50,10 +50,9 @@ export type T_valeurs_filtres = {
   difficulteTechniqueMax: number;
   difficulteOrientationMax: number;
 };
-
 export interface T_flat_point {
-  lat: number;
-  lon: number;
+  lat: number; // Latitude
+  lon: number; // Longitude
 }
 export interface TPoint extends T_flat_point {
   alt: number; // Altitude
@@ -76,17 +75,18 @@ export type T_TypeSignalement = "PointInteret" | "Avertissement";
 export type T_Signalement = {
   id?: number;
   nom: string;
+  type: T_TypeSignalement;
   description: string;
   image: string;
   lat: number;
   lon: number;
-  type: T_TypeSignalement;
-  postId: number;
+  idExcursion: number;
+  idPointLie: number; // id du point du track sur lequel le signalement est lié
 };
 export type T_infoLangue = {
   nom: string;
   description: string;
-  typeParcours: string;
+  typeParcours: "Ida" | "Ida y Vuelta" | "Circular";
 };
 
 export type T_excursion = {
@@ -113,8 +113,7 @@ type ExcursionStackParamList = {
 };
 
 type CarteStackParamList = {
-  Carte: undefined;
-  DetailsExcursion: undefined | { excursion: T_excursion };
+  Carte: undefined | { excursion: T_excursion };
   Description: { excursion: T_excursion };
   NouveauSignalement: { type: T_TypeSignalement };
 };
@@ -235,7 +234,6 @@ const CarteStackScreen = () => (
     }}
   >
     <CarteStack.Screen name="Carte" component={Screens.MapScreen} />
-    <CarteStack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
     <CarteStack.Screen name="Description" component={Screens.DescriptionScreen} />
     <CarteStack.Screen name="NouveauSignalement" component={Screens.NouveauSignalementScreen} />
   </CarteStack.Navigator>

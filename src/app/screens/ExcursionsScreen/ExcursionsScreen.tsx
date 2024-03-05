@@ -18,8 +18,32 @@ import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
 const { width } = Dimensions.get("window");
 
-interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
+/**
+ * Applique la langue aux excursions
+ */
+export function applicationLangue(excursions: T_excursion[], langue: string) {
+  return excursions.map(excursion => {
+    if (langue === "fr") {
+      return {
+        ...excursion,
+        nom: excursion.fr.nom,
+        description: excursion.fr.description,
+        typeParcours: excursion.fr.typeParcours,
+      };
+    } else if (langue === "es") {
+      return {
+        ...excursion,
+        nom: excursion.es.nom,
+        description: excursion.es.description,
+        typeParcours: excursion.es.typeParcours,
+      };
+    } else {
+      throw new Error("Langue non prise en charge : " + langue);
+    }
+  });
+}
 
+interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(
   props: ExcursionsScreenProps,
 ) {
@@ -142,37 +166,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     );
   }
 
-  // Applique la langue aux excursions
-  function applicationLangue(excursions: T_excursion[]) {
-    const langue = parametres.langue;
-
-    return excursions.map(excursion => {
-      if (langue === "fr") {
-        return {
-          ...excursion,
-          nom: excursion.fr.nom,
-          description: excursion.fr.description,
-          typeParcours: excursion.fr.typeParcours,
-        };
-      } else if (langue === "es") {
-        return {
-          ...excursion,
-          nom: excursion.es.nom,
-          description: excursion.es.description,
-          typeParcours: excursion.es.typeParcours,
-        };
-      } else {
-        throw new Error("Langue non prise en charge : " + langue);
-      }
-    });
-  }
-
   /* --------------------------------- STATES --------------------------------- */
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
   const [saisieBarre, setSaisieBarre] = useState<string>("");
 
   const excursionsTraduites = useMemo<T_excursion[]>(
-    () => allExcursions && applicationLangue(allExcursions),
+    () => allExcursions && applicationLangue(allExcursions, parametres.langue),
     [allExcursions],
   );
 
@@ -204,7 +203,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   /* ------------------------------- CALL BACKS ------------------------------- */
   const clicExcursion = (excursion: T_excursion) => {
     props.navigation.navigate("CarteStack", {
-      screen: "DetailsExcursion",
+      screen: "Carte",
       params: { excursion },
     });
   };
