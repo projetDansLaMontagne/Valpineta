@@ -23,7 +23,6 @@ export interface InfosExcursionProps {
   excursion: T_excursion;
   navigation: NativeStackNavigationProp<AppStackParamList, "Carte", undefined>;
   setInterfaceCourrante: React.Dispatch<React.SetStateAction<"infos" | "avis" | "signalements">>;
-  userLocation: LocationObject;
 }
 
 /**
@@ -31,7 +30,7 @@ export interface InfosExcursionProps {
  * @precondition l'excursion doit absolument être définie
  */
 export function InfosExcursion(props: InfosExcursionProps) {
-  const { excursion, navigation, setInterfaceCourrante, userLocation } = props;
+  const { excursion, navigation, setInterfaceCourrante } = props;
 
   /**
    * @returns la description courte

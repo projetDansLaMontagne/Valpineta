@@ -47,7 +47,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
 
   // States
   const [gavePermission, setGavePermission] = useState(false);
-  const [location, setLocation] = useState<null | Location.LocationObject>(null);
+  const [userLocation, setUserLocation] = useState<null | Location.LocationObject>(null);
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
@@ -78,12 +78,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
    */
   const animateToLocation = (passedLocation?: Location.LocationObject | LatLng): void => {
     if (mapRef.current) {
-      if (!location && !passedLocation) {
+      if (!userLocation && !passedLocation) {
         console.log("[MapScreen] location is null");
         return;
       }
 
-      const finalLocation = passedLocation ?? location;
+      const finalLocation = passedLocation ?? userLocation;
 
       mapRef.current.animateCamera({
         center: {
@@ -104,7 +104,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const removeLocationSubscription = () => {
     if (watchPositionSubscriptionRef.current) {
       watchPositionSubscriptionRef.current.remove();
-      setLocation(null);
+      setUserLocation(null);
     }
   };
 
@@ -124,7 +124,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
           distanceInterval: 1,
         },
         location => {
-          setLocation(location);
+          setUserLocation(location);
         },
       );
     }
@@ -199,8 +199,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   }, [gavePermission]);
 
   useEffect(() => {
-    followUserLocation && animateToLocation(location);
-  }, [location]);
+    followUserLocation && animateToLocation(userLocation);
+  }, [userLocation]);
 
   useEffect(() => {
     if (menuIsOpen) {
@@ -444,7 +444,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             <Swiper
               excursion={excursion}
               navigation={navigation}
-              userLocation={location}
               setCameraTarget={setCameraTarget}
             />
 

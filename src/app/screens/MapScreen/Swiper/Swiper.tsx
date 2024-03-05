@@ -35,7 +35,6 @@ export type SwiperProps = {
   navigation: NativeStackNavigationProp<AppStackParamList, "Carte", undefined>;
 
   excursion: T_excursion;
-  userLocation: LocationObject;
   setCameraTarget: React.Dispatch<React.SetStateAction<LatLng>>;
 };
 
@@ -43,7 +42,7 @@ export type SwiperProps = {
  * Describe your component here
  */
 export const Swiper = observer(function Swiper(props: SwiperProps) {
-  const { style, userLocation, excursion, navigation, setCameraTarget } = props;
+  const { style, excursion, navigation, setCameraTarget } = props;
   const $styles = [$container, style];
 
   const bottomMargin = useBottomTabBarHeight() + useSafeAreaInsets().bottom;
@@ -144,7 +143,6 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
               excursion={excursion}
               navigation={navigation}
               setInterfaceCourrante={setInterfaceCourrante}
-              userLocation={userLocation}
             />
           )}
           {interfaceCourrante === "signalements" &&
