@@ -76,25 +76,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
    * @param passedLocation {Location.LocationObject} The location to animate to
    * @returns {void}
    */
-  const animateToLocation = (passedLocation?: Location.LocationObject | LatLng): void => {
+  const animateToLocation = (passedLocation: LatLng): void => {
     if (mapRef.current) {
-      if (!userLocation && !passedLocation) {
-        console.log("[MapScreen] location is null");
-        return;
-      }
-
-      const finalLocation = passedLocation ?? userLocation;
-
       mapRef.current.animateCamera({
-        center: {
-          latitude: finalLocation.coords ? finalLocation.coords.latitude : finalLocation.latitude,
-          longitude: finalLocation.coords
-            ? finalLocation.coords.longitude
-            : finalLocation.longitude,
-        },
+        center: passedLocation,
       });
-    } else {
-      console.log("[MapScreen] mapRef.current is null");
     }
   };
 
@@ -199,7 +185,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   }, [gavePermission]);
 
   useEffect(() => {
-    followUserLocation && animateToLocation(userLocation);
+    userLocation &&
+      animateToLocation({
+        latitude: userLocation.coords.latitude,
+        longitude: userLocation.coords.longitude,
+      });
   }, [userLocation]);
 
   useEffect(() => {
@@ -221,9 +211,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
 
   useEffect(() => {
     if (followUserLocation) {
-      startLocationAsync();
-    } else {
-      removeLocationSubscription();
+      if (followUserLocation === true) {
+        startLocationAsync();
+      } else {
+        removeLocationSubscription();
+      }
     }
   }, [followUserLocation]);
 
