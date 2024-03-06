@@ -46,7 +46,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const USER_LOCATION_INTERVAL_MS = 1000; // ! mabye change this value
 
   // States
-  const [gavePermission, setGavePermission] = useState(false);
   const [userLocation, setUserLocation] = useState<null | Location.LocationObject>(null);
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
@@ -57,7 +56,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   /** @todo STATIC, a remplacer par le store */
   const SuiviExcursion = { etat: "enCours" };
   const { parametres } = useStores();
-  const intervalRef = useRef(null);
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
   const mapRef = useRef<MapView>(null);
 
@@ -123,7 +121,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
     if (!permissionsOK) {
       console.log("[MapScreen] Permission to access location was denied");
     }
-    setGavePermission(permissionsOK);
 
     return permissionsOK;
   };
@@ -178,12 +175,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   };
 
   /* ------------------------------- USE EFFECTS ------------------------------ */
-  useEffect(() => {
-    return () => {
-      clearInterval(intervalRef.current);
-    };
-  }, [gavePermission]);
-
   useEffect(() => {
     userLocation &&
       animateToLocation({
