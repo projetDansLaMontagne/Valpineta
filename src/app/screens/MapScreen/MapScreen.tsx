@@ -119,7 +119,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
     const permissionsOK = status === "granted";
 
     if (!permissionsOK) {
-      console.log("[MapScreen] Permission to access location was denied");
+      console.warn("[MapScreen] Permission to access location was denied");
     }
 
     return permissionsOK;

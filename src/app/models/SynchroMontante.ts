@@ -122,7 +122,7 @@ export const SynchroMontanteModel = types
       if (response.ok) {
         removeAllSignalements();
       } else {
-        console.log(
+        console.error(
           "[SYNCHRO MONTANTE] Debug : Erreur serveur lors de la synchronisation : ",
           getGeneralApiProblem(response),
         );
