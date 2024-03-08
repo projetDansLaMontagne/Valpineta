@@ -13,7 +13,12 @@ import {
   TouchableOpacity,
   ImageStyle,
 } from "react-native";
-import { AppStackScreenProps, T_TypeSignalement, T_Signalement } from "app/navigators";
+import {
+  AppStackScreenProps,
+  T_TypeSignalement,
+  T_flat_point,
+  T_Signalement,
+} from "app/navigators";
 import { colors, spacing } from "app/theme";
 import * as ImagePicker from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -50,6 +55,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     // ActionSheet
     const { showActionSheetWithOptions } = useActionSheet();
 
+    /** @todo STATIC, a remplacer par le store */
+    const SuiviExcursion = { etat: "enCours", trackSuivi: [] as T_flat_point[], iPointCourant: 0 };
     const { synchroMontante } = useStores();
 
     /**
@@ -177,19 +184,40 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     /**
      * Fonction pour envoyer le signalement en base de données
      */
-    const envoyerSignalement = async (signalement: T_Signalement) => {
-      if (saisiesValides(signalement.nom, signalement.description, signalement.image)) {
-        //Conversion de l'image url en base64
-        const blob = await fetch(signalement.image).then(response => response.blob());
-        signalement.image = await blobToBase64(blob);
+    const envoyerSignalement = async (
+      nom: string,
+      type: T_TypeSignalement,
+      description: string,
+      image: string,
+    ) => {
+      if (SuiviExcursion.etat === "enCours") {
+        if (saisiesValides(nom, description, image)) {
+          //Conversion de l'image url en base64
+          const blob = await fetch(image).then(response => response.blob());
+          const pointCourant = SuiviExcursion.trackSuivi[SuiviExcursion.iPointCourant];
 
-        setIsLoading(true);
-        synchroMontante.addSignalement(signalement);
-        const status = await synchroMontante.tryToPush();
-        setIsLoading(false);
+          // Fabrication du nouveau signalement
+          const newSignalement: T_Signalement = {
+            nom,
+            type,
+            description,
+            image: await blobToBase64(blob),
+            lat: pointCourant.lat,
+            lon: pointCourant.lon,
+          };
 
-        AlerteStatus(status);
-        props.navigation.goBack();
+          setIsLoading(true);
+          synchroMontante.addSignalement(newSignalement);
+          const status = await synchroMontante.tryToPush();
+          setIsLoading(false);
+
+          AlerteStatus(status);
+          props.navigation.goBack();
+        }
+      } else {
+        console.error(
+          "[NouveauSignalement] ERREUR : impossible de creer un signalement sans etre en randonnee",
+        );
       }
     };
 
@@ -273,18 +301,9 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           <Button
             style={$bouton}
             tx="pageNouveauSignalement.boutons.valider"
-            onPress={() =>
-              envoyerSignalement({
-                nom,
-                type,
-                description,
-                image,
-                // WARNING A CHANGER AVEC LA LOCALISATION REELLE DE L'UTILISATEUR
-                lat: 42.666,
-                lon: 0.1034,
-                postId: 2049,
-              })
-            }
+            onPress={() => {
+              envoyerSignalement(nom, type, description, image);
+            }}
             textStyle={$textBouton}
           />
         </View>

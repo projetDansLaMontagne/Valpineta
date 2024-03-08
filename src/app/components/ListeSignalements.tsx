@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ScrollView, StyleProp, TouchableWithoutFeedback, View, ViewStyle } from "react-native";
 import { observer } from "mobx-react-lite";
-import { TPoint, T_Signalement, T_flat_point } from "app/navigators";
+import { TPoint, T_SignalementLie, T_flat_point } from "app/navigators";
 import { CarteSignalement } from "./CarteSignalement";
 import { useEffect, useState } from "react";
 import { spacing } from "app/theme";
@@ -12,7 +12,7 @@ export type ListeSignalementsProps = {
    */
   style?: StyleProp<ViewStyle>;
   detaille: boolean;
-  signalements: T_Signalement[];
+  signalements: T_SignalementLie[];
   track: TPoint[];
   onPress?: (point: T_flat_point) => void;
 };
@@ -28,7 +28,7 @@ export const ListeSignalements = observer(function ListeSignalements(
   /** @todo STATIC, a remplacer par le store */
   const SuiviExcursion = { etat: "enCours", iPointCourant: 1100 };
 
-  const [signalementsTries, setSignalementsTries] = useState<T_Signalement[]>([]);
+  const [signalementsTries, setSignalementsTries] = useState<T_SignalementLie[]>([]);
 
   useEffect(() => {
     setSignalementsTries(

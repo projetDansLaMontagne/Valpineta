@@ -11,7 +11,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { AppStackScreenProps, T_Signalement, T_excursion, TPoint } from "app/navigators";
+import { AppStackScreenProps, T_SignalementLie, T_excursion, TPoint } from "app/navigators";
 import { Screen } from "app/components";
 import { spacing, colors } from "app/theme";
 import { ImageSource } from "react-native-vector-icons/Icon";
@@ -538,11 +538,11 @@ const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
 /**
  * @description Affiche les signalements sur la carte.
  *
- * @param signalements {T_Signalement[]} - les signalements de l'excursion
+ * @param signalements {T_SignalementLie[]} - les signalements de l'excursion
  *
  * @returns les signalements à afficher sur la carte.
  */
-const SignalementHandler = ({ signalement }: { signalement: T_Signalement }) => {
+const SignalementHandler = ({ signalement }: { signalement: T_SignalementLie }) => {
   let iconColor: string;
   let image: ImageSource;
 

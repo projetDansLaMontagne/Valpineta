@@ -79,9 +79,13 @@ export type T_Signalement = {
   image: string;
   lat: number;
   lon: number;
-  idExcursion: number;
-  idPointLie: number; // id du point du track sur lequel le signalement est lié
 };
+
+export type T_SignalementLie = {
+  idExcursion: number; //id de l'excursion sur laquelle le signalement est lié
+  idPointLie: number; // id du point du track sur lequel le signalement est lié
+} & T_Signalement;
+
 export type T_infoLangue = {
   nom: string;
   description: string;
@@ -101,7 +105,7 @@ export type T_excursion = {
   es?: T_infoLangue;
   fr?: T_infoLangue;
 
-  signalements: T_Signalement[];
+  signalements: T_SignalementLie[];
   track: TPoint[];
 } & Partial<T_infoLangue>;
 
