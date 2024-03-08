@@ -83,7 +83,7 @@ export const CarteSignalement = observer(function CarteSignalement(props: CarteS
           <View style={styles.container}>
             {props.imageSignalement && (
               <Image
-                source={{ uri: `data:image/jpeg;base64,${props.imageSignalement}` }} // On récupère l'image en base64
+                source={{ uri: props.imageSignalement }} // On récupère l'image en base64
                 style={styles.image}
               />
             )}
