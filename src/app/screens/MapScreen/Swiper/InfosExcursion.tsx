@@ -125,9 +125,7 @@ export function InfosExcursion(props: InfosExcursionProps) {
 
           <View style={$containerDenivele}>
             <Text tx="detailsExcursion.titres.denivele" size="xl" />
-            {excursion.track && (
-              <GraphiqueDenivele points={excursion.track as T_Point[]} detaille={true} />
-            )}
+            {excursion.track && <GraphiqueDenivele points={excursion.track} detaille={true} />}
           </View>
         </View>
       </TouchableWithoutFeedback>

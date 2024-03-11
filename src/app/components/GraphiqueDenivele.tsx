@@ -4,10 +4,8 @@ import { colors, spacing } from "app/theme";
 import { LineChart } from "react-native-chart-kit";
 import { T_point } from "app/navigators";
 
-type T_point_graphique = Omit<T_point, "pos">
-
+type T_point_graphique = Pick<T_point, "alt" | "dist">;
 export interface GraphiqueDeniveleProps {
-  style?: StyleProp<ViewStyle>;
   detaille: boolean;
   points: T_point_graphique[];
 }
@@ -15,28 +13,48 @@ export interface GraphiqueDeniveleProps {
 export const GraphiqueDenivele = observer(function GraphiqueDenivele(
   props: GraphiqueDeniveleProps,
 ) {
+  /* -------------------------------- VARIABLES ------------------------------- */
+  const { points: allPoints, detaille } = props;
+  const { width } = Dimensions.get("window");
+  const PRECISION = 40; // Precision de l altitude (nombre de points du graphique)
+
   /* ---------------------- PROTECTION MAUVAIS PARAMETRES --------------------- */
-  if (!props.points || props.detaille === undefined) {
-    throw new Error("GraphiqueDenivele : Mauvais parametres");
+  if (!allPoints || detaille === undefined) {
+    throw new Error("[GraphiqueDenivele] Mauvais parametres");
   }
 
-  /* -------------------------------- Variables ------------------------------- */
-  const { width } = Dimensions.get("window");
-  const precision = 40; // Precision de l altitude (nombre de points du graphique)
+  for (const point of allPoints) {
+    if (point.alt === undefined) {
+      console.error("[GraphiqueDenivele] Tous les points doivent avoir une altitude");
+      return <></>;
+    }
+  }
 
-  /* -------------------------------- Fonctions ------------------------------- */
+  /* --------------------------- DONNEES GRAPHIQUES --------------------------- */
+  const points = trackReduit(allPoints, PRECISION);
+  const abscises = getAbscises(points);
+  const donneesGraphique = {
+    labels: abscises,
+    datasets: [
+      {
+        data: points.map(point => point.alt),
+        strokeWidth: detaille ? 3 : 2,
+      },
+    ],
+  };
+
+  /* -------------------------------- FONCTIONS ------------------------------- */
   /**
-   * Formate les points de l excursion pour qu ils soient utilisables par le graphique
+   * Reduit le nombre de points du track a la valeur souhaitee
    * @param track Le track (points du track)
-   * @param nbFragments Le nombre de points souhaités sur le diagrame (doit etre inferieur au nombre de points de l excursion)
-   * @returns Les points formates
+   * @param nbFragments Le nombre de points souhaités sur le diagrame
    */
-  const trackReduit = (track: T_point_graphique[], nbFragments: number) => {
+  function trackReduit(track: T_point_graphique[], nbFragments: number) {
     /* ---------------------- Verifications des parametres ---------------------- */
     if (nbFragments > track.length) {
       // Si on demande trop de fragments par rapport au nombre de points du track
-      // On reduit le nombre de fragments au nombre de points du track
-      nbFragments = track.length;
+      // On retourne le track initial sans le reduire
+      return track;
     }
 
     /* -------------------------- Selection des points -------------------------- */
@@ -66,10 +84,10 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
         } else {
           // Le point est apres la distance ideale
           const prevNearest = ecartPointPrecedent < distancePoint - distanceIdeale;
-          const pointLePlusProche = prevNearest ? track[indexPoint - 1] : track[indexPoint];
+          const nearestPoint = prevNearest ? track[indexPoint - 1] : track[indexPoint];
 
           // Sauvegarde du point le plus proche
-          pointsSelectionnes.push(pointLePlusProche);
+          pointsSelectionnes.push(nearestPoint);
 
           // On passe a la prochaine distance ideale
           distanceIdeale += incrementFragments;
@@ -79,13 +97,13 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     }
 
     return pointsSelectionnes;
-  };
+  }
 
   /**
    * Pour recupérer les 4 abscisses du graphique
    */
-  const getAbscises = (points: T_point_graphique[]): string[] => {
-    let abscisses = [];
+  function getAbscises(points: T_point_graphique[]) {
+    let abscisses: string[] = [];
     for (let quart = 0; quart < 4; quart++) {
       // Pour les 4 abscisses (les 4 premiers quarts)
       const index = Math.round((points.length * quart) / 4);
@@ -94,33 +112,15 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     }
 
     return abscisses;
-  };
-
-  /* ------------------------ Calcul donnees graphiques ----------------------- */
-  // Reduction du nombre de points a la valeur souhaitee
-  const points = trackReduit(props.points, precision);
-
-  // Calcul des 4 absisses
-  const abscises = getAbscises(points);
-
-  // Creation des donnees pour le graphique
-  const donneesGraphique = {
-    labels: abscises,
-    datasets: [
-      {
-        data: points.map(point => point.alt ?? 0),
-        strokeWidth: props.detaille ? 3 : 2,
-      },
-    ],
-  };
+  }
 
   return (
     <LineChart
       data={donneesGraphique}
       width={width - spacing.xl * 2}
-      height={props.detaille ? 200 : 100}
+      height={detaille ? 200 : 100}
       formatYLabel={valeur => Math.round(+valeur / 50) * 50 + " m"}
-      withVerticalLabels={props.detaille}
+      withVerticalLabels={detaille}
       withHorizontalLabels={true}
       withInnerLines={false}
       withOuterLines={false}
