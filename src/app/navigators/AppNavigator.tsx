@@ -87,7 +87,6 @@ export type T_infoLangue = {
 
 export type T_excursion = {
   denivele: number;
-  description: string;
   difficulteOrientation: number;
   difficulteTechnique: number;
   distance: number;

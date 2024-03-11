@@ -16,10 +16,6 @@ const T_point = types.model({
   alt: types.number,
   dist: types.number,
 });
-const T_excursion_suivie = types.model({
-  index: types.number,
-  track: types.array(T_point),
-});
 type T_etat_excursion = "nonDemarree" | "enCours" | "enPause" | "terminee";
 
 // Constantes
@@ -34,9 +30,9 @@ export const SuiviExcursionModel = types
   .model("SuiviExcursion")
   .props({
     etat: "nonDemarree",
-    trackReel: types.optional(types.array(T_point_GPX), []),
-    excursionSuivie: types.maybeNull(T_excursion_suivie),
-    iPointCourant: 0,
+    trackReel: types.maybeNull(types.array(T_point_GPX)),
+    trackSuivi: types.maybeNull(types.array(T_point)),
+    iPointCourant: types.maybeNull(types.integer),
     __DEV__: false,
   })
   .actions(withSetPropAction)
@@ -54,20 +50,14 @@ export const SuiviExcursionModel = types
     /**
      * Setter privé pour le track reel
      */
-    _setTrackReel(value: Instance<typeof T_point_GPX>[]) {
+    _setTrackReel(value: Instance<typeof T_point_GPX>[] | null) {
       self.trackReel.replace(value);
     },
     /**
      * Setter privé pour le track suivi
      */
-    _setExcursionSuivie(value: Instance<typeof T_excursion_suivie>) {
-      self.excursionSuivie = value;
-    },
-    /**
-     * Setter privé pour le point courant
-     */
-    _setPointCourant(value: number) {
-      self.iPointCourant = value;
+    _setTrackSuivi(value: Instance<typeof T_point>[] | null) {
+      self.trackSuivi.replace(value);
     },
     /**
      * Setter pour le point courant
@@ -83,7 +73,7 @@ export const SuiviExcursionModel = types
     type switchStateParams =
       | {
           newEtat: "enCours";
-          excursionSuivie?: Instance<typeof T_excursion_suivie>; // Si on passe de nonDemarree a enCours, on doit fournir l excursionSuivie
+          trackSuivi?: Instance<typeof T_point>[] | null; // Si on passe de nonDemarree a enCours, on doit fournir l excursionSuivie
         }
       | { newEtat: Exclude<T_etat_excursion, "enCours"> };
     /**
@@ -98,7 +88,7 @@ export const SuiviExcursionModel = types
       let verificationsOK = false;
       switch (self.etat) {
         case "nonDemarree":
-          if (newEtat === "enCours" && props.excursionSuivie !== undefined) verificationsOK = true;
+          if (newEtat === "enCours" && props.trackSuivi) verificationsOK = true;
           break;
 
         case "enCours":
@@ -119,13 +109,13 @@ export const SuiviExcursionModel = types
         let aFonctionne: boolean;
         switch (newEtat) {
           case "nonDemarree":
-            self._setTrackReel([]);
-            self._setExcursionSuivie(undefined);
-            self._setPointCourant(0);
+            self._setTrackReel(null);
+            self._setTrackSuivi(null);
+            self.setIPointCourant(null);
             aFonctionne = true;
             break;
           case "enCours":
-            self._setExcursionSuivie(props.excursionSuivie);
+            self._setTrackSuivi(props.trackSuivi);
             aFonctionne = await startBackgroundTask();
             break;
           case "enPause":

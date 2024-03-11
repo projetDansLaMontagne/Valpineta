@@ -29,9 +29,8 @@ export function tacheLocalisationBackground(
   });
 
   // Positionnement sur le track reel
-  const { excursionSuivie, trackReel } = suiviExcursion;
-  const trackSuivi = excursionSuivie.track;
-  
+  const { trackSuivi, trackReel } = suiviExcursion;
+
   const lastLoc = trackReel[trackReel.length - 1];
   const nbPoints = trackSuivi.length;
   const PX = { lat: lastLoc.lat, lon: lastLoc.lon }; //Position actuelle
@@ -69,12 +68,12 @@ export function tacheLocalisationBackground(
       // Pas de changement de point
       break;
     }
+  }
 
-    // Si le point courant a change, on verifie si on est perdu (trop ecarte du point)
-    const distNearest = distanceEntrePoints(PX, trackSuivi[suiviExcursion.iPointCourant]);
-    if (distNearest > RAYON_DEVIATION) {
-      /**@todo GERER LES NOTIFS */
-    }
+  // Si le point courant a change, on verifie si on est perdu (trop ecarte du point)
+  const distNearest = distanceEntrePoints(PX, trackSuivi[suiviExcursion.iPointCourant]);
+  if (distNearest > RAYON_DEVIATION) {
+    /**@todo GERER LES NOTIFS */
   }
 }
 
