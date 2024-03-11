@@ -46,7 +46,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const USER_LOCATION_INTERVAL_MS = 1000; // ! mabye change this value
 
   // States
-  const [userLocation, setUserLocation] = useState<null | Location.LocationObject>(null);
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
@@ -88,7 +87,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const removeLocationSubscription = () => {
     if (watchPositionSubscriptionRef.current) {
       watchPositionSubscriptionRef.current.remove();
-      setUserLocation(null);
     }
   };
 
@@ -108,7 +106,10 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
           distanceInterval: 1,
         },
         location => {
-          setUserLocation(location);
+          animateToLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
         },
       );
     }
@@ -176,14 +177,6 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
 
   /* ------------------------------- USE EFFECTS ------------------------------ */
   useEffect(() => {
-    userLocation &&
-      animateToLocation({
-        latitude: userLocation.coords.latitude,
-        longitude: userLocation.coords.longitude,
-      });
-  }, [userLocation]);
-
-  useEffect(() => {
     if (menuIsOpen) {
       // animate the 'addPOIBtnRef' and 'addWarningBtnRef' buttons
       Animated.sequence([
@@ -213,6 +206,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   useEffect(() => {
     downloadTiles();
 
+    /**@todo STATIC, a globaliser (langue ne se met pas a jour automatiquement) */
     const excursions: T_excursion[] = require("assets/JSON/excursions.json");
     setAllExcursions(applicationLangue(excursions, parametres.langue));
 
