@@ -22,7 +22,6 @@ import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import { InfosExcursion } from "./InfosExcursion";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { LocationObject } from "expo-location";
 import { LatLng } from "react-native-maps";
 
 const { width, height } = Dimensions.get("window");

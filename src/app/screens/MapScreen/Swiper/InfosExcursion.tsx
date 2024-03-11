@@ -1,6 +1,4 @@
-import { CarteSignalement } from "app/components/CarteSignalement";
 import { colors, spacing } from "app/theme";
-import { recupDistance } from "app/utils/recupDistance";
 import {
   View,
   ViewStyle,
@@ -17,7 +15,6 @@ import { Text, GraphiqueDenivele, ListeSignalements } from "app/components";
 import { T_Point } from "app/components/GraphiqueDenivele";
 import { AppStackParamList, T_excursion } from "app/navigators";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { LocationObject } from "expo-location";
 
 export interface InfosExcursionProps {
   excursion: T_excursion;

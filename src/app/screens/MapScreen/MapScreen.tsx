@@ -11,7 +11,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { AppStackScreenProps, T_SignalementLie, T_excursion, TPoint } from "app/navigators";
+import { AppStackScreenProps, T_signalement_lie, T_excursion, T_point } from "app/navigators";
 import { Screen } from "app/components";
 import { spacing, colors } from "app/theme";
 import { ImageSource } from "react-native-vector-icons/Icon";
@@ -280,7 +280,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             <>
               <Polyline
                 coordinates={excursion.track.map(
-                  (point: TPoint) =>
+                  (point: T_point) =>
                     ({
                       latitude: point.lat,
                       longitude: point.lon,
@@ -459,56 +459,44 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
  * @returns les points de départ, milieu et fin de l'excursion
  */
 type StartMiddleAndEndHandlerProps = {
-  track: TPoint[];
+  track: T_point[];
   typeParcours: "Ida" | "Ida y Vuelta" | "Circular";
 };
 const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
   const { track, typeParcours } = props;
 
-  // Point d'arrivée
-  const start = {
-    ...track[0],
-    title: "Départ",
-  };
-  const end = {
-    ...track[track.length - 1],
-    title: "Arrivée",
-  };
-  let points: TPoint[] & { title: string }[];
+  const start = track[0];
+  const end = track[track.length - 1];
+  const sameExtremities = typeParcours !== "Ida"; // Indique si on a le même point de départ et d'arrivée
 
-  // Calcul du point du milieu
   // Si c'est un aller-retour, le parcours étant symétrique,
   // on prend le point à la moitié de la distance totale
   const middleDistance = end.dist / (typeParcours === "Ida y Vuelta" ? 1 : 2);
+  const mid = track
+    .sort((a, b) => {
+      return a.dist - b.dist;
+    })
+    // find prend le premier élément qui correspond à la condition, vu que c'est sorted, on a le bon point
+    .find(point => point.dist >= middleDistance);
 
-  const middle = {
-    ...track
-      .sort((a, b) => {
-        return a.dist - b.dist;
-      })
-      .find(point => point.dist >= middleDistance),
-    title: "Milieu",
-  };
-  // find prend le premier élément qui correspond à la condition, vu que c'est sorted, on a le bon point
-
-  // À ce stade, on a les points d'arrivée et du milieu.
-  switch (typeParcours) {
-    case "Ida": // aller simple
-      // Point de départ si c'est un aller simple
-      points = [start, middle, end];
-      break;
-    case "Ida y Vuelta":
-    case "Circular":
-      // Point d'arrivée si c'est un aller-retour
-      start.title = "Départ / Arrivée";
-
-      points = [start, middle];
-      break;
-  }
+  const markers = [
+    {
+      ...start,
+      title: sameExtremities ? "Départ / Arrivée" : "Départ",
+    },
+    {
+      ...mid,
+      title: "Milieu",
+    },
+    !sameExtremities && {
+      ...end,
+      title: "Arrivée",
+    },
+  ];
 
   const image: ImageSource = require("assets/icons/location.png");
 
-  return points.map((point, index) => (
+  return markers.map((point, index) => (
     <Marker
       coordinate={{
         latitude: point.lat ?? 0,
@@ -538,11 +526,11 @@ const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
 /**
  * @description Affiche les signalements sur la carte.
  *
- * @param signalements {T_SignalementLie[]} - les signalements de l'excursion
+ * @param signalements {T_signalement_lie[]} - les signalements de l'excursion
  *
  * @returns les signalements à afficher sur la carte.
  */
-const SignalementHandler = ({ signalement }: { signalement: T_SignalementLie }) => {
+const SignalementHandler = ({ signalement }: { signalement: T_signalement_lie }) => {
   let iconColor: string;
   let image: ImageSource;
 

@@ -15,9 +15,9 @@ import {
 } from "react-native";
 import {
   AppStackScreenProps,
-  T_TypeSignalement,
+  T_type_signalement,
   T_flat_point,
-  T_Signalement,
+  T_signalement,
 } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import * as ImagePicker from "expo-image-picker";
@@ -28,7 +28,7 @@ import { Button, Screen, Text } from "app/components";
 import { EtatSynchro, useStores } from "app/models";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
-  type: T_TypeSignalement;
+  type: T_type_signalement;
 }
 
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
@@ -186,7 +186,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
      */
     const envoyerSignalement = async (
       nom: string,
-      type: T_TypeSignalement,
+      type: T_type_signalement,
       description: string,
       image: string,
     ) => {
@@ -197,7 +197,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           const pointCourant = SuiviExcursion.trackSuivi[SuiviExcursion.iPointCourant];
 
           // Fabrication du nouveau signalement
-          const newSignalement: T_Signalement = {
+          const newSignalement: T_signalement = {
             nom,
             type,
             description,
@@ -290,7 +290,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           {photoErreur && !image && (
             <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
           )}
-          <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
+          <TouchwableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
             <Image
               style={{ tintColor: colors.palette.vert }}
               source={require("../../assets/icons/camera.png")}

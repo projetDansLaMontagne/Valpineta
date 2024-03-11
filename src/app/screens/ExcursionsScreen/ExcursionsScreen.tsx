@@ -8,9 +8,8 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  Keyboard,
 } from "react-native";
-import { AppStackScreenProps, T_excursion, TFiltres, T_valeurs_filtres } from "app/navigators";
+import { AppStackScreenProps, T_excursion, T_filtres, T_valeurs_filtres } from "app/navigators";
 import { Screen, Text } from "app/components";
 import { CarteExcursion } from "./CarteExcursion";
 import { colors, spacing } from "app/theme";
@@ -55,6 +54,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   /**
    * Cette fonction doit etre executee systematiquement lors de la synchro descendante
    * Recupere les valeurs max et les intervalles de chaque filtre (valeurs max, types de parcours, vallees)
+   * @todo Déplacer cette fonction en back, pour recalculer les filtres à chaque ajout d'excursion
    */
   const calculValeursFiltres = (excursions: T_excursion[]): T_valeurs_filtres => {
     // Parcourt de chaque excursion pour connaitre les maximas
@@ -114,9 +114,9 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
    * Tri et filtre des excursions avec les filtres
    * Doit etre effectué a chaque modification des filtres
    */
-  function filtrageParametre(excursions: T_excursion[], filtres: TFiltres) {
+  function filtrageParametre(excursions: T_excursion[], filtres: T_filtres) {
     const nomsTypesParcours =
-      parametres.langue == "fr"
+      parametres.langue === "fr"
         ? ["Aller simple", "Aller/retour", "Circuit"]
         : ["Ida", "Ida y Vuelta", "Circular"];
 
@@ -127,7 +127,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       return !(
         excursion.distance < filtres.intervalleDistance.min ||
         excursion.distance > filtres.intervalleDistance.max ||
-        (excursion.duree.h == filtres.intervalleDuree.max && excursion.duree.m != 0) ||
+        (excursion.duree.h === filtres.intervalleDuree.max && excursion.duree.m !== 0) ||
         excursion.duree.h < filtres.intervalleDuree.min ||
         excursion.duree.h > filtres.intervalleDuree.max ||
         excursion.denivele < filtres.intervalleDenivele.min ||
@@ -231,7 +231,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
       </View>
 
       {excursionsFiltreesBarre &&
-        (excursionsFiltreesBarre.length == 0 ? (
+        (excursionsFiltreesBarre.length === 0 ? (
           <Text tx="excursions.absenceResultats" />
         ) : (
           <ScrollView style={styles.scrollContainer}>

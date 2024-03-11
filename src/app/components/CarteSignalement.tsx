@@ -2,10 +2,10 @@ import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
 import { Text } from "app/components/Text";
-import { T_TypeSignalement } from "app/navigators";
+import { T_type_signalement } from "app/navigators";
 
 type CarteSignalementProps = {
-  type: T_TypeSignalement;
+  type: T_type_signalement;
   nomSignalement: string;
   distanceDuDepartEnM?: number;
   isDistanceAbsolue: boolean;
