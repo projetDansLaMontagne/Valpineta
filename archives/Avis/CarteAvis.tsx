@@ -29,7 +29,7 @@ export const CarteAvis = observer(function CarteAvis(props: CarteAvisProps) {
   const $styles = [$container, style];
   const { nombreEtoiles, texteAvis } = props;
 
-  var etoilesVides = 5 - nombreEtoiles;
+  let etoilesVides = 5 - nombreEtoiles;
 
   return (
     <View style={$styles}>

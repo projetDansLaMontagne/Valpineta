@@ -34,7 +34,7 @@ interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSign
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
     //type de signalement
-    var type = props.route.params?.type;
+    let type = props.route.params?.type;
     if (type === undefined) {
       throw new Error("[NouveauSignalementScreen] Type de signalement non défini");
     }

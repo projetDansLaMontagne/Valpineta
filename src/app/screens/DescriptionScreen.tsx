@@ -46,8 +46,8 @@ export const DescriptionScreen: FC<DescriptionScreenProps> = observer(function D
     );
   } else {
     const { excursion } = route.params;
-    var nomExcursion = "";
-    var description = "";
+    let nomExcursion = "";
+    let description = "";
 
     if (excursion) {
       nomExcursion = excursion.nom;

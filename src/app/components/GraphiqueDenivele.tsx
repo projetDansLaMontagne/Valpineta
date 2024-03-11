@@ -2,18 +2,14 @@ import { StyleProp, View, ViewStyle, Dimensions } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
 import { LineChart } from "react-native-chart-kit";
+import { T_point } from "app/navigators";
 
-export type T_Point = {
-  lat: number;
-  lon: number;
-  alt: number;
-  dist: number;
-};
+type T_point_graphique = Omit<T_point, "pos">
 
 export interface GraphiqueDeniveleProps {
   style?: StyleProp<ViewStyle>;
   detaille: boolean;
-  points: T_Point[];
+  points: T_point_graphique[];
 }
 
 export const GraphiqueDenivele = observer(function GraphiqueDenivele(
@@ -35,7 +31,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
    * @param nbFragments Le nombre de points souhaités sur le diagrame (doit etre inferieur au nombre de points de l excursion)
    * @returns Les points formates
    */
-  const trackReduit = (track: T_Point[], nbFragments: number): T_Point[] => {
+  const trackReduit = (track: T_point_graphique[], nbFragments: number) => {
     /* ---------------------- Verifications des parametres ---------------------- */
     if (nbFragments > track.length) {
       // Si on demande trop de fragments par rapport au nombre de points du track
@@ -45,21 +41,18 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
 
     /* -------------------------- Selection des points -------------------------- */
     // (c est cette etape qui va assurer une distance equivalente entre les points)
-    var pointsSelectionnes = [];
+    let pointsSelectionnes: T_point_graphique[] = [];
     const distanceTotale = track[track.length - 1].dist; // Distance du dernier point
     const incrementFragments = distanceTotale / (nbFragments - 1); // Increment (en m) entre chaque fragments
 
     // Variables de la boucle
-    var distanceIdeale = 0;
-    var indexPoint = 0;
-    var ecartPointPrecedent = Infinity;
+    let distanceIdeale = 0;
+    let indexPoint = 0;
+    let ecartPointPrecedent = Infinity;
 
     // Pour chaque fragment, on recherche le point le plus proche de sa distance ideale
     // Le but est d encadrer la distance ideale entre deux points et de prendre le plus proche
     while (true) {
-      // console.log("Point n°" + indexPoint + " à " + points[indexPoint].dist + "m")
-      // console.log("Distance ideale : " + distanceIdeale + "m")
-
       if (distanceIdeale > distanceTotale) {
         // Dernier point atteint
         break;
@@ -71,15 +64,9 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
           ecartPointPrecedent = distanceIdeale - distancePoint;
           indexPoint += 1;
         } else {
-          // Le point est (à / apres) la distance ideale
-          var pointLePlusProche;
-          if (ecartPointPrecedent < distancePoint - distanceIdeale) {
-            // Le point precedent est plus proche
-            pointLePlusProche = track[indexPoint - 1];
-          } else {
-            // Le point est plus proche que le precedent
-            pointLePlusProche = track[indexPoint];
-          }
+          // Le point est apres la distance ideale
+          const prevNearest = ecartPointPrecedent < distancePoint - distanceIdeale;
+          const pointLePlusProche = prevNearest ? track[indexPoint - 1] : track[indexPoint];
 
           // Sauvegarde du point le plus proche
           pointsSelectionnes.push(pointLePlusProche);
@@ -97,8 +84,8 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
   /**
    * Pour recupérer les 4 abscisses du graphique
    */
-  const getAbscises = (points: T_Point[]): string[] => {
-    var abscisses = [];
+  const getAbscises = (points: T_point_graphique[]): string[] => {
+    let abscisses = [];
     for (let quart = 0; quart < 4; quart++) {
       // Pour les 4 abscisses (les 4 premiers quarts)
       const index = Math.round((points.length * quart) / 4);
