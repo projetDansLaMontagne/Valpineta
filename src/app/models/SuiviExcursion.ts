@@ -50,14 +50,14 @@ export const SuiviExcursionModel = types
     /**
      * Setter privé pour le track reel
      */
-    _setTrackReel(value: Instance<typeof T_point_GPX>[] | null) {
-      self.trackReel.replace(value);
+    _setTrackReel(value: any) {
+      self.trackReel = value;
     },
     /**
      * Setter privé pour le track suivi
      */
-    _setTrackSuivi(value: Instance<typeof T_point>[] | null) {
-      self.trackSuivi.replace(value);
+    _setTrackSuivi(value: any) {
+      self.trackSuivi = value;
     },
     /**
      * Setter pour le point courant
@@ -88,7 +88,8 @@ export const SuiviExcursionModel = types
       let verificationsOK = false;
       switch (self.etat) {
         case "nonDemarree":
-          if (newEtat === "enCours" && props.trackSuivi) verificationsOK = true;
+          if (newEtat === "enCours" && props.trackSuivi && props.trackSuivi.length !== 0)
+            verificationsOK = true;
           break;
 
         case "enCours":
@@ -104,61 +105,58 @@ export const SuiviExcursionModel = types
           break;
       }
 
-      /* -------------------------- Actions consecutives -------------------------- */
-      if (verificationsOK) {
-        let aFonctionne: boolean;
-        switch (newEtat) {
-          case "nonDemarree":
-            self._setTrackReel(null);
-            self._setTrackSuivi(null);
-            self.setIPointCourant(null);
-            aFonctionne = true;
-            break;
-          case "enCours":
-            self._setTrackSuivi(props.trackSuivi);
-            aFonctionne = await startBackgroundTask();
-            break;
-          case "enPause":
-            stopBackgroundTask();
-            aFonctionne = true;
-            break;
-          case "terminee":
-            stopBackgroundTask();
-            /**@todo sauvegarde du track reel*/
-            /**@todo publication avis*/
-            aFonctionne = true;
-            break;
-        }
-        if (aFonctionne === true) {
-          self._setEtat(newEtat);
-          return true;
-        } else {
-          console.warn("[SuiviExcursion] Erreur : Impossible de changer d etat");
-          return false;
-        }
-      } else {
+      if (!verificationsOK) {
         console.warn("[SuiviExcursion] Erreur : Pre requis violés");
         return false;
       }
+
+      /* -------------------------- Actions consecutives -------------------------- */
+      let aFonctionne = true;
+      switch (newEtat) {
+        case "nonDemarree":
+          self._setTrackReel(null);
+          self._setTrackSuivi(null);
+          self.setIPointCourant(null);
+          break;
+        case "enCours":
+          if (self.etat === "nonDemarree") {
+            self._setTrackReel([]);
+            self._setTrackSuivi(props.trackSuivi);
+            self.setIPointCourant(0);
+          }
+          const success = await startBackgroundTask();
+          if (!success) aFonctionne = false;
+          break;
+        case "enPause":
+          stopBackgroundTask();
+          break;
+        case "terminee":
+          if (self.etat === "enCours") stopBackgroundTask();
+          /**@todo sauvegarde du track reel*/
+          /**@todo publication avis*/
+          break;
+      }
+      if (aFonctionne) {
+        self._setEtat(newEtat);
+      } else {
+        console.warn("[SuiviExcursion] Erreur : Impossible de changer d etat");
+      }
+      return aFonctionne;
     }
     /**
      * Demande les permissions pour la localisation en front puis en back
      * @returns booleen indiquant si les permissions ont ete obtenues
      */
     async function requestPermissions(): Promise<boolean> {
-      try {
-        const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
-        if (foregroundStatus === "granted") {
-          const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-          if (backgroundStatus === "granted") {
-            return true;
-          }
-        }
-        return false;
-      } catch (e) {
-        console.warn("[requestPermissions]:", e);
+      const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+      if (foregroundStatus !== "granted") {
         return false;
       }
+      const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+      if (backgroundStatus !== "granted") {
+        return false;
+      }
+      return true;
     }
     function ajoutPointTrackReel(point: Instance<typeof T_point_GPX>) {
       self.trackReel.push(point);
@@ -172,36 +170,38 @@ export const SuiviExcursionModel = types
      * Methode privee pour demarrer la tache de fond de suivi, en s assurant que les permissions sont ok
      */
     async function startBackgroundTask(): Promise<boolean> {
-      const permissionsOK = await requestPermissions();
+      try {
+        const permissionsOK = await requestPermissions();
 
-      if (permissionsOK) {
-        if ((await tacheEnCours()) === false) {
-          await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME, {
-            accuracy: ACCURACY,
-            timeInterval: self.__DEV__
-              ? 1000
-              : undefined /**@warning ne fonctionne pas sur Xiaomi. L'opti de batterie fait qu il envoie la loc seulement quand on bouge */,
-            distanceInterval: self.__DEV__ ? undefined : DISTANCE_INTERVAL,
+        if (permissionsOK) {
+          if ((await tacheEnCours()) === false) {
+            await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME, {
+              accuracy: ACCURACY,
+              timeInterval: self.__DEV__
+                ? 1000
+                : undefined /**@warning certains telephones ont des optimisateur de batterie qui surpassent ce parametre*/,
+              distanceInterval: self.__DEV__ ? undefined : DISTANCE_INTERVAL,
 
-            pausesUpdatesAutomatically: self.__DEV__ ? false : true, // APPLE only : permet d envoyer moins de loc si elles sont rapprochees
-            showsBackgroundLocationIndicator: true, // APPLE only : pour changer l apparence du bandeau
+              pausesUpdatesAutomatically: self.__DEV__ ? false : true, // APPLE only : permet d envoyer moins de loc si elles sont rapprochees
+              showsBackgroundLocationIndicator: true, // APPLE only : pour changer l apparence du bandeau
 
-            foregroundService: {
-              notificationTitle: "Suivi de votre randonnées en cours",
-              notificationBody:
-                "Ne fermez pas l'application sinon vous ne pourrez plus être suivi.",
-              killServiceOnDestroy: true,
-            },
-          });
+              foregroundService: {
+                notificationTitle: "Suivi de votre randonnées en cours",
+                notificationBody:
+                  "Ne fermez pas l'application sinon vous ne pourrez plus être suivi.",
+                killServiceOnDestroy: true,
+              },
+            });
 
-          console.log("Suivi en arrière-plan lancé");
-        } else {
-          TaskManager.getRegisteredTasksAsync().then(console.log);
-          console.log("Suivi en arrière-plan déjà en cours");
+            console.log("DEBUG - Suivi en arrière-plan lancé");
+          } else {
+            TaskManager.getRegisteredTasksAsync().then(console.log);
+            console.log("DEBUG - Suivi en arrière-plan déjà en cours");
+          }
         }
-
-        return true;
-      } else {
+        return permissionsOK;
+      } catch (e) {
+        console.warn("[startBackgroundTask]:", e);
         return false;
       }
     }
@@ -221,7 +221,7 @@ export const SuiviExcursionModel = types
       }
     }
 
-    return { setEtat, requestPermissions, ajoutPointTrackReel, tacheEnCours };
+    return { setEtat, ajoutPointTrackReel, tacheEnCours };
   }); // eslint-disable-line @typescript-eslint/no-unused-vars
 
 export interface SuiviExcursion extends Instance<typeof SuiviExcursionModel> {}
