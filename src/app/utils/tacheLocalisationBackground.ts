@@ -3,27 +3,34 @@ import { TaskManagerError } from "expo-task-manager";
 import { distanceEntrePoints } from "./distanceEntrePoints";
 import { LocationObject } from "expo-location";
 import { T_flat_point } from "app/navigators";
+import { SuiviTrack } from "app/screens/DetailsExcursionScreen/SuiviTrack";
 
 const RAYON_DEVIATION = 30; // Rayon autour du point a partir duquel on considere l utilisateur comme devie
+const DISTANCE_DETECTION_SIGNALEMENT = 30; // Distance a partir de laquelle on detecte un signalement
+
+export type T_location_recieved = {
+  alt: number;
+  timestamp: number;
+} & T_flat_point;
 
 /**
  * Remplit suiviExcursion.trackReel des reelles coordonnees parcourues
  */
 export function tacheLocalisationBackground(
-  locations: LocationObject[],
+  locations: T_location_recieved[],
   error: TaskManagerError,
   suiviExcursion: SuiviExcursion,
 ) {
   if (error) {
-    console.error(error);
-    return;
+    throw new Error(error.message);
   }
 
+  // Sauvegarde des coordonnees recuperees
   locations.forEach(location => {
     suiviExcursion.ajoutPointTrackReel({
-      lat: location.coords.latitude,
-      lon: location.coords.longitude,
-      alt: location.coords.altitude,
+      lat: location.lat,
+      lon: location.lon,
+      alt: location.alt,
       timestamp: location.timestamp,
     });
   });
@@ -42,12 +49,26 @@ export function tacheLocalisationBackground(
     // (prev) <------> (P) <--(PX)----> (next)
     const P = trackSuivi[iPointCourant]; //Dernier point validé
 
-    const isFirstPoint = iPointCourant == 0;
-    const isLastPoint = iPointCourant == nbPoints - 1;
+    const isFirstPoint = iPointCourant === 0;
+    const isLastPoint = iPointCourant === nbPoints - 1;
 
     const prev = isFirstPoint ? undefined : trackSuivi[iPointCourant - 1];
     const next = isLastPoint ? undefined : trackSuivi[iPointCourant + 1];
 
+    // console.log(
+    //   "trackSuivi :",
+    //   trackSuivi,
+    //   "\niPointCourant :",
+    //   iPointCourant,
+    //   "\nP : ",
+    //   P,
+    //   "\nPX : ",
+    //   PX,
+    //   "\nprev : ",
+    //   prev,
+    //   "\nnext : ",
+    //   next,
+    // );
     const nextPointNearer = next && distanceEntrePoints(next, PX) < distanceEntrePoints(P, PX);
     const prevPointNearer = prev && distanceEntrePoints(prev, PX) < distanceEntrePoints(P, PX);
     const isLost = next && next.dist - P.dist < distanceEntrePoints(P, PX);

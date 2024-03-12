@@ -63,12 +63,31 @@ export const useInitialRootStore = (callback: () => void | Promise<void>) => {
       _unsubscribe = unsubscribe;
 
       // setup background location task
-      TaskManager.defineTask("background-location-task", ({ data, error }) =>
-        tacheLocalisationBackground(
-          data.locations as LocationObject[],
-          error,
-          rootStore.suiviExcursion,
-        ),
+      type T_data = {
+        locations: LocationObject[];
+      };
+      TaskManager.defineTask<T_data>(
+        "background-location-task",
+        ({ data: { locations }, error }) => {
+          if (!locations) {
+            console.warn("ERREUR : Pas de coordonnées dans la tache de localisation");
+            return;
+          }
+          try {
+            tacheLocalisationBackground(
+              locations.map(coord => ({
+                lat: coord.coords.latitude,
+                lon: coord.coords.longitude,
+                alt: coord.coords.altitude,
+                timestamp: coord.timestamp,
+              })),
+              error,
+              rootStore.suiviExcursion,
+            );
+          } catch (e) {
+            console.error("[tacheLocalisationBackground] :", e);
+          }
+        },
       );
 
       // reactotron integration with the MST root store (DEV only)
