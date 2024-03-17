@@ -23,13 +23,6 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     throw new Error("[GraphiqueDenivele] Mauvais parametres");
   }
 
-  for (const point of allPoints) {
-    if (point.alt === undefined) {
-      console.error("[GraphiqueDenivele] Tous les points doivent avoir une altitude");
-      return <></>;
-    }
-  }
-
   /* --------------------------- DONNEES GRAPHIQUES --------------------------- */
   const points = trackReduit(allPoints, PRECISION);
   const abscises = getAbscises(points);
@@ -37,7 +30,7 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
     labels: abscises,
     datasets: [
       {
-        data: points.map(point => point.alt),
+        data: points.map(point => point.alt ?? 0),
         strokeWidth: detaille ? 3 : 2,
       },
     ],
