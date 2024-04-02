@@ -279,7 +279,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
           zoomControlEnabled={false}
           zoomEnabled={true}
           minZoomLevel={12} // Niveau de zoom minimum
-          maxZoomLevel={15} // Niveau de zoom maximum
+          maxZoomLevel={20} // Niveau de zoom maximum
         >
           <UrlTile
             urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}

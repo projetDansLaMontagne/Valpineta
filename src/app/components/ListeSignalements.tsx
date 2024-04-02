@@ -5,6 +5,7 @@ import { TPoint, T_Signalement, T_flat_point } from "app/navigators";
 import { CarteSignalement } from "./CarteSignalement";
 import { useEffect, useState } from "react";
 import { spacing } from "app/theme";
+import { useStores } from "app/models";
 
 export type ListeSignalementsProps = {
   /**
@@ -25,8 +26,10 @@ export const ListeSignalements = observer(function ListeSignalements(
 ) {
   const { detaille, signalements, track, onPress } = props;
 
-  /** @todo STATIC, a remplacer par le store */
-  const SuiviExcursion = { etat: "enCours", iPointCourant: 1100 };
+  // /** @todo STATIC, a remplacer par le store */
+  // const suiviExcursion = { etat: "enCours", iPointCourant: 1100 };
+
+  const { suiviExcursion } = useStores();
 
   const [signalementsTries, setSignalementsTries] = useState<T_Signalement[]>([]);
 
@@ -39,6 +42,7 @@ export const ListeSignalements = observer(function ListeSignalements(
           );
           return 0;
         }
+
         const distA = track[a.idPointLie].dist;
         const distB = track[b.idPointLie].dist;
         return distA - distB;
@@ -49,7 +53,12 @@ export const ListeSignalements = observer(function ListeSignalements(
   return (
     signalementsTries &&
     signalementsTries.map((signalement, index) => {
-      const isDistanceRelative = detaille && SuiviExcursion.etat === "enCours";
+      const isDistanceRelative = detaille && suiviExcursion.etat === "enCours";
+      console.log("isDistanceRelative", isDistanceRelative);
+      console.log("suiviExcursion.etat", suiviExcursion.etat);
+      console.log("detaille", detaille);
+
+      console.log("signalement.idPointLie", signalement.idPointLie);
       return (
         <View key={index}>
           <CarteSignalement
@@ -61,7 +70,7 @@ export const ListeSignalements = observer(function ListeSignalements(
               signalement.idPointLie === undefined
                 ? undefined
                 : isDistanceRelative
-                ? track[signalement.idPointLie].dist - track[SuiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
+                ? track[signalement.idPointLie].dist - track[suiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
                 : track[signalement.idPointLie].dist // Position absolue (par rapport au depart)
             }
             isDistanceAbsolue={!isDistanceRelative}
