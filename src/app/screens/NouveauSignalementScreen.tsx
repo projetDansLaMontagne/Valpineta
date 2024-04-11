@@ -290,7 +290,7 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
           {photoErreur && !image && (
             <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
           )}
-          <TouchwableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
+          <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
             <Image
               style={{ tintColor: colors.palette.vert }}
               source={require("../../assets/icons/camera.png")}
