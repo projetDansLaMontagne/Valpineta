@@ -34,6 +34,10 @@ export const SuiviExcursionModel = types
     trackSuivi: types.maybeNull(types.array(T_point)),
     iPointCourant: types.maybeNull(types.integer),
     __DEV__: false,
+    dateDebutExcursion: types.maybeNull(types.Date), // Ne pas utiliser (decalee des qu une pause est effectuee)
+    dateDebutPause: types.maybeNull(types.Date),
+    dureeEnS: types.maybeNull(types.number),
+    timer: types.frozen<NodeJS.Timeout>(),
   })
   .actions(withSetPropAction)
   .views(self => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -58,6 +62,24 @@ export const SuiviExcursionModel = types
      */
     _setTrackSuivi(value: any) {
       self.trackSuivi = value;
+    },
+    /**
+     * Setter privé pour la date de debut de l excursion
+     */
+    _setDateDebutExcursion(value: Date | null) {
+      self.dateDebutExcursion = value;
+    },
+    /**
+     * Setter privé pour la date de debut de la pause
+     */
+    _setDateDebutPause(value: Date | null) {
+      self.dateDebutPause = value;
+    },
+    /**
+     * Setter privé pour la duree
+     */
+    _setDureeEnS(value: number) {
+      self.dureeEnS = value;
     },
     /**
      * Setter pour le point courant
@@ -117,23 +139,36 @@ export const SuiviExcursionModel = types
           self._setTrackReel(null);
           self._setTrackSuivi(null);
           self.setIPointCourant(null);
+          self._setDateDebutExcursion(null);
+          self._setDateDebutPause(null);
+          self._setDureeEnS(null);
           break;
         case "enCours":
           if (self.etat === "nonDemarree") {
             self._setTrackReel([]);
             self._setTrackSuivi(props.trackSuivi);
             self.setIPointCourant(0);
+            self._setDateDebutExcursion(new Date());
+          } else if (self.etat === "enPause") {
+            // Ajout de la duree de la pause a la date de debut
+            const dureePause = msEntreDates(new Date(), self.dateDebutPause);
+            self._setDateDebutExcursion(new Date(self.dateDebutExcursion.getTime() + dureePause));
+            self._setDateDebutPause(null);
           }
+          startTimer(500);
           const success = await startBackgroundTask();
           if (!success) aFonctionne = false;
           break;
         case "enPause":
           stopBackgroundTask();
+          stopTimer();
+          self._setDateDebutPause(new Date());
           break;
         case "terminee":
-          if (self.etat === "enCours") stopBackgroundTask();
-          /**@todo sauvegarde du track reel*/
-          /**@todo publication avis*/
+          if (self.etat === "enCours") {
+            stopBackgroundTask();
+            stopTimer();
+          }
           break;
       }
       if (aFonctionne) {
@@ -161,6 +196,48 @@ export const SuiviExcursionModel = types
     function ajoutPointTrackReel(point: Instance<typeof T_point_GPX>) {
       self.trackReel.push(point);
       console.log("Ajout de ", point.lat, point.lon, point.alt);
+    }
+    /**
+     * Methode pour obtenir la duree de l excursion en cours en secondes
+     */
+    function getDureeInS() {
+      console.log("CALCUL DUREE");
+      if (self.etat !== "enCours") {
+        console.error(
+          "[getDureeInMs] Impossible de recuperer la duree si l excursion n est pas en cours",
+        );
+      }
+      const sEntreDates = msEntreDates(new Date(), self.dateDebutExcursion) / 1000;
+      return Math.round(sEntreDates);
+    }
+    function msEntreDates(date1: Date, date2: Date) {
+      if (date1 && date2) {
+        return Math.abs(date2.getTime() - date1.getTime());
+      } else {
+        console.error("[msEntreDates] : Les dates ne doivent pas etre nulles");
+        return 0;
+      }
+    }
+    /**
+     * Demarre le timer qui met a jour la duree
+     */
+    function startTimer(msInterval: number) {
+      if (self.timer) {
+        console.warn("[startTimer] Timer deja en cours");
+        stopTimer();
+      }
+      self.timer = setInterval(() => {
+        self._setDureeEnS(getDureeInS());
+      }, msInterval);
+    }
+    /**
+     * Stoppe le timer
+     */
+    function stopTimer() {
+      if (self.timer) {
+        clearInterval(self.timer);
+        self.timer = null;
+      }
     }
 
     /* -------------------------------------------------------------------------- */

@@ -19,7 +19,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
   }, []);
 
   // En debug, on met un track personnalise pour pouvoir faire des tests haut niveau
-  const trackSuivi: TPoint[] = require("assets/tests_examples/track_test_manuel_devant_chez_nico.json");
+  const trackSuivi = [{ lat: 1, lon: 1, alt: 100, dist: 0 }]; //require("assets/tests_examples/track_test_manuel_devant_chez_nico.json");
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top", "bottom"]}>
@@ -55,7 +55,6 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
             onPress={() => suiviExcursion.setEtat({ newEtat: "enPause" })}
           />
           <Button text="Stopper" onPress={() => suiviExcursion.setEtat({ newEtat: "terminee" })} />
-          <Text>Point courant : {suiviExcursion.iPointCourant}</Text>
         </>
       )}
       {suiviExcursion.etat === "enPause" && (
@@ -76,11 +75,17 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           onPress={() => suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: trackSuivi })}
         />
       )}
-      {suiviExcursion.trackReel.map((point, i) => (
-        <Text key={i}>
-          {new Date(point.timestamp).toLocaleTimeString()} {point.lat} {point.lon}
-        </Text>
-      ))}
+      {suiviExcursion.etat !== "nonDemarree" && (
+        <>
+          <Text>Point courant : {suiviExcursion.iPointCourant}</Text>
+          {suiviExcursion.trackReel.map((point, i) => (
+            <Text key={i}>
+              {new Date(point.timestamp).toLocaleTimeString()} {point.lat} {point.lon}
+            </Text>
+          ))}
+        </>
+      )}
+      <Text>{suiviExcursion.dureeEnS}</Text>
     </Screen>
   );
 });
