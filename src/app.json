@@ -7,7 +7,7 @@
     "scheme": "valpineta",
     "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.jpg",
+    "icon": "./assets/images/logo.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -17,9 +17,7 @@
       "fallbackToCacheTimeout": 0
     },
     "jsEngine": "hermes",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "android": {
       "permissions": [
         "INTERNET",
@@ -27,7 +25,11 @@
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION"
+        "ACCESS_BACKGROUND_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.ACCESS_BACKGROUND_LOCATION"
       ],
       "package": "com.valpineta.app",
       "versionCode": 14,
@@ -45,26 +47,17 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.valpineta.app",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "location",
-          "fetch"
-        ],
+        "UIBackgroundModes": ["location", "fetch"],
         "NSLocationWhenInUseUsageDescription": "text",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "text",
         "NSLocationAlwaysUsageDescription": "text"
       }
     },
     "web": {
-      "favicon": "./assets/images/logo.jpg"
+      "favicon": "./assets/images/logo.png"
     },
     "packagerOpts": {
-      "sourceExts": [
-        "js",
-        "json",
-        "ts",
-        "tsx",
-        "jsx, xml, gpx"
-      ]
+      "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
     },
     "plugins": [
       "expo-localization",
@@ -76,6 +69,11 @@
           "isIosBackgroundLocationEnabled": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e93b502a-59cb-46c2-aaa0-13f8510e2bc3"
+      }
+    }
   }
 }
