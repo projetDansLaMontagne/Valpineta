@@ -42,9 +42,12 @@ export const ListeSignalements = observer(function ListeSignalements(
           );
           return 0;
         }
-
-        const distA = track[a.idPointLie].dist;
-        const distB = track[b.idPointLie].dist;
+        console.log("a.idPointLie", a.idPointLie);
+        console.log("b.idPointLie", b.idPointLie);
+        const distA = track[a.idPointLie - 1].dist;
+        const distB = track[b.idPointLie - 1].dist;
+        console.log("distA", distA);
+        console.log("distB", distB);
         return distA - distB;
       }),
     );
@@ -54,11 +57,6 @@ export const ListeSignalements = observer(function ListeSignalements(
     signalementsTries &&
     signalementsTries.map((signalement, index) => {
       const isDistanceRelative = detaille && suiviExcursion.etat === "enCours";
-      console.log("isDistanceRelative", isDistanceRelative);
-      console.log("suiviExcursion.etat", suiviExcursion.etat);
-      console.log("detaille", detaille);
-
-      console.log("signalement.idPointLie", signalement.idPointLie);
       return (
         <View key={index}>
           <CarteSignalement
@@ -70,8 +68,8 @@ export const ListeSignalements = observer(function ListeSignalements(
               signalement.idPointLie === undefined
                 ? undefined
                 : isDistanceRelative
-                ? track[signalement.idPointLie].dist - track[suiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
-                : track[signalement.idPointLie].dist // Position absolue (par rapport au depart)
+                ? track[signalement.idPointLie - 1].dist - track[suiviExcursion.iPointCourant].dist // Position relative (par rapport a la position utilisateur)
+                : track[signalement.idPointLie - 1].dist // Position absolue (par rapport au depart)
             }
             isDistanceAbsolue={!isDistanceRelative}
             imageSignalement={detaille ? signalement.image : undefined}

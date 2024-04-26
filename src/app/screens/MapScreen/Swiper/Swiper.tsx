@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
-import { ListeSignalements, Text } from "app/components";
+import { Button, ListeSignalements, Text } from "app/components";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -24,6 +24,7 @@ import { InfosExcursion } from "./InfosExcursion";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LocationObject } from "expo-location";
 import { LatLng } from "react-native-maps";
+import { useStores } from "app/models";
 
 const { width, height } = Dimensions.get("window");
 
@@ -37,17 +38,20 @@ export type SwiperProps = {
   excursion: T_excursion;
   userLocation: LocationObject;
   setCameraTarget: React.Dispatch<React.SetStateAction<LatLng>>;
+  setIsInfoDisplayed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 /**
  * Describe your component here
  */
 export const Swiper = observer(function Swiper(props: SwiperProps) {
-  const { style, userLocation, excursion, navigation, setCameraTarget } = props;
+  const { style, userLocation, excursion, navigation, setCameraTarget, setIsInfoDisplayed } = props;
   const $styles = [$container, style];
 
   const bottomMargin = useBottomTabBarHeight() + useSafeAreaInsets().bottom;
   const swipeUpDownRef = useRef<any>();
+
+  const { suiviExcursion } = useStores();
 
   const [interfaceCourrante, setInterfaceCourrante] = useState<"infos" | "signalements">("infos");
 
@@ -70,7 +74,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
       itemMini={<ItemMini />}
       itemFull={<ItemFull />}
       animation="easeInEaseOut"
-      swipeHeight={bottomMargin} // barre de navigation + footer + hauteur du swiper
+      swipeHeight={bottomMargin + 50} // barre de navigation + footer + hauteur du swiper
       disableSwipeIcon={false}
       ref={swipeUpDownRef}
       extraMarginTop={height / 6}
@@ -174,6 +178,20 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
                 style={{ textAlign: "center", marginTop: spacing.lg }}
               />
             ))}
+          <Button
+            style={[$buttonCommencer, { bottom: 200 }]}
+            textStyle={{
+              color: colors.palette.blanc,
+              fontSize: 22,
+              fontWeight: "bold",
+              justifyContent: "center",
+            }}
+            tx="detailsExcursion.boutons.commencerExcursion"
+            onPress={() => [
+              setIsInfoDisplayed(false),
+              suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: excursion.track }),
+            ]}
+          />
         </>
       </View>
     );
@@ -237,4 +255,18 @@ const $iconDownload: ImageStyle = {
   width: 40,
   height: 40,
   tintColor: colors.bouton,
+};
+
+/* ---------------------------- Style du bouton commencer --------------------------- */
+
+const $buttonCommencer: ViewStyle = {
+  alignSelf: "center",
+  width: width / 2,
+  backgroundColor: colors.bouton,
+  borderRadius: 13,
+  position: "absolute",
+  zIndex: 3,
+  minHeight: 10,
+  height: 41,
+  borderColor: colors.bouton,
 };

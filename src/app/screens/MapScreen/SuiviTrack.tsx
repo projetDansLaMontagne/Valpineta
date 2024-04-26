@@ -15,21 +15,20 @@ import { Text, GraphiqueDenivele, Erreur } from "app/components";
 import { spacing, colors } from "app/theme";
 import SwipeUpDown from "react-native-swipe-up-down";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { ListeSignalements } from "./ListeSignalements";
+import { ListeSignalements } from "../../components/ListeSignalements";
 import { recupDistance } from "app/utils/recupDistance";
 import { T_flat_point, T_excursion } from "app/navigators";
 import { useStores } from "app/models";
-import { set } from "date-fns";
+import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 const { width, height } = Dimensions.get("window");
 
 export interface SuiviTrackProps {
   excursion: T_excursion;
   navigation: any;
-  setStartPoint: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export function SuiviTrack(props: SuiviTrackProps) {
-  const { excursion, navigation, setStartPoint } = props;
+  const { excursion, navigation } = props;
   const { suiviExcursion } = useStores();
   const footerHeight = useBottomTabBarHeight();
   const swipeUpDownRef = useRef();
@@ -299,13 +298,11 @@ export function SuiviTrack(props: SuiviTrackProps) {
               </View>
             ) : (
               <ListeSignalements
-                excursion={excursion}
-                footerHeight={footerHeight}
                 style={$containerSignalements}
-                userLocation={userLocation}
-                distanceDepuisUser={true}
-                setStartPoint={setStartPoint}
-                swipeDown={showMini}
+                detaille={true}
+                signalements={excursion.signalements}
+                track={excursion.track}
+                onPress={showMini}
               />
             )}
           </View>

@@ -30,6 +30,7 @@ import * as fileSystem from "expo-file-system";
 import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
 import { Swiper } from "./Swiper";
+import { SuiviTrack } from "./SuiviTrack";
 
 // images
 const binoculars: ImageSource = require("assets/icons/binoculars.png");
@@ -52,11 +53,11 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
   const [cameraTarget, setCameraTarget] = useState<LatLng>();
+  const [isInfoDisplayed, setIsInfoDisplayed] = useState(true);
 
   // Refs
   /** @todo STATIC, a remplacer par le store */
-  const SuiviExcursion = { etat: "enCours" };
-  const { parametres } = useStores();
+  const { parametres, suiviExcursion } = useStores();
   const intervalRef = useRef(null);
   const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
   const mapRef = useRef<MapView>(null);
@@ -394,7 +395,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
         </View>
 
         {/* Boutons de signalements */}
-        {SuiviExcursion.etat === "enCours" && (
+        {suiviExcursion.etat === "enCours" && (
           <View
             style={{
               ...styles.mapOverlay,
@@ -441,13 +442,17 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
         {/* Swiper et bouton retour */}
         {excursion && (
           <>
-            <Swiper
-              excursion={excursion}
-              navigation={navigation}
-              userLocation={location}
-              setCameraTarget={setCameraTarget}
-            />
-
+            {isInfoDisplayed ? (
+              <Swiper
+                excursion={excursion}
+                navigation={navigation}
+                userLocation={location}
+                setCameraTarget={setCameraTarget}
+                setIsInfoDisplayed={setIsInfoDisplayed}
+              />
+            ) : (
+              <SuiviTrack excursion={excursion} navigation={navigation} />
+            )}
             <TouchableOpacity
               style={$boutonRetour}
               onPress={() => navigation.navigate("CarteStack", { screen: "Carte" })}
@@ -652,9 +657,9 @@ const downloadTiles = async () => {
     // Supprimer le dossier
     await fileSystem.deleteAsync(folderDest, { idempotent: true });
 
-    const assets = await TilesRequire();
+    // const assets = await TilesRequire();
 
-    await createFolderStruct(fichierJson, folderDest, assets);
+    // await createFolderStruct(fichierJson, folderDest, assets);
   }
 };
 

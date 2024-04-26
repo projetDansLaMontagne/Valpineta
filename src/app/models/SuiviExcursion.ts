@@ -88,13 +88,17 @@ export const SuiviExcursionModel = types
      */
     async function setEtat(props: switchStateParams): Promise<boolean> {
       console.log(self.etat, "-->", props.newEtat);
-      const { newEtat } = props;
+      const { newEtat, trackSuivi } = props as {
+        newEtat: T_etat_excursion;
+        trackSuivi?: Instance<typeof T_point>[];
+      };
 
       /* ------------------------------ Verifications ----------------------------- */
       let verificationsOK = false;
+
       switch (self.etat) {
         case "nonDemarree":
-          if (newEtat === "enCours" && props.trackSuivi !== undefined) verificationsOK = true;
+          if (newEtat === "enCours" && trackSuivi !== undefined) verificationsOK = true;
           break;
 
         case "enCours":
@@ -121,7 +125,7 @@ export const SuiviExcursionModel = types
             aFonctionne = true;
             break;
           case "enCours":
-            self._setTrackSuivi(props.trackSuivi);
+            self._setTrackSuivi(trackSuivi);
             aFonctionne = await startBackgroundTask();
             break;
           case "enPause":
