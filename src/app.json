@@ -7,7 +7,7 @@
     "scheme": "valpineta",
     "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/logo.jpg",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -25,11 +25,7 @@
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.ACCESS_BACKGROUND_LOCATION"
+        "ACCESS_BACKGROUND_LOCATION"
       ],
       "package": "com.valpineta.app",
       "versionCode": 14,
@@ -54,7 +50,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/images/logo.png"
+      "favicon": "./assets/images/logo.jpg"
     },
     "packagerOpts": {
       "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
@@ -69,11 +65,6 @@
           "isIosBackgroundLocationEnabled": true
         }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "e93b502a-59cb-46c2-aaa0-13f8510e2bc3"
-      }
-    }
+    ]
   }
 }
