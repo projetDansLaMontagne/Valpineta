@@ -11,7 +11,13 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { AppStackScreenProps, T_Signalement, T_excursion, TPoint } from "app/navigators";
+import {
+  AppStackScreenProps,
+  T_Signalement,
+  T_excursion,
+  TPoint,
+  T_flat_point,
+} from "app/navigators";
 import { Screen } from "app/components";
 import { spacing, colors } from "app/theme";
 import { ImageSource } from "react-native-vector-icons/Icon";
@@ -31,6 +37,9 @@ import TilesRequire from "app/services/importAssets/tilesRequire";
 import fichierJson from "assets/Tiles/tiles_struct.json";
 import { Swiper } from "./Swiper";
 import { SuiviTrack } from "./SuiviTrack";
+import { ExcursionTerminee } from "./ExcursionTerminee";
+import { PopupSignalement } from "./PopupSignalement";
+import { distanceEntrePoints } from "app/utils/distanceEntrePoints";
 
 // images
 const binoculars: ImageSource = require("assets/icons/binoculars.png");
@@ -53,7 +62,13 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
   const [cameraTarget, setCameraTarget] = useState<LatLng>();
+
   const [isInfoDisplayed, setIsInfoDisplayed] = useState(true);
+  const [modalSignalementVisible, setModalSignalementVisible] = useState(false);
+  const [signalementPopup, setSignalementPopup] = useState(null);
+  const [estEntier, setEstEntier] = useState(false);
+
+  const [modalExcursionTermineeVisible, setModalExcursionTermineeVisible] = useState(false);
 
   // Refs
   /** @todo STATIC, a remplacer par le store */
@@ -238,6 +253,38 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
       removeLocationSubscription();
     };
   }, []);
+
+  /* ------------------------------- USE EFFECTS ------------------------------ */
+
+  //utilser useEffect pour déclancher le popup lorsqu'on est a moins de 30 mètres d'un signalement
+  useEffect(() => {
+    if (suiviExcursion.iPointCourant) {
+      const positionActuelle = suiviExcursion.iPointCourant;
+      const coordUser: T_flat_point = {
+        lat: suiviExcursion.trackReel[positionActuelle].lat,
+        lon: suiviExcursion.trackReel[positionActuelle].lon,
+      };
+
+      for (let i = 0; i < excursion.signalements.length; i++) {
+        const coordSignalement: T_flat_point = {
+          lat: excursion.signalements[i].lat,
+          lon: excursion.signalements[i].lon,
+        };
+
+        const distance = distanceEntrePoints(coordUser, coordSignalement);
+        if (distance < 0.03) {
+          setModalSignalementVisible(true);
+          setSignalementPopup(excursion.signalements[i]);
+        }
+      }
+    }
+  }, [suiviExcursion.iPointCourant]);
+
+  useEffect(() => {
+    if (suiviExcursion.etat === "terminee") {
+      setModalExcursionTermineeVisible(true);
+    }
+  }, [suiviExcursion.etat]);
 
   /* -------------------------------- Constants ------------------------------- */
   const ASPECT_RATIO = width / height;
@@ -442,6 +489,25 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
         {/* Swiper et bouton retour */}
         {excursion && (
           <>
+            {modalSignalementVisible && (
+              <PopupSignalement
+                signalement={signalementPopup}
+                modalSignalementVisible={modalSignalementVisible}
+                setModalSignalementVisible={setModalSignalementVisible}
+                estEntier={estEntier}
+                setEstEntier={setEstEntier}
+              />
+            )}
+
+            {modalExcursionTermineeVisible && (
+              <ExcursionTerminee
+                navigation={navigation}
+                modalExcursionTermineeVisible={modalExcursionTermineeVisible}
+                setModalExcursionTermineeVisible={setModalExcursionTermineeVisible}
+                setIsSuiviTrack={setIsInfoDisplayed}
+              />
+            )}
+
             {isInfoDisplayed ? (
               <Swiper
                 excursion={excursion}
