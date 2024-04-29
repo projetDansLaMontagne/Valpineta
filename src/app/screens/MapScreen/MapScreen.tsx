@@ -63,7 +63,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
   const [cameraTarget, setCameraTarget] = useState<LatLng>();
 
-  const [isInfoDisplayed, setIsInfoDisplayed] = useState(true);
+  const [isSuiviTrack, setIsSuiviTrack] = useState(false);
   const [modalSignalementVisible, setModalSignalementVisible] = useState(false);
   const [signalementPopup, setSignalementPopup] = useState(null);
   const [estEntier, setEstEntier] = useState(false);
@@ -504,17 +504,17 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
                 navigation={navigation}
                 modalExcursionTermineeVisible={modalExcursionTermineeVisible}
                 setModalExcursionTermineeVisible={setModalExcursionTermineeVisible}
-                setIsSuiviTrack={setIsInfoDisplayed}
+                setIsSuiviTrack={setIsSuiviTrack}
               />
             )}
 
-            {isInfoDisplayed ? (
+            {!isSuiviTrack ? (
               <Swiper
                 excursion={excursion}
                 navigation={navigation}
                 userLocation={location}
                 setCameraTarget={setCameraTarget}
-                setIsInfoDisplayed={setIsInfoDisplayed}
+                setIsSuiviTrack={setIsSuiviTrack}
               />
             ) : (
               <SuiviTrack excursion={excursion} navigation={navigation} />

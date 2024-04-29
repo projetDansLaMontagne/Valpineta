@@ -38,14 +38,14 @@ export type SwiperProps = {
   excursion: T_excursion;
   userLocation: LocationObject;
   setCameraTarget: React.Dispatch<React.SetStateAction<LatLng>>;
-  setIsInfoDisplayed: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSuiviTrack: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 /**
  * Describe your component here
  */
 export const Swiper = observer(function Swiper(props: SwiperProps) {
-  const { style, userLocation, excursion, navigation, setCameraTarget, setIsInfoDisplayed } = props;
+  const { style, userLocation, excursion, navigation, setCameraTarget, setIsSuiviTrack } = props;
   const $styles = [$container, style];
 
   const bottomMargin = useBottomTabBarHeight() + useSafeAreaInsets().bottom;
@@ -188,7 +188,7 @@ export const Swiper = observer(function Swiper(props: SwiperProps) {
             }}
             tx="detailsExcursion.boutons.commencerExcursion"
             onPress={() => [
-              setIsInfoDisplayed(false),
+              setIsSuiviTrack(true),
               suiviExcursion.setEtat({ newEtat: "enCours", trackSuivi: excursion.track }),
             ]}
           />
