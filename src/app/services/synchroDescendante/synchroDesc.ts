@@ -167,29 +167,27 @@ export const downloadExcursionsJson = async (): Promise<void> => {
   });
 
   // On récupère le MD5 du fichier sur le serveur
-  // la réponse est un string
-  console.log(`[synchroDesc] fetch API_EXCURSIONS_MD5_URL -> `, API_EXCURSIONS_MD5_URL);
+  // console.log(`[synchroDesc] fetch API_EXCURSIONS_MD5_URL -> `, API_EXCURSIONS_MD5_URL);
   const md5API = await fetch(API_EXCURSIONS_MD5_URL)
     .then(res => res.json() as Promise<string>)
     .catch(error => {
-      console.error("Error fetching API_EXCURSIONS_MD5_URL:", error);
-      return "";
+      throw new Error("Error fetching " + API_EXCURSIONS_MD5_URL, error);
     });
 
-  console.log(`[synchroDesc] MD5 du fichier de l'API -> `, md5API);
+  // console.log(`[synchroDesc] MD5 du fichier de l'API -> `, md5API);
 
   // On compare les deux MD5 pour savoir si le téléchargement s'est bien passé.
   if (md5 !== md5API) {
     // Suppression du fichier temporaire
     await FileSystem.deleteAsync(EXCURSIONS_TEMP_FILE_DEST);
-    console.error(
-      `[synchroDesc - 182] MD5 du fichier 'excursions.json' différents: ${md5} ${md5API}`,
-    );
+    // console.error(
+    //   `[synchroDesc - 182] MD5 du fichier 'excursions.json' différents: ${md5} ${md5API}`,
+    // );
 
     throw new Error("Erreur lors du téléchargement du fichier 'excursions.json'.");
   }
 
-  // Déplcement du fichier temporaire
+  // Déplacement du fichier temporaire
   await FileSystem.moveAsync({
     from: EXCURSIONS_TEMP_FILE_DEST,
     to: EXCURSIONS_FILE_DEST,

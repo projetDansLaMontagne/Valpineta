@@ -6,4 +6,3 @@ export * from "./ParametresScreen";
 export * from "./DetailsExcursionScreen";
 export * from "./DescriptionScreen";
 export * from "./MapScreen";
-export * from "./LoadingScreen";

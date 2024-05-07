@@ -118,12 +118,10 @@ type CarteStackParamList = {
   Carte: undefined;
   DetailsExcursion: undefined | { excursion: TExcursion };
   Description: { excursion: TExcursion };
-  Loading: undefined;
 };
 
 type ParametresStackParamList = {
   Parametres: undefined;
-  Loading: undefined;
 };
 
 export type AppStackParamList = {
@@ -182,13 +180,13 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
    * ! a tous les coups.
    */
   // check si c'est la première fois que l'utilisateur ouvre l'application
-  const [firstLaunch, setFirstLaunch] = React.useState<boolean | undefined>();
-  useEffect(() => {
-    checkIfFirstLaunch().then(res => {
-      console.log(`[AppNavigator] checkIfFirstLaunch: ${res}`);
-      setFirstLaunch(res);
-    });
-  }, []);
+  // const [firstLaunch, setFirstLaunch] = React.useState<boolean | undefined>();
+  // useEffect(() => {
+  // checkIfFirstLaunch().then(res => {
+  //   console.log(`[AppNavigator] checkIfFirstLaunch: ${res}`);
+  //   setFirstLaunch(res);
+  // });
+  // }, []);
 
   const Tab = createBottomTabNavigator();
   return (
@@ -198,7 +196,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <Tab.Navigator
-        initialRouteName={firstLaunch ? "ParametresStack" : "CarteStack"}
+        initialRouteName={"CarteStack"}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
@@ -264,12 +262,11 @@ const ParametresStack = createNativeStackNavigator<ParametresStackParamList>();
 const ParametresStackScreen = () => {
   return (
     <ParametresStack.Navigator
-      initialRouteName={"Loading"}
+      initialRouteName={"Parametres"}
       screenOptions={{
         headerShown: false,
       }}
     >
-      <ParametresStack.Screen name="Loading" component={Screens.LoadingScreen} />
       <ParametresStack.Screen name="Parametres" component={Screens.ParametresScreen} />
     </ParametresStack.Navigator>
   );

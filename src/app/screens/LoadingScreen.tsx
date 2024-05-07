@@ -9,11 +9,10 @@
 // IMPORTS ===================================================================================================  IMPORTS
 import { AppStackScreenProps } from "../navigators";
 import { observer } from "mobx-react-lite";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Button, Icon, Screen, Text } from "../components";
 import { ActivityIndicator, View, ViewStyle } from "react-native";
 import {
-  EDebugMode,
   ESynchroDescendanteRes,
   getNumberOfExcursions,
   synchroDescendante,
@@ -23,7 +22,9 @@ import i18n from "i18n-js";
 
 // VARIABLES ================================================================================================ VARIABLE
 // types & interfaces
-interface LoadingScreenProps extends AppStackScreenProps<"Loading"> {}
+interface LoadingScreenProps {
+  onFinished: () => void;
+}
 type TEtape = {
   title: string;
   description?: string;
@@ -136,7 +137,7 @@ const Step: FC<TEtape> = ({
  * @return
  * @constructor
  **/
-export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingScreen(_props) {
+export function LoadingScreen(props: LoadingScreenProps) {
   // States
   const [step, setStep] = useState(0);
   const [stepsArray, setStepsArray] = useState<TEtape[]>();
@@ -148,23 +149,16 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
   const [synchoTries, setSynchoTries] = useState(0);
 
   // Fonctions
-  const goToMapScreen = () => {
-    _props.navigation.goBack();
-    _props.navigation.navigate("CarteStack");
-  };
-
-  const retrySynchro = () => {
-    setStep(0);
-    trySyncho();
-  };
-
   const trySyncho = async () => {
-    const nbExcursions = await getNumberOfExcursions();
-    setTotalGPX(nbExcursions);
-    setSynchoTries(synchoTries => synchoTries + 1);
+    const MAX_TRIES = 2;
+    let triesCounter = 0;
 
-    setSynchroDescRes(
-      await synchroDescendante(
+    while (true) {
+      const nbExcursions = await getNumberOfExcursions();
+      setStep(0);
+      setTotalGPX(nbExcursions);
+      setSynchoTries(synchoTries => synchoTries + 1);
+      const res = await synchroDescendante(
         (step, totalSteps) => {
           console.log(`[LoadingScreen] step: ${step}/${totalSteps}`);
           setStep(step);
@@ -173,8 +167,28 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
           filesDownloaded > dlGPX && setDlGPX(filesDownloaded);
           filesToDl > totalGPX && setTotalGPX(filesToDl);
         },
-      ),
-    );
+      );
+
+      triesCounter++;
+
+      if (res === ESynchroDescendanteRes.KO && triesCounter !== MAX_TRIES) {
+        continue;
+      }
+
+      switch (res) {
+        case ESynchroDescendanteRes.KO:
+        case ESynchroDescendanteRes.NO_CONNEXION:
+          setSynchroDescRes(res);
+          setTimeout(() => {
+            props.onFinished();
+          }, 3000);
+          break;
+        case ESynchroDescendanteRes.OK:
+          props.onFinished();
+          break;
+      }
+      break;
+    }
   };
 
   // useEffect
@@ -188,122 +202,65 @@ export const LoadingScreen: FC<LoadingScreenProps> = observer(function LoadingSc
       // le `as unknown as` est nécessaire pour que le type soit accepté
       [key: string]: string;
     };
-    const stepsArray: TEtape[] = Object.values(steps).map(title => ({ title }));
 
-    setStepsArray(stepsArray);
+    setStepsArray(Object.values(steps).map(title => ({ title, isDone: false })));
 
     trySyncho(); // flemme de le await ou de `then` dans le useEffect
   }, []);
 
   useEffect(() => {
-    if (!stepsArray) {
-      return;
-    }
-
-    if (step > 0) {
+    if (stepsArray && step && step > 0) {
       setStepsArray(
-        stepsArray.map((etape, index) => {
-          if (index === step) {
-            // étape actuelle, on la passe à terminée
-            return { ...etape, isDone: true };
-          }
-          return etape;
-        }),
-      );
-    } else {
-      // on passe toutes les étapes à non terminées
-      setStepsArray(
-        stepsArray.map(etape => {
-          return { ...etape, isDone: false };
-        }),
+        stepsArray.map((etape, index) =>
+          index === step
+            ? { ...etape, isDone: true } // étape actuelle, on la passe à terminée
+            : etape,
+        ),
       );
     }
   }, [step]);
 
   useEffect(() => {
-    if (!stepsArray) {
-      return;
-    }
-    if (totalGPX > 0) {
+    if (stepsArray && totalGPX && totalGPX > 0) {
       setStepsArray(
-        stepsArray.map((etape, index) => {
-          // pas propre, mais on sait que c'est l'étape 3 -> GPX
-          // peut-être qu'on devrait regex le titre mais flemme pour le moment
-          if (index === 2) {
-            // on met à jour l'objectif
-            return { ...etape, goal: totalGPX };
-          }
-          // sinon on ne fait rien
-          return etape;
-        }),
+        stepsArray.map(
+          (etape, index) =>
+            // pas propre, mais on sait que c'est l'étape 3 -> GPX
+            // peut-être qu'on devrait regex le titre mais flemme pour le moment
+            index === 2
+              ? { ...etape, goal: totalGPX, currentStep: dlGPX } // on met à jour l'objectif
+              : etape, // sinon on ne fait rien
+        ),
       );
     }
-  }, [totalGPX]);
-
-  useEffect(() => {
-    if (dlGPX > 0) {
-      setStepsArray(
-        stepsArray.map((etape, index) => {
-          // meme chose qu'au dessus
-          if (index === 2) {
-            // on met à jour l'étape (fichier gpx téléchargé) actuelle
-            return { ...etape, isLoading: true, currentStep: dlGPX };
-          }
-          return etape;
-        }),
-      );
-    }
-  }, [dlGPX]);
-
-  useEffect(() => {
-    switch (synchroDescRes) {
-      case ESynchroDescendanteRes.KO:
-        // si erreurn on réessaye
-        if (synchoTries < 3) {
-          setTimeout(() => {
-            retrySynchro();
-          }, 3000);
-        } else {
-          // pas sur de cette ligne
-          setSynchroDescRes(ESynchroDescendanteRes.KO);
-        }
-
-        break;
-    }
-  }, [synchroDescRes]);
+  }, [totalGPX, dlGPX]);
 
   // Render
   return (
-    <Screen>
-      <View style={$screenStyle}>
-        <Text preset="heading" style={{ textAlign: "center" }}>
-          {synchroDescRes === ESynchroDescendanteRes.OK
-            ? i18n.t("loadingScreen.titleFinished")
-            : i18n.t("loadingScreen.title")}
-        </Text>
-        <Text tx="loadingScreen.paragraph" />
+    <View style={$screenStyle}>
+      <Text preset="heading" style={{ textAlign: "center" }}>
+        {synchroDescRes === ESynchroDescendanteRes.OK
+          ? i18n.t("loadingScreen.titleFinished")
+          : i18n.t("loadingScreen.title")}
+      </Text>
+      <Text tx="loadingScreen.paragraph" />
 
-        {stepsArray && (
-          <View style={$stepContainerStyle}>
-            {stepsArray.map((etape, index) => (
-              <Step key={index} {...etape} totalStep={step} totalGoal={index + 1} />
-            ))}
-          </View>
-        )}
+      {stepsArray && (
+        <View style={$stepContainerStyle}>
+          {stepsArray.map((etape, index) => (
+            <Step key={index} {...etape} totalStep={step} totalGoal={index + 1} />
+          ))}
+        </View>
+      )}
 
-        {synchroDescRes === ESynchroDescendanteRes.OK && (
-          <Button onPress={goToMapScreen} tx="loadingScreen.buttonText" />
-        )}
+      {synchroDescRes === ESynchroDescendanteRes.KO && <Text tx="loadingScreen.error" />}
 
-        {synchroDescRes === ESynchroDescendanteRes.KO && <Text tx="loadingScreen.error" />}
-
-        {synchroDescRes === ESynchroDescendanteRes.NO_CONNEXION && (
-          <Text tx="loadingScreen.noConnection" />
-        )}
-      </View>
-    </Screen>
+      {synchroDescRes === ESynchroDescendanteRes.NO_CONNEXION && (
+        <Text tx="loadingScreen.noConnection" />
+      )}
+    </View>
   );
-});
+}
 
 // Styles
 const $screenStyle: ViewStyle = {
