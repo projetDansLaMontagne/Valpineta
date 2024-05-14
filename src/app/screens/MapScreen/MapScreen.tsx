@@ -295,7 +295,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             console.log("Signalement trouvé", excursion.signalements[i].nom);
             setModalSignalementVisible(true);
             setSignalementPopup(excursion.signalements[i]);
-            excursion.signalements.splice(i, 1); //à enlever quand on passera par l'api
+            // excursion.signalements.splice(i, 1); //à enlever quand on passera par l'api
             break;
           }
         }
@@ -304,7 +304,13 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   }, [suiviExcursion.iPointCourant]);
 
   useEffect(() => {
-    if (suiviExcursion.etat === "terminee") {
+    if (
+      excursion &&
+      excursion.track &&
+      (suiviExcursion.etat === "terminee" ||
+        suiviExcursion.iPointCourant == excursion.track.length - 1)
+    ) {
+      console.log("excursion terminée");
       setModalExcursionTermineeVisible(true);
     }
   }, [suiviExcursion.etat]);
@@ -515,6 +521,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
           <>
             {modalSignalementVisible && (
               <PopupSignalement
+                excursion={excursion}
                 signalement={signalementPopup}
                 modalSignalementVisible={modalSignalementVisible}
                 setModalSignalementVisible={setModalSignalementVisible}

@@ -40,7 +40,8 @@ export function ExcursionTerminee(props: ExcursionTermineeProps) {
               style={[styles.button, { opacity: 0.7 }]}
               onPress={() => {
                 setModalExcursionTermineeVisible(!modalExcursionTermineeVisible);
-                suiviExcursion.setEtat({ newEtat: "nonDemarree" });
+                suiviExcursion.setEtat({ newEtat: "terminee" });
+                suiviExcursion.setEtat({ newEtat: "nonDemarree" }); //à voir si ça marche ou pas sinon voir avec nico
                 setIsSuiviTrack(false);
               }}
             >

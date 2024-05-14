@@ -1,4 +1,4 @@
-import { T_Signalement } from "app/navigators";
+import { T_Signalement, T_excursion } from "app/navigators";
 import { colors } from "app/theme";
 import { spacing } from "app/theme/spacing";
 import { ImageStyle, TextStyle, View, ViewStyle, Image, Modal } from "react-native";
@@ -9,6 +9,7 @@ import { useStores } from "app/models";
 const { height } = Dimensions.get("window");
 
 export interface PopupSignalementProps {
+  excursion: T_excursion;
   signalement: T_Signalement;
   modalSignalementVisible: boolean; // Etat du modal (modal = popup permettant d'alerter l'utilisateur sur un signalement)
   setModalSignalementVisible: (modalSignalementVisible: boolean) => void; // Permet de changer l'état de modal
@@ -18,6 +19,7 @@ export interface PopupSignalementProps {
 
 export function PopupSignalement(props: PopupSignalementProps) {
   const {
+    excursion,
     signalement,
     modalSignalementVisible,
     setModalSignalementVisible,
@@ -92,6 +94,11 @@ export function PopupSignalement(props: PopupSignalementProps) {
             tx="detailsExcursion.popup.signalement.absent"
             onPress={() => [
               setModalSignalementVisible(false),
+              excursion.signalements.splice(
+                excursion.signalements.findIndex(s => s.id == signalement.id),
+                1,
+              ),
+              console.log("Signalements après suppr", excursion.signalements),
               synchroMontante.addSignalementASupprimer(signalement.id),
               console.log("Signalements à supprimer", synchroMontante.signalementsASupprimer),
               synchroMontante.tryToPush(),
