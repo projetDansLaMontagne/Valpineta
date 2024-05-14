@@ -93,7 +93,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
       )}
       {suiviExcursion.trackReel.map((point, i) => (
         <Text key={i}>
-          {new Date(point.timestamp).toLocaleTimeString()} {point.lat} {point.lon}
+          {new Date(point.timestamp).toLocaleTimeString()} {point.lat} {point.lon} {point.alt}
         </Text>
       ))}
     </Screen>

@@ -376,6 +376,8 @@ function getUserLocationAndUpdate(
 }
 
 function descritpion(excursion, altitudeActuelle) {
+  const { suiviExcursion } = useStores();
+
   let track = excursion.track;
   let altitudeMax = 0;
   let altitudeMin = 0;
@@ -463,6 +465,11 @@ function descritpion(excursion, altitudeActuelle) {
           </View>
         </View>
       </View>
+      {suiviExcursion.trackReel.map((point, i) => (
+        <Text key={i}>
+          {new Date(point.timestamp).toLocaleTimeString()} {point.lat} {point.lon} {point.alt}
+        </Text>
+      ))}
     </View>
   );
 }

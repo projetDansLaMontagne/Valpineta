@@ -55,6 +55,12 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
   const excursion = route?.params?.excursion;
   const USER_LOCATION_INTERVAL_MS = 1000; // ! mabye change this value
 
+  //Je fais ça pour pouvoir supprimer artificiellement les signalements de la liste, donc a supprimer plus tard quand on passera par l'api
+  // let ListeSignalements = [] as T_Signalement[];
+  // if (excursion) {
+  //   ListeSignalements = excursion.signalements;
+  // }
+
   // States
   const [gavePermission, setGavePermission] = useState(false);
   const [location, setLocation] = useState<null | Location.LocationObject>(null);
@@ -258,23 +264,40 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
 
   //utilser useEffect pour déclancher le popup lorsqu'on est a moins de 30 mètres d'un signalement
   useEffect(() => {
-    if (suiviExcursion.iPointCourant) {
-      const positionActuelle = suiviExcursion.iPointCourant;
-      const coordUser: T_flat_point = {
-        lat: suiviExcursion.trackReel[positionActuelle].lat,
-        lon: suiviExcursion.trackReel[positionActuelle].lon,
-      };
+    if (suiviExcursion.etat === "enCours") {
+      console.log("Liste de tous les signalements", excursion.signalements);
+      if (suiviExcursion.iPointCourant) {
+        console.log("iPointCourant", suiviExcursion.iPointCourant);
+        const positionActuelle = suiviExcursion.iPointCourant;
+        const coordUser: T_flat_point = suiviExcursion.trackReel
+          ? {
+              lat: suiviExcursion.trackReel[positionActuelle].lat,
+              lon: suiviExcursion.trackReel[positionActuelle].lon,
+            }
+          : { lat: 0, lon: 0 };
+        console.log("coordUser", coordUser);
 
-      for (let i = 0; i < excursion.signalements.length; i++) {
-        const coordSignalement: T_flat_point = {
-          lat: excursion.signalements[i].lat,
-          lon: excursion.signalements[i].lon,
-        };
-
-        const distance = distanceEntrePoints(coordUser, coordSignalement);
-        if (distance < 0.03) {
-          setModalSignalementVisible(true);
-          setSignalementPopup(excursion.signalements[i]);
+        for (let i = 0; i <= excursion.signalements.length - 1; i++) {
+          console.log("i", i);
+          console.log("signalement", excursion.signalements[i].nom);
+          console.log("idPointLie", excursion.signalements[i].idPointLie);
+          const coordSignalement: T_flat_point = {
+            lat: excursion.signalements[i].lat,
+            lon: excursion.signalements[i].lon,
+          };
+          const distance = distanceEntrePoints(coordUser, coordSignalement);
+          // if (distance < 0.03 && distance > 0) {//
+          // if (distance < 0.01 && distance > 0) {
+          if (
+            distance > 0 &&
+            suiviExcursion.iPointCourant == excursion.signalements[i].idPointLie
+          ) {
+            console.log("Signalement trouvé", excursion.signalements[i].nom);
+            setModalSignalementVisible(true);
+            setSignalementPopup(excursion.signalements[i]);
+            excursion.signalements.splice(i, 1); //à enlever quand on passera par l'api
+            break;
+          }
         }
       }
     }
@@ -315,7 +338,8 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
             pitch: 0,
             heading: 0,
             altitude: 6000,
-            zoom: 5,
+            // zoom: 10,
+            zoom: 20,
           }}
           onMoveShouldSetResponder={handleMapMoves}
           showsBuildings={true}
@@ -326,7 +350,7 @@ export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_p
           showsUserLocation={true}
           zoomControlEnabled={false}
           zoomEnabled={true}
-          minZoomLevel={12} // Niveau de zoom minimum
+          minZoomLevel={20} // Niveau de zoom minimum
           maxZoomLevel={20} // Niveau de zoom maximum
         >
           <UrlTile
