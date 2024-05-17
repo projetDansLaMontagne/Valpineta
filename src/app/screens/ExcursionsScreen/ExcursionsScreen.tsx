@@ -9,19 +9,45 @@ import {
   Image,
   TouchableOpacity,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import { AppStackScreenProps, T_excursion, TFiltres, T_valeurs_filtres } from "app/navigators";
-import { Screen, Text } from "app/components";
+import { Button, Screen, Text } from "app/components";
 import { CarteExcursion } from "./CarteExcursion";
 import { colors, spacing } from "app/theme";
 import { useStores } from "app/models";
+const { width } = Dimensions.get("window");
+
+/**
+ * Applique la langue aux excursions
+ */
+export function applicationLangue(excursions: T_excursion[], langue: string) {
+  return excursions.map(excursion => {
+    if (langue === "fr") {
+      return {
+        ...excursion,
+        nom: excursion.fr.nom,
+        description: excursion.fr.description,
+        typeParcours: excursion.fr.typeParcours,
+      };
+    } else if (langue === "es") {
+      return {
+        ...excursion,
+        nom: excursion.es.nom,
+        description: excursion.es.description,
+        typeParcours: excursion.es.typeParcours,
+      };
+    } else {
+      throw new Error("Langue non prise en charge : " + langue);
+    }
+  });
+}
 
 interface ExcursionsScreenProps extends AppStackScreenProps<"Excursions"> {}
-
 export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function ExcursionsScreen(
   props: ExcursionsScreenProps,
 ) {
-  const { parametres } = useStores();
+  const { parametres, suiviExcursion } = useStores();
 
   const filtres = props.route.params?.filtres;
 
@@ -140,37 +166,12 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
     );
   }
 
-  // Applique la langue aux excursions
-  function applicationLangue(excursions: T_excursion[]) {
-    const langue = parametres.langue;
-
-    return excursions.map(excursion => {
-      if (langue === "fr") {
-        return {
-          ...excursion,
-          nom: excursion.fr.nom,
-          description: excursion.fr.description,
-          typeParcours: excursion.fr.typeParcours,
-        };
-      } else if (langue === "es") {
-        return {
-          ...excursion,
-          nom: excursion.es.nom,
-          description: excursion.es.description,
-          typeParcours: excursion.es.typeParcours,
-        };
-      } else {
-        throw new Error("Langue non prise en charge : " + langue);
-      }
-    });
-  }
-
   /* --------------------------------- STATES --------------------------------- */
   const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
   const [saisieBarre, setSaisieBarre] = useState<string>("");
 
   const excursionsTraduites = useMemo<T_excursion[]>(
-    () => allExcursions && applicationLangue(allExcursions),
+    () => allExcursions && applicationLangue(allExcursions, parametres.langue),
     [allExcursions],
   );
 
@@ -202,10 +203,35 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
   /* ------------------------------- CALL BACKS ------------------------------- */
   const clicExcursion = (excursion: T_excursion) => {
     props.navigation.navigate("CarteStack", {
-      screen: "DetailsExcursion",
+      screen: "Carte",
       params: { excursion },
     });
   };
+
+  function afficherBoutonReprendreExcursion() {
+    ////A faire plus tard, non fonctionnel
+    let excursion;
+
+    return (
+      <Button
+        style={[$buttonCommencer, { bottom: 200 }]}
+        textStyle={{
+          lineHeight: 25,
+          color: colors.palette.blanc,
+          fontSize: 22,
+          fontWeight: "bold",
+          justifyContent: "center",
+        }}
+        tx="detailsExcursion.boutons.reprendreExcursion"
+        onPress={() =>
+          props.navigation.navigate("CarteStack", {
+            screen: "DetailsExcursion",
+            params: { excursion },
+          })
+        }
+      />
+    );
+  }
 
   return (
     <Screen style={$root} safeAreaEdges={["top"]}>
@@ -230,6 +256,7 @@ export const ExcursionsScreen: FC<ExcursionsScreenProps> = observer(function Exc
           <Image style={styles.iconeFiltre} source={filtreIcone} />
         </TouchableOpacity>
       </View>
+      {/* {suiviExcursion.etat == "enCours" && afficherBoutonReprendreExcursion()} A FAIRE PLUS TARD NON FONCTIONNEL */}
 
       {excursionsFiltreesBarre &&
         (excursionsFiltreesBarre.length == 0 ? (
@@ -297,3 +324,15 @@ const styles = StyleSheet.create({
     height: 30,
   },
 });
+
+const $buttonCommencer: ViewStyle = {
+  alignSelf: "center",
+  width: width / 2,
+  backgroundColor: colors.bouton,
+  borderRadius: 13,
+  position: "absolute",
+  zIndex: 3,
+  minHeight: 10,
+  height: 100,
+  borderColor: colors.bouton,
+};

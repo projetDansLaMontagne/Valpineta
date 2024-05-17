@@ -62,13 +62,52 @@ const es = {
       lireSuite: "Leer más",
       voirDetails: "Ver detalles",
       retourInformations: "Volver a la información",
+      commencerExcursion: "Empezar",
+      reprendreExcursion: "Reanudar",
     },
     erreur: {
       titre: "Error",
       message: "Se produjo un error. Por favor, inténtalo de nuevo.",
     },
+    popup: {
+      signalement: {
+        present: "Siempre presente",
+        absent: "Ausente",
+        voirPlus: "Ver más",
+        voirMoins: "Ver menos",
+      },
+      excursionTerminee: {
+        felicitations: "¡Felicidades!",
+        message: "Has completado esta excursión",
+        acceuil: "Página de inicio",
+        fermer: "Cerrar",
+      },
+    },
   },
-
+  suiviTrack: {
+    titres: {
+      signalements: "Informes",
+      description: "Descripción",
+    },
+    description: {
+      typeParcours: "Tipo de recorrido : ",
+      duree: "Duración :",
+      distance: "Distancia :",
+      difficulteTech: "Dificultad técnica :",
+      difficulteOrientation: "Dificultad de orientación :",
+      denivele: "Desnivel",
+      altitudeActuelle: "Altitud actual : ",
+      altitudeMax: "Altitud máxima : ",
+      altitudeMin: "Altitud mínima : ",
+    },
+    barreAvancement: {
+      parcouru: "Viajó :",
+      total: "Total :",
+    },
+  },
+  listeSignalements: {
+    signalementDepasse: "Superado",
+  },
   parametres: {
     titre: "Ajustes",
     changerLangue: {

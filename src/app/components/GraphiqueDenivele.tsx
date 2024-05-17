@@ -14,6 +14,7 @@ export interface GraphiqueDeniveleProps {
   style?: StyleProp<ViewStyle>;
   detaille: boolean;
   points: T_Point[];
+  largeur?: number;
 }
 
 export const GraphiqueDenivele = observer(function GraphiqueDenivele(
@@ -25,8 +26,11 @@ export const GraphiqueDenivele = observer(function GraphiqueDenivele(
   }
 
   /* -------------------------------- Variables ------------------------------- */
-  const { width } = Dimensions.get("window");
+  let { width } = Dimensions.get("window");
   const precision = 40; // Precision de l altitude (nombre de points du graphique)
+  if (props.largeur) {
+    width = props.largeur;
+  }
 
   /* -------------------------------- Fonctions ------------------------------- */
   /**

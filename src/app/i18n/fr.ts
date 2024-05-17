@@ -63,11 +63,51 @@ const fr = {
       lireSuite: "Lire la suite",
       voirDetails: "Voir détails",
       retourInformations: "Revenir aux informations",
+      commencerExcursion: "Commencer",
+      reprendreExcursion: "Revenir à l'excursion en cours",
     },
     erreur: {
       titre: "Erreur",
       message: "Une erreur est survenue, veuillez réessayer",
     },
+    popup: {
+      signalement: {
+        present: "Présent",
+        absent: "Absent",
+        voirPlus: "Voir plus",
+        voirMoins: "Voir moins",
+      },
+      excursionTerminee: {
+        felicitations: "Félicitations !",
+        message: "Vous venez de terminer cette excursion",
+        accueil: "Accueil",
+        fermer: "Fermer",
+      },
+    },
+  },
+  suiviTrack: {
+    titres: {
+      signalements: "Signalements",
+      description: "Description",
+    },
+    description: {
+      typeParcours: "Type de parcours : ",
+      duree: "Durée:",
+      distance: "Distance:",
+      difficulteTech: "Difficulté technique:",
+      difficulteOrientation: "Difficulté d'orientation:",
+      denivele: "Dénivelé",
+      altitudeActuelle: "Altitude actuelle : ",
+      altitudeMax: "Altitude max : ",
+      altitudeMin: "Altitude min : ",
+    },
+    barreAvancement: {
+      parcouru: "Parcouru : ",
+      total: "Total : ",
+    },
+  },
+  listeSignalements: {
+    signalementDepasse: "Dépassé",
   },
   parametres: {
     titre: "Paramètres",
@@ -78,7 +118,7 @@ const fr = {
     },
     choisirSynchro: {
       titre: "Synchronisation",
-    }
+    },
   },
   pageFiltres: {
     tri: {

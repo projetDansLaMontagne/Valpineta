@@ -1,5 +1,6 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree";
 import { ParametresModel } from "./Parametres";
+import { SuiviExcursionModel } from "./SuiviExcursion";
 import { SynchroMontanteModel } from "./SynchroMontante";
 
 /**
@@ -7,6 +8,7 @@ import { SynchroMontanteModel } from "./SynchroMontante";
  */
 export const RootStoreModel = types.model("RootStore").props({
   parametres: types.optional(ParametresModel, {}),
+  suiviExcursion: types.optional(SuiviExcursionModel, {}),
   synchroMontante: types.optional(SynchroMontanteModel, {}),
 });
 

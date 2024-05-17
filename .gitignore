@@ -2,6 +2,7 @@
 #
 .DS_Store
 
+
 # Xcode
 #
 build/
@@ -90,4 +91,5 @@ src/assets/Tiles
 src/assets/tracks
 .commitignore
 commit_message.md
-/src/android
+src/android
+src/coverage

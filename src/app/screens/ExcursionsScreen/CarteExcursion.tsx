@@ -159,7 +159,7 @@ export function CarteExcursion(props: CarteExcursionProps) {
           <View style={styles.ligneInf}>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={distanceIcone} resizeMode="contain" />
-              <Text text={distance + " km"} style={styles.content} />
+              <Text text={distance + "km"} style={styles.content} />
             </View>
             <View style={styles.groupeTexteIconeLigneInf}>
               <Image style={styles.icone} source={deniveleIcone} resizeMode="contain" />

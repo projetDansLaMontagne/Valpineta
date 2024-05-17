@@ -4,6 +4,7 @@ const palette = {
   marron: "#333300",
   vert: "#007C27",
   vertAttenue: "#009944",
+  vertTresClair: "#58C178",
   gris: "#D9D9D9",
   grisClair: "#F9F9F9",
   grisFonce: "#666666",
@@ -11,6 +12,7 @@ const palette = {
   rouge: "#FF0000",
   jaune: "#FFEE00",
   noir: "#000000",
+  orange: "#FFA500",
 
   bleuLocActive: "#3478f6",
   bleuLocInactive: "#3478f660",

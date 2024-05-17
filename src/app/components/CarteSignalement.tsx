@@ -1,123 +1,99 @@
-import React, { useEffect, useState } from "react";
-import NetInfo from "@react-native-community/netinfo";
 import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors, spacing } from "app/theme";
 import { Text } from "app/components/Text";
+import { T_TypeSignalement } from "app/navigators";
 
-export interface CarteSignalementProps {
-  details: boolean;
-
-  type: string;
-
+type CarteSignalementProps = {
+  type: T_TypeSignalement;
   nomSignalement: string;
-
-  description?: string;
-
-  distanceDuDepart: string;
-
-  imageSignalement?: Image;
-
+  distanceDuDepartEnM?: number;
+  isDistanceAbsolue: boolean;
   onPress?: () => void;
-}
+} & (
+  | {
+      details: false;
+    }
+  | {
+      details: true;
+      description: string;
+      imageSignalement?: string;
+    }
+);
 
 export const CarteSignalement = observer(function CarteSignalement(props: CarteSignalementProps) {
-  const { details, type, nomSignalement, description, distanceDuDepart, imageSignalement } = props;
-
-  const [isConnected, setIsConnected] = useState(true); // État de la connexion Internet
-
-  useEffect(() => {
-    const checkConnection = async () => {
-      const netInfoState = await NetInfo.fetch();
-      setIsConnected(netInfoState.isConnected);
-    };
-
-    // Vérifier la connexion au montage du composant
-    checkConnection();
-
-    // Abonnement aux changements d'état de la connexion
-    const unsubscribe = NetInfo.addEventListener(state => {
-      setIsConnected(state.isConnected);
-    });
-
-    // Nettoyage de l'abonnement lors du démontage du composant
-    return () => unsubscribe();
-  }, []);
-
-  // Si on ne veut pas de détails, problème
-  if (details === undefined) {
-    console.error(`CarteSignalement : details non défini pour le signalement: ${nomSignalement}`);
-    console.log(details);
-  }
+  const { details, type, nomSignalement, distanceDuDepartEnM, onPress, isDistanceAbsolue } = props;
 
   const check = (paramName, paramValue) => {
     // Vérification de la présence des paramètres
-    if (!paramValue) {
+    if (paramValue === undefined) {
       console.error(
         `CarteSignalement : ${paramName} non défini pour le signalement: ${nomSignalement}`,
       );
     }
   };
 
-  if (details) {
-    // Si on veut les détails, on vérifie la présence de toutes les données
-    check("type", type);
-    check("nomSignalement", nomSignalement);
-    check("distanceDuDepart", distanceDuDepart);
-    check("imageSignalement", imageSignalement);
-    check("description", description);
-  } else {
-    // Sinon, on vérifie seulement si type, nomSignalement et distanceDuDepart sont présents
-    check("type", type);
-    check("nomSignalement", nomSignalement);
-    check("distanceDuDepart", distanceDuDepart);
+  /**
+   * Retourne le texte indiquant la distance a laquelle se situe le signalement (de maniere relative ou absolue)
+   */
+  function distanceText() {
+    let text = "";
+    if (distanceDuDepartEnM === undefined) {
+      text += "??";
+    } else {
+      if (isDistanceAbsolue) {
+        text += "à ";
+      } else {
+        const pointPasse = distanceDuDepartEnM < 0;
+        text += pointPasse ? "passé de " : "dans ";
+      }
+      text += Math.abs(Math.round(distanceDuDepartEnM / 100) / 10);
+    }
+    text += " km";
+    return text;
   }
 
-  const renderImageEtDescription = () => {
-    // Affichage de l'image si on est connecté et que c'est un point d'intérêt ; ou que c'est un avertissement
-    if (
-      (isConnected && type === "pointInteret") ||
-      (type === "avertissement" && imageSignalement)
-    ) {
-      console.log("imageSignalement : " + imageSignalement);
-      return (
-        <View style={styles.container}>
-          <Image
-            source={{ uri: `data:image/jpeg;base64,${imageSignalement}` }} // On récupère l'image en base64
-            style={styles.image}
-          />
-          <Text style={styles.texte}>{description}</Text>
-        </View>
-      );
-    } else {
-      return <Text style={styles.texte}>{description}</Text>;
-    }
-  };
+  // Verification de la conformite de type des parametres
+  check("type", type);
+  check("nomSignalement", nomSignalement);
+  if (details === true) {
+    // Si on veut les détails, on vérifie la présence de toutes les données
+    check("description", props.description);
+  }
 
-  return details ? ( // Si on veut les détails, on affiche l'image et la description
-    <TouchableOpacity style={styles.carteGlobale} onPress={props.onPress}>
-      {entete(type, nomSignalement, distanceDuDepart)}
-      <View style={styles.contenu}>{renderImageEtDescription()}</View>
+  return (
+    <TouchableOpacity
+      style={styles.carteGlobale}
+      onPress={onPress}
+      disabled={onPress === undefined}
+    >
+      <View style={styles.entete}>
+        {type === "PointInteret" ? (
+          <Image source={require("../../assets/icons/pin.png")} style={styles.iconeVert} />
+        ) : (
+          <Image source={require("../../assets/icons/pin.png")} style={styles.iconeRouge} />
+        )}
+        <Text style={styles.heading}>{nomSignalement}</Text>
+
+        <Text>{distanceText()}</Text>
+      </View>
+
+      {details && (
+        <View style={styles.contenu}>
+          <View style={styles.container}>
+            {props.imageSignalement && (
+              <Image
+                source={{ uri: `data:image/jpeg;base64,${props.imageSignalement}` }} // On récupère l'image en base64
+                style={styles.image}
+              />
+            )}
+            <Text style={styles.texte}>{props.description}</Text>
+          </View>
+        </View>
+      )}
     </TouchableOpacity>
-  ) : (
-    <View style={styles.carteGlobale}>{entete(type, nomSignalement, distanceDuDepart)}</View>
   );
 });
-
-function entete(type, nomSignalement, distanceDuDepart) {
-  // Affichage de l'entête
-  return (
-    <View style={styles.entete}>
-      {type === "pointInteret" ? (
-        <Image source={require("../../assets/icons/pin.png")} style={styles.iconeVert} />
-      ) : (
-        <Image source={require("../../assets/icons/pin.png")} style={styles.iconeRouge} />
-      )}
-      <Text style={styles.heading}>{nomSignalement}</Text>
-      <Text>{distanceDuDepart} km</Text>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   carteGlobale: {
