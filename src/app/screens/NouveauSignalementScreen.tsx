@@ -13,7 +13,12 @@ import {
   TouchableOpacity,
   ImageStyle,
 } from "react-native";
-import { AppStackScreenProps, T_TypeSignalement, T_Signalement } from "app/navigators";
+import {
+  AppStackScreenProps,
+  T_type_signalement,
+  T_flat_point,
+  T_signalement,
+} from "app/navigators";
 import { colors, spacing } from "app/theme";
 import * as ImagePicker from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -23,13 +28,13 @@ import { Button, Screen, Text } from "app/components";
 import { EtatSynchro, useStores } from "app/models";
 
 interface NouveauSignalementScreenProps extends AppStackScreenProps<"NouveauSignalement"> {
-  type: T_TypeSignalement;
+  type: T_type_signalement;
 }
 
 export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = observer(
   function NouveauSignalementScreen(props) {
     //type de signalement
-    var type = props.route.params?.type;
+    let type = props.route.params?.type;
     if (type === undefined) {
       throw new Error("[NouveauSignalementScreen] Type de signalement non défini");
     }
@@ -50,6 +55,8 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     // ActionSheet
     const { showActionSheetWithOptions } = useActionSheet();
 
+    /** @todo STATIC, a remplacer par le store */
+    const SuiviExcursion = { etat: "enCours", trackSuivi: [] as T_flat_point[], iPointCourant: 0 };
     const { synchroMontante } = useStores();
 
     /**
@@ -177,116 +184,130 @@ export const NouveauSignalementScreen: FC<NouveauSignalementScreenProps> = obser
     /**
      * Fonction pour envoyer le signalement en base de données
      */
-    const envoyerSignalement = async (signalement: T_Signalement) => {
-      if (saisiesValides(signalement.nom, signalement.description, signalement.image)) {
-        //Conversion de l'image url en base64
-        const blob = await fetch(signalement.image).then(response => response.blob());
-        signalement.image = await blobToBase64(blob);
+    const envoyerSignalement = async (
+      nom: string,
+      type: T_type_signalement,
+      description: string,
+      image: string,
+    ) => {
+      if (SuiviExcursion.etat === "enCours") {
+        if (saisiesValides(nom, description, image)) {
+          //Conversion de l'image url en base64
+          const blob = await fetch(image).then(response => response.blob());
+          const pointCourant = SuiviExcursion.trackSuivi[SuiviExcursion.iPointCourant];
 
-        setIsLoading(true);
-        synchroMontante.addSignalement(signalement);
-        const status = await synchroMontante.tryToPush();
-        setIsLoading(false);
+          // Fabrication du nouveau signalement
+          const newSignalement: T_signalement = {
+            nom,
+            type,
+            description,
+            image: await blobToBase64(blob),
+            lat: pointCourant.lat,
+            lon: pointCourant.lon,
+          };
 
-        AlerteStatus(status);
-        props.navigation.goBack();
+          setIsLoading(true);
+          synchroMontante.addSignalement(newSignalement);
+          const status = await synchroMontante.tryToPush();
+          setIsLoading(false);
+
+          AlerteStatus(status);
+          props.navigation.goBack();
+        }
+      } else {
+        console.error(
+          "[NouveauSignalement] ERREUR : impossible de creer un signalement sans etre en randonnee",
+        );
       }
     };
 
     return isLoading ? (
-      <Screen style={$containerLoader} preset="fixed" safeAreaEdges={["top", "bottom"]}>
+      <Screen
+        style={{ justifyContent: "center", alignItems: "center" }}
+        preset="fixed"
+        safeAreaEdges={["top", "bottom"]}
+      >
         <ActivityIndicator size="large" color={colors.palette.vert} />
       </Screen>
     ) : (
-      <View style={$view}>
+      <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
         <TouchableOpacity style={$boutonRetour} onPress={() => props.navigation.goBack()}>
           <Image
             style={{ tintColor: colors.bouton }}
             source={require("../../assets/icons/back.png")}
           />
         </TouchableOpacity>
-        <Screen style={$container} preset="scroll" safeAreaEdges={["top", "bottom"]}>
+        <Text
+          style={$h1}
+          tx={
+            type === "Avertissement"
+              ? "pageNouveauSignalement.titreAvertissement"
+              : "pageNouveauSignalement.titrePointInteret"
+          }
+          size="xxl"
+        />
+        <Text text="Col de la marmotte" size="lg" />
+        {nomErreur && (
           <Text
-            style={$h1}
-            tx={
-              type === "Avertissement"
-                ? "pageNouveauSignalement.titreAvertissement"
-                : "pageNouveauSignalement.titrePointInteret"
-            }
-            size="xxl"
+            text="pageNouveauSignalement.erreur.titre"
+            size="xs"
+            style={{ color: colors.palette.rouge }}
           />
-          <Text text="Col de la marmotte" size="lg" />
-          {nomErreur && (
-            <Text
-              text="pageNouveauSignalement.erreur.titre"
-              size="xs"
-              style={{ color: colors.palette.rouge }}
-            />
+        )}
+        <TextInput
+          placeholder={translate("pageNouveauSignalement.placeholderNom")}
+          placeholderTextColor={nomErreur ? colors.palette.rouge : colors.text}
+          onChangeText={setNom}
+          value={nom}
+          style={[
+            { ...$inputnom },
+            nomErreur
+              ? { borderColor: colors.palette.rouge }
+              : { borderColor: colors.palette.vert },
+          ]}
+        />
+        {descriptionErreur && (
+          <Text
+            tx="pageNouveauSignalement.erreur.description"
+            size="xs"
+            style={{ color: colors.palette.rouge }}
+          />
+        )}
+        <TextInput
+          placeholder={translate("pageNouveauSignalement.placeholderDescription")}
+          placeholderTextColor={descriptionErreur ? colors.palette.rouge : colors.text}
+          onChangeText={setDescription}
+          multiline={true}
+          value={description}
+          style={[
+            { ...$inputDescription },
+            descriptionErreur
+              ? { borderColor: colors.palette.rouge }
+              : { borderColor: colors.palette.vert },
+          ]}
+        />
+        <View>
+          {photoErreur && !image && (
+            <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
           )}
-          <TextInput
-            placeholder={translate("pageNouveauSignalement.placeholderNom")}
-            placeholderTextColor={nomErreur ? colors.palette.rouge : colors.text}
-            onChangeText={setNom}
-            value={nom}
-            style={[
-              { ...$inputnom },
-              nomErreur
-                ? { borderColor: colors.palette.rouge }
-                : { borderColor: colors.palette.vert },
-            ]}
-          />
-          {descriptionErreur && (
-            <Text
-              tx="pageNouveauSignalement.erreur.description"
-              size="xs"
-              style={{ color: colors.palette.rouge }}
+          <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
+            <Image
+              style={{ tintColor: colors.palette.vert }}
+              source={require("../../assets/icons/camera.png")}
             />
-          )}
-          <TextInput
-            placeholder={translate("pageNouveauSignalement.placeholderDescription")}
-            placeholderTextColor={descriptionErreur ? colors.palette.rouge : colors.text}
-            onChangeText={setDescription}
-            multiline={true}
-            value={description}
-            style={[
-              { ...$inputDescription },
-              descriptionErreur
-                ? { borderColor: colors.palette.rouge }
-                : { borderColor: colors.palette.vert },
-            ]}
+            <Text tx="pageNouveauSignalement.boutons.photo" size="xs" style={$textBoutonPhoto} />
+          </TouchableOpacity>
+          {image && <Image source={{ uri: image }} style={$image} />}
+          <Button
+            style={$bouton}
+            tx="pageNouveauSignalement.boutons.valider"
+            onPress={() => {
+              envoyerSignalement(nom, type, description, image);
+            }}
+            textStyle={$textBouton}
           />
-          <View>
-            {photoErreur && !image && (
-              <Text tx="pageNouveauSignalement.erreur.photo" size="xs" style={$imageError} />
-            )}
-            <TouchableOpacity style={$boutonContainer} onPress={() => choixPhoto()}>
-              <Image
-                style={{ tintColor: colors.palette.vert }}
-                source={require("../../assets/icons/camera.png")}
-              />
-              <Text tx="pageNouveauSignalement.boutons.photo" size="xs" style={$textBoutonPhoto} />
-            </TouchableOpacity>
-            {image && <Image source={{ uri: image }} style={$image} />}
-            <Button
-              style={$bouton}
-              tx="pageNouveauSignalement.boutons.valider"
-              onPress={() =>
-                envoyerSignalement({
-                  nom,
-                  type,
-                  description,
-                  image,
-                  // WARNING A CHANGER AVEC LA LOCALISATION REELLE DE L'UTILISATEUR
-                  lat: 42.666,
-                  lon: 0.1034,
-                  postId: 2049,
-                })
-              }
-              textStyle={$textBouton}
-            />
-          </View>
-        </Screen>
-      </View>
+        </View>
+      </Screen>
     );
   },
 );
@@ -323,19 +344,9 @@ async function blobToBase64(blob: Blob): Promise<string> {
 
 const { width } = Dimensions.get("window");
 
-const $view: ViewStyle = {
-  flex: 1,
-};
-
 const $container: ViewStyle = {
   paddingRight: spacing.sm,
   paddingLeft: spacing.sm,
-};
-
-const $containerLoader: ViewStyle = {
-  ...$container,
-  justifyContent: "center",
-  alignItems: "center",
 };
 
 const $boutonRetour: ViewStyle = {
@@ -344,15 +355,13 @@ const $boutonRetour: ViewStyle = {
   borderColor: colors.bordure,
   borderRadius: 10,
   padding: spacing.sm,
-  margin: spacing.lg,
+  margin: spacing.md,
   width: 50,
-  position: "absolute",
   top: 0,
   zIndex: 1,
 };
 
 const $h1: TextStyle = {
-  marginTop: 50,
   textAlign: "center",
   marginBottom: spacing.sm,
 };

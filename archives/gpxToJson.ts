@@ -14,7 +14,7 @@ import { getDistance } from 'geolib';
  */
 export function conversionGPX(gpx: string, nbFragments: number): Array<Record<string, number>> {
     // -- CONVERSION GPX TO JSON --
-    var points = jsonBrut.features[0].geometry.coordinates[0];
+    let points = jsonBrut.features[0].geometry.coordinates[0];
 
 
     // -- VERIFICATIONS DE LA VALIDITE DU GPX --
@@ -57,8 +57,8 @@ export function conversionGPX(gpx: string, nbFragments: number): Array<Record<st
 
     // -- Completion des zones vides d altitude --
     // Recherche des intervalles d altitudes nulles
-    var i = 0;
-    var intervallesNulles = [];
+    let i = 0;
+    let intervallesNulles = [];
     while (true) {
         if (i == points.length)
             // Dernier point atteint
@@ -68,7 +68,7 @@ export function conversionGPX(gpx: string, nbFragments: number): Array<Record<st
             i += 1;
         else {
             // Point nul : on definit l intervalle
-            var departIntervalle = i;
+            let departIntervalle = i;
 
             while (true) {
                 // Tant que le point est nul, on agrandit l intervalle
@@ -123,7 +123,7 @@ export function conversionGPX(gpx: string, nbFragments: number): Array<Record<st
     //     // [0, 0, 0, 8],
     //     // [0, 0, 0, 9],
     // ]
-    var mauvaisParams = false;
+    let mauvaisParams = false;
     if (points.length < nbFragments) {
         mauvaisParams = true;
         console.error("Le nombre de fragments demandés doit être inferieur au nombre de points du fichier GPX");
@@ -134,16 +134,16 @@ export function conversionGPX(gpx: string, nbFragments: number): Array<Record<st
     }
 
     // Pioche nbFragments points
-    var pointsSelectionnes = [];
+    let pointsSelectionnes = [];
     if (!mauvaisParams) {
         const nbPoints = points.length;
         const distanceTotale = points[nbPoints - 1][3];
         const nbDivisions = nbFragments - 1;                        // -1 car on retire le premier point
         const incrementFragments = distanceTotale / nbDivisions;    // C est l increment (en m) entre chaque fragments
 
-        var distanceIdeale = 0;
-        var indexPoint = 0;
-        var ecartPointPrecedent = Infinity;
+        let distanceIdeale = 0;
+        let indexPoint = 0;
+        let ecartPointPrecedent = Infinity;
 
         // Pour chaque fragment, on recherche le point le plus proche de sa distance ideale
         // Le but est d encadrer la distance ideale entre deux points et de prendre le plus proche
@@ -166,7 +166,7 @@ export function conversionGPX(gpx: string, nbFragments: number): Array<Record<st
                 }
                 else {
                     // Le point est (à || apres) la distance ideale
-                    var pointLePlusProche;
+                    let pointLePlusProche;
                     if (ecartPointPrecedent < distancePoint - distanceIdeale) {
                         // Le point precedent est plus proche 
                         pointLePlusProche = points[indexPoint - 1];

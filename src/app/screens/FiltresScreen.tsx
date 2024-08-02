@@ -38,7 +38,7 @@ export const FiltresScreen: FC<FiltresScreenProps> = observer(function FiltresSc
 
   // -- CONSTANTES --
   // Recuperation des valeurs de filtres
-  var valeursFiltres: T_valeurs_filtres;
+  let valeursFiltres: T_valeurs_filtres;
 
   // ! OBTENABLE DEPUIS LA FONCTION valeursFiltres dans la page ExcursionsScreen
   valeursFiltres = require("../../assets/JSON/valeurs_filtres.json");

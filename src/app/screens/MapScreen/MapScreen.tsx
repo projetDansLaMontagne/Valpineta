@@ -1,11 +1,3 @@
-/**
- * ! PROPS
- *
- * - startLocation: LatLng, si on veut centrer la carte sur une position au chargement,
- * si on met un state et que l'on change la valeur, la carte se recentre
- * - hideOverlay: boolean, si on veut afficher les boutons de la carte.®
- */
-
 import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
@@ -17,10 +9,15 @@ import {
   ViewStyle,
   Dimensions,
   Image,
+  TouchableOpacity,
 } from "react-native";
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps, T_signalement_lie, T_excursion, T_point } from "app/navigators";
 import { Screen } from "app/components";
 import { spacing, colors } from "app/theme";
+import { ImageSource } from "react-native-vector-icons/Icon";
+import { useStores } from "app/models";
+
+import { applicationLangue } from "app/screens/ExcursionsScreen";
 
 // location
 import * as Location from "expo-location";
@@ -28,36 +25,551 @@ import MapView, { LatLng, Marker, Polyline, UrlTile } from "react-native-maps";
 import MapButton from "./MapButton";
 import { Asset } from "expo-asset";
 
+// files
 import * as fileSystem from "expo-file-system";
-// import TilesRequire from "app/services/importAssets/tilesRequire";
+import TilesRequire from "app/services/importAssets/tilesRequire";
+import fichierJson from "assets/Tiles/tiles_struct.json";
+import { Swiper } from "./Swiper";
 
-// import fichierJson from "assets/Tiles/tiles_struct.json";
-import { TExcursion } from "app/screens/DetailsExcursionScreen";
-import { ImageSource } from "react-native-vector-icons/Icon";
+// images
+const binoculars: ImageSource = require("assets/icons/binoculars.png");
+const attention: ImageSource = require("assets/icons/attention.png");
+const markerImage: ImageSource = require("assets/icons/location.png");
 
-// variables
-type MapScreenProps = AppStackScreenProps<"Carte"> & {
-  startLocation?: LatLng;
+const { width, height } = Dimensions.get("window");
 
-  isInDetailExcursion?: boolean;
-  children?: React.ReactNode;
-} & (
-    | {
-        hideOverlay: true;
+type MapScreenProps = AppStackScreenProps<"Carte"> & {};
+export const MapScreen: FC<MapScreenProps> = observer(function MapScreenProps(_props) {
+  // Constants
+  const { navigation, route } = _props;
+  const excursion = route?.params?.excursion;
+  const USER_LOCATION_INTERVAL_MS = 1000; // ! mabye change this value
+
+  // States
+  const [followUserLocation, setFollowUserLocation] = useState(false);
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const [allExcursions, setAllExcursions] = useState<T_excursion[]>(undefined);
+  const [cameraTarget, setCameraTarget] = useState<LatLng>();
+
+  // Refs
+  /** @todo STATIC, a remplacer par le store */
+  const SuiviExcursion = { etat: "enCours" };
+  const { parametres } = useStores();
+  const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
+  const mapRef = useRef<MapView>(null);
+
+  // Buttons
+  const followLocationButtonRef = useRef(null);
+  const toggleBtnMenuRef = useRef(null);
+  const addPOIBtnRef = useRef(null);
+  const addWarningBtnRef = useRef(null);
+
+  // Animation(s)
+  const buttonOpacity = useRef(new Animated.Value(0)).current;
+
+  // Functions
+  /**
+   * Animate the map to follow the user location.
+   * @param passedLocation {Location.LocationObject} The location to animate to
+   * @returns {void}
+   */
+  const animateToLocation = (passedLocation: LatLng): void => {
+    if (mapRef.current) {
+      mapRef.current.animateCamera({
+        center: passedLocation,
+      });
+    }
+  };
+
+  /**
+   * Remove the location subscription
+   */
+  const removeLocationSubscription = () => {
+    if (watchPositionSubscriptionRef.current) {
+      watchPositionSubscriptionRef.current.remove();
+    }
+  };
+
+  /**
+   * Get the user location (authorization is asked if not already given).
+   * @returns {Promise<void>}
+   */
+  const startLocationAsync = async (): Promise<void> => {
+    const permissionsOK = await askPermissions();
+
+    if (permissionsOK) {
+      // write code for the app to handle GPS changes
+      watchPositionSubscriptionRef.current = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.BestForNavigation,
+          timeInterval: USER_LOCATION_INTERVAL_MS,
+          distanceInterval: 1,
+        },
+        location => {
+          animateToLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+        },
+      );
+    }
+  };
+
+  const askPermissions = async (): Promise<boolean> => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    const permissionsOK = status === "granted";
+
+    if (!permissionsOK) {
+      console.warn("[MapScreen] Permission to access location was denied");
+    }
+
+    return permissionsOK;
+  };
+
+  /**
+   * Affiche la couleur a utiliser pour l excursion en fonction de son index
+   * @param index intensite de la couleur (0 à 1)
+   */
+  const excursionColor = (intensite: number) => {
+    const greenMin = 80;
+    const greenMax = 220;
+    const greenValue = Math.floor(intensite * (greenMax - greenMin) + greenMin); // valeur de green (de 94 à 194)
+    const greenValueHexa = greenValue.toString(16);
+    return `#00${greenValueHexa}27`;
+  };
+
+  /* ------------------------------- CALL BACKS ------------------------------- */
+  /**
+   * Handle the map moves
+   * I want the map to follow the user location if the map is centered on the user location
+   * withing a certain radius. If the user moves the map outside of this radius, the map
+   * stops following the user location.
+   *
+   * @param _ {GestureResponderEvent} The gesture event
+   */
+  const handleMapMoves = (_: GestureResponderEvent) => {
+    setFollowUserLocation(false);
+
+    return false;
+  };
+
+  const toggleFollowUserLocation = () => {
+    setFollowUserLocation(!followUserLocation);
+  };
+
+  const ButtonOnPressAvertissement = () => {
+    navigation.navigate("CarteStack", {
+      screen: "NouveauSignalement",
+      params: { type: "Avertissement" },
+    });
+  };
+
+  const ButtonOnPressPointInteret = () => {
+    navigation.navigate("CarteStack", {
+      screen: "NouveauSignalement",
+      params: { type: "PointInteret" },
+    });
+  };
+
+  const toggleMenu = () => {
+    setMenuIsOpen(!menuIsOpen);
+  };
+
+  /* ------------------------------- USE EFFECTS ------------------------------ */
+  useEffect(() => {
+    if (menuIsOpen) {
+      // animate the 'addPOIBtnRef' and 'addWarningBtnRef' buttons
+      Animated.sequence([
+        Animated.timing(buttonOpacity, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [menuIsOpen]);
+
+  useEffect(() => {
+    cameraTarget && animateToLocation(cameraTarget);
+  }, [cameraTarget]);
+
+  useEffect(() => {
+    if (followUserLocation) {
+      if (followUserLocation === true) {
+        startLocationAsync();
+      } else {
+        removeLocationSubscription();
       }
-    | {
-        hideOverlay: false;
-        overlayDebugMode?: boolean;
-      }
+    }
+  }, [followUserLocation]);
+
+  useEffect(() => {
+    downloadTiles();
+
+    /**@todo STATIC, a globaliser (langue ne se met pas a jour automatiquement) */
+    const excursions: T_excursion[] = require("assets/JSON/excursions.json");
+    setAllExcursions(applicationLangue(excursions, parametres.langue));
+
+    return () => {
+      removeLocationSubscription();
+    };
+  }, []);
+
+  /* -------------------------------- Constants ------------------------------- */
+  const ASPECT_RATIO = width / height;
+  const LATITUDE = 42.63099943470989;
+  const LONGITUDE = 0.21949934093707602;
+  const LATITUDE_DELTA = 0.0922;
+  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+  return (
+    <Screen style={$screen}>
+      <View style={styles.container}>
+        {/* Map */}
+        <MapView
+          mapType={Platform.OS === "android" ? "none" : "standard"} // pour n avoir aucune autre tuile que Valpineta sur android
+          ref={mapRef}
+          style={styles.map}
+          initialRegion={{
+            latitude: cameraTarget?.latitude ?? LATITUDE,
+            longitude: cameraTarget?.longitude ?? LONGITUDE,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          }}
+          initialCamera={{
+            center: {
+              latitude: cameraTarget?.latitude ?? LATITUDE,
+              longitude: cameraTarget?.longitude ?? LONGITUDE,
+            },
+            pitch: 0,
+            heading: 0,
+            altitude: 6000,
+            zoom: 5,
+          }}
+          onMoveShouldSetResponder={handleMapMoves}
+          showsBuildings={true}
+          showsCompass={true}
+          showsMyLocationButton={false} // only for Android
+          shouldRasterizeIOS={true} // only for iOS
+          showsScale={true} // only for iOS
+          showsUserLocation={true}
+          zoomControlEnabled={false}
+          zoomEnabled={true}
+          minZoomLevel={12} // Niveau de zoom minimum
+          maxZoomLevel={15} // Niveau de zoom maximum
+        >
+          <UrlTile
+            urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
+            tileSize={256}
+            offlineMode={true}
+            style={{
+              zIndex: -1,
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Tracés */}
+          {excursion ? (
+            // Affichage de l excursion, des markers et des signalements
+            <>
+              <Polyline
+                coordinates={excursion.track.map(
+                  (point: T_point) =>
+                    ({
+                      latitude: point.lat,
+                      longitude: point.lon,
+                    } as LatLng),
+                )}
+                strokeColor={colors.bouton}
+                strokeWidth={5}
+              />
+
+              <StartMiddleAndEndHandler
+                track={excursion.track}
+                typeParcours={excursion.es.typeParcours}
+              />
+
+              {excursion?.signalements.map((signalement, i) => (
+                <SignalementHandler signalement={signalement} key={i} />
+              ))}
+            </>
+          ) : (
+            // Toutes les excursions
+            allExcursions !== undefined &&
+            allExcursions.map((exc, index) => {
+              const color = excursionColor(index / allExcursions.length);
+
+              return (
+                exc.track && (
+                  <React.Fragment key={index}>
+                    <Polyline
+                      coordinates={exc.track.map(point => {
+                        return {
+                          latitude: point.lat,
+                          longitude: point.lon,
+                        } as LatLng;
+                      })}
+                      strokeColor={color}
+                      strokeWidth={5}
+                      style={{
+                        zIndex: 1000000,
+                      }}
+                      onPress={() =>
+                        navigation.navigate("CarteStack", {
+                          screen: "Carte",
+                          params: { excursion: exc },
+                        })
+                      }
+                      tappable={true} // pour permettre le onpress sur Anroid
+                    />
+
+                    <Marker
+                      coordinate={
+                        {
+                          latitude: exc.track[0].lat ?? 0,
+                          longitude: exc.track[0].lon ?? 0,
+                        } as LatLng
+                      }
+                      title={exc.nom}
+                      centerOffset={{ x: 0, y: -15 }}
+                    >
+                      <Image
+                        source={markerImage}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          tintColor: color,
+                        }}
+                      />
+                    </Marker>
+                  </React.Fragment>
+                )
+              );
+            })
+          )}
+        </MapView>
+
+        {/* Bouton de centrage */}
+        <View
+          style={{
+            ...styles.mapOverlayLeft,
+            bottom: excursion ? 60 : 0, // taille par defaut du swiper
+          }}
+        >
+          <MapButton
+            ref={followLocationButtonRef}
+            style={{
+              ...styles.locateButtonContainer,
+            }}
+            onPress={toggleFollowUserLocation}
+            icon="location-arrow"
+            iconSize={spacing.lg}
+            iconColor={
+              followUserLocation ? colors.palette.bleuLocActive : colors.palette.bleuLocInactive
+            }
+          />
+        </View>
+
+        {/* Boutons de signalements */}
+        {SuiviExcursion.etat === "enCours" && (
+          <View
+            style={{
+              ...styles.mapOverlay,
+              bottom: excursion ? 60 : 0, // taille par defaut du swiper
+            }}
+          >
+            {menuIsOpen && (
+              <>
+                <MapButton
+                  ref={addPOIBtnRef}
+                  style={{
+                    ...styles.actionsButtonContainer,
+                  }}
+                  onPress={ButtonOnPressAvertissement}
+                  icon={"eye"}
+                  iconSize={spacing.lg}
+                  iconColor={colors.palette.blanc}
+                />
+                <MapButton
+                  ref={addWarningBtnRef}
+                  style={{
+                    ...styles.actionsButtonContainer,
+                  }}
+                  onPress={ButtonOnPressPointInteret}
+                  icon="exclamation-circle"
+                  iconSize={spacing.lg}
+                  iconColor={colors.palette.blanc}
+                />
+              </>
+            )}
+            <MapButton
+              ref={toggleBtnMenuRef}
+              style={{
+                ...styles.actionsButtonContainer,
+              }}
+              onPress={toggleMenu}
+              icon={menuIsOpen ? "times" : "map-marker-alt"}
+              iconSize={spacing.lg}
+              iconColor={colors.palette.blanc}
+            />
+          </View>
+        )}
+
+        {/* Swiper et bouton retour */}
+        {excursion && (
+          <>
+            <Swiper
+              excursion={excursion}
+              navigation={navigation}
+              setCameraTarget={setCameraTarget}
+            />
+
+            <TouchableOpacity
+              style={$boutonRetour}
+              onPress={() => navigation.navigate("CarteStack", { screen: "Carte" })}
+            >
+              <Image
+                style={{ tintColor: colors.bouton }}
+                source={require("assets/icons/back.png")}
+              />
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    </Screen>
   );
+});
 
-type T_animateToLocation = (passedLocation?: Location.LocationObject | LatLng) => void;
+/* ------------------------------ JSX ELEMENTS ------------------------------ */
+/**
+ * @description Affiche les points de départ, milieu et fin de l'excursion en fonction du type de parcours.
+ * Un parcours en boucle n'a pas de point d'arrivée.
+ * Un parcours en aller-retour a un point d'arrivée.
+ * Tous les parcours ont un point de départ et un point de milieu.
+ *
+ * @param track {T_Point[]} - le fichier gpx de l'excursion
+ * @param typeParcours {"Ida" | "Ida y Vuelta" | "Circular"} - le type de parcours
+ *
+ * @returns les points de départ, milieu et fin de l'excursion
+ */
+type StartMiddleAndEndHandlerProps = {
+  track: T_point[];
+  typeParcours: "Ida" | "Ida y Vuelta" | "Circular";
+};
+const StartMiddleAndEndHandler = (props: StartMiddleAndEndHandlerProps) => {
+  const { track, typeParcours } = props;
 
+  const start = track[0];
+  const end = track[track.length - 1];
+  const sameExtremities = typeParcours !== "Ida"; // Indique si on a le même point de départ et d'arrivée
+
+  // Si c'est un aller-retour, le parcours étant symétrique,
+  // on prend le point à la moitié de la distance totale
+  const middleDistance = end.dist / (typeParcours === "Ida y Vuelta" ? 1 : 2);
+  const mid = track
+    .sort((a, b) => {
+      return a.dist - b.dist;
+    })
+    // find prend le premier élément qui correspond à la condition, vu que c'est sorted, on a le bon point
+    .find(point => point.dist >= middleDistance);
+
+  const markers = [
+    {
+      ...start,
+      title: sameExtremities ? "Départ / Arrivée" : "Départ",
+    },
+    {
+      ...mid,
+      title: "Milieu",
+    },
+    !sameExtremities && {
+      ...end,
+      title: "Arrivée",
+    },
+  ];
+
+  const image: ImageSource = require("assets/icons/location.png");
+
+  return markers.map((point, index) => (
+    <Marker
+      coordinate={{
+        latitude: point.lat ?? 0,
+        longitude: point.lon ?? 0,
+      }}
+      key={index}
+      // Si l'array de points ne contient que 2 points,
+      // on est sur un aller simple, le deuxième point est donc l'arrivée
+      title={point.title}
+      pinColor={index === 1 ? colors.bouton : colors.text}
+      style={{
+        zIndex: 999,
+      }}
+      centerOffset={{ x: 0, y: -15 }}
+    >
+      <Image
+        source={image}
+        style={{
+          width: 30,
+          height: 30,
+          tintColor: index === 1 ? colors.bouton : colors.text,
+        }}
+      />
+    </Marker>
+  ));
+};
+/**
+ * @description Affiche les signalements sur la carte.
+ *
+ * @param signalements {T_signalement_lie[]} - les signalements de l'excursion
+ *
+ * @returns les signalements à afficher sur la carte.
+ */
+const SignalementHandler = ({ signalement }: { signalement: T_signalement_lie }) => {
+  let iconColor: string;
+  let image: ImageSource;
+
+  switch (signalement.type) {
+    case "PointInteret":
+      image = binoculars;
+      break;
+    case "Avertissement":
+      image = attention;
+      break;
+    default:
+      iconColor = "black";
+      image = binoculars;
+      break;
+  }
+
+  return (
+    <Marker
+      coordinate={{
+        latitude: signalement.lat ?? 0,
+        longitude: signalement.lon ?? 0,
+      }}
+      title={signalement.nom}
+      style={{
+        zIndex: 999,
+      }}
+      centerOffset={{ x: 0, y: signalement.type === "PointInteret" ? 0 : -15 }}
+    >
+      <Image
+        source={image}
+        style={{
+          width: 30,
+          height: 30,
+          tintColor: iconColor,
+        }}
+      />
+    </Marker>
+  );
+};
+
+/* ------------------------------ TILES IMPORT ------------------------------ */
 let COMPTEUR = 0;
 const folderDest = `${fileSystem.documentDirectory}cartes/OSM`;
 const cacheDirectory = `${fileSystem.cacheDirectory}cartes/OSM`;
 
-// Fonction(s)
 /**
  * Create the folder structure (recursively)
  *
@@ -95,466 +607,32 @@ const createFolderStruct = async (
     }
   }
 };
+const downloadTiles = async () => {
+  const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
 
-/**
- * Get all the tracks of the `src/assets/JSON/excursions.json` file.
- *
- * @returns {Promise<TExcursion[]>} The list of all the tracks
- */
-const getAllTracks = (): TExcursion[] => {
-  return require("assets/JSON/excursions.json") as TExcursion[];
+  if (folderInfo.exists && !folderInfo.isDirectory) {
+    await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
+  } else {
+    // Supprimer le dossier
+    await fileSystem.deleteAsync(folderDest, { idempotent: true });
+
+    const assets = await TilesRequire();
+
+    await createFolderStruct(fichierJson, folderDest, assets);
+  }
 };
 
-// Component(s)
-export const MapScreen: FC<MapScreenProps> = observer(function EcranTestScreen(_props) {
-  //Props
-  const { navigation } = _props;
-
-  // Variables
-  const userLocationIntervalMs = 1000; // ! mabye change this value
-
-  // State(s)
-  const [gavePermission, setGavePermission] = useState(false);
-  const [location, setLocation] = useState(null);
-
-  const [followUserLocation, setFollowUserLocation] = useState(false);
-
-  const [menuIsOpen, setMenuIsOpen] = useState(false);
-
-  const [excursions, setExcursions] = useState<TExcursion[]>(undefined);
-
-  // Ref(s)
-  const intervalRef = useRef(null);
-
-  const watchPositionSubscriptionRef = useRef<Location.LocationSubscription>(null);
-  const mapRef = useRef<MapView>(null);
-
-  // buttons
-  /**@warning la navigation doit se faire avec props.navigation avec Ignite */
-  const followLocationButtonRef = useRef(null);
-  const toggleBtnMenuRef = useRef(null);
-  const addPOIBtnRef = useRef(null);
-  const addWarningBtnRef = useRef(null);
-
-  // Animation(s)
-  const buttonOpacity = useRef(new Animated.Value(0)).current;
-
-  // Var(s)
-
-  // Method(s)
-  /**
-   * Animate the map to follow the user location.
-   * @param passedLocation {Location.LocationObject} The location to animate to
-   * @returns {void}
-   */
-  const animateToLocation: T_animateToLocation = (
-    passedLocation: Location.LocationObject | LatLng,
-  ): void => {
-    if (mapRef.current) {
-      if (!location && !passedLocation) {
-        console.log("[MapScreen] location is null");
-        return;
-      }
-
-      const finalLocation = passedLocation ?? location;
-
-      mapRef.current.animateCamera({
-        center: {
-          latitude: finalLocation.coords ? finalLocation.coords.latitude : finalLocation.latitude,
-          longitude: finalLocation.coords
-            ? finalLocation.coords.longitude
-            : finalLocation.longitude,
-        },
-      });
-    } else {
-      console.log("[MapScreen] mapRef.current is null");
-    }
-  };
-
-  const downloadTiles = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied");
-    } else {
-      console.log("[MapScreen] Permission ok");
-      const folderInfo = await fileSystem.getInfoAsync(folderDest + "/17/65682/48390.jpg");
-      console.log("[MapScreen] folderInfo: ", folderInfo);
-      if (folderInfo.exists && !folderInfo.isDirectory) {
-        console.log("Tuiles déjà DL");
-        await fileSystem.deleteAsync(cacheDirectory, { idempotent: true });
-      } else {
-        // Supprimer le dossier
-        console.log("[MapScreen] Suppression du dossier");
-        await fileSystem.deleteAsync(folderDest, { idempotent: true });
-
-        const assets = await TilesRequire();
-
-        await createFolderStruct(fichierJson, folderDest, assets);
-      }
-    }
-  };
-
-  /**
-   * Remove the location subscription
-   */
-  const removeLocationSubscription = () => {
-    if (watchPositionSubscriptionRef.current) {
-      console.log("[MapScreen] watchPositionSubscriptionRef.current.remove() ");
-      watchPositionSubscriptionRef.current.remove();
-
-      setLocation(null);
-    }
-  };
-
-  /**
-   * Get the user location (authorization is asked if not already given).
-   * @param debug {boolean} If true, log some debug information
-   * @returns {Promise<void>}
-   */
-  const getLocationAsync = async (debug?: boolean): Promise<void> => {
-    if (debug) {
-      console.log(`[[MapScreen]] getLocationAsync()`);
-      console.log(
-        `[[MapScreen]] Platform.OS: ${Platform.OS} -- Platform.Version: ${Platform.Version}`,
-      );
-    }
-
-    const { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied");
-    }
-
-    // write code for the app to handle GPS changes
-    watchPositionSubscriptionRef.current = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.BestForNavigation,
-        timeInterval: userLocationIntervalMs,
-        distanceInterval: 1,
-      },
-      location => {
-        if (debug) {
-          console.log(`[[MapScreen]] watchPositionAsync()`);
-          console.log(`[[MapScreen]] location.coords.latitude: ${location.coords.latitude}`);
-          console.log(`[[MapScreen]] location.coords.longitude: ${location.coords.longitude}`);
-        }
-        setLocation(location);
-      },
-    );
-  };
-
-  /**
-   * Handle the map moves
-   * I want the map to follow the user location if the map is centered on the user location
-   * withing a certain radius. If the user moves the map outside of this radius, the map
-   * stops following the user location.
-   *
-   * @param _ {GestureResponderEvent} The gesture event
-   */
-  const handleMapMoves = (_: GestureResponderEvent) => {
-    setFollowUserLocation(false);
-
-    return false;
-  };
-
-  const toggleFollowUserLocation = () => {
-    if (!gavePermission) {
-      askUserLocation().then(() => console.log("[MapScreen] aled"));
-    }
-
-    setFollowUserLocation(!followUserLocation);
-  };
-
-  const askUserLocation = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("[MapScreen] Permission to access location was denied");
-      setGavePermission(false);
-      return;
-    }
-    setGavePermission(true);
-  };
-
-  const ButtonOnPressAvertissement = () => {
-    navigation.navigate("CarteStack", {
-      screen: "NouveauSignalement",
-      params: { type: "Avertissement" },
-    });
-  };
-
-  const ButtonOnPressPointInteret = () => {
-    navigation.navigate("CarteStack", {
-      screen: "NouveauSignalement",
-      params: { type: "PointInteret" },
-    });
-  };
-
-  const toggleMenu = () => {
-    setMenuIsOpen(!menuIsOpen);
-  };
-
-  // Effect(s)
-  useEffect(() => {
-    return () => {
-      clearInterval(intervalRef.current);
-    };
-  }, [gavePermission]);
-
-  useEffect(() => {
-    followUserLocation && animateToLocation(location);
-  }, [location]);
-
-  useEffect(() => {
-    if (menuIsOpen) {
-      // animate the 'addPOIBtnRef' and 'addWarningBtnRef' buttons
-      Animated.sequence([
-        Animated.timing(buttonOpacity, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
-  }, [menuIsOpen]);
-
-  useEffect(() => {
-    console.log(`[MapScreen] _props.startLocation: ${JSON.stringify(_props.startLocation)}`);
-    _props.startLocation && animateToLocation(_props.startLocation);
-  }, [_props.startLocation]);
-
-  useEffect(() => {
-    console.log(`[[MapScreen]] followUserLocation: ${followUserLocation}`);
-
-    if (followUserLocation) {
-      getLocationAsync(true)
-        .then(() => console.log("[MapScreen] getLocationAsync() ok"))
-        .catch(e => console.log("[MapScreen] getLocationAsync() error: ", e));
-    } else {
-      removeLocationSubscription();
-    }
-  }, [followUserLocation]);
-
-  useEffect(() => {
-    if (excursions !== undefined && excursions.length > 0) {
-      console.log(`[MapScreen] excursions[]: ${JSON.stringify(excursions[0].track[0])}`);
-    }
-  }, [excursions]);
-
-  useEffect(() => {
-    downloadTiles().then(() => console.log("[MapScreen] PAGE CHARGEE"));
-
-    if (!_props.isInDetailExcursion) {
-      setExcursions(getAllTracks());
-    }
-
-    return () => {
-      removeLocationSubscription();
-    };
-  }, []);
-
-  const { width, height } = Dimensions.get("window");
-
-  const ASPECT_RATIO = width / height;
-  const LATITUDE = 42.63099943470989;
-  const LONGITUDE = 0.21949934093707602;
-  const LATITUDE_DELTA = 0.0922;
-  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
-  const image: ImageSource = require("assets/icons/location.png");
-
-  return (
-    <Screen style={$container} safeAreaEdges={["bottom"]}>
-      <View style={styles.container}>
-        <View style={styles.mapContainer}>
-          <MapView
-            mapType={Platform.OS === "android" ? "none" : "standard"}
-            ref={mapRef}
-            style={{
-              height,
-              width,
-
-              ...styles.map,
-            }}
-            initialRegion={{
-              latitude: _props.startLocation?.latitude ?? LATITUDE,
-              longitude: _props.startLocation?.longitude ?? LONGITUDE,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            }}
-            initialCamera={{
-              center: {
-                latitude: _props.startLocation?.latitude ?? LATITUDE,
-                longitude: _props.startLocation?.longitude ?? LONGITUDE,
-              },
-              pitch: 0,
-              heading: 0,
-              altitude: 6000,
-              zoom: 5,
-            }}
-            onMoveShouldSetResponder={handleMapMoves}
-            showsBuildings={true}
-            showsCompass={true}
-            showsMyLocationButton={false} // only for Android
-            shouldRasterizeIOS={true} // only for iOS
-            showsScale={true} // only for iOS
-            showsUserLocation={true}
-            zoomControlEnabled={false}
-            zoomEnabled={true}
-            minZoomLevel={12} // Niveau de zoom minimum
-            maxZoomLevel={15} // Niveau de zoom maximum
-          >
-            <UrlTile
-              urlTemplate={folderDest + "/{z}/{x}/{y}.jpg"}
-              tileSize={256}
-              // shouldReplaceMapContent={true}
-              style={{
-                zIndex: -1,
-                pointerEvents: "none",
-              }}
-            />
-
-            {_props.children}
-
-            {
-              // Oier voulait toutes les excursions sur la carte
-              // si on était pas dans la page détail excursion.
-              !_props.isInDetailExcursion &&
-                excursions !== undefined &&
-                excursions.length > 0 &&
-                excursions.map((excursion, index) => {
-                  if (excursion.track) {
-                    return (
-                      <React.Fragment key={index}>
-                        <Polyline
-                          coordinates={excursion.track.map(point => {
-                            return {
-                              latitude: point.lat,
-                              longitude: point.lon,
-                            } as LatLng;
-                          })}
-                          strokeColor={colors.palette.vert}
-                          strokeWidth={5}
-                          style={{
-                            zIndex: 1000000,
-                          }}
-                        />
-
-                        <Marker
-                          coordinate={
-                            {
-                              latitude: excursion.track[0].lat ?? 0,
-                              longitude: excursion.track[0].lon ?? 0,
-                            } as LatLng
-                          }
-                          title={excursion.fr.nom}
-                          centerOffset={{ x: 0, y: -15 }}
-                        >
-                          <Image
-                            source={image}
-                            style={{
-                              width: 30,
-                              height: 30,
-                              tintColor: colors.palette.marron,
-                            }}
-                          />
-                        </Marker>
-                      </React.Fragment>
-                    );
-                  } else {
-                    return null;
-                  }
-                })
-            }
-          </MapView>
-
-          {!_props.hideOverlay && (
-            <>
-              <View
-                style={{
-                  ...styles.mapOverlay,
-                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                  bottom: _props.isInDetailExcursion ? 20 : 0,
-                }}
-              >
-                {menuIsOpen && (
-                  <>
-                    <MapButton
-                      ref={addPOIBtnRef}
-                      style={{
-                        ...styles.actionsButtonContainer,
-                      }}
-                      onPress={ButtonOnPressAvertissement}
-                      icon={"eye"}
-                      iconSize={spacing.lg}
-                      iconColor={colors.palette.blanc}
-                    />
-                    <MapButton
-                      ref={addWarningBtnRef}
-                      style={{
-                        ...styles.actionsButtonContainer,
-                      }}
-                      onPress={ButtonOnPressPointInteret}
-                      icon="exclamation-circle"
-                      iconSize={spacing.lg}
-                      iconColor={colors.palette.blanc}
-                    />
-                  </>
-                )}
-                <MapButton
-                  ref={toggleBtnMenuRef}
-                  style={{
-                    ...styles.actionsButtonContainer,
-                  }}
-                  onPress={toggleMenu}
-                  icon={menuIsOpen ? "times" : "map-marker-alt"}
-                  iconSize={spacing.lg}
-                  iconColor={colors.palette.blanc}
-                />
-              </View>
-              <View
-                style={{
-                  ...styles.mapOverlayLeft,
-                  ...(!_props.hideOverlay && _props.overlayDebugMode && mapOverlayStyleDebug),
-                  bottom: _props.isInDetailExcursion ? 20 : 0,
-                }}
-              >
-                <MapButton
-                  ref={followLocationButtonRef}
-                  style={{
-                    ...styles.locateButtonContainer,
-                  }}
-                  onPress={toggleFollowUserLocation}
-                  icon="location-arrow"
-                  iconSize={spacing.lg}
-                  iconColor={
-                    followUserLocation
-                      ? colors.palette.bleuLocActive
-                      : colors.palette.bleuLocInactive
-                  }
-                />
-              </View>
-            </>
-          )}
-        </View>
-      </View>
-    </Screen>
-  );
-});
-
+/* ------------------------------ STYLES ------------------------------ */
 const values = {
   locateBtnContainerSize: 50,
 };
-
-const $container: ViewStyle = {
+const $screen: ViewStyle = {
   display: "flex",
 };
-
 const mapOverlayStyle: ViewStyle = {
   position: "absolute",
   right: 0,
 
-  // height: "max-content",
   width: "20%",
   display: "flex",
   flexDirection: "column",
@@ -562,17 +640,8 @@ const mapOverlayStyle: ViewStyle = {
   justifyContent: "flex-end",
   gap: spacing.sm,
 
-  padding: spacing.sm,
-
-  zIndex: 1000,
+  paddingBottom: spacing.sm,
 };
-
-const mapOverlayStyleDebug: ViewStyle = {
-  borderColor: colors.palette.vert,
-  borderWidth: 4,
-  borderRadius: 10,
-};
-
 const buttonContainer = {
   height: values.locateBtnContainerSize,
   width: values.locateBtnContainerSize,
@@ -586,7 +655,6 @@ const buttonContainer = {
 
   pointerEvents: "auto",
 };
-
 const styles = StyleSheet.create({
   actionsButtonContainer: {
     ...(buttonContainer as ViewStyle),
@@ -619,13 +687,7 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
     width: "100%",
-  },
-  mapContainer: {
-    alignItems: "center",
-    display: "flex",
-    flex: 1,
-    position: "relative",
-    width: "100%",
+    height: "100%",
   },
   mapOverlay: {
     ...mapOverlayStyle,
@@ -635,3 +697,16 @@ const styles = StyleSheet.create({
     left: 0,
   },
 });
+const $boutonRetour: ViewStyle = {
+  backgroundColor: colors.fond,
+  borderWidth: 1,
+  borderColor: colors.bordure,
+  borderRadius: 10,
+  padding: spacing.sm,
+  margin: spacing.lg,
+  width: 50,
+  position: "absolute",
+  top: 20,
+  left: 0,
+  zIndex: 1,
+};

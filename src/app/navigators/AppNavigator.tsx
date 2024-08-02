@@ -50,14 +50,16 @@ export type T_valeurs_filtres = {
   difficulteTechniqueMax: number;
   difficulteOrientationMax: number;
 };
-export interface TPoint {
-  alt: number; // Altitude
-  dist: number; // Distance par rapport au point de départ
+export interface T_flat_point {
   lat: number; // Latitude
   lon: number; // Longitude
+}
+export interface T_point extends T_flat_point {
+  alt: number; // Altitude
+  dist: number; // Distance par rapport au point de départ
   pos: number; // Denivele positif
 }
-export type TFiltres = {
+export type T_filtres = {
   critereTri: string;
   intervalleDistance: { min: number; max: number };
   intervalleDuree: { min: number; max: number };
@@ -68,21 +70,26 @@ export type TFiltres = {
   difficultesOrientation: number[];
 };
 
-export type T_TypeSignalement = "PointInteret" | "Avertissement";
+export type T_type_signalement = "PointInteret" | "Avertissement";
 
-export type T_Signalement = {
+export type T_signalement = {
   nom: string;
+  type: T_type_signalement;
   description: string;
   image: string;
   lat: number;
   lon: number;
-  type: T_TypeSignalement;
-  postId: number;
 };
-export type T_infoLangue = {
+
+export type T_signalement_lie = {
+  idExcursion: number; //id de l'excursion sur laquelle le signalement est lié
+  idPointLie: number; // id du point du track sur lequel le signalement est lié
+} & T_signalement;
+
+export type T_info_langue = {
   nom: string;
   description: string;
-  typeParcours: string;
+  typeParcours: "Ida" | "Ida y Vuelta" | "Circular";
 };
 
 export type T_excursion = {
@@ -95,24 +102,23 @@ export type T_excursion = {
   nomTrackGpx: string;
   vallee: string;
 
-  es?: T_infoLangue;
-  fr?: T_infoLangue;
+  es?: T_info_langue;
+  fr?: T_info_langue;
 
-  signalements: T_Signalement[];
-  track: TPoint[];
-} & Partial<T_infoLangue>;
+  signalements: T_signalement_lie[];
+  track: T_point[];
+} & Partial<T_info_langue>;
 
 // TYPES STACKS
 type ExcursionStackParamList = {
   Filtres: undefined;
-  Excursions: undefined | { filtres?: TFiltres };
+  Excursions: undefined | { filtres?: T_filtres };
 };
 
 type CarteStackParamList = {
-  Carte: undefined;
-  DetailsExcursion: undefined | { excursion: T_excursion };
+  Carte: undefined | { excursion: T_excursion };
   Description: { excursion: T_excursion };
-  NouveauSignalement: { type: T_TypeSignalement };
+  NouveauSignalement: { type: T_type_signalement };
 };
 
 type ParametresStackParamList = {
@@ -153,10 +159,10 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
   const parametresLogo = require("./../../assets/icons/parametres.png");
   useBackButtonHandler(routeName => exitRoutes.includes(routeName));
 
+  const { parametres } = useStores();
   /**
    * @warning CODE REDONDANT mais sans cette partie le footer ne change pas de langue... raison inconnue
    */
-  const { parametres } = useStores();
   useEffect(() => {}, [parametres.langue]);
 
   const optionsBoutons = (tx: any, logo: ImageSourcePropType): BottomTabNavigationOptions => ({
@@ -231,7 +237,6 @@ const CarteStackScreen = () => (
     }}
   >
     <CarteStack.Screen name="Carte" component={Screens.MapScreen} />
-    <CarteStack.Screen name="DetailsExcursion" component={Screens.DetailsExcursionScreen} />
     <CarteStack.Screen name="Description" component={Screens.DescriptionScreen} />
     <CarteStack.Screen name="NouveauSignalement" component={Screens.NouveauSignalementScreen} />
   </CarteStack.Navigator>

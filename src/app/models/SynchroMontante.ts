@@ -1,6 +1,6 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
-import { T_Signalement } from "app/navigators";
+import { T_signalement } from "app/navigators";
 import NetInfo from "@react-native-community/netinfo";
 import { reaction } from "mobx";
 //Api
@@ -122,7 +122,7 @@ export const SynchroMontanteModel = types
       if (response.ok) {
         removeAllSignalements();
       } else {
-        console.log(
+        console.error(
           "[SYNCHRO MONTANTE] Debug : Erreur serveur lors de la synchronisation : ",
           getGeneralApiProblem(response),
         );
@@ -132,7 +132,7 @@ export const SynchroMontanteModel = types
     }
 
     /* --------------------------------- SETTERS -------------------------------- */
-    function addSignalement(signalement: T_Signalement) {
+    function addSignalement(signalement: T_signalement) {
       self.signalements.push(signalement);
     }
     function removeAllSignalements() {
