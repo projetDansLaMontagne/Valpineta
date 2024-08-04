@@ -40,6 +40,6 @@
     "packagerOpts": {
       "sourceExts": ["js", "json", "ts", "tsx", "jsx, xml, gpx"]
     },
-    "plugins": ["expo-localization", "expo-font"]
+    "plugins": ["expo-localization"]
   }
 }
