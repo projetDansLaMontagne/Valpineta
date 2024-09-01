@@ -59,7 +59,7 @@ export enum ESynchroDescendanteStep {
 export enum ESynchroDescendanteRes {
   OK = 0,
   KO,
-  NO_CONNEXION,
+  NO_CONNECTION,
 }
 
 export type TCallbackToGetNumberOfFiles = (filesDownloaded: number, filesToDl: number) => void;
@@ -207,6 +207,7 @@ export const getExcursionsJsonFromDevice = async (): Promise<Array<TExcursion>> 
   try {
     if (await excursionsJsonExists()) {
       const excursionsJson = await FileSystem.readAsStringAsync(EXCURSIONS_FILE_DEST);
+      console.log(EXCURSIONS_FILE_DEST);
       return JSON.parse(excursionsJson);
     }
   } catch (error) {
@@ -391,7 +392,7 @@ export const synchroDescendante = async (
   const connexion = await NetInfo.fetch();
 
   if (!connexion.isConnected) {
-    return ESynchroDescendanteRes.NO_CONNEXION;
+    return ESynchroDescendanteRes.NO_CONNECTION;
   }
 
   try {

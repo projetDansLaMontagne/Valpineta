@@ -28,8 +28,6 @@ import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary";
 import * as storage from "./utils/storage";
 import { customFontsToLoad } from "./theme";
 import Config from "./config";
-import LoadingScreen from "./screens/LoadingScreen";
-import { checkIfFirstLaunch } from "./services/CheckIfFirstLaunch";
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
 
@@ -70,7 +68,6 @@ function App(props: AppProps) {
   } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY);
 
   const [areFontsLoaded] = useFonts(customFontsToLoad);
-  const [needsSync, setNeedsSync] = useState(null);
 
   const { rehydrated } = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
@@ -82,19 +79,13 @@ function App(props: AppProps) {
     setTimeout(hideSplashScreen, 500);
   });
 
-  // Checks first launch
-  (async () => {
-    setNeedsSync(await checkIfFirstLaunch());
-  })();
-
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
   // color set in native by rootView's background color.
   // In iOS: application:didFinishLaunchingWithOptions:
   // In Android: https://stackoverflow.com/a/45838109/204044
   // You can replace with your own loading component if you wish.
-  if (!rehydrated || !isNavigationStateRestored || !areFontsLoaded || needsSync === null)
-    return null;
+  if (!rehydrated || !isNavigationStateRestored || !areFontsLoaded) return null;
 
   const linking = {
     prefixes: [prefix],
@@ -104,17 +95,13 @@ function App(props: AppProps) {
   // otherwise, we're ready to render the app
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      {needsSync ? (
-        <LoadingScreen onFinished={() => setNeedsSync(false)} />
-      ) : (
-        <ErrorBoundary catchErrors={Config.catchErrors}>
-          <AppNavigator
-            linking={linking}
-            initialState={initialNavigationState}
-            onStateChange={onNavigationStateChange}
-          />
-        </ErrorBoundary>
-      )}
+      <ErrorBoundary catchErrors={Config.catchErrors}>
+        <AppNavigator
+          linking={linking}
+          initialState={initialNavigationState}
+          onStateChange={onNavigationStateChange}
+        />
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }

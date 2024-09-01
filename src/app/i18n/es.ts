@@ -25,8 +25,9 @@ const es = {
     },
   },
   loadingScreen: {
-    trigger: "sincronizar los datos",
-    triggerButton: "Sincronizar",
+    syncText: "Sincronizar los datos",
+    syncBtn: "Sincronizar",
+    syncScheduledBtn: "Sincronización programada",
     title: "Cargando...",
     titleFinished: "¡Carga terminada!",
     paragraph: "Cargamos los datos para usted.",

@@ -16,7 +16,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
   const { parametres } = useStores();
 
   useEffect(() => {
-    parametres.setLangues(I18n.locale);
+    parametres.setProp("langues", I18n.locale);
   }, []);
 
   const navigation = useNavigation();
@@ -35,7 +35,7 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
           style={$containerBoutons}
           onPress={() => {
             const nouvelleLangue = parametres.langues === "fr" ? "es" : "fr";
-            parametres.setLangues(nouvelleLangue);
+            parametres.setProp("langues", nouvelleLangue);
             I18n.locale = nouvelleLangue;
           }}
         >
@@ -47,14 +47,14 @@ export const ParametresScreen: FC<ParametresScreenProps> = observer(function Par
         </TouchableOpacity>
       </View>
       <View style={$containerBoutonLoadingScreen}>
-        <Text style={$texteParametre} tx={"loadingScreen.trigger"} size="sm" />
+        <Text style={$texteParametre} tx={"loadingScreen.syncText"} size="sm" />
         <TouchableOpacity
           style={$containerBoutons}
           onPress={() => {
-            navigation.navigate("Loading");
+            parametres.setProp("initialized", false);
           }}
         >
-          <Text style={$buttonStyle} tx={"loadingScreen.triggerButton"} size="sm" />
+          <Text style={$buttonStyle} tx={"loadingScreen.syncBtn"} size="sm" />
         </TouchableOpacity>
       </View>
     </Screen>
@@ -95,6 +95,7 @@ const $containerBoutons: ViewStyle = {
 };
 
 const $containerBoutonLoadingScreen: ViewStyle = {
+  display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
@@ -102,6 +103,7 @@ const $containerBoutonLoadingScreen: ViewStyle = {
 };
 
 const $texteParametre: TextStyle = {
+  flex: 1,
   marginHorizontal: spacing.sm,
 };
 

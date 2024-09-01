@@ -26,7 +26,7 @@ import { Text } from "app/components";
 
 import { useStores } from "app/models";
 import React, { useEffect } from "react";
-import { checkIfFirstLaunch } from "../services/CheckIfFirstLaunch";
+import LoadingScreen from "app/screens/LoadingScreen";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -152,6 +152,8 @@ export interface NavigationProps
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme();
+  const { parametres } = useStores();
+
   /* --------------------------------- Assets --------------------------------- */
   const excursionLogo = require("./../../assets/icons/explorer.png");
   const carteLogo = require("./../../assets/icons/carte.png");
@@ -163,7 +165,6 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
    * (dans la page des parametres) donc ça sert à rien de faire dépendre l'un de l'autre
    * MAIS sans cette partie le footer ne change pas de langue... raison inconnue
    */
-  const { parametres } = useStores();
   useEffect(() => {
     I18n.locale = parametres.langues;
   }, [parametres.langues]);
@@ -175,21 +176,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
     tabBarLabel: ({ color }) => <Text tx={tx} style={{ color, fontSize: 10 }} />,
   });
 
-  /**
-   * ! ca ne marche pas, par défaut pour le moment, l'app arrive sur la page de chargement
-   * ! a tous les coups.
-   */
-  // check si c'est la première fois que l'utilisateur ouvre l'application
-  // const [firstLaunch, setFirstLaunch] = React.useState<boolean | undefined>();
-  // useEffect(() => {
-  // checkIfFirstLaunch().then(res => {
-  //   console.log(`[AppNavigator] checkIfFirstLaunch: ${res}`);
-  //   setFirstLaunch(res);
-  // });
-  // }, []);
-
   const Tab = createBottomTabNavigator();
-  return (
+  return parametres.initialized ? (
     <NavigationContainer
       ref={navigationRef}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
@@ -225,6 +213,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
         />
       </Tab.Navigator>
     </NavigationContainer>
+  ) : (
+    <LoadingScreen onFinished={() => parametres.setProp("initialized", true)} />
   );
 });
 

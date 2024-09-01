@@ -6,7 +6,6 @@ import { useStores } from "app/models";
 
 import fr, { Translations } from "./fr";
 import es from "./es";
-import en from "./en";
 
 i18n.fallbacks = true;
 /**
@@ -14,7 +13,7 @@ i18n.fallbacks = true;
  * the language code is the suffixed with "-US". i.e. if a device is set to English ("en"),
  * if you change to another language and then return to English language code is now "en-US".
  */
-i18n.translations = { fr, es, en };
+i18n.translations = { fr, es };
 
 const preferredLanguage:
   | Localization.Locale

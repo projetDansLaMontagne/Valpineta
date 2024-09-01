@@ -27,8 +27,9 @@ const fr = {
     },
   },
   loadingScreen: {
-    trigger: "Synchroniser les données",
-    triggerButton: "Synchroniser",
+    syncText: "Synchroniser les données",
+    syncBtn: "Synchroniser",
+    syncScheduledBtn: "Synchronisation planifiée",
     title: "Chargement...",
     titleFinished: "Chargement terminé !",
     paragraph: "Ne bougez pas, nous chargeons les données pour vous.",

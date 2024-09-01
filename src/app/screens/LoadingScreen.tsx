@@ -175,18 +175,17 @@ export function LoadingScreen(props: LoadingScreenProps) {
         continue;
       }
 
-      switch (res) {
-        case ESynchroDescendanteRes.KO:
-        case ESynchroDescendanteRes.NO_CONNEXION:
-          setSynchroDescRes(res);
-          setTimeout(() => {
-            props.onFinished();
-          }, 3000);
-          break;
-        case ESynchroDescendanteRes.OK:
-          props.onFinished();
-          break;
-      }
+      setSynchroDescRes(res);
+
+      const timeoutDuration =
+        res === ESynchroDescendanteRes.NO_CONNECTION || res === ESynchroDescendanteRes.KO
+          ? 3000
+          : 1500;
+
+      setTimeout(() => {
+        props.onFinished();
+      }, timeoutDuration);
+
       break;
     }
   };
@@ -255,7 +254,7 @@ export function LoadingScreen(props: LoadingScreenProps) {
 
       {synchroDescRes === ESynchroDescendanteRes.KO && <Text tx="loadingScreen.error" />}
 
-      {synchroDescRes === ESynchroDescendanteRes.NO_CONNEXION && (
+      {synchroDescRes === ESynchroDescendanteRes.NO_CONNECTION && (
         <Text tx="loadingScreen.noConnection" />
       )}
     </View>
